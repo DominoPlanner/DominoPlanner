@@ -1,0 +1,50 @@
+﻿<Window x:Name="newProject" x:Class="DominoPlanner.NewProject"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Create Project" Height="396" Width="433" ResizeMode="NoResize">
+    <Grid RenderOptions.BitmapScalingMode="HighQuality">
+        <Button Click="SelectFolder" HorizontalAlignment="Left" Margin="383,41,0,0" VerticalAlignment="Top" Width="27" Height="23" ToolTip="Select the file path for your project. \n Try using a Cloud Folder (e.g. dropbox) to share a project with a friend.">
+            <Image Source="/Icons/open.ico"></Image>
+        </Button>
+        <Button Click="SelectColorArray" HorizontalAlignment="Left" Margin="383,69,0,0" VerticalAlignment="Top" Width="27" Height="23" ToolTip="Select the file path for your project. \n Try using a Cloud Folder (e.g. dropbox) to share a project with a friend.">
+            <Image Source="/Icons/colorLine.ico"></Image>
+        </Button>
+        <Label Content="Super Folder Path:" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Height="26" Width="107"/>
+        <TextBox x:Name="PathTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="127,41,0,0" TextWrapping="Wrap" Text="{Binding Source={StaticResource Settings.settings}, Path=Default.StandardProjectPath}" VerticalAlignment="Top" Width="241"/>
+        <Label Content="Project Name:" HorizontalAlignment="Left" Margin="10,11,0,0" VerticalAlignment="Top" Height="26" Width="84"/>
+        <TextBox Name="NameTextBox" HorizontalAlignment="Left" Height="23" Margin="127,13,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="283">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Enter Name" Foreground="LightGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <Label Content="&#xA;DominoPlanner will create a folder containing all your project data.&#xA;If you delete or move this folder, DominoPlanner won't open your &#xA;projects anymore. If it was moved, you can add it again.&#xA;DominoPlanner will also create a &quot;Master Document&quot; for your &#xA;project, where your overall setup will be stored in. It contains e.g.&#xA;fields, walls and lines.&#xA;If you select a cloud folder (e.g. DropBox) as project folder, you&#xA;can share the project with a friend.&#xA;DominoPlanner will also copy the selected Domino Colors file to&#xA;the project folder. You can edit it later on." 
+               HorizontalAlignment="Left" Margin="20,121,0,0" VerticalAlignment="Top" Height="190" Width="375"/>
+        <Label Content="Tips:&#xD;&#xA;•&#xD;&#xA;•&#xD;&#xA;&#xD;&#xA;•&#xA;&#xA;&#xA;•&#xA;&#xA;•" HorizontalAlignment="Left" Margin="10,121,0,0" VerticalAlignment="Top" Height="165" Width="385"/>
+        <Button Click="OK" Content="Let's start!" HorizontalAlignment="Left" Height="30" Margin="50,312,0,0" VerticalAlignment="Top" Width="107"/>
+        <Button Click="Cancel" Content="Cancel" HorizontalAlignment="Right" Height="30" Margin="0,312,37,0" VerticalAlignment="Top" Width="107"/>
+        <Label Content="Color Array:" HorizontalAlignment="Left" Margin="10,65,0,0" VerticalAlignment="Top" Height="26" Width="72"/>
+        <RadioButton Checked="SelectionChanged" IsChecked="True" Content="Use Standard" HorizontalAlignment="Left" Margin="128,72,0,0" VerticalAlignment="Top" Height="15" Width="90"/>
+        <RadioButton Checked="SelectionChanged" Content="Select from file" HorizontalAlignment="Left" Margin="268,72,0,0" VerticalAlignment="Top" Height="15" Width="98"/>
+        <Label x:Name="LabelColorPath" FontStyle="Italic" Content="Selected Path:" HorizontalAlignment="Left" Margin="24,89,0,0" VerticalAlignment="Top" Width="376" Height="26"/>
+
+    </Grid>
+</Window>

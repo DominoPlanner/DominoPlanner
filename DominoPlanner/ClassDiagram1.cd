@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DominoPlanner.Document">
+    <Position X="6.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIBAAAAAAAAAAAACAAAAAAAAAQAAAARAAABAAAA=</HashCode>
+      <FileName>Document Classes\Document.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.StructureDocument">
+    <Position X="5.75" Y="5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>CIEAAoAIgCAAAwQFIEBBEAFAhFkAhTCAQMDiAAUCAAA=</HashCode>
+      <FileName>Document Classes\StructureDocument.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="structure_templates" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DominoPlanner.ColorArrayDocument">
+    <Position X="3.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAIAAIAAAAAAAAAAAAAABAAAAICAAQAAAABAAAAAAAA=</HashCode>
+      <FileName>Document Classes\ColorArrayDocument.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.FieldDocument">
+    <Position X="12.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ASAAAOAgACAAEAwxJEEAAAEAwQwAJQCkDVDAghQAABA=</HashCode>
+      <FileName>Document Classes\FieldDocument.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DominoPlanner.AddNewObject" BaseTypeListCollapsed="true">
+    <Position X="23" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAgAAAAgQAABAAAALAAkAAAABEACAAAAAAAACAAA=</HashCode>
+      <FileName>AddNewObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.ColorControl" BaseTypeListCollapsed="true">
+    <Position X="35" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAACACAAAA=</HashCode>
+      <FileName>ColorControl.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.DominoColor">
+    <Position X="33.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABgAAAAAAAAAEAAAAAAQAAAEAAAA=</HashCode>
+      <FileName>Document Classes\ColorArrayDocument.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.StructureDefinition">
+    <Position X="10.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAQEEAAAAAAgABAAACA=</HashCode>
+      <FileName>Document Classes\StructureDocument.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.ImageHelper" Collapsed="true">
+    <Position X="40.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAMAAAAAIAAAAACAAAAAAAIAAAA=</HashCode>
+      <FileName>Document Classes\StructureDocument.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.EditColors" BaseTypeListCollapsed="true">
+    <Position X="28.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQACAIAAAAAAACMAAAAAgIAMIQAACAAAAAAAAAAAA=</HashCode>
+      <FileName>EditColors.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.FieldPlanEditor" BaseTypeListCollapsed="true">
+    <Position X="29.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAABAAAgAAAAA=</HashCode>
+      <FileName>FieldPlanEditor.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.FieldPlanDocument" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAEAAQHAUAAACIYQIgAAAgCAhDgGAECQGAAIAAGQ=</HashCode>
+      <FileName>FieldPlanEditor.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.FirstStart" BaseTypeListCollapsed="true">
+    <Position X="31.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAEABAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>FirstStart.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="36.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAyAAAsAAAAIAACEQIABkAIoEIQBAAIEQBACAABCCA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DominoPlanner.RegressionModeToStringConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="33.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.ColorToBrushConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.PathToHeaderConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="40.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.TabTemplateSelector" Collapsed="true">
+    <Position X="40.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAQAEAAAAAAQAAAAAAAAAQAAAAAAAAAAAEAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.NewProject" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAARAAAAAEAAAACQAAAAAAEAAAAAAABQAAAAAA=</HashCode>
+      <FileName>NewProject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.ColorSpace">
+    <Position X="14" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAIAAAAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpace.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Rgb">
+    <Position X="11.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAACAEAAQA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Lab">
+    <Position X="13.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAAIAUAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Cmyk">
+    <Position X="15.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAAgIIAIAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Hsv">
+    <Position X="17" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAAAECQAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.ColorSpaceWithProfile" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAgAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaceWithProfile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.ColorSpaceExtensions">
+    <Position X="36.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaceWithProfile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Comparisons.Cie1976Comparison" BaseTypeListCollapsed="true">
+    <Position X="25.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\Cie1976Comparison.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Comparisons.Cie94Comparison" BaseTypeListCollapsed="true">
+    <Position X="27.5" Y="3.25" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ColorMine.ColorSpaces.Comparisons.Cie94Comparison.Application" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ColorMine\Comparisons\Cie94Comparison.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="ColorMine.ColorSpaces.Comparisons.Cie94Comparison.ApplicationConstants" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ColorMine\Comparisons\Cie94Comparison.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\Cie94Comparison.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Comparisons.CieDe2000Comparison" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\CieDe2000Comparison.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Comparisons.CmcComparison" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAEAAAAAAEABQAAAEAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\CmcComparison.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Comparisons.EuklideanComparison" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\EuklideanComparison.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Conversions.CmyConverter" Collapsed="true">
+    <Position X="40.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Conversions\CmyConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ColorMine.ColorSpaces.Conversions.HunterLabConverter" Collapsed="true">
+    <Position X="38.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Conversions\HunterLabConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dominorechner_V2.ColorMine.Dithering">
+    <Position X="15.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Dithering\Dithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dominorechner_V2.ColorMine.FloydSteinbergDithering">
+    <Position X="14.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACDABAAAAAAAAAAIAYAAAAIAAAAAQAAAIEAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Dithering\FloydSteinbergDithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dominorechner_V2.ColorMine.JarvisJudiceNinkeDithering">
+    <Position X="16.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACDABAAAAAAAAAAIAYAAAAIAAAAAQAAAIEAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Dithering\JarvisJudiceNinkeDithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dominorechner_V2.ColorMine.NoDithering">
+    <Position X="18.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACBABAAAAAAAAAAAAQAAAAIAAAAAQAAAIAAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Dithering\NoDithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Dominorechner_V2.ColorMine.StuckiDithering">
+    <Position X="12.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACDABAAAAAAAAAAIAYAAAAIAAAAAQAAAIEAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Dithering\StuckiDithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Properties.Settings">
+    <Position X="34.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAEAEBAACABAAIAAAAAABBAIAAAAAAACAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="DominoPlanner.GenStructHelper">
+    <Position X="4" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAQAQAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Document Classes\StructureDocument.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="DominoPlanner.FieldPlanHelper">
+    <Position X="9.25" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABQAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>FieldPlanEditor.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="ColorMine.ColorSpaces.IColorSpace">
+    <Position X="16.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAQAAAAIAAAAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpace.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.IRgb">
+    <Position X="18" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAEAAQA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.ILab">
+    <Position X="14" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAUAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.ICmyk">
+    <Position X="16" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgIIAIAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.IHsv">
+    <Position X="20" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAECQAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.IColorSpaceWithProfile">
+    <Position X="31.5" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAgAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpaceWithProfile.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ColorMine.ColorSpaces.Comparisons.IColorSpaceComparison">
+    <Position X="26.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>ColorMine\Comparisons\IColorSpaceComparison.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="DominoPlanner.type">
+    <Position X="23.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAgAQA=</HashCode>
+      <FileName>Document Classes\Document.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Delegate Name="ColorMine.ColorSpaces.ComparisonAlgorithm">
+    <Position X="29.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ColorMine\ColorSpace.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

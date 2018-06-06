@@ -1,0 +1,114 @@
+﻿<Window x:Class="DominoPlanner.FieldPlanEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DominoPlanner"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        mc:Ignorable="d"
+        Title="FieldPlanEditor" Loaded="Window_Loaded" Height="500" Width="720" Closed="WindowClosed">
+    <Window.Resources>
+        <Style x:Key="NumericUpDown" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="MinHeight" Value="27" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Border BorderThickness="1" BorderBrush="Gray">
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="12*" />
+                                    <ColumnDefinition Width="5*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox VerticalAlignment="Center" FontSize="12"  Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"  Margin="0,2,1,3" />
+                                <Grid Grid.Column="1" x:Name="GridRoot" Width="Auto" Background="{TemplateBinding Background}" Margin="0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition MaxHeight="18" />
+                                        <RowDefinition Height="0.00001*" />
+                                        <RowDefinition MaxHeight="18" />
+                                    </Grid.RowDefinitions>
+                                    <RepeatButton x:Name="DecreaseRepeat" Command="ScrollBar.LineDownCommand" Focusable="False">
+                                        <Grid>
+                                            <Path x:Name="DecreaseArrow" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M 0 4 L 8 4 L 4 0 Z" />
+                                        </Grid>
+                                    </RepeatButton>
+                                    <RepeatButton Grid.Row="2" x:Name="IncreaseRepeat" Command="ScrollBar.LineUpCommand" Focusable="False">
+                                        <Grid>
+                                            <Path x:Name="IncreaseArrow" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M 0 0 L 4 4 L 8 0 Z" />
+                                        </Grid>
+                                    </RepeatButton>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <BooleanToVisibilityConverter x:Key="b2v"/>
+        <local:SummaryConverter x:Key="SummaryConverter"/>
+    </Window.Resources>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="110"/>
+        </Grid.RowDefinitions>
+        <!--<FlowDocumentScrollViewer HorizontalScrollBarVisibility="Auto" Document="{Binding doc}">
+            
+        </FlowDocumentScrollViewer>-->
+        <WebBrowser  local:BrowserBehavior.Html="{Binding TempHTML}">
+
+        </WebBrowser>
+        <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch">
+                <Grid>
+                    <TextBox x:Name="tbName" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="25" Margin="35,5,0,0" TextWrapping="Wrap" Text="{Binding Path=title}" VerticalAlignment="Top" Width="144"/>
+                    <Label Content="Title:" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkUseTemplate" Content="Display blocks (for template)" HorizontalAlignment="Left" Margin="5,39,0,0" VerticalAlignment="Top" IsChecked="{Binding Path=use_template}"
+                              ToolTip="When activating this option, DominoPlanner will show blocks in the specified length.&#10;
+                              This should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes
+                              (e.g. you left out one domino)."/>
+                    <ScrollBar Name="NumTemplateLength" Style="{DynamicResource NumericUpDown}"  HorizontalAlignment="Left" VerticalAlignment="Top" Value="{Binding template_length}"
+                                       Minimum="1" Maximum="5000" SmallChange="1" Margin="27,59,0,0" Width="63" Height="28" Visibility="{Binding IsChecked, ElementName=chkUseTemplate, Converter={StaticResource b2v}}" />
+                </Grid>
+
+            </GroupBox>
+            <GroupBox Grid.Column="1" Header="Field Property Settings" ToolTip="Selects additional information shown at the end of the document" Margin="0,0,0,23">
+                <Grid>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding summary_selection, Converter={StaticResource SummaryConverter}, ConverterParameter={x:Static local:SummaryEnum.None}}"  x:Name="NoSummary" Content="No Properties" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding summary_selection, Converter={StaticResource SummaryConverter}, ConverterParameter={x:Static local:SummaryEnum.Small}}" x:Name="ShortSummary" Content="Short Properties" ToolTip="Shows Length, Height, and total amount of used dominoes" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding summary_selection, Converter={StaticResource SummaryConverter}, ConverterParameter={x:Static local:SummaryEnum.Large}}" x:Name="DetailedSummary" Content="Detailed Properties" ToolTip="Shows a complete list of used colors" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </GroupBox>
+            <CheckBox IsChecked="{Binding build_reverse}" Grid.Column="2" Margin="14, 5" Height="23" VerticalAlignment="Top">Build backwards</CheckBox>
+            <Grid Grid.Column="2" Margin="14,30,56,8">
+                <Button x:Name="btnAdvancedProperties" HorizontalAlignment="Left"  Width="230" Height="30" VerticalAlignment="Top" Click="ShowAdvancedProperties">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" ToolTip="e.g. color options, text formatting...">
+                        <Image Height="20" Source="/Icons/properties.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                        <Label Content="Show Advanced Properties" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnSaveHTML" HorizontalAlignment="Left" Margin="0,35,0,0" VerticalAlignment="Top" Width="111" Click="SaveHTML">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" ToolTip="Export as HTML (web browser file). ">
+                        <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                        <Label Content="Save as HTML" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnOpenXls" HorizontalAlignment="Left" Margin="116,35,0,0" VerticalAlignment="Top" Width="114" Click="SaveXLSX">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" ToolTip="e.g. Text" Width="106">
+                        <Image Height="20" Source="/Icons/print.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                        <Label Content="Save Excel File" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <CheckBox x:Name="chkNumbersOnly" IsChecked="{Binding hide_text}" Content="Hide color names" Grid.Column="1" HorizontalAlignment="Left" Margin="5,90,0,0" VerticalAlignment="Top"/>
+
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,68 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.FieldSize"
+             xmlns:intr="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d" d:DesignWidth="374" Height="205">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="269*"/>
+            <ColumnDefinition Width="105*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Field Size [Dominoes]: " Height="24" VerticalAlignment="Top"/>
+        <xctk:IntegerUpDown Value="{Binding FieldSize}" Minimum="0" Margin="125,4,1,0" Height="20" VerticalAlignment="Top"/>
+        <Grid Margin="0,27,0,0" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Width="268">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="30" />
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+            <!--Length and Height Setters-->
+            <Label Content="Length:" Grid.Column="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="50"/>
+            <xctk:IntegerUpDown Value="{Binding Length}" IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
+            <Image Source="{Binding BindUnbind}"  IsEnabled="{Binding EditState}" Margin="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <intr:Interaction.Triggers>
+                    <intr:EventTrigger EventName="MouseUp">
+                        <intr:InvokeCommandAction Command="{Binding Click_Binding}"/>
+                    </intr:EventTrigger>
+                </intr:Interaction.Triggers>
+            </Image>
+            <Label Content="Height:" Grid.Column="3" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
+            <xctk:IntegerUpDown Value="{Binding Height}"  IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="4" HorizontalAlignment="Stretch"/>
+        </Grid>
+        <Label Content="Choose Standard: " Margin="0,70,0,0" HorizontalAlignment="Left" Width="102" Height="28" VerticalAlignment="Top"/>
+        <ComboBox SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding field_templates}" Margin="107,70,1,0" Height="22" VerticalAlignment="Top"/>
+        <Grid Margin="0,113,1,0" Height="65" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="70" />
+                <ColumnDefinition Width="60" />
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="26" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="26" />
+            </Grid.RowDefinitions>
+
+            <!--Field Distances and Dimensions-->
+            <Label Content="a:" Grid.Row="2" HorizontalAlignment="Right"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.a}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" />
+            <Label Content="b:" Grid.Row="0" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.b}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
+            <Label Content="c:" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.c}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,-5,0" />
+            <Label Content="d:" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" />
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.d}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="0,0,-5,0" />
+        </Grid>
+        <Image Source="/DominoPlanner.Usage;component/Icons/Variablen.jpg" Height="125" VerticalAlignment="Top" Margin="4,53,0,0" HorizontalAlignment="Left" Width="101" Grid.Column="1"/>
+        <Label Content="Orientation: "  HorizontalAlignment="Left" Margin="10,178,0,0" VerticalAlignment="Top"/>
+        <RadioButton Content="Horizontal" GroupName="HorVert" HorizontalAlignment="Left" Margin="107,184,0,0" VerticalAlignment="Top" IsChecked="{Binding Horizontal}"/>
+        <RadioButton Content="Vertical" GroupName="HorVert" HorizontalAlignment="Left" Margin="201,184,0,0" VerticalAlignment="Top" IsChecked="{Binding Vertical}"/>
+    </Grid>
+</UserControl>

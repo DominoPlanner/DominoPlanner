@@ -1,0 +1,202 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DominoPlanner.Usage"
+        xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View" x:Class="DominoPlanner.Usage.MainWindow"
+        xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        mc:Ignorable="d"
+        Title="Domino Planner" Height="700" Width="1200" MinWidth="820" Icon="Icons/DominoCalculator.ico">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
+            <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
+            <View:CreateField HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CreateStructureVM}">
+            <View:CreateStructure HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:EditProjectVM}">
+            <View:EditProject HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFieldStruct}"/>
+        <KeyBinding Key="N" Modifiers="Alt" Command="{Binding NewProject}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveCurrentOpen}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Alt" Command="{Binding SaveAll}"/>
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.UndoComm}"/>
+        <KeyBinding Key="Y" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.RedoComm}"/>
+        <KeyBinding Key="R" Modifiers="Ctrl" Command="{Binding MenuSetStandard}"/>
+        <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.CopyCom}"/>
+        <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.PasteCom}"/>
+        <KeyBinding Key="A" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.SelectAllCom}"/>
+    </Window.InputBindings>
+    <Grid >
+        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0">
+            <MenuItem Header="New">
+                <MenuItem.Icon>
+                    <Image Source="/Icons/new.ico"/>
+                </MenuItem.Icon>
+                <MenuItem Header="New Project" Command="{Binding NewProject}" InputGestureText="Alt+N">
+                    <MenuItem.Icon>
+                        <Image Source="/Icons/new.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" InputGestureText="Ctrl+N">
+                    <MenuItem.Icon>
+                        <Image Source="/Icons/new.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Save">
+                <MenuItem.Icon>
+                    <Image Source="Icons/Save.ico"/>
+                </MenuItem.Icon>
+                <MenuItem Header="Save" Command="{Binding SaveCurrentOpen}" InputGestureText="Ctrl+S">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/Save.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save all" Command="{Binding SaveAll}" InputGestureText="Ctrl+Alt+S">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/Save_All.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Undo" Command="{Binding SelectedTab.Content.UndoComm}" InputGestureText="Ctrl+Z" >
+                <MenuItem.Icon>
+                    <Image Source="Icons/edit_undo.ico"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Redo" Command="{Binding SelectedTab.Content.RedoComm}" InputGestureText="Ctrl+Y">
+                <MenuItem.Icon>
+                    <Image Source="Icons/edit_redo.ico"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Set Standards" Command="{Binding MenuSetStandard}" InputGestureText="Ctrl+R"/>
+            <MenuItem Header="Edit">
+                <MenuItem.Style>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Visibility" Value="Hidden"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedTab.Content.tabType}" Value="{x:Static vm:TabItemType.EditProject}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+                <MenuItem.Icon>
+                    <Image Source="Icons/draw_freehand.ico"/>
+                </MenuItem.Icon>
+                <MenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" InputGestureText="Ctrl+C">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/Copy.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" InputGestureText="Ctrl+V">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/Paste.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Mirror">
+                    <MenuItem Header="Flip Horizontally" Command="{Binding SelectedTab.Content.FlipHorizontallyCom}">
+                        <MenuItem.Icon>
+                            <Image Source="Icons/flip hori.ico"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Flip Vertically" Command="{Binding SelectedTab.Content.FlipVerticallyCom}">
+                        <MenuItem.Icon>
+                            <Image Source="Icons/flip vertical.ico"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Add">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/add.ico"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="Add row above" ToolTip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
+                    <MenuItem Header="Add row below" ToolTip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
+                    <MenuItem Header="Add column right" ToolTip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
+                    <MenuItem Header="Add column left" ToolTip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
+                </MenuItem>
+                <MenuItem Header="Remove">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/remove.ico"/>
+                    </MenuItem.Icon>
+                    <MenuItem Header="Remove row above" ToolTip="Remove Row above selected stone" Command="{Binding SelectedTab.Content.RemoveRowAbove}"/>
+                    <MenuItem Header="Remove row below" ToolTip="Remove Row below selected stone" Command="{Binding SelectedTab.Content.RemoveRowBelow}"/>
+                    <MenuItem Header="Remove column right" ToolTip="Remove column at the right from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnRight}"/>
+                    <MenuItem Header="Remove column left" ToolTip="Remove column at the left from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnLeft}"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="0,25,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" MinWidth="95"/>
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="9*" MinWidth="720"/>
+            </Grid.ColumnDefinitions>
+            <TreeView Grid.Column="0" Margin="0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <ContentControl Height="20">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <Grid ContextMenu="{Binding conMenu}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="{Binding Img}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            </Grid>
+                        </ContentControl>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+            <GridSplitter HorizontalAlignment="Center" Margin="0,0,0,0" Width="5" Grid.Column="1" Background="#33F0F0F0"/>
+            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" MinWidth="720" Background="#33FFFFFF">
+                <TabControl.ItemTemplate>
+                    <!-- this is the header template-->
+                    <DataTemplate>
+                        <Grid Background="#66FFFFFF">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="2"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
+                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}">
+                                <Button.Background>
+                                    <ImageBrush ImageSource="Icons/closewindow.ico"/>
+                                </Button.Background>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <!-- this is the body of the TabItem template-->
+                    <DataTemplate>
+                        <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding Content}"/>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
+    </Grid>
+</Window>

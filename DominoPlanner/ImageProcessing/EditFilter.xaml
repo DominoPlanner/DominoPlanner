@@ -1,0 +1,414 @@
+﻿<Window x:Class="DominoPlanner.EditFilter"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+        xmlns:local="clr-namespace:DominoPlanner"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="EditFilter" ResizeMode="NoResize" Height="500" Width="500" Loaded="WindowLoaded" Closing="Window_Closing">
+    <Window.Resources>
+        <local:ColorToBrushConverter x:Key="C2B"/>
+        <local:ColorToHTMLConverter x:Key="C2HTML"/>
+        <DataTemplate x:Key="AlphaTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="100" Header="Percentage">
+                        <StackPanel Orientation="Vertical">
+                            <xctk:ByteUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left" Width="80" Value="{Binding percentage}" Minimum="0" Maximum="100" VerticalAlignment="Top" Margin="5, 8, 0, 0"/>
+                            <Label>The percentage by which to alter the image's opacity. Any integer between 0 and 100.</Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="BackgroundColorTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="86" Header="Color">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="5, 8, 0, 0">
+                                
+                                <Button Margin="0, 0, 0, 0" Height="30" Click="SelectColorButton">
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0, 10, 0">
+                                        <Image Source="/DominoPlanner;component/Icons/colorPicker.ico" Width="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Label>Select color...</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Label VerticalAlignment="Center" Margin="10, 0, 0, 0" Content="{Binding Path=color, Converter={StaticResource C2HTML}}"></Label>
+                                <Rectangle Fill="{Binding Path=color, Converter={StaticResource C2B}}" VerticalAlignment="Center" Width="30" Height="30" Margin="5, 0, 0, 0" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <Label>The color to paint opaque areas with.</Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="BrightnessTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="100" Header="Percentage">
+                        <StackPanel Orientation="Vertical">
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left" Width="80" Value="{Binding percentage}" Minimum="-100" Maximum="100" VerticalAlignment="Top" Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The percentage by which to alter the image's brightness. <LineBreak/> Any integer between -100 and 100.</TextBlock></Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ContrastTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="100" Header="Percentage">
+                        <StackPanel Orientation="Vertical">
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left" Width="80" Value="{Binding percentage}" Minimum="-100" Maximum="100" VerticalAlignment="Top" Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The percentage by which to alter the image's contrast. <LineBreak/> Any integer between -100 and 100.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="CropTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="135" Header="Cropped Areas">
+                        <StackPanel Orientation="Vertical">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="100, 0, 0, 0" RenderTransformOrigin="0.5,-0.69">
+                                    <Label>Top:</Label>
+                                    <xctk:ByteUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left"  Width="50"
+                                           Minimum="0" Value="{Binding Path=top}" 
+                                           Maximum="{c:Binding 99-bottom, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label>%</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0, 30, 0, 0"  VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label>Left:</Label>
+                                    <xctk:ByteUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left"  Width="50"
+                                           Minimum="0" Value="{Binding Path=left}" 
+                                           Maximum="{c:Binding 99-right, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label>%</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="200, 30, 0, 0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label>Right:</Label>
+                                    <xctk:ByteUpDown ValueChanged="XNumChanged" HorizontalAlignment="right"  Width="50"
+                                           Minimum="0" Value="{Binding Path=right}" 
+                                           Maximum="{c:Binding 99-left, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label>%</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="81, 60, 0, 0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label>Bottom:</Label>
+                                    <xctk:ByteUpDown ValueChanged="XNumChanged" HorizontalAlignment="Left"  Width="50"
+                                           Minimum="0" Value="{Binding Path=bottom}" 
+                                           Maximum="{c:Binding 99-top, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Label>%</Label>
+                                </StackPanel>
+                            </Grid>
+                            <Label>
+                                <TextBlock>The coordinates to crop the image to.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="EdgeDetectionTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="75" Header="Filter">
+                        <StackPanel Orientation="Vertical">
+                            <ComboBox SelectionChanged="ComboBox_SelectionChanged" Margin="0, 5, 0, 0" Width="250" HorizontalAlignment="Left" SelectedIndex="{Binding index}">
+                                <ComboBoxItem>Kayyali</ComboBoxItem>
+                                <ComboBoxItem>Kirsch</ComboBoxItem>
+                                <ComboBoxItem>Laplacian, 3x3</ComboBoxItem>
+                                <ComboBoxItem>Laplacian, 5x5</ComboBoxItem>
+                                <ComboBoxItem>Laplacian of Gaussian (Marr-Hildreth)</ComboBoxItem>
+                                <ComboBoxItem>Prewitt</ComboBoxItem>
+                                <ComboBoxItem>Robert's Cross</ComboBoxItem>
+                                <ComboBoxItem>Scharr</ComboBoxItem>
+                                <ComboBoxItem>Sobel</ComboBoxItem>
+                            </ComboBox>
+                            <Label>
+                                <TextBlock>The algorithm to detect the edges with.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Height="55" Header="Greyscale">
+                        <CheckBox Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="{Binding greyscale}" Margin="0, 8, 0, 0">Convert image to greyscale first</CheckBox>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="EntropyCropTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="80" Header="Threshold">
+                        <StackPanel Orientation="Vertical">
+                            
+                            <xctk:ByteUpDown ValueChanged="XNumChanged" Value="{Binding threshold}" HorizontalAlignment="Left"   Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The threshold in to control the entropy detection level. Any integer between 0 to 256.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="FilterTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="75" Header="Filter">
+                        <StackPanel Orientation="Vertical">
+                            <ComboBox SelectionChanged="ComboBox_SelectionChanged" Margin="0, 5, 0, 0" Width="250" HorizontalAlignment="Left" SelectedIndex="{Binding index}">
+                                <ComboBoxItem>Black White</ComboBoxItem>
+                                <ComboBoxItem>Comic</ComboBoxItem>
+                                <ComboBoxItem>Gotham</ComboBoxItem>
+                                <ComboBoxItem>GreyScale</ComboBoxItem>
+                                <ComboBoxItem>HiSatch</ComboBoxItem>
+                                <ComboBoxItem>Invert</ComboBoxItem>
+                                <ComboBoxItem>Lomograph</ComboBoxItem>
+                                <ComboBoxItem>LoSatch</ComboBoxItem>
+                                <ComboBoxItem>Polariod</ComboBoxItem>
+                                <ComboBoxItem>Sepia</ComboBoxItem>
+                            </ComboBox>
+                            <Label>
+                                <TextBlock>The filter to add to the image.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="FlipTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="70" Header="Flip Direction">
+                        <StackPanel Orientation="Vertical">
+                            <RadioButton Checked="CheckBox_Checked" Margin="5, 8, 0, 0" IsChecked="{c:Binding !vertical}">Horizontal</RadioButton>
+                            <RadioButton Checked="CheckBox_Checked" Margin="5, 5, 0, 0" Height="25" IsChecked="{c:Binding vertical}">Vertical</RadioButton>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="GaussianBlurTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="75" Header="Kernel Size">
+                        <StackPanel Orientation="Vertical">
+
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding size}" HorizontalAlignment="Left" Minimum="1" Maximum="200" Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The size to set the Gaussian kernel to.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Height="90" Header="Sigma">
+                            <StackPanel Orientation="Vertical">
+
+                                <xctk:DecimalUpDown ValueChanged="XNumChanged" Value="{Binding sigma}" HorizontalAlignment="Left" Minimum="1" Maximum="200" Width="60"  Margin="5, 8, 0, 0" Increment="0.1"/>
+                                <Label>
+                                    <TextBlock>The standard derivation for the Gaussian<LineBreak/> function used to calculate the kernel.</TextBlock>
+                                </Label>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Height="90" Header="Threshold" Grid.Column="1">
+                            <StackPanel Orientation="Vertical">
+
+                                <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding threshold}" HorizontalAlignment="Left" Minimum="0" Maximum="1000" Width="60"  Margin="5, 8, 0, 0"/>
+                                <Label>
+                                    <TextBlock>The threshold value which is added to <LineBreak/>each weighted sum of pixels.</TextBlock>
+                                </Label>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="HueTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="75" Header="Angle">
+                        <StackPanel Orientation="Vertical">
+
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding degrees}" HorizontalAlignment="Left" Minimum="0" Maximum="360" Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The angle by which to rotate the image's hue. Any integer between 0 and 360.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Height="55" Header="Mirror Hue">
+                        <CheckBox Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="{Binding rotate}" Margin="5, 8, 0, 0">Mirror the image's hue before rotating</CheckBox>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ReplaceTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                    <GroupBox Height="86" Header="Target Color">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="5, 8, 0, 0">
+
+                                <Button Margin="0, 0, 0, 0" Height="30" Click="SelectColorButton" ToolTip="First Color">
+                                    <StackPanel Orientation="Horizontal" Margin="5, 0, 5, 0">
+                                        <Image Source="/DominoPlanner;component/Icons/colorPicker.ico" Width="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Label>Select color...</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Label VerticalAlignment="Center" Margin="10, 0, 0, 0" Content="{Binding Path=source, Converter={StaticResource C2HTML}}"></Label>
+                                <Rectangle Fill="{Binding Path=source, Converter={StaticResource C2B}}" VerticalAlignment="Center" Width="30" Height="30" Margin="5, 0, 0, 0" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <Label>The color to  be replaced.</Label>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Height="86" Header="Replacement Color" Grid.Column="1">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="5, 8, 0, 0">
+
+                                <Button Margin="0, 0, 0, 0" Height="30" Click="SelectColorButton" ToolTip="Second Color">
+                                    <StackPanel Orientation="Horizontal" Margin="5, 0, 5, 0">
+                                        <Image Source="/DominoPlanner;component/Icons/colorPicker.ico" Width="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Label>Select color...</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Label VerticalAlignment="Center" Margin="10, 0, 0, 0" Content="{Binding Path=target, Converter={StaticResource C2HTML}}"></Label>
+                                <Rectangle Fill="{Binding Path=target, Converter={StaticResource C2B}}" VerticalAlignment="Center" Width="30" Height="30" Margin="5, 0, 0, 0" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <Label>The replacement color.</Label>
+                        </StackPanel>
+                    </GroupBox>
+                    </Grid>
+                    <GroupBox Height="75" Header="Accuracy" Grid.Column="1">
+                        <StackPanel Orientation="Vertical">
+
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding threshold}" HorizontalAlignment="Left" Minimum="0" Maximum="128" Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>Determines the detection accuracy. Higher values result in larger replaced areas.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="RotateTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="80" Header="Angle">
+                        <StackPanel Orientation="Vertical">
+
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding degrees}" HorizontalAlignment="Left" Minimum="-359" Maximum="359" Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The angle at which to rotate the image. Negative values are counterclockwise.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="SaturationTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="80" Header="Percentage">
+                        <StackPanel Orientation="Vertical">
+
+                            <xctk:IntegerUpDown ValueChanged="XNumChanged" Value="{Binding percentage}" HorizontalAlignment="Left" Minimum="-100" Maximum="100"  Width="60"  Margin="5, 8, 0, 0"/>
+                            <Label>
+                                <TextBlock>The percentage to set the image's saturation to. Any integer between -100 and 100.</TextBlock>
+                            </Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="TintVignetteTemplate">
+            <Grid>
+                <StackPanel Orientation="Vertical">
+                    <GroupBox Height="86" Header="Color">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="5, 8, 0, 0">
+
+                                <Button Margin="0, 0, 0, 0" Height="30" Click="SelectColorButton">
+                                    <StackPanel Orientation="Horizontal" Margin="10, 0, 10, 0">
+                                        <Image Source="/DominoPlanner;component/Icons/colorPicker.ico" Width="24" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Label>Select color...</Label>
+                                    </StackPanel>
+                                </Button>
+                                <Label VerticalAlignment="Center" Margin="10, 0, 0, 0" Content="{Binding Path=color, Converter={StaticResource C2HTML}}"></Label>
+                                <Rectangle Fill="{Binding Path=color, Converter={StaticResource C2B}}" VerticalAlignment="Center" Width="30" Height="30" Margin="5, 0, 0, 0" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <Label>The color to tint the image with.</Label>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <local:ContentTemplateSelector x:Key="ContentTemplateSelector" 
+                                       AlphaTemplate="{StaticResource AlphaTemplate}" 
+                                       BackgroundColorTemplate="{StaticResource BackgroundColorTemplate}"
+                                       BrightnessTemplate="{StaticResource BrightnessTemplate}"
+                                       ContrastTemplate="{StaticResource ContrastTemplate}"
+                                       CropTemplate="{StaticResource CropTemplate}"
+                                       EdgeDetectionTemplate="{StaticResource EdgeDetectionTemplate}"
+                                       EntropyCropTemplate="{StaticResource EntropyCropTemplate}"
+                                       MatrixTemplate="{StaticResource FilterTemplate}"
+                                       FlipTemplate="{StaticResource FlipTemplate}"
+                                       GaussianBlurTemplate="{StaticResource GaussianBlurTemplate}"
+                                       GaussianSharpenTemplate="{StaticResource GaussianBlurTemplate}"
+                                       HueTemplate="{StaticResource HueTemplate}"
+                                       ReplaceTemplate="{StaticResource ReplaceTemplate}"
+                                       RotateTemplate="{StaticResource RotateTemplate}"
+                                       SaturationTemplate="{StaticResource SaturationTemplate}"
+                                       TintTemplate="{StaticResource TintVignetteTemplate}"
+                                       VignetteTemplate="{StaticResource TintVignetteTemplate}"/>
+    </Window.Resources>
+    <Grid>
+        
+        <Grid VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+                <RowDefinition Height="270"/>
+            </Grid.RowDefinitions>
+            <Label FontWeight="DemiBold" FontSize="15">Available Parameters:</Label>
+            <ContentControl  x:Name="ContentController" Grid.Row="1" Grid.ColumnSpan="2" ContentTemplateSelector="{StaticResource ContentTemplateSelector}">
+                <ContentPresenter ContentTemplate="{StaticResource ReplaceTemplate}"  >
+
+                </ContentPresenter>
+            </ContentControl>
+            <StackPanel Orientation="Vertical"  Grid.Row="2" Margin="5">
+                <Label>Before:</Label>
+                <Border BorderBrush="Black" BorderThickness="1" >
+                    <Image Height="220" Margin="5" Source="{Binding Path=source,
+                          RelativeSource={RelativeSource Mode=FindAncestor,
+                                                         AncestorType=Window}}"/>
+                </Border>
+            </StackPanel>
+            <StackPanel Orientation="Vertical"  Grid.Row="2" Grid.Column="1" Margin="5">
+                <Label>After:</Label>
+                <Border BorderBrush="Black" BorderThickness="1">
+                    <Image Height="220" Margin="5" Source="{Binding Path=result,
+                          RelativeSource={RelativeSource Mode=FindAncestor,
+                                                         AncestorType=Window}}"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,487 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7AC2F7A9-4252-4265-9324-340AD469A938}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DominoPlanner</RootNamespace>
+    <AssemblyName>DominoPlanner</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>1</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>DominoCalculator.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>DominoPlanner.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>19C74F9AEE0F4E3F827D15C117EAADE249668B0D</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CalcBinding, Version=2.2.5.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CalcBinding.2.2.5.1\lib\net45\CalcBinding.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DynamicExpresso.Core, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DynamicExpresso.Core.1.3.0.0\lib\net40\DynamicExpresso.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EPPlus, Version=4.1.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.1.0\lib\net40\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ImageProcessor, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.2.4.4.0\lib\net45\ImageProcessor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack.Core.1.1.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack.Shell.1.1.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RibbonControlsLibrary, Version=4.0.0.11019, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\RibbonControlsLibrary.4.0.0\lib\net40\RibbonControlsLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WriteableBitmapEx.Wpf, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
+      <HintPath>..\packages\WriteableBitmapEx.1.5.0.0\lib\net40\WriteableBitmapEx.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=2.6.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.6\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AddNewObject.xaml.cs">
+      <DependentUpon>AddNewObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChangeProjectSize.xaml.cs">
+      <DependentUpon>ChangeProjectSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ColorPicker\BindOnEnterTextBox.cs" />
+    <Compile Include="ColorPicker\ColorComboBox.cs" />
+    <Compile Include="ColorPicker\ColorPicker.cs" />
+    <Compile Include="ColorPicker\ColorSlider.cs" />
+    <Compile Include="ColorPicker\ColorUtils.cs" />
+    <Compile Include="ColorPicker\HsvControl.cs" />
+    <Compile Include="ColorPicker\SpectrumSlider.cs" />
+    <Compile Include="Document Classes\ImageEditingDocument.cs" />
+    <Compile Include="Document Classes\ColorArrayDocument.cs" />
+    <Compile Include="ColorControl.xaml.cs">
+      <DependentUpon>ColorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ColorMine\ColorSpace.cs" />
+    <Compile Include="ColorMine\ColorSpaces.cs" />
+    <Compile Include="ColorMine\ColorSpaceWithProfile.cs" />
+    <Compile Include="ColorMine\Comparisons\Cie1976Comparison.cs" />
+    <Compile Include="ColorMine\Comparisons\Cie94Comparison.cs" />
+    <Compile Include="ColorMine\Comparisons\CieDe2000Comparison.cs" />
+    <Compile Include="ColorMine\Comparisons\CmcComparison.cs" />
+    <Compile Include="ColorMine\Comparisons\EuklideanComparison.cs" />
+    <Compile Include="ColorMine\Comparisons\IColorSpaceComparison.cs" />
+    <Compile Include="ColorMine\Conversions\CmyConverter.cs" />
+    <Compile Include="ColorMine\Conversions\CmykConverter.cs" />
+    <Compile Include="ColorMine\Conversions\CmykProfileConverter.cs" />
+    <Compile Include="ColorMine\Conversions\HsbConverter.cs" />
+    <Compile Include="ColorMine\Conversions\HslConverter.cs" />
+    <Compile Include="ColorMine\Conversions\HsvConverter.cs" />
+    <Compile Include="ColorMine\Conversions\HunterLabConverter.cs" />
+    <Compile Include="ColorMine\Conversions\LabConverter.cs" />
+    <Compile Include="ColorMine\Conversions\LchConverter.cs" />
+    <Compile Include="ColorMine\Conversions\LuvConverter.cs" />
+    <Compile Include="ColorMine\Conversions\RgbConverter.cs" />
+    <Compile Include="ColorMine\Conversions\Utility\DoubleExtension.cs" />
+    <Compile Include="ColorMine\Conversions\XyzConverter.cs" />
+    <Compile Include="ColorMine\Conversions\YxyConverter.cs" />
+    <Compile Include="ColorMine\Dithering\Dithering.cs" />
+    <Compile Include="ColorMine\Dithering\FloydSteinbergDithering.cs" />
+    <Compile Include="ColorMine\Dithering\JarvisJudiceNinkeDithering.cs" />
+    <Compile Include="ColorMine\Dithering\NoDithering.cs" />
+    <Compile Include="ColorMine\Dithering\StuckiDithering.cs" />
+    <Compile Include="Document Classes\Document.cs" />
+    <Compile Include="Document Classes\ProjectDocument.cs" />
+    <Compile Include="Document Classes\StructureDocument.cs" />
+    <Compile Include="Document Classes\StructureTypes.cs" />
+    <Compile Include="DominoCanvas.cs" />
+    <Compile Include="DominoUI.cs" />
+    <Compile Include="EditColors.xaml.cs">
+      <DependentUpon>EditColors.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Document Classes\FieldDocument.cs" />
+    <Compile Include="EditFieldViewModel.cs" />
+    <Compile Include="EditProject.xaml.cs">
+      <DependentUpon>EditProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FieldBlockViewer.xaml.cs">
+      <DependentUpon>FieldBlockViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FieldBlockViewerIntroduction.xaml.cs">
+      <DependentUpon>FieldBlockViewerIntroduction.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FieldPlanEditor.xaml.cs">
+      <DependentUpon>FieldPlanEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FieldProtocolDetails.xaml.cs">
+      <DependentUpon>FieldProtocolDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FirstStart.xaml.cs">
+      <DependentUpon>FirstStart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageProcessing\EditFilter.xaml.cs">
+      <DependentUpon>EditFilter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageProcessing\FilterClasses\IFilter.cs" />
+    <Compile Include="NewProject.xaml.cs">
+      <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RemoveRowCol.xaml.cs">
+      <DependentUpon>RemoveRowCol.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Util\ImageHelper.cs" />
+    <Compile Include="Util\MathHelper.cs" />
+    <Compile Include="Util\StructureDefinition.cs" />
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AddNewObject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChangeProjectSize.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ColorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ColorPicker\Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="EditColors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditProject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FieldBlockViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FieldBlockViewerIntroduction.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FieldPlanEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FieldProtocolDetails.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FirstStart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImageProcessing\EditFilter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="NewProject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NumericUpDown.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RemoveRowCol.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NumericUpDown.xaml.cs">
+      <DependentUpon>NumericUpDown.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
+    <Fakes Include="Fakes\CalcBinding.fakes" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\exit.ico" />
+    <Resource Include="Icons\font.ico" />
+    <Resource Include="Icons\colorPalette.ico" />
+    <Resource Include="Icons\back.ico" />
+    <Resource Include="Icons\ok.ico" />
+    <Resource Include="Icons\colorPicker.ico" />
+    <Resource Include="Icons\colorFill.ico" />
+    <Resource Include="Icons\colorLine.ico" />
+    <Resource Include="Icons\contents.ico" />
+    <Resource Include="Icons\contexthelp.ico" />
+    <Resource Include="Icons\cancel.ico" />
+    <Resource Include="Icons\close.ico" />
+    <Resource Include="Icons\print.ico" />
+    <Resource Include="Icons\brush.ico" />
+    <Resource Include="Icons\eraser.ico" />
+    <Resource Include="Icons\draw_freehand.ico" />
+    <Resource Include="Icons\closewindow.ico" />
+    <Resource Include="Icons\edit_redo.ico" />
+    <Resource Include="Icons\edit_undo.ico" />
+    <Resource Include="Icons\fileBroken.ico" />
+    <Resource Include="Icons\folder.ico" />
+    <Resource Include="Icons\home.ico" />
+    <Resource Include="Icons\folder_image.ico" />
+    <Resource Include="Icons\folder_tar.ico" />
+    <Resource Include="Icons\folder_txt.ico" />
+    <Resource Include="Icons\forward.ico" />
+    <Resource Include="Icons\help_hint.ico" />
+    <Resource Include="Icons\history.ico" />
+    <Resource Include="Icons\remove.ico" />
+    <Resource Include="Icons\ruler.ico" />
+    <Resource Include="Icons\view_statistics.ico" />
+    <Resource Include="Icons\zoom_in.ico" />
+    <Resource Include="Icons\zoom_original.ico" />
+    <Resource Include="Icons\zoom_out.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\add.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\properties.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\new.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\open.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="Icons\DominoCalculator.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\down.ico" />
+    <Resource Include="Icons\up.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\document_save.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\Variablen.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\decrypted.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\file_export.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\insert_table.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\insert_text.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="DominoCalculator.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ColorPicker\Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\DominoCalculator.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

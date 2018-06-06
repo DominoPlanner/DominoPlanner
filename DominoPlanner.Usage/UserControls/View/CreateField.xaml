@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.CreateField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="720" MinWidth="720">
+    <Grid ShowGridLines="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="205"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Image Grid.Row="0" RenderOptions.BitmapScalingMode="NearestNeighbor" Source="{Binding Path=CurrentPlan}"></Image>
+        <Grid Grid.Row="1" HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="373"/>
+                <ColumnDefinition Width="327"/>
+            </Grid.ColumnDefinitions>
+            <local:FieldSize Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" DataContext="{Binding fsvm}"/>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="Resize mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Label Grid.Row="1" Content="{Binding sResizeMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Pixel" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iResizeMode}"/>
+                    <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                </Grid>
+                <Label Grid.Row="3" Content="Color Approximation Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Label Grid.Row="4" Content="{Binding sColorApproxMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Grid Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Fast" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}"/>
+                    <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                </Grid>
+                <Label Grid.Row="6" Content="Diffusion Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Top" Margin="0,-2,0,0"/>
+                <Label Grid.Row="7" Content="{Binding sDiffusionMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Grid Grid.Row="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="None" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}"/>
+                    <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                <Label Content="Save Field" />
+            </StackPanel>
+        </Button>
+        <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                <Label Content="Edit" />
+            </StackPanel>
+        </Button>
+        <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding BuildtoolsClick}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
+                <Label Content="Buildtools" />
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

@@ -1,0 +1,394 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:colorPicker="clr-namespace:ColorPicker">
+    <!--xmlns:diagnostics="clr-namespace:System.Diagnostics;assembly=WindowsBase"-->
+    <Style x:Key="ColorPickerRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ColorSliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Width="9" Height="12">
+                        <Polygon 
+              Fill="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" 
+              Points="4.5,0 9,5 9,12 0,12 0,5"/>
+                        <Polygon Fill="Black" Points="4.5,1 8,5 1,5"/>
+                        <Polygon Stroke="Black" StrokeThickness="1"  Points="7.5,5.5 7.5,10.5 1.5,10.5 1.5,5.5"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="SpectrumSliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Background="Transparent" Width="16" Height="9">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="6"/>
+                        </Grid.ColumnDefinitions>
+                        <Polygon Grid.Column="0" Stroke="White" StrokeThickness="1" Fill="Black" Points="0.5,0  5.5,4.5  0.5,9"/>
+                        <Polygon Grid.Column="2" Stroke="White" StrokeThickness="1" Fill="Black" Points="5.5,0  0.5,4.5  5.5,9"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <DrawingBrush x:Key="CheckersBrush" 
+                  Viewport="0,0,11,11" ViewportUnits="Absolute"
+                  TileMode="Tile">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Geometry="M0,0 L2,0 2,2, 0,2Z" Brush="White"/>
+                <GeometryDrawing Geometry="M0,1 L2,1 2,2 1,2 1,0 0,0Z" Brush="LightGray"/>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    <Style x:Key="SunkenFrameStyle" TargetType="{x:Type Label}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid>
+                        <Border Margin="0,1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" BorderThickness="1,0,0,0"/>
+                        <Border Margin="1,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" BorderThickness="0,1,0,0"/>
+                        <Border Margin="0,1" BorderBrush="#F8F8F8" BorderThickness="0,0,1,0"/>
+                        <Border Margin="1,0" BorderBrush="#F8F8F8" BorderThickness="0,0,0,1"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type colorPicker:ColorSlider}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Maximum" Value="255"/>
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="SmallChange" Value="1"/>
+        <Setter Property="LargeChange" Value="10"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type colorPicker:ColorSlider}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="13"/>
+                            <RowDefinition Height="12*"/>
+                        </Grid.RowDefinitions>
+                        <Border Margin="1" Grid.Row="1" Background="{TemplateBinding Background}"/>
+                        <Border Margin="1" Grid.Row="1">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <!--<GradientStop Color="{Binding diagnostics:PresentationTraceSources.TraceLevel=High, RelativeSource={RelativeSource TemplatedParent}, Path=LeftColor}" Offset="0"/>-->
+                                    <GradientStop Color="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=LeftColor}" Offset="0"/>
+                                    <GradientStop Color="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=RightColor}" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        <Label Grid.Row="1" Style="{StaticResource SunkenFrameStyle}"/>
+                        <Track Grid.Row="1" Margin="-3,0,-2,0" x:Name="PART_Track" >
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ColorPickerRepeatButtonStyle}" Command="{x:Static Slider.DecreaseLarge}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ColorPickerRepeatButtonStyle}" Command="{x:Static Slider.IncreaseLarge}" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb" Style="{StaticResource ColorSliderThumbStyle}">
+                                    <Thumb.RenderTransform>
+                                        <TranslateTransform Y="5"/>
+                                    </Thumb.RenderTransform>
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--<colorPicker:ValueToSelectedColorConverter x:Key="ValueToSelectedColorConverter" />-->
+    <Style TargetType="{x:Type colorPicker:SpectrumSlider}">
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="Orientation" Value="Vertical"/>
+        <Setter Property="Maximum" Value="360"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type colorPicker:SpectrumSlider}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10*"/>
+                            <ColumnDefinition Width="17"/>
+                            <ColumnDefinition Width="10*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1">
+                            <Border Margin="1" Background="{TemplateBinding Background}"/>
+                            <Label Style="{StaticResource SunkenFrameStyle}"/>
+                        </Grid>
+                        <Track Grid.Column="1"  Margin="0,-3" x:Name="PART_Track" >
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ColorPickerRepeatButtonStyle}" Command="{x:Static Slider.DecreaseLarge}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource ColorPickerRepeatButtonStyle}" Command="{x:Static Slider.IncreaseLarge}" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb x:Name="Thumb" Style="{StaticResource SpectrumSliderThumbStyle}">
+                                </Thumb>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <colorPicker:HueToColorConverter x:Key="HueToColorConverter"/>
+
+    <Style x:Key="HsvControlThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Stylus.IsPressAndHoldEnabled" Value="True" />
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid Height="12" Width="12">
+                        <Ellipse Stroke="White" Margin="0"/>
+                        <Ellipse Stroke="Black" Margin="1"/>
+                        <Ellipse Stroke="White" Margin="2"/>
+                        <Line Stroke="#80000000" X1="0" Y1="6" X2="12" Y2="6"/>
+                        <Line Stroke="#80000000" X1="6" Y1="0" X2="6" Y2="12"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type colorPicker:HsvControl}">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type colorPicker:HsvControl}">
+                    <Grid>
+                        <Rectangle>
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Offset="0" Color="#FFFFFFFF"/>
+                                    <GradientStop Offset="1"
+                      Color="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Hue, Converter={StaticResource HueToColorConverter}}"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle>
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                    <GradientStop Offset="0" Color="#00000000"/>
+                                    <GradientStop Offset="1" Color="#FF000000"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <Grid>
+                            <Border BorderBrush="#A0808080" BorderThickness="1,1,0,0"/>
+                            <Border BorderBrush="#A0F0F0F0" BorderThickness="0,0,1,1"/>
+                        </Grid>
+                        <Canvas ClipToBounds="true">
+                            <Thumb Canvas.Left="-5" Canvas.Top="-5" x:Name="PART_Thumb" Style="{StaticResource HsvControlThumbStyle}">
+                                <Thumb.RenderTransform>
+                                    <TranslateTransform X="0" Y="0"/>
+                                </Thumb.RenderTransform>
+                            </Thumb>
+                        </Canvas>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <colorPicker:DoubleToIntegerStringConverter x:Key="DoubleToIntegerStringConverter"/>
+    <Style x:Key="ColorPickerTextBox" TargetType="{x:Type TextBox}">
+        <Setter Property="Margin" Value="5,1,3,3"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style TargetType="{x:Type colorPicker:ColorPicker}">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                            Padding="{TemplateBinding Padding}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <Grid Height="190" Width="370">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="5"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="40"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="135" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+                            <colorPicker:HsvControl x:Name="PART_HsvControl" Grid.Row="0" Grid.Column="0" Grid.RowSpan="9" />
+                            <colorPicker:SpectrumSlider x:Name="PART_SpectrumSlider1" Grid.Column="1" Grid.RowSpan="9" BorderBrush="Black" BorderThickness="1" 
+                                                        LargeChange="30" SmallChange="10" Hue="0" />
+                            <TextBlock Text="R" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0"/>
+                            <TextBlock Text="G" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="2"/>
+                            <TextBlock Text="B" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="4"/>
+                            <!--<TextBlock Text="A" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="6"/>-->
+                            <colorPicker:BindOnEnterTextBox Style="{StaticResource ColorPickerTextBox}" Grid.Column="4" Grid.Row="0" 
+                                                            Text="{Binding Path=Value, ElementName=PART_RedColorSlider, Mode=TwoWay, 
+                                Converter={StaticResource DoubleToIntegerStringConverter}}"/>
+                            <colorPicker:BindOnEnterTextBox
+                Style="{StaticResource ColorPickerTextBox}"
+                Grid.Column="4" Grid.Row="2" 
+                Text="{Binding Path=Value, ElementName=PART_GreenColorSlider, Mode=TwoWay, Converter={StaticResource DoubleToIntegerStringConverter}}"/>
+                            <colorPicker:BindOnEnterTextBox
+                Style="{StaticResource ColorPickerTextBox}"
+                Grid.Column="4" Grid.Row="4" 
+                Text="{Binding Path=Value, ElementName=PART_BlueColorSlider, Mode=TwoWay, Converter={StaticResource DoubleToIntegerStringConverter}}"/>
+                            <!--<colorPicker:BindOnEnterTextBox
+                Style="{StaticResource ColorPickerTextBox}"
+                Grid.Column="4" Grid.Row="6" 
+                Text="{Binding Path=Value, ElementName=PART_AlphaColorSlider, Mode=TwoWay, Converter={StaticResource DoubleToIntegerStringConverter}}"/>-->
+                            <colorPicker:ColorSlider x:Name="PART_RedColorSlider" Grid.Column="3" Grid.Row="0" BorderBrush="Black" BorderThickness="1"/>
+                            <colorPicker:ColorSlider x:Name="PART_GreenColorSlider" Grid.Column="3" Grid.Row="2" BorderBrush="Black" BorderThickness="1"/>
+                            <colorPicker:ColorSlider x:Name="PART_BlueColorSlider" Grid.Column="3" Grid.Row="4" BorderBrush="Black" BorderThickness="1"/>
+                            <colorPicker:ColorSlider x:Name="PART_AlphaColorSlider" Grid.Column="3" Grid.Row="6" Width="0" Background="{StaticResource CheckersBrush}" 
+                                                     BorderBrush="Black" BorderThickness="1" LeftColor="#00000000" RightColor="#FF000000" Visibility="Hidden"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="6" Grid.ColumnSpan="3">
+                                <TextBlock Text="Name" Width="50"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="8" Grid.ColumnSpan="3">
+                                <TextBlock Text="Count" Width="50"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="9" Grid.ColumnSpan="3">
+                                <TextBlock Text="" Height="39"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <LinearGradientBrush x:Key="GlassBrush" StartPoint="0,0" EndPoint="0,1" >
+        <GradientStop Color="#96FFFFFF" Offset="0"/>
+        <GradientStop Color="#28FFFFFF" Offset="0.5"/>
+        <GradientStop Color="#00FFFFFF" Offset="0.5"/>
+    </LinearGradientBrush>
+    <colorPicker:ColorToStringConverter x:Key="ColorToStringConverter"/>
+    <Style TargetType="{x:Type colorPicker:ColorComboBox}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type colorPicker:ColorComboBox}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="1" x:Name="OverallBorder"
+                  BorderBrush="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
+                  BorderThickness="1"/>
+                        <Grid Grid.Row="1" Background="Transparent">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column ="0" Margin="4">
+                                <Rectangle Fill="{StaticResource CheckersBrush}"/>
+                                <Rectangle Stroke="Black" StrokeThickness="1">
+                                    <Rectangle.Fill>
+                                        <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <!--<Border BorderBrush="Black" BorderThickness="1"/>-->
+                            </Grid>
+                            <TextBlock
+                  Text="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ColorToStringConverter}}" 
+                  Grid.Column="1" Margin="5,0" VerticalAlignment="Center"/>
+                            <Grid Grid.Column="2">
+                                <Border x:Name="ToggleButtonFill" Visibility="Hidden" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"/>
+                                <Border x:Name="ToggleButtonGlass" Visibility="Hidden" Background="{StaticResource GlassBrush}"/>
+                                <Border x:Name="ToggleButtonBorder" Visibility="Hidden" BorderThickness="1"  BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                                <ToggleButton 
+                  x:Name="PART_ToggleButton"
+                  Focusable="False"                  
+                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate>
+                                                        <Grid Background="Transparent">
+                                                            <Path 
+                                  Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 3.5 4 L 7 0 Z"/>
+                                                        </Grid>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                            </Grid>
+                            <Popup
+                x:Name="PART_Popup"
+                AllowsTransparency="True"
+                Placement="Bottom" Focusable="True" StaysOpen="False"
+                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" 
+                IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                                <!--IsOpen="{Binding IsChecked, ElementName=PART_ToggleButton}">-->
+                                <!--IsOpen="{TemplateBinding IsDropDownOpen}">-->
+                                <Border
+                  Padding="5"
+                  Background="#F6F6F6"
+                  BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"
+                  BorderThickness="1">
+                                    <colorPicker:ColorPicker x:Name="PART_ColorPicker"/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ToggleButtonFill" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ToggleButtonGlass" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ToggleButtonBorder" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="OverallBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                        </Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="ToggleButtonFill" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ToggleButtonGlass" Property="Visibility" Value="Hidden"/>
+                            <Setter TargetName="ToggleButtonBorder" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="OverallBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

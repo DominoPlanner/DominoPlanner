@@ -1,0 +1,19 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Custom="http://schemas.microsoft.com/winfx/2006/xaml/presentation/ribbon" x:Class="DominoPlanner.FirstStart"
+        Title="Welcome to DominoPlanner!" Height="229" Width="400" Initialized="Window_Initialized" ResizeMode="NoResize">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="353*"/>
+            <ColumnDefinition Width="41*"/>
+        </Grid.ColumnDefinitions>
+        <Button HorizontalAlignment="Left" Margin="7,76,0,0" VerticalAlignment="Top" Width="27" Height="23" ToolTip="Select your standard project path. This is the super folder for your projects." RenderTransformOrigin="-2.815,0.739" Click="Button_Click" Grid.Column="1">
+            <Image Source="/Icons/open.ico" RenderTransformOrigin="-4.158,0.789"/>
+        </Button>
+        <TextBox Name="PathTextBox" HorizontalAlignment="Left" Height="23" Margin="10,76,0,0" TextWrapping="Wrap" Text="Standard Path" VerticalAlignment="Top" Width="345" Grid.ColumnSpan="2"/>
+        <Label Content="Welcome to DominoPlanner! This software is designed to simplify&#xD;&#xA;Domino planning as much as possible. &#xD;&#xA;&#xD;&#xA;First, select a standard folder to store your projects in:" HorizontalAlignment="Left" VerticalAlignment="Top" Height="76" Width="384" Grid.ColumnSpan="2"/>
+        <Button Content="Let's start!"  Margin="150,166,109,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="94" Click="CloseDialog"/>
+        <Label Content="Secondly, you will create a list of your dominoes, so DominoPlanner&#xD;&#xA;will know which colors it can use." HorizontalAlignment="Left" VerticalAlignment="Top" Height="46" Width="387" Margin="0,109,0,0" Grid.ColumnSpan="2"/>
+    </Grid>
+</Window>

@@ -1,0 +1,89 @@
+﻿<Window x:Class="DominoPlanner.FieldBlockViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+
+        xmlns:local="clr-namespace:DominoPlanner"
+        mc:Ignorable="d"
+        Title="FieldBlockViewer" Height="600" Width="1100"
+        WindowStyle="None" ResizeMode="NoResize"  
+        Loaded="Window_Loaded"
+    WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        >
+    <Window.Resources>
+        <Style x:Key="NumericUpDown" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="MinHeight" Value="27" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Border BorderThickness="1" BorderBrush="Gray">
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="12*" />
+                                    <ColumnDefinition Width="5*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox VerticalAlignment="Center" FontSize="25"  Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}"  Margin="0,2,1,3" />
+                                <Grid Grid.Column="1" x:Name="GridRoot" Width="Auto" Background="{TemplateBinding Background}" Margin="0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition MaxHeight="18" />
+                                        <RowDefinition Height="0.00001*" />
+                                        <RowDefinition MaxHeight="18" />
+                                    </Grid.RowDefinitions>
+                                    <RepeatButton x:Name="DecreaseRepeat" Command="ScrollBar.LineDownCommand" Focusable="False">
+                                        <Grid>
+                                            <Path x:Name="DecreaseArrow" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M 0 4 L 8 4 L 4 0 Z" />
+                                        </Grid>
+                                    </RepeatButton>
+                                    <RepeatButton Grid.Row="2" x:Name="IncreaseRepeat" Command="ScrollBar.LineUpCommand" Focusable="False">
+                                        <Grid>
+                                            <Path x:Name="IncreaseArrow" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M 0 0 L 4 4 L 8 0 Z" />
+                                        </Grid>
+                                    </RepeatButton>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+            
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Height="45" VerticalAlignment="Top" Margin="25">
+            <Label FontSize="25" VerticalAlignment="Center">Row:</Label>
+            <ScrollBar ValueChanged="numRows_ValueChanged" Maximum="1000000" Minimum="0" x:Name="numRows" Style="{StaticResource NumericUpDown}" Width="100" Margin="5, 0, 0, 0" SmallChange="1" Value="-1"/>
+            <Label VerticalAlignment="Center" FontSize="25">of</Label>
+            <Label VerticalAlignment="Center" FontSize="25" x:Name="MaxRows"></Label>
+        </StackPanel>
+        <StackPanel Margin="25" Orientation="Horizontal" Height="45" VerticalAlignment="Top" Grid.Column="1">
+            <Label FontSize="25" VerticalAlignment="Center">Block:</Label>
+            <ScrollBar ValueChanged="numBlocks_ValueChanged" x:Name="numBlocks" Style="{StaticResource NumericUpDown}" Width="100" Margin="5, 0, 0, 0" Maximum="100000000" SmallChange="1"/>
+        </StackPanel>
+        <StackPanel Margin="25" Orientation="Horizontal" Height="45" VerticalAlignment="Top" Grid.Column="2">
+            <Label FontSize="25" VerticalAlignment="Center">Battery:</Label>
+            <Label FontSize="25" VerticalAlignment="Center" x:Name="Battery"></Label>
+        </StackPanel>
+        <StackPanel Margin="25" Orientation="Horizontal" Height="45" VerticalAlignment="Top" Grid.Column="3">
+            <Label FontSize="25" VerticalAlignment="Center" x:Name="Time"></Label>
+        </StackPanel>
+        <WindowsFormsHost Grid.Row="1" Grid.ColumnSpan="4" Margin="5">
+            <wf:PictureBox MouseClick="PictBx_MouseClick" BackColor="White" x:Name="PictBx"></wf:PictureBox>
+        </WindowsFormsHost>
+    </Grid>
+</Window>
