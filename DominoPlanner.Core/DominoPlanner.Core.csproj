@@ -39,6 +39,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -93,8 +94,10 @@
     <Compile Include="Enums.cs" />
     <Compile Include="ExtensionClasses.cs" />
     <Compile Include="FieldParameters.cs" />
+    <Compile Include="HistoryTree.cs" />
     <Compile Include="IDominoProvider.cs" />
     <Compile Include="IDominoShape.cs" />
+    <Compile Include="IFinalizable.cs" />
     <Compile Include="ObjectProtocolParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtocolDefinition.cs" />

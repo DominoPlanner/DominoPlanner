@@ -18,8 +18,8 @@
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="colors" />
-      <Property Name="ImageFilters" />
       <Property Name="PreFilters" />
+      <Property Name="ImageFilters" />
       <Property Name="PostFilters" />
     </ShowAsCollectionAssociation>
   </Class>
@@ -136,10 +136,10 @@
       <FileName>ObjectProtocolParameters.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="orientation" />
+      <Property Name="summaryMode" />
       <Property Name="foreColorMode" />
       <Property Name="backColorMode" />
-      <Property Name="summaryMode" />
+      <Property Name="orientation" />
     </ShowAsAssociation>
   </Class>
   <Class Name="DominoPlanner.Core.IDominoShape">
@@ -279,7 +279,7 @@
         <Point X="10.25" Y="12" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="2.369" Y="0.643" />
+        <Position X="1.846" Y="0.036" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>

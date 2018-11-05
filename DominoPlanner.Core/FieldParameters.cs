@@ -253,7 +253,7 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Feld erhält.</returns>
-        public override DominoTransfer Generate(IProgress<string> progressIndicator)
+        public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
             if (!imageValid)
             {

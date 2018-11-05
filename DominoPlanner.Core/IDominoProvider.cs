@@ -98,7 +98,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         protected bool shapesValid = false;
-        protected bool lastValid = false;
+        public bool lastValid = false;
 
         protected DominoTransfer last;
         #region const
