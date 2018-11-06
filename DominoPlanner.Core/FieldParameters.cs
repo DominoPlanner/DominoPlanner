@@ -181,6 +181,7 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
+        public HistoryTree<FieldParameters> history { get; set; }
         #endregion
         #region private properties
         private WriteableBitmap resizedImage;
@@ -219,6 +220,7 @@ namespace DominoPlanner.Core
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
             hasProcotolDefinition = true;
+            this.history = new HistoryTree<FieldParameters>(new EmptyOperation<FieldParameters>(this));
         }
         /// <summary>
         /// Erzeugt ein Feld, dessen Steineanzahl möglichst nahe an einem bestimmten Wert liegt.
@@ -365,9 +367,15 @@ namespace DominoPlanner.Core
                         result[i, j] = last.dominoes[i*height + j];
                     }
                 }
-
             if (o == Orientation.Vertical) result = TransposeArray(result);
             return result;
+        }
+
+        public override object Clone()
+        {
+            FieldParameters res = ObjectExtensions.Copy(this);
+            res.history = null;
+            return res;
         }
         #endregion
     }

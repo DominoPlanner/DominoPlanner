@@ -12,7 +12,7 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Die allgemeine Basisklasse für die Erstellung jeglicher Domino-Objekte.
     /// </summary>
-    public abstract class IDominoProvider
+    public abstract class IDominoProvider : ICloneable
     {
         #region public properties
         /// <summary>
@@ -73,6 +73,8 @@ namespace DominoPlanner.Core
         public List<PreFilter> PreFilters { get; set; }
 
         public List<ImageFilter> ImageFilters { get; set; }
+
+        
         public List<PostFilter> PostFilters { get; set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
@@ -100,7 +102,7 @@ namespace DominoPlanner.Core
         protected bool shapesValid = false;
         public bool lastValid = false;
 
-        protected DominoTransfer last;
+        public DominoTransfer last;
         #region const
         protected IDominoProvider(WriteableBitmap bitmap, bool useOnlyMyColors, IColorSpaceComparison comp, List<DominoColor> colors, DominoFilter calculationFilters)
         {
@@ -267,6 +269,8 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
+
+        public abstract object Clone();
         #endregion
     }
 }

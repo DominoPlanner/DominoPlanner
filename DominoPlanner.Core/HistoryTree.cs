@@ -111,47 +111,29 @@ namespace DominoPlanner.Core
             else throw (new Exception("kein unterstützter Datentyp übergeben"));
         }
     }
-    public class ChangeDimensionOperation<T> : Operation<T> where T : FieldParameters
+    public class EmptyOperation<T> : Operation<T> where T : IDominoProvider
     {
-        public int length;
-        public int width;
+        public EmptyOperation(T input)
+        {
+            state_before = (T)input.Clone();
+        }
         public override void execute(T input)
         {
-            input.length = length;
-            input.height = width;
-        }
-        public ChangeDimensionOperation()
-        {
-            icon_path = "icons/stuff";
-        }
-
-    }
-    public class ChangeMarginOperation<T> : Operation<T> where T: FieldParameters
-    {
-        public int a;
-        public int b;
-        public int c;
-        public int d;
-        public override void execute(T input)
-        {
-            input.a = a;
-            input.b = b;
-            input.c = c;
-            input.d = d;
+           
         }
     }
-    public class AddRowsOperation<T> : Operation<T> where T: FieldParameters
+    public abstract class NeedsFinalizationOperation<T> : Operation<T> where T: IDominoProvider
     {
         public override void execute(T input)
         {
-            // Falls noch nicht berechnet, Feld neu berechnen und als Keyframe speichern.
-            if (input.lastValid)
+            if(!input.lastValid)
             {
                 input.Generate();
-                state_before = input; // TODO: Durch Deep Copy ersetzen 
+                state_before = (T)input.Clone();
             }
-            throw new NotImplementedException();
+            executeInternal(input);
         }
-       
+        public abstract void executeInternal(T input);
     }
+
 }

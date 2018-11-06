@@ -13,7 +13,7 @@ namespace DominoPlanner.Core
     public class DominoTransfer
     {
         public int[] dominoes { get; set; }
-        IDominoShape[] shapes;
+        public IDominoShape[] shapes;
         List<DominoColor> colors;
         public int length
         {

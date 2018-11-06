@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="clipper.cs" />
     <Compile Include="ColorMine\ColorSpace.cs" />
     <Compile Include="ColorMine\ColorSpaces.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="DominoTypes.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ExtensionClasses.cs" />
+    <Compile Include="FieldOperations.cs" />
     <Compile Include="FieldParameters.cs" />
     <Compile Include="HistoryTree.cs" />
     <Compile Include="IDominoProvider.cs" />
