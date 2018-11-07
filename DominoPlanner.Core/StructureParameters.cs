@@ -123,7 +123,7 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         public StructureParameters(WriteableBitmap bitmap, XElement definition, int length, int height, List<DominoColor> colors, IColorSpaceComparison colorMode, AverageMode averageMode, bool allowStretch = false, bool useOnlyMyColors = false) :
-            base(bitmap, colors, colorMode, useOnlyMyColors, null, averageMode, allowStretch)
+            base(bitmap, colors, colorMode, useOnlyMyColors, averageMode, allowStretch)
         {
             structureDefinitionXML = definition;
             this.length = length;
@@ -153,6 +153,11 @@ namespace DominoPlanner.Core
         {
             shapes = structuredef.GenerateStructure(length, height);
             shapesValid = true;
+        }
+
+        public override object Clone()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }

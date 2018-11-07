@@ -67,8 +67,8 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected RectangleDominoProvider(WriteableBitmap bitmap, List<DominoColor> colors, IColorSpaceComparison comp, bool useOnlyMyColors, DominoFilter filter, AverageMode averageMode, bool allowStretch)
-            : base(bitmap, useOnlyMyColors, comp, colors, filter)
+        protected RectangleDominoProvider(WriteableBitmap bitmap, List<DominoColor> colors, IColorSpaceComparison comp, bool useOnlyMyColors, AverageMode averageMode, bool allowStretch)
+            : base(bitmap, useOnlyMyColors, comp, colors)
         {
             this.allowStretch = allowStretch;
             average = averageMode;

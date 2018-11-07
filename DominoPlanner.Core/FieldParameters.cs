@@ -182,6 +182,7 @@ namespace DominoPlanner.Core
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
+        public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
         private WriteableBitmap resizedImage;
@@ -209,7 +210,7 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         public FieldParameters(WriteableBitmap bitmap, List<DominoColor> colors, int a, int b, int c, int d, int width, int height, 
             BitmapScalingMode scalingMode, DitherMode ditherMode, IColorSpaceComparison interpolationMode, bool useOnlyMyColors = false) 
-            : base(bitmap, useOnlyMyColors, interpolationMode, colors, null)
+            : base(bitmap, useOnlyMyColors, interpolationMode, colors)
         {
             this.a = a;
             this.b = b;
@@ -220,7 +221,8 @@ namespace DominoPlanner.Core
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
             hasProcotolDefinition = true;
-            this.history = new HistoryTree<FieldParameters>(new EmptyOperation<FieldParameters>(this));
+            this.history = new EmptyOperation<FieldParameters>(this);
+            current = history;
         }
         /// <summary>
         /// Erzeugt ein Feld, dessen Steineanzahl möglichst nahe an einem bestimmten Wert liegt.
@@ -259,12 +261,12 @@ namespace DominoPlanner.Core
         {
             if (!imageValid)
             {
-                progressIndicator.Report("Resizing Image");
+                if (progressIndicator != null) progressIndicator.Report("Resizing Image");
                 ResizeImage();
             }
             if (!lastValid)
             {
-                progressIndicator.Report("Calculating ideal domino colors");
+                if (progressIndicator != null) progressIndicator.Report("Calculating ideal domino colors");
                 GetDominoes();
             }
             return last;
@@ -284,6 +286,7 @@ namespace DominoPlanner.Core
             
             using (MemoryStream stream = new MemoryStream())
             {
+                source.Lock();
                 PngBitmapEncoder encoder = new PngBitmapEncoder(); // jpeg to remove transparency
                 encoder.Frames.Add(BitmapFrame.Create(source));
                 Console.WriteLine("Hallo");
@@ -333,7 +336,7 @@ namespace DominoPlanner.Core
         private void GetDominoes()
         {
             // apply filters to color list
-            foreach (PreFilter f in PreFilters) f.Apply(colors);
+            //foreach (PreFilter f in PreFilters) f.Apply(colors);
             // remove transparency
             WriteableBitmap b = BitmapFactory.New(resizedImage.PixelWidth, resizedImage.PixelHeight);
             b.Clear(Color.FromArgb(255, 255, 255, 255));
@@ -374,7 +377,9 @@ namespace DominoPlanner.Core
         public override object Clone()
         {
             FieldParameters res = ObjectExtensions.Copy(this);
-            res.history = null;
+            res.history = this.history; // History-Objekt soll immer gleich bleiben
+            res.current = this.current;
+            source.Lock();
             return res;
         }
         #endregion

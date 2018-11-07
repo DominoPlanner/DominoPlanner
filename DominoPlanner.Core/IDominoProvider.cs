@@ -104,13 +104,12 @@ namespace DominoPlanner.Core
 
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(WriteableBitmap bitmap, bool useOnlyMyColors, IColorSpaceComparison comp, List<DominoColor> colors, DominoFilter calculationFilters)
+        protected IDominoProvider(WriteableBitmap bitmap, bool useOnlyMyColors, IColorSpaceComparison comp, List<DominoColor> colors)
         {
             source = FixTransparency(bitmap);
             this.colorMode = comp;
             this.useOnlyMyColors = useOnlyMyColors;
             this.colors = colors;
-            this.calculationFilters = calculationFilters;
         }
         #endregion
         #region public methods

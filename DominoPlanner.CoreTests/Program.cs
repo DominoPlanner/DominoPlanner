@@ -8,11 +8,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.IO;
 using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
 using System.Threading;
 using DominoPlanner.Core;
 using System.Xml.Linq;
 using DominoPlanner.Core.ColorMine.Comparisons;
+using System.Diagnostics;
 
 namespace DominoPlanner.CoreTests
 {
@@ -21,15 +21,15 @@ namespace DominoPlanner.CoreTests
 
         static void Main(string[] args)
         {
-            Thread.Sleep(3000);
-            FieldTest();
-            SpiralTest();
-            WallTest();
+            HistoryTreeFieldTest();
+            //FieldTest();
+            //SpiralTest();
+            //WallTest();
             Console.Read();
         }
-        static async void FieldTest()
+        static void FieldTest()
         {
-            Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+            //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
             WriteableBitmap wb = new WriteableBitmap(b);
@@ -41,9 +41,9 @@ namespace DominoPlanner.CoreTests
             p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
             p.colors.Add(new DominoColor(Colors.White, 1000, "white"));
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
+            //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
 
-            DominoTransfer t = p.Generate(progress);
+            DominoTransfer t = p.Generate();
             Console.WriteLine("Size: " + t.dominoes.Count());
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
@@ -95,7 +95,7 @@ namespace DominoPlanner.CoreTests
             using (var stream = new FileStream(@"WBXTest.png", FileMode.Create))
                 encoder.Save(stream);
         }
-        static async void SpiralTest()
+        static void SpiralTest()
         {
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
@@ -152,7 +152,7 @@ namespace DominoPlanner.CoreTests
             //});
             sw.Close();
         }
-        static async void WallTest()
+        static void WallTest()
         {
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
@@ -212,5 +212,42 @@ namespace DominoPlanner.CoreTests
             //});
             //sw.Close();
         }
+        static void HistoryTreeFieldTest()
+        {
+            //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+
+            BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
+            WriteableBitmap wb = new WriteableBitmap(b);
+            FieldParameters p = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 10000, BitmapScalingMode.HighQuality, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
+            p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
+            p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
+            p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
+            p.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
+            p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
+            p.colors.Add(new DominoColor(Colors.White, 1000, "white"));
+            //FieldParameters state = p.current.getState();
+            wb.Freeze();
+            p.current.getState();
+
+
+
+
+
+            //saveDominoTransfer("Tests/before_resize", state.Generate());
+            //ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};
+
+            //p.current = dims;
+            //saveDominoTransfer("Tests/after_resize", p.current.getState().Generate());
+        }
+        public static void saveDominoTransfer(string path, DominoTransfer transfer)
+        {
+            Console.WriteLine("Size: " + transfer.dominoes.Count());
+            WriteableBitmap b2 = transfer.GenerateImage(2000, false);
+            PngBitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(b2));
+            using (var stream = new FileStream(Path.Combine(path, "FieldTest.png"), FileMode.Create))
+                encoder.Save(stream);
+        }
+
     }
 }

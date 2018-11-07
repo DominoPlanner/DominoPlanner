@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner", "DominoPlanner\DominoPlanner.csproj", "{7AC2F7A9-4252-4265-9324-340AD469A938}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.Core", "DominoPlanner.Core\DominoPlanner.Core.csproj", "{7B3057CF-E826-401F-8F61-344A4EA1AAFE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.CoreTests", "DominoPlanner.CoreTests\DominoPlanner.CoreTests.csproj", "{2F101449-5DBE-41A6-847A-E0F8E1E8056A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.UnitTests", "DominoPlanner.UnitTests\DominoPlanner.UnitTests.csproj", "{85600840-C657-452D-8CF0-0AEFD1B68D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,12 +85,27 @@ Global
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Release|x86.ActiveCfg = Release|Any CPU
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Release|x86.Build.0 = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Debug|x86.Build.0 = Debug|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|x86.ActiveCfg = Release|Any CPU
+		{85600840-C657-452D-8CF0-0AEFD1B68D5D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CBA6F06-2B7A-41B9-B2D8-CEADE64F1D3D}
+	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://johanneslinnenbrink.visualstudio.com/
 		SccLocalPath0 = .
@@ -107,5 +124,8 @@ Global
 		SccProjectUniqueName5 = DominoPlanner.Usage\\DominoPlanner.Usage.csproj
 		SccProjectName5 = DominoPlanner.Usage
 		SccLocalPath5 = DominoPlanner.Usage
+		SccProjectUniqueName6 = DominoPlanner.UnitTests\\DominoPlanner.UnitTests.csproj
+		SccProjectName6 = DominoPlanner.UnitTests
+		SccLocalPath6 = DominoPlanner.UnitTests
 	EndGlobalSection
 EndGlobal

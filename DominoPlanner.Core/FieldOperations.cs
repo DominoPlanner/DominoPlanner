@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
 {
-    public class ChangeDimensionOperation<T> : Operation<T> where T : FieldParameters
+    public class ChangeDimensionOperation<T> : HistoryTree<T> where T : FieldParameters
     {
         public int length;
         public int width;
@@ -15,12 +15,12 @@ namespace DominoPlanner.Core
             input.length = length;
             input.height = width;
         }
-        public ChangeDimensionOperation()
+        public ChangeDimensionOperation(HistoryTree<T> history) : base(history)
         {
             icon_path = "icons/stuff";
         }
     }
-    public class ChangeMarginOperation<T> : Operation<T> where T : FieldParameters
+    public class ChangeMarginOperation<T> : HistoryTree<T> where T : FieldParameters
     {
         public int a;
         public int b;
@@ -32,6 +32,10 @@ namespace DominoPlanner.Core
             input.b = b;
             input.c = c;
             input.d = d;
+        }
+        public ChangeMarginOperation(HistoryTree<T> history) : base(history)
+        {
+
         }
     }
     public class AddRowsOperation<T> : NeedsFinalizationOperation<T> where T : FieldParameters
@@ -66,6 +70,10 @@ namespace DominoPlanner.Core
             input.lastValid = true;
             
         }
+        public AddRowsOperation(HistoryTree<T> history) : base(history)
+        {
+
+        }
     }
     public class AddColumnsOperation<T> : NeedsFinalizationOperation<T> where T : FieldParameters
     {
@@ -99,6 +107,10 @@ namespace DominoPlanner.Core
             }
             input.lastValid = true;
         }
+        public AddColumnsOperation(HistoryTree<T> history) : base(history)
+        {
+
+        }
     }
     public class ReplaceColorOperation<T> : NeedsFinalizationOperation<T> where T : IDominoProvider
     {
@@ -113,6 +125,10 @@ namespace DominoPlanner.Core
                 if (input.last.dominoes[index] == color_old) input.last.dominoes[index] = color_new;
             }
         }
+        public ReplaceColorOperation(HistoryTree<T> history) : base(history)
+        {
+
+        }
     }
     public class SetColorOperation<T> : NeedsFinalizationOperation<T> where T: IDominoProvider
     {
@@ -126,6 +142,10 @@ namespace DominoPlanner.Core
             {
                 input.last.dominoes[index] = color_new;
             }
+        }
+        public SetColorOperation(HistoryTree<T> history) : base(history)
+        {
+
         }
     }
 }

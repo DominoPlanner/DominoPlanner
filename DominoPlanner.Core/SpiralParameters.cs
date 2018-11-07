@@ -138,7 +138,7 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         public SpiralParameters(WriteableBitmap bitmap, double quarterRotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance, List<DominoColor> colors, IColorSpaceComparison colorMode, bool useOnlyMyColors, AverageMode averageMode, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, useOnlyMyColors, null, averageMode, allowStretch)
+            base(bitmap, colors, colorMode, useOnlyMyColors, averageMode, allowStretch)
         {
             this.quarterRotations = quarterRotations;
             this.normalDistance = normalDistance;
@@ -251,6 +251,11 @@ namespace DominoPlanner.Core
             Point point = getPoint(theta);
             Point point2 = getPoint(theta + 0.00001);
             return Math.PI * 0.5d - Math.Atan((point.Y - point2.Y) / (point2.X - point.X));
+        }
+
+        public override object Clone()
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }
