@@ -39,6 +39,11 @@ namespace DominoPlanner.Core
             }
             return pointcol;
         }
+        public System.Drawing.Point[] getSDPath()
+        {
+            return points.Select(point => new System.Drawing.Point() { X = (int) point.X, Y = (int) point.Y }).ToArray();
+        }
+
         /// <summary>
         /// Gibt einen Pfad zurück, wie er für ein WriteableBitmap benötigt wird.
         /// </summary>

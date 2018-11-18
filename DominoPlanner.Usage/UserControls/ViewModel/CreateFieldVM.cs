@@ -1,6 +1,8 @@
 ﻿using ColorMine.ColorSpaces.Comparisons;
 using DominoPlanner.Core;
 using DominoPlanner.Core.ColorMine.Comparisons;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +21,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             //filePath einfach mal öffnen :D
             fsvm = new FieldSizeVM(true);
-            BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.RelativeOrAbsolute));
-            WriteableBitmap wb = new WriteableBitmap(b);
-            fParameters = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1000, BitmapScalingMode.NearestNeighbor, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
+            Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
+            fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1000, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
             fParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             fParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
             fParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
@@ -153,22 +154,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         case 0:
                             bsMode = BitmapScalingMode.Unspecified;
-                            fParameters.resizeMode = BitmapScalingMode.Unspecified;
+                            fParameters.resizeMode = Inter.Lanczos4;
                             sResizeMode = "ähm.. wie wollen wir das nenen?";
                             break;
                         case 1:
                             bsMode = BitmapScalingMode.Linear;
-                            fParameters.resizeMode = BitmapScalingMode.Linear;
+                            fParameters.resizeMode = Inter.Linear;
                             sResizeMode = "Linear";
                             break;
                         case 2:
                             bsMode = BitmapScalingMode.Fant;
-                            fParameters.resizeMode = BitmapScalingMode.Fant;
+                            fParameters.resizeMode = Inter.Cubic;
                             sResizeMode = "Bicubic";
                             break;
                         case 3:
                             bsMode = BitmapScalingMode.NearestNeighbor;
-                            fParameters.resizeMode = BitmapScalingMode.NearestNeighbor;
+                            fParameters.resizeMode = Inter.Nearest;
                             sResizeMode = "Nearest Neighbor";
                             break;
                         default:

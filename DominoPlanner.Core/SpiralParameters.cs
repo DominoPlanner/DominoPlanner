@@ -1,4 +1,5 @@
 ﻿using ColorMine.ColorSpaces.Comparisons;
+using Emgu.CV;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,8 +138,10 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public SpiralParameters(WriteableBitmap bitmap, double quarterRotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance, List<DominoColor> colors, IColorSpaceComparison colorMode, bool useOnlyMyColors, AverageMode averageMode, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, useOnlyMyColors, averageMode, allowStretch)
+        public SpiralParameters(Mat bitmap, double quarterRotations, int normalWidth, int tangentialWidth, 
+            int normalDistance, int tangentialDistance, List<DominoColor> colors, 
+            IColorSpaceComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
+            base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
             this.quarterRotations = quarterRotations;
             this.normalDistance = normalDistance;

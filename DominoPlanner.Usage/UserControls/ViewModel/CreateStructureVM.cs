@@ -31,7 +31,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 using (StreamReader sr = new StreamReader(new FileStream(@"D:\Dropbox\Dropbox\Structures.xml", FileMode.Open)))
                 {
                     xElement = XElement.Parse(sr.ReadToEnd());
-                    structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, true);
+                    structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, 
+                        new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner);
                 }
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;

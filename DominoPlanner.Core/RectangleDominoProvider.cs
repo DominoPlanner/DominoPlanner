@@ -10,6 +10,10 @@ using System.Xml.Linq;
 using DominoPlanner.Core.Dithering;
 using ColorMine.ColorSpaces;
 using System.Windows;
+using Emgu.CV;
+using Emgu.CV.Util;
+using System.ComponentModel;
+//using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {
@@ -54,6 +58,21 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
+        IterationInformation _iterationInfo;
+        public override IterationInformation IterationInformation
+        {
+            get
+            {
+                return _iterationInfo;
+            }
+            set
+            {
+                _iterationInfo = value;
+                _iterationInfo.PropertyChanged +=
+                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
+                lastValid = false;
+            }
+        }
         #endregion
         protected GenStructHelper shapes;
         #region constructors
@@ -67,8 +86,9 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected RectangleDominoProvider(WriteableBitmap bitmap, List<DominoColor> colors, IColorSpaceComparison comp, bool useOnlyMyColors, AverageMode averageMode, bool allowStretch)
-            : base(bitmap, useOnlyMyColors, comp, colors)
+        protected RectangleDominoProvider(Mat bitmap, List<DominoColor> colors, IColorSpaceComparison comp, 
+            AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
+            : base(bitmap, comp, colors, iterationInformation)
         {
             this.allowStretch = allowStretch;
             average = averageMode;
@@ -81,16 +101,16 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
-        public override DominoTransfer Generate(IProgress<string> progressIndicator)
+        public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
             if (!shapesValid)
             {
-                progressIndicator.Report("Calculating Domino Positions...");
+                if (progressIndicator != null) progressIndicator.Report("Calculating Domino Positions...");
                 GenerateShapes();
             }
             if (!lastValid)
             {
-                progressIndicator.Report("Calculating ideal colors...");
+                if (progressIndicator != null) progressIndicator.Report("Calculating ideal colors...");
                 last = new DominoTransfer(CalculateDominoes(), shapes.dominoes, colors);
                 lastValid = true;
             }
@@ -108,33 +128,74 @@ namespace DominoPlanner.Core
         /// <returns>ein Int-Array mit den Farbindizes</returns>
         private int[] CalculateDominoes()
         {
-            
             if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
-            using (source.GetBitmapContext())
+            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Count).ToArray();
+            if (IterationInformation is IterativeColorRestriction)
             {
-                double scalingX = (source.PixelWidth - 1) / shapes.width;
-                double scalingY = (source.PixelHeight - 1) / shapes.height;
+                if (colors.Sum(color => color.count) < source.Width * source.Height)
+                    throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
+            }
+            Lab[] usecolors = getUseColors();
+            int[] dominoes = new int[shapes.dominoes.Length];
+            // tatsächlich genutzte Farben auslesen
+            for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
+            {
+                IterationInformation.numberofiterations = iter;
+                Console.WriteLine($"Iteration {iter}");
+                Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                {
+                    for (int color = 0; color < colors.Count; color++)
+                    {
+                        double minimum = int.MaxValue;
+                        double value = colorMode.Compare(usecolors[i], colors[color].labColor) * IterationInformation.weights[color];
+                        if (value < minimum)
+                        {
+                            minimum = value;
+                            dominoes[i] = color;
+                        }
+                    }
+                });
+                // Farben zählen
+                IterationInformation.EvaluateSolution(colors.ToArray(), dominoes);
+                if (IterationInformation.colorRestrictionsFulfilled != false) break;
+            }
+            return dominoes;
+        }
+        private Lab[] getUseColors()
+        {
+            Lab[] usecolors = new Lab[shapes.dominoes.Length];
+            using (Image<Emgu.CV.Structure.Bgr, Byte> img = source.ToImage<Emgu.CV.Structure.Bgr, Byte>())
+            {
+                double scalingX = (source.Width - 1) / shapes.width;
+                double scalingY = (source.Height - 1) / shapes.height;
                 if (!allowStretch)
                 {
                     if (scalingX > scalingY) scalingX = scalingY;
                     else scalingY = scalingX;
                 }
-                int[] dominoes = new int[shapes.dominoes.Length];
-
-                for (int i = 0; i < shapes.dominoes.Length; i++)
+                
+                // tatsächlich genutzte Farben auslesen
+                Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
                 {
-                    Lab c = new Lab();
+                    Rgb c = new Rgb();
                     if (average == AverageMode.Corner)
                     {
                         DominoRectangle container = shapes.dominoes[i].GetContainer(scalingX, scalingY);
-                        c = source.GetPixel(container.x1, container.y1).ToLab();
+                        c = new Rgb()
+                        {
+                            R = img.Data[container.y1, container.x1, 2],
+                            G = img.Data[container.y1, container.x1, 1],
+                            B = img.Data[container.y1, container.x1, 0]
+                        };
                     }
                     else if (average == AverageMode.Average)
                     {
                         DominoRectangle container = shapes.dominoes[i].GetContainer(scalingX, scalingY);
 
-                        int r = 0, g = 0, b = 0;
+
+                        int R = 0, G = 0, B = 0;
                         int counter = 0;
+
                         // for loop: each container
                         for (int x_iterator = container.x1; x_iterator <= container.x2; x_iterator++)
                         {
@@ -142,38 +203,36 @@ namespace DominoPlanner.Core
                             {
                                 if (shapes.dominoes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY))
                                 {
-                                    Color col = source.GetPixel(x_iterator, y_iterator);
-                                    r += col.R;
-                                    g += col.G;
-                                    b += col.B;
+                                    R += img.Data[container.y1, container.x1, 2];
+                                    G += img.Data[container.y1, container.x1, 1];
+                                    B += img.Data[container.y1, container.x1, 0];
                                     counter++;
                                 }
                             }
                         }
                         if (counter != 0)
                         {
-                            c = Color.FromRgb((byte)(r / counter), (byte)(g / counter), (byte)(b / counter)).ToLab();
+                            c = new Rgb()
+                            {
+                                R = (byte)(R / counter),
+                                G = (byte)(G / counter),
+                                B = (byte)(B / counter)
+                            };
                         }
                         else // rectangle too small
                         {
-                            c = source.GetPixel(container.x1, container.y1).ToLab();
+                            c = new Rgb()
+                            {
+                                R = img.Data[container.y1, container.x1, 2],
+                                G = img.Data[container.y1, container.x1, 1],
+                                B = img.Data[container.y1, container.x1, 0]
+                            };
                         }
                     }
-                    // determine ideal color
-                    double minimum = double.MaxValue;
-                    for (int color = 0; color < colors.Count; color++)
-                    {
-                        double value = colorMode.Compare(c, colors[color].labColor);
-                        if (value < minimum)
-                        {
-                            minimum = value;
-                            dominoes[i] = color;
-                        }
-                    }
-                }
-                shapesValid = true;
-                return dominoes;
+                    usecolors[i] = c.To<Lab>();
+                });
             }
+            return usecolors;
         }
         #endregion
     }

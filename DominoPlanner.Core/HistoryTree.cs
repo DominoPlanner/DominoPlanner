@@ -22,7 +22,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                this.parent = value;
+                _parent = value;
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using DominoPlanner.Core;
 using DominoPlanner.Core.ColorMine.Comparisons;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,9 +21,8 @@ namespace DominoPlanner.Usage
         public ProtocolVM(string filePath)
         {
             //hier muss dann mal die Datei geladen werden
-            BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.RelativeOrAbsolute));
-            WriteableBitmap wb = new WriteableBitmap(b);
-            fParameters = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1500, BitmapScalingMode.HighQuality, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
+            Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
+            fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1500, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
             fParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             fParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
             fParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
@@ -332,7 +333,7 @@ namespace DominoPlanner.Usage
             DefaultBackColor = true;
             IntelligentTextColor = true;
             HideText = true;
-            currentOPP.orientation = Orientation.Horizontal;
+            currentOPP.orientation = Core.Orientation.Horizontal;
 
             CurrentProtocol = fParameters.GetHTMLProcotol(currentOPP);
 

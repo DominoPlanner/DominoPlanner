@@ -437,7 +437,7 @@ namespace DominoPlanner.Document_Classes
             {
                 GraphicsPath p = shapes[i].GetPath();
                 g.FillPath(new SolidBrush(SystemMediaColorToSystemDrawingColor(Colors[dominoes[i]].rgb)), p);
-                if (draw_borders == true) g.DrawPath(new Pen(Color.Black, size_x / ((export) ? 1200 : 600)), p);
+                if (draw_borders == true) g.DrawPath(new Pen(Color.Black, size_x / ((export) ? size_x : 600)), p);
 
             }
             TargetPreview = ImageHelper.BitmapToBitmapSource((Bitmap)b);

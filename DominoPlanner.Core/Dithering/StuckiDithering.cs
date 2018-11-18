@@ -9,22 +9,23 @@ namespace DominoPlanner.Core.Dithering
 {
     class StuckiDithering : BasicDithering
     {
-        public StuckiDithering(IColorSpaceComparison comparison, List<DominoColor> palette) : base(comparison, palette)
+        public StuckiDithering(IColorSpaceComparison comparison, List<DominoColor> palette, IterationInformation iterationInformation)
+            : base(comparison, palette, iterationInformation)
         {
-
+            maxDegreeOfParallelism = 1;
         }
 
         protected override void DiffuseError(int x, int y, int r, int g, int b)
         {
             //right pixels
-            if (x + 1 < bitmap.PixelWidth)
+            if (x + 1 < bitmap.Width)
             {
                 SetPixel(x + 1, y, 
                         Scale((int)(GetPixel(x + 1, y).R + (r * 8d / 42d))),
                         Scale((int)(GetPixel(x + 1, y).G + (g * 8d / 42d))),
                         Scale((int)(GetPixel(x + 1, y).B + (b * 8d / 42d))));
             }
-            if (x + 2 < bitmap.PixelWidth)
+            if (x + 2 < bitmap.Width)
             {
                 SetPixel(x + 2, y,
                         Scale((int)((GetPixel(x + 2, y).R) + (r * 4d / 42d))),
@@ -32,20 +33,20 @@ namespace DominoPlanner.Core.Dithering
                         Scale((int)((GetPixel(x + 2, y).B) + (b * 4d / 42d))));
             }
             //first row
-            if (y + 1 < bitmap.PixelHeight)
+            if (y + 1 < bitmap.Height)
             {
                 SetPixel(x, y + 1, 
                         Scale((int)((GetPixel(x, y + 1).R) + (r * 8d / 42d))),
                         Scale((int)((GetPixel(x, y + 1).G) + (g * 8d / 42d))),
                         Scale((int)((GetPixel(x, y + 1).B) + (b * 8d / 42d))));
-                if (x + 1 < bitmap.PixelWidth)
+                if (x + 1 < bitmap.Width)
                 {
                     SetPixel(x + 1, y + 1, 
                         Scale((int)((GetPixel(x + 1, y + 1).R) + (r * 4d / 42d))),
                         Scale((int)((GetPixel(x + 1, y + 1).G) + (g * 4d / 42d))),
                         Scale((int)((GetPixel(x + 1, y + 1).B) + (b * 4d / 42d))));
                 }
-                if (x + 2 < bitmap.PixelWidth)
+                if (x + 2 < bitmap.Width)
                 {
                     SetPixel(x + 2, y + 1,
                         Scale((int)((GetPixel(x + 2, y + 1).R) + (r * 2d / 42d))),
@@ -68,20 +69,20 @@ namespace DominoPlanner.Core.Dithering
                 }
             }
             //second row
-            if (y + 2 < bitmap.PixelHeight)
+            if (y + 2 < bitmap.Height)
             {
                 SetPixel(x, y + 2, 
                         Scale((int)((GetPixel(x, y + 2).R) + (r * 4d / 42d))),
                         Scale((int)((GetPixel(x, y + 2).G) + (g * 4d / 42d))),
                         Scale((int)((GetPixel(x, y + 2).B) + (b * 4d / 42d))));
-                if (x + 1 < bitmap.PixelWidth)
+                if (x + 1 < bitmap.Width)
                 {
                     SetPixel(x + 1, y + 2, 
                         Scale((int)((GetPixel(x + 1, y + 2).R) + (r * 2d / 42d))),
                         Scale((int)((GetPixel(x + 1, y + 2).G) + (g * 2d / 42d))),
                         Scale((int)((GetPixel(x + 1, y + 2).B) + (b * 2d / 42d))));
                 }
-                if (x + 2 < bitmap.PixelWidth)
+                if (x + 2 < bitmap.Width)
                 {
                     SetPixel(x + 2, y + 2, 
                         Scale((int)((GetPixel(x + 2, y + 2).R) + (r * 1d / 42d))),

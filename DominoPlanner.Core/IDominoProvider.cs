@@ -6,6 +6,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.IO;
 using OfficeOpenXml;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
 {
@@ -23,12 +26,13 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
-        protected WriteableBitmap source;
+        protected Mat source;
         /// <summary>
         /// Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
-        public bool useOnlyMyColors { get; set; }
+        public virtual IterationInformation IterationInformation { get; set; }
+
         private List<DominoColor> _colors;
         /// <summary>
         /// Die Farben, die für dieses Objekt verwendet werden sollen.
@@ -74,7 +78,7 @@ namespace DominoPlanner.Core
 
         public List<ImageFilter> ImageFilters { get; set; }
 
-        
+
         public List<PostFilter> PostFilters { get; set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
@@ -93,7 +97,7 @@ namespace DominoPlanner.Core
                         {
                             counts[item]++;
                         }
-                  }
+                    }
                 }
                 return counts;
             }
@@ -104,12 +108,12 @@ namespace DominoPlanner.Core
 
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(WriteableBitmap bitmap, bool useOnlyMyColors, IColorSpaceComparison comp, List<DominoColor> colors)
+        protected IDominoProvider(Mat bitmap, IColorSpaceComparison comp, List<DominoColor> colors, IterationInformation iterationInformation)
         {
-            source = FixTransparency(bitmap);
+            source = overlayImage(bitmap);
             this.colorMode = comp;
-            this.useOnlyMyColors = useOnlyMyColors;
             this.colors = colors;
+            this.IterationInformation = iterationInformation;
         }
         #endregion
         #region public methods
@@ -212,18 +216,6 @@ namespace DominoPlanner.Core
         #endregion
         #region internal methods
         /// <summary>
-        /// Behebt das Transparenzproblem, indem das Bitmap auf ein weißes Bitmap überblendet wird.
-        /// </summary>
-        /// <param name="source">Das zu fixende Bitmap.</param>
-        /// <returns>Das Bitmap, nur ohne Transparenz auf weißem Hintergrund.</returns>
-        private static WriteableBitmap FixTransparency(WriteableBitmap source)
-        {
-            WriteableBitmap bitm = BitmapFactory.New(source.PixelWidth, source.PixelHeight);
-            bitm.Clear(Color.FromArgb(255, 255, 255, 255));
-            bitm.Blit(new Rect(0, 0, source.PixelWidth, source.PixelHeight), source, new Rect(0, 0, source.PixelWidth, source.PixelHeight), WriteableBitmapExtensions.BlendMode.None);
-            return bitm;
-        }
-        /// <summary>
         /// Berechnet das Basisfeld eines Objekts aus dessen Protokolldefinition. 
         /// </summary>
         /// <param name="o">Die Orientierung des gewünschten Basisfeldes</param>
@@ -233,7 +225,7 @@ namespace DominoPlanner.Core
             if (!hasProcotolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
             if (!lastValid || !shapesValid) throw new InvalidOperationException("This object has unreflected changes.");
             int[,] basefield = new int[last.dominoLength, last.dominoHeight];
-            for (int i= 0; i < basefield.GetLength(0); i++)
+            for (int i = 0; i < basefield.GetLength(0); i++)
             {
                 for (int j = 0; j < basefield.GetLength(1); j++)
                 {
@@ -250,6 +242,31 @@ namespace DominoPlanner.Core
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
             return basefield;
         }
+        public Mat overlayImage(Mat overlay)
+        {
+            if (overlay.NumberOfChannels != 4) return overlay;
+            Image<Emgu.CV.Structure.Bgra, byte> overlay_img = overlay.ToImage<Emgu.CV.Structure.Bgra, byte>();
+
+            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+            Parallel.For(0, overlay_img.Height, (y) =>
+           {
+               for (int x = overlay_img.Width - 1; x >= 0 ; x--)
+               {
+                   double opacity = (double)(overlay_img.Data[y, x, 3]) / 255;
+
+                   for (int c = 2; c >= 0; c--)
+                   {
+                       overlay_img.Data[y, x, c] = (byte)(255 * (1 - opacity) + overlay_img.Data[y, x, c] * (opacity));
+                   }
+               }
+           });
+            
+            overlay_img.Save("tests/res.png");
+            watch.Stop();
+            Console.WriteLine("Blend " + watch.ElapsedMilliseconds);
+            return overlay_img.Mat;
+        }
+    
         /// <summary>
         /// Spiegelt einen Array an der Nicht-Delta-Diagonale
         /// </summary>

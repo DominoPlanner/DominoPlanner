@@ -61,17 +61,26 @@ namespace DominoPlanner.Core
             {
                 for (int y = -1; y < sHeight + 1; y++)
                 {
-                    DominoList.AddRange(
-                        (cells[(x == -1) ? 0 : ((x == sWidth) ? 2 : 1), (y == -1) ? 0 : ((y == sHeight) ? 2 : 1)]
-                        .TransformDefinition(
-                            (x == -1) ? 0 : (cells[1, 1].width * x + cells[0, 0].width),
-                            (y == -1) ? 0 : (cells[1, 1].height * y + cells[0, 0].height),
-                            x, y, sWidth, sHeight))
-                        .dominoes);
+                    try
+                    {
+                        DominoList.AddRange(
+                            (cells[(x == -1) ? 0 : ((x == sWidth) ? 2 : 1), (y == -1) ? 0 : ((y == sHeight) ? 2 : 1)]
+                            .TransformDefinition(
+                                (x == -1) ? 0 : (cells[1, 1].width * x + cells[0, 0].width),
+                                (y == -1) ? 0 : (cells[1, 1].height * y + cells[0, 0].height),
+                                x, y, sWidth, sHeight))
+                            .dominoes);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Caught: " + e);
+                    }
+                    
                 }
             }
             g.dominoes = DominoList.ToArray();
             g.HasProtocolDefinition = hasProtocolDefinition;
+            int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;
         }
         public WriteableBitmap DrawPreview(int col, int row, int targetDimension)

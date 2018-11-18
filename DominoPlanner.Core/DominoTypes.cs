@@ -106,7 +106,7 @@ namespace DominoPlanner.Core
             double xmin = points.Min(p => p.X);
             double ymin = points.Min(p => p.Y);
             double xmax = points.Max(p => p.X);
-            double ymax = points.Max(p => p.X);
+            double ymax = points.Max(p => p.Y);
            
             return new DominoRectangle() { x = xmin * scaling_x, y = ymin * scaling_y, width = (xmax - xmin) * scaling_x, height = (ymax - ymin) * scaling_y };
         }

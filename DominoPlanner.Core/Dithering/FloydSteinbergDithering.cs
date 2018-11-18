@@ -5,17 +5,21 @@ namespace DominoPlanner.Core.Dithering
 {
     class FloydSteinbergDithering : BasicDithering
     {
-        public FloydSteinbergDithering(IColorSpaceComparison comparison, List<DominoColor> palette) : base(comparison, palette) { }
+        public FloydSteinbergDithering(IColorSpaceComparison comparison, List<DominoColor> palette, IterationInformation iterationInformation) 
+            : base(comparison, palette, iterationInformation) {
+            maxDegreeOfParallelism = 1;
+
+        }
         protected override void DiffuseError(int x, int y, int r, int g, int b)
         {
-            if (x + 1 < bitmap.PixelWidth)
+            if (x + 1 < bitmap.Width)
             {
                 SetPixel(x + 1, y, 
                         Scale((int)((GetPixel(x + 1, y).R) + (r * 7d / 16d))),
                         Scale((int)((GetPixel(x + 1, y).G) + (g * 7d / 16d))),
                         Scale((int)((GetPixel(x + 1, y).B) + (b * 7d / 16d))));
             }
-            if (y + 1 < bitmap.PixelHeight && x != 0)
+            if (y + 1 < bitmap.Height && x != 0)
             {
                 SetPixel(x - 1, y + 1, 
                         Scale((int)((GetPixel(x - 1, y + 1).R) + (r * 3d / 16d))),

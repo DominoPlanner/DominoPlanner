@@ -5,6 +5,10 @@ using System.IO;
 using System.Windows.Threading;
 using ColorMine.ColorSpaces.Comparisons;
 using System.Collections.Generic;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DominoPlanner.Core
 {
@@ -18,8 +22,8 @@ namespace DominoPlanner.Core
         {
             set
             {
-                double tempwidth = Math.Sqrt(((double)source.PixelHeight * (a + b) * value * (c + d) * source.PixelWidth)) / (source.PixelHeight * (a + b));
-                double tempheight = Math.Sqrt(((double)source.PixelHeight * (a + b) * value * (c + d) * source.PixelWidth)) / (source.PixelWidth * (c + d));
+                double tempwidth = Math.Sqrt(((double)source.Height * (a + b) * value * (c + d) * source.Width)) / (source.Height * (a + b));
+                double tempheight = Math.Sqrt(((double)source.Height * (a + b) * value * (c + d) * source.Width)) / (source.Width * (c + d));
                 if (tempwidth < tempheight)
                 {
                     length = (int)Math.Round(tempwidth);
@@ -109,12 +113,12 @@ namespace DominoPlanner.Core
             }
         }
 
-        private BitmapScalingMode _resizeMode;
+        private Inter _resizeMode;
         /// <summary>
         /// Gibt an, mit welcher Genauigkeit das Bild verkleinert werden soll.
         /// Bicubic eignet sich für Fotos, NearestNeighbor für Logos
         /// </summary>
-        public BitmapScalingMode resizeMode
+        public Inter resizeMode
         {
             get
             {
@@ -141,7 +145,6 @@ namespace DominoPlanner.Core
             set
             {
                 _ditherMode = value;
-                shapesValid = false;
                 lastValid = false;
             }
         }
@@ -181,11 +184,26 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
+        IterationInformation _iterationInfo;
+        public override IterationInformation IterationInformation
+        {
+            get
+            {
+                return _iterationInfo;
+            }
+            set
+            {
+                _iterationInfo = value;
+                _iterationInfo.PropertyChanged +=
+                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
+                lastValid = false;
+            }
+        }
         public HistoryTree<FieldParameters> history { get; set; }
         public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
-        private WriteableBitmap resizedImage;
+        private Mat resizedImage;
         private IDominoShape[] shapes;
         private bool imageValid = false;
         #endregion
@@ -208,9 +226,9 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        public FieldParameters(WriteableBitmap bitmap, List<DominoColor> colors, int a, int b, int c, int d, int width, int height, 
-            BitmapScalingMode scalingMode, DitherMode ditherMode, IColorSpaceComparison interpolationMode, bool useOnlyMyColors = false) 
-            : base(bitmap, useOnlyMyColors, interpolationMode, colors)
+        public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int width, int height, 
+            Inter scalingMode, DitherMode ditherMode, IColorSpaceComparison colormode, IterationInformation iterationInformation) 
+            : base(bitmap, colormode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -243,9 +261,9 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
-        public FieldParameters(WriteableBitmap bitmap, List<DominoColor> colors, int a, int b, int c, int d, int targetSize, 
-            BitmapScalingMode scalingMode, DitherMode ditherMode, IColorSpaceComparison interpolationMode, bool useOnlyMyColors = false) 
-            : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, useOnlyMyColors)
+        public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int targetSize, 
+            Inter scalingMode, DitherMode ditherMode, IColorSpaceComparison interpolationMode, IterationInformation iterationInformation) 
+            : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
             targetCount = targetSize;
         }
@@ -281,30 +299,11 @@ namespace DominoPlanner.Core
         {
             if (length < 2) length = 2;
             if (height < 2) height = 2;
-            BitmapImage temp = new BitmapImage();
-            RenderTargetBitmap target;
-            
-            using (MemoryStream stream = new MemoryStream())
-            {
-                source.Lock();
-                PngBitmapEncoder encoder = new PngBitmapEncoder(); // jpeg to remove transparency
-                encoder.Frames.Add(BitmapFrame.Create(source));
-                Console.WriteLine("Hallo");
-                encoder.Save(stream);
-                var group = new DrawingGroup();
-                RenderOptions.SetBitmapScalingMode(group, resizeMode);
-                group.Children.Add(new ImageDrawing(source, new System.Windows.Rect(0, 0, length, height)));
-                var targetVisual = new DrawingVisual();
-                var targetContext = targetVisual.RenderOpen();
-                targetContext.DrawDrawing(group);
-                target = new RenderTargetBitmap(length, height, 96, 96, PixelFormats.Default);
-
-                targetContext.Close();
-                target.Render(targetVisual);
-            }
+            resizedImage = new Mat();
+            CvInvoke.Resize(source, resizedImage, new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
             imageValid = true;
             if (!shapesValid) GenerateShapes();
-            resizedImage = new WriteableBitmap(target); /*Dispatcher.CurrentDispatcher.Invoke(() => new WriteableBitmap(target));*/
+            //shapes = new IDominoShape[height*length];
         }
         /// <summary>
         /// Berechnet die Shapes mit den angegebenen Parametern.
@@ -312,7 +311,7 @@ namespace DominoPlanner.Core
         public void GenerateShapes()
         {
             IDominoShape[] array = new IDominoShape[length*height];
-            for (int xi = 0; xi < length; xi++)
+            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism=1}, (xi) =>
             {
                 for (int yi = 0; yi < height; yi++)
                 {
@@ -322,11 +321,11 @@ namespace DominoPlanner.Core
                         y = (c + d) * yi,
                         width = b,
                         height = c,
-                        position = new ProtocolDefinition() { x = xi, y=yi }
+                        position = new ProtocolDefinition() { x = xi, y = yi }
                     };
                     array[height * xi + yi] = shape;
                 }
-            }
+            });
             shapes = array;
             shapesValid = true;
         }
@@ -338,20 +337,16 @@ namespace DominoPlanner.Core
             // apply filters to color list
             //foreach (PreFilter f in PreFilters) f.Apply(colors);
             // remove transparency
-            WriteableBitmap b = BitmapFactory.New(resizedImage.PixelWidth, resizedImage.PixelHeight);
-            b.Clear(Color.FromArgb(255, 255, 255, 255));
-            b.Blit(new System.Windows.Rect(0, 0, resizedImage.PixelWidth, resizedImage.PixelHeight), resizedImage, new System.Windows.Rect(0, 0, resizedImage.PixelWidth, resizedImage.PixelHeight), WriteableBitmapExtensions.BlendMode.None);
-
             Dithering.BasicDithering d;
             switch(ditherMode)
             {
                 // todo: rewrite Ditherings
-                case DitherMode.NoDithering: d = new Dithering.BasicDithering(colorMode, colors); break;
-                case DitherMode.FloydSteinberg: d = new Dithering.FloydSteinbergDithering(colorMode, colors); break;
-                case DitherMode.JarvisJudiceNinke: d = new Dithering.JarvisJudiceNinkeDithering(colorMode, colors); break;
-                default: d = new Dithering.StuckiDithering(colorMode, colors); break;
+                case DitherMode.NoDithering: d = new Dithering.BasicDithering(colorMode, colors, IterationInformation); break;
+                case DitherMode.FloydSteinberg: d = new Dithering.FloydSteinbergDithering(colorMode, colors, IterationInformation); break;
+                case DitherMode.JarvisJudiceNinke: d = new Dithering.JarvisJudiceNinkeDithering(colorMode, colors, IterationInformation); break;
+                default: d = new Dithering.StuckiDithering(colorMode, colors, IterationInformation); break;
             }
-            last = new DominoTransfer(d.Dither(b), shapes, colors);
+            last = new DominoTransfer(d.Dither(resizedImage), shapes, colors);
             lastValid = true;
         }
         /// <summary>
@@ -379,7 +374,6 @@ namespace DominoPlanner.Core
             FieldParameters res = ObjectExtensions.Copy(this);
             res.history = this.history; // History-Objekt soll immer gleich bleiben
             res.current = this.current;
-            source.Lock();
             return res;
         }
         #endregion
