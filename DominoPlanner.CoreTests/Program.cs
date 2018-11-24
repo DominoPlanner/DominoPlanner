@@ -16,6 +16,7 @@ using System.Diagnostics;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
+using DominoPlanner.Core.Dithering;
 
 namespace DominoPlanner.CoreTests
 {
@@ -30,7 +31,7 @@ namespace DominoPlanner.CoreTests
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    FieldTest("tests/bird.jpg");
+                    FieldTest("tests/mars.jpg");
                     Thread.Sleep(2000);
                 }
             }
@@ -40,7 +41,7 @@ namespace DominoPlanner.CoreTests
                 throw;
             }
             //CircleTest("tests/NewField.jpg");
-            //WallTest("tests/NewField.jpg");
+            //
             //WallTest("tests/NewField.jpg");
             //FieldTest("tests/NewField.jpg");
 
@@ -63,10 +64,10 @@ namespace DominoPlanner.CoreTests
         static void FieldTest(String path)
         {
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-
-            Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
-            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 7000, Inter.Lanczos4, 
-                DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison, new IterativeColorRestriction(20, 0.5));
+            Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 100000, Inter.Lanczos4,
+                new JarvisJudiceNinkeDithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.colors.Add(new DominoColor(Colors.Black, 2000, "black"));
             p.colors.Add(new DominoColor(Colors.Blue, 2000, "blue"));
             p.colors.Add(new DominoColor(Colors.Gray, 2000, "gray"));
@@ -75,7 +76,7 @@ namespace DominoPlanner.CoreTests
             p.colors.Add(new DominoColor(Colors.Yellow, 2000, "yellow"));
             p.colors.Add(new DominoColor(Colors.Red, 2000, "red"));
             p.colors.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "white"));
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
 
             DominoTransfer t = p.Generate();
@@ -83,10 +84,10 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            //Mat b2 = t.GenerateImage(2000, false);
+            Mat b2 = t.GenerateImage(Colors.Black);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
-            //b2.Save("tests/FieldTest.png");
+            b2.Save("tests/FieldTest.png");
             FileStream fs = new FileStream(@"FieldPlanTest.html", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
             /*sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
@@ -116,6 +117,7 @@ namespace DominoPlanner.CoreTests
 
             //});
             sw.Close();
+
 
         }
         static void WBXTest()
@@ -302,8 +304,8 @@ namespace DominoPlanner.CoreTests
 
             BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 10000, Inter.Lanczos4, 
-                DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 10000, Inter.Lanczos4,
+                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
             p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));

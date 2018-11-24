@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 namespace DominoPlanner.Core
 {
 
-    public class DominoTransfer
+    public class DominoTransfer : ICloneable
     {
         public int[] dominoes { get; set; }
         public IDominoShape[] shapes;
@@ -53,6 +53,10 @@ namespace DominoPlanner.Core
         }
         public Mat GenerateImage(int targetWidth = 0, bool borders = false)
         {
+            return GenerateImage(Colors.White, targetWidth, borders);
+        }
+        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false)
+        {
 
             double scalingFactor = 1;
             int width = shapes.Max(s => s.GetContainer().x2);
@@ -65,7 +69,10 @@ namespace DominoPlanner.Core
                 int y_min = shapes.Min(s => s.GetContainer().y1);
                 scalingFactor = (double)targetWidth / width;
             }
-            Image<Emgu.CV.Structure.Bgra, byte> bitmap = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor), (int)(heigth * scalingFactor));
+            Image<Emgu.CV.Structure.Bgra, byte> bitmap
+                = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor), (int)(heigth * scalingFactor),
+                new Emgu.CV.Structure.Bgra() { Alpha = 255, Blue = background.B, Green = background.G, Red = background.R });
+            
 
             Parallel.For(0, dominoes.Length, (i) =>
            {
@@ -147,9 +154,18 @@ namespace DominoPlanner.Core
             return bitmap;
             */
         }
+
+        public object Clone()
+        {
+            DominoTransfer res = (DominoTransfer) this.MemberwiseClone();
+            dominoes.CopyTo(res.dominoes, 0);
+            res.iterationInfo = (IterationInformation) iterationInfo.Clone();
+
+            return res;
+        }
     }
 
-    public abstract class IterationInformation : INotifyPropertyChanged
+    public abstract class IterationInformation : INotifyPropertyChanged, ICloneable
     {
         public int numberofiterations;
         public double[] weights;
@@ -163,6 +179,13 @@ namespace DominoPlanner.Core
         public virtual void EvaluateSolution(DominoColor[] palette, int[] field)
         {
 
+        }
+
+        public object Clone()
+        {
+            IterationInformation res = (IterationInformation) this.MemberwiseClone();
+            this.weights.CopyTo(res.weights, 0);
+            return res;
         }
     }
     public class NoColorRestriction : IterationInformation

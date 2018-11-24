@@ -9,6 +9,8 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Linq;
+using ColorMine.ColorSpaces;
 
 namespace DominoPlanner.Core
 {
@@ -132,11 +134,11 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
-        private DitherMode _ditherMode;
+        private Dithering.Dithering _ditherMode;
         /// <summary>
         /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
         /// </summary>
-        public DitherMode ditherMode
+        public Dithering.Dithering ditherMode
         {
             get
             {
@@ -227,7 +229,7 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int width, int height, 
-            Inter scalingMode, DitherMode ditherMode, IColorSpaceComparison colormode, IterationInformation iterationInformation) 
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorSpaceComparison colormode, IterationInformation iterationInformation) 
             : base(bitmap, colormode, colors, iterationInformation)
         {
             this.a = a;
@@ -262,7 +264,7 @@ namespace DominoPlanner.Core
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
         public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int targetSize, 
-            Inter scalingMode, DitherMode ditherMode, IColorSpaceComparison interpolationMode, IterationInformation iterationInformation) 
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorSpaceComparison interpolationMode, IterationInformation iterationInformation) 
             : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
             targetCount = targetSize;
@@ -304,6 +306,8 @@ namespace DominoPlanner.Core
             imageValid = true;
             if (!shapesValid) GenerateShapes();
             //shapes = new IDominoShape[height*length];
+            GC.SuppressFinalize(resizedImage);
+            GC.SuppressFinalize(source);
         }
         /// <summary>
         /// Berechnet die Shapes mit den angegebenen Parametern.
@@ -337,16 +341,55 @@ namespace DominoPlanner.Core
             // apply filters to color list
             //foreach (PreFilter f in PreFilters) f.Apply(colors);
             // remove transparency
-            Dithering.BasicDithering d;
-            switch(ditherMode)
+            Console.WriteLine("Debug Flag");
+            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Count).ToArray();
+            if (IterationInformation is IterativeColorRestriction)
             {
-                // todo: rewrite Ditherings
-                case DitherMode.NoDithering: d = new Dithering.BasicDithering(colorMode, colors, IterationInformation); break;
-                case DitherMode.FloydSteinberg: d = new Dithering.FloydSteinbergDithering(colorMode, colors, IterationInformation); break;
-                case DitherMode.JarvisJudiceNinke: d = new Dithering.JarvisJudiceNinkeDithering(colorMode, colors, IterationInformation); break;
-                default: d = new Dithering.StuckiDithering(colorMode, colors, IterationInformation); break;
+                if (colors.Sum(color => color.count) < resizedImage.Width * resizedImage.Height)
+                    throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }
-            last = new DominoTransfer(d.Dither(resizedImage), shapes, colors);
+            int[] field = new int[resizedImage.Width * resizedImage.Height];
+            using (Image<Emgu.CV.Structure.Bgr, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgr, Byte>())
+            {
+                // tatsächlich genutzte Farben auslesen
+                for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
+                {
+                    IterationInformation.numberofiterations = iter;
+                    Console.WriteLine($"Iteration {iter}");
+                    Parallel.For(0, resizedImage.Width, new ParallelOptions() { MaxDegreeOfParallelism = ditherMode.maxDegreeOfParallelism }, (x) =>
+                    {
+                        for (int y = resizedImage.Height - 1; y >= 0; y--)
+                        {
+                            Rgb rgb = new Rgb()
+                            {
+                                R = bitmap.Data[y, x, 2],
+                                G = bitmap.Data[y, x, 1],
+                                B = bitmap.Data[y, x, 0]
+                            };
+                            Lab lab = rgb.To<Lab>();
+                            int Minimum = 0;
+                            double min = Int32.MaxValue;
+                            double temp = Int32.MaxValue;
+                            for (int z = colors.Count - 1; z >= 0; z--)
+                            {
+                                temp = colorMode.Compare(colors[z].labColor, lab) * IterationInformation.weights[z];
+                                if (min > temp)
+                                {
+                                    min = temp;
+                                    Minimum = z;
+                                }
+                            }
+                            Color newpixel = colors[Minimum].mediaColor;
+                            field[resizedImage.Height * x + y] = Minimum;
+                            ditherMode.DiffuseError(
+                                x, y, (int)(rgb.R) - newpixel.R, (int)(rgb.G) - newpixel.G, (int)(rgb.B) - newpixel.B, bitmap);
+                        }
+                    });
+                    IterationInformation.EvaluateSolution(colors.ToArray(), field);
+                    if (IterationInformation.colorRestrictionsFulfilled != false) break;
+                }
+            }
+            last = new DominoTransfer(field, shapes, colors);
             lastValid = true;
         }
         /// <summary>
@@ -371,10 +414,17 @@ namespace DominoPlanner.Core
 
         public override object Clone()
         {
-            FieldParameters res = ObjectExtensions.Copy(this);
-            res.history = this.history; // History-Objekt soll immer gleich bleiben
-            res.current = this.current;
+            FieldParameters res = (FieldParameters)this.MemberwiseClone();
+            res.source = source.Clone();
+            res.resizedImage = resizedImage?.Clone();
+            // History-Objekt soll immer gleich bleiben. Keinesfalls klonen. 
+            res.last = (DominoTransfer) last?.Clone();
             return res;
+        }
+        private FieldParameters(Mat mat, List<DominoColor> list, IColorSpaceComparison colorMode, IterationInformation iterationInformation)
+            : base(mat,  colorMode, list, iterationInformation)
+        {
+
         }
         #endregion
     }

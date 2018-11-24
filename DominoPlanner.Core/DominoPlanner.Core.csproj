@@ -72,7 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircleParameters.cs" />
-    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="clipper.cs" />
     <Compile Include="ColorMine\ColorSpace.cs" />
     <Compile Include="ColorMine\ColorSpaces.cs" />
