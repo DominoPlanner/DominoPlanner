@@ -26,8 +26,11 @@ namespace DominoPlanner.CoreTests
 
         {
             Thread.Sleep(3000);
+            Workspace.Instance.root_path = Path.GetFullPath("tests");
+            Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
+            
             //HistoryTreeFieldTest("tests/NewField.jpg");
-            try
+            /*try
             {
                 for (int i = 0; i < 10; i++)
                 {
@@ -39,17 +42,50 @@ namespace DominoPlanner.CoreTests
             {
                 Console.WriteLine(ex.Message);
                 throw;
-            }
+            }*/
             //CircleTest("tests/NewField.jpg");
             //
             //WallTest("tests/NewField.jpg");
             //FieldTest("tests/NewField.jpg");
-
-
+            ColorRepoSaveTest();
+            var result1 = ColorRepoLoadTest("colors.xml");
+            var result2 = ColorRepoLoadTest("colors.xml");
+            Console.WriteLine($"zurückgegebene Objekte identisch? { result1 == result2}");
+            for (int i = 0; i < result1.Length; i++)
+            {
+                Console.WriteLine(result1[i].name + " " + (i > 0 ? result1.Anzeigeindizes[i-1] : -1));
+            }
+            Console.WriteLine(String.Join("\n", result1.RepresentionForCalculation.Select(x => $"{x.name}, {x.mediaColor}").ToArray()));
 
             //Console.WriteLine(Test());
             Console.ReadLine();
             
+        }
+
+        private static void ColorRepoSaveTest()
+        {
+            var repo = new ColorRepository();
+            repo.Add(new DominoColor(Colors.Black, 2000, "black"));
+            repo.Add(new DominoColor(Colors.Blue, 2000, "blue"));
+            repo.Add(new DominoColor(Colors.Gray, 2000, "gray"));
+            repo.Add(new DominoColor(Colors.DarkGreen, 2000, "dark_green"));
+            repo.Add(new DominoColor(Colors.Green, 2000, "green"));
+            repo.Add(new DominoColor(Colors.Yellow, 2000, "yellow"));
+            repo.Add(new DominoColor(Colors.Red, 2000, "red"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "white"));
+            repo.MoveUp((DominoColor) repo[3]);
+            Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
+            repo.MoveUp((DominoColor)repo[3]);
+            Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
+            repo.MoveDown((DominoColor)repo[3]);
+            Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
+            repo.MoveUp((DominoColor)repo[4]);
+            Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
+            repo.Save("colors.xml");
+        }
+        private static ColorRepository ColorRepoLoadTest(String path)
+        {
+            return ColorRepository.Load(path);
         }
         static async Task<String> Test()
         {
