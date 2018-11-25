@@ -1,5 +1,4 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -145,9 +144,9 @@ namespace DominoPlanner.Core
                 Console.WriteLine($"Iteration {iter}");
                 Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
                 {
+                    double minimum = int.MaxValue;
                     for (int color = 0; color < colors.Length; color++)
                     {
-                        double minimum = int.MaxValue;
                         double value = colors[color].distance(usecolors[i], colorMode) * IterationInformation.weights[color];
                         if (value < minimum)
                         {
@@ -218,6 +217,7 @@ namespace DominoPlanner.Core
                             img.Data[container.y1, container.x1, 2], img.Data[container.y1, container.x1, 3]);
                         }
                     }
+                    usecolors[i] = c;
                 });
             }
             return usecolors;

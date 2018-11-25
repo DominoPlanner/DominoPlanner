@@ -1,5 +1,4 @@
-﻿using ColorMine.ColorSpaces;
-using ColorMine.ColorSpaces.Comparisons;
+﻿
 using DominoPlanner.Core;
 using Emgu.CV;
 using System;

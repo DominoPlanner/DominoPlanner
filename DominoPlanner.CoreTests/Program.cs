@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ColorMine.ColorSpaces.Comparisons;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.IO;
@@ -11,7 +10,6 @@ using System.Windows.Threading;
 using System.Threading;
 using DominoPlanner.Core;
 using System.Xml.Linq;
-using DominoPlanner.Core.ColorMine.Comparisons;
 using System.Diagnostics;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -45,7 +43,7 @@ namespace DominoPlanner.CoreTests
             }*/
             //CircleTest("tests/NewField.jpg");
             //
-            //WallTest("tests/NewField.jpg");
+            WallTest("tests/bird.jpg");
             //FieldTest("tests/NewField.jpg");
             ColorRepoSaveTest();
             var result1 = ColorRepoLoadTest("colors.DColor");
@@ -57,7 +55,7 @@ namespace DominoPlanner.CoreTests
             }
             Console.WriteLine(String.Join("\n", result1.RepresentionForCalculation.Select(x => $"{x.name}, {x.mediaColor}").ToArray()));
 
-            FieldTest("tests/bird.jpg");
+            //FieldTest("tests/bird.jpg");
 
             //Console.WriteLine(Test());
             Console.ReadLine();
@@ -67,15 +65,36 @@ namespace DominoPlanner.CoreTests
         private static void ColorRepoSaveTest()
         {
             var repo = new ColorRepository();
-            repo.Add(new DominoColor(Colors.Black, 2000, "black"));
-            repo.Add(new DominoColor(Colors.Blue, 2000, "blue"));
-            repo.Add(new DominoColor(Colors.Gray, 2000, "gray"));
-            repo.Add(new DominoColor(Colors.DarkGreen, 2000, "dark_green"));
-            repo.Add(new DominoColor(Colors.Green, 2000, "green"));
-            repo.Add(new DominoColor(Colors.Yellow, 2000, "yellow"));
-            repo.Add(new DominoColor(Colors.Red, 2000, "red"));
-            repo.Add(new DominoColor(Colors.LightBlue, 2000, "light_blue"));
-            repo.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "white"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 17, 17, 16), 1000, "schwarz"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 38, 36, 36), 1000, "dunkelgrau"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 124, 119, 115), 1000, "silber"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 170, 164, 155), 1000, "grau"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 39, 24, 17), 1000, "braunschwarz"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 84, 38, 19), 1000, "braun"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 133, 56, 23), 1000, "kupfer"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 151, 90, 27), 1000, "ocker"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 151, 99, 71), 1000, "hellbraun"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 46, 13, 36), 1000, "dunkelviolett"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 86, 31, 70), 1000, "lila"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 158, 34, 104), 1000, "hellviolett"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 193, 126, 144), 1000, "pastellviolett"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 6, 46, 184), 1000, "blau"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 70, 131, 191), 1000, "hellblau"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 51, 170, 142), 1000, "gelb"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 228, 160, 82), 1000, "maisgelb"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 229, 184, 134), 1000, "sandgelb"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 135, 98, 10), 1000, "gold"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 236, 78, 17), 1000, "orange"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 252, 80, 60), 1000, "orangerot"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 210, 64, 74), 1000, "altrosa"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 207, 30, 22), 1000, "rot"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 186, 45, 36), 1000, "blutorange"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 146, 23, 26), 1000, "himbeerrot"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 255, 42, 80), 1000, "leuchtrot"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 230, 127, 121), 1000, "rosa"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 255, 54, 196), 1000, "pink"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 242, 241, 193), 1000, "elfenbein"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "weiß"));
             repo.MoveUp((DominoColor) repo[3]);
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
             repo.MoveUp((DominoColor)repo[3]);
@@ -282,7 +301,7 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            Mat b2 = t.GenerateImage(1000, false);
+            Mat b2 = t.GenerateImage(borders: false);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/WallTest.png");

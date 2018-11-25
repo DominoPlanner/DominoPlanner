@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using ColorMine.ColorSpaces;
 using DominoPlanner.Core.Dithering;
 using System.Xml.Linq;
-using ColorMine.ColorSpaces.Comparisons;
 using System.Collections.ObjectModel;
 using ProtoBuf;
 using System.IO;
@@ -75,7 +73,7 @@ namespace DominoPlanner.Core
         public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp)
         {
             if (count == 0) return Int32.MaxValue;
-            return comp.Distance(color.ToLab(), mediaColor.ToLab());
+            return comp.Distance(color.ToLab(), labColor);
         }
         public DominoColor(XElement source)
         {

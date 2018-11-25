@@ -1,11 +1,4 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoPlanner.Core
+﻿namespace DominoPlanner.Core
 {
     public enum DitherMode
     {

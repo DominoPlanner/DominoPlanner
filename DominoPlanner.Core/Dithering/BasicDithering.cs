@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ColorMine.ColorSpaces;
-using ColorMine.ColorSpaces.Comparisons;
 using System.Windows.Media.Imaging;
 using Emgu.CV;
 using System.Threading.Tasks;

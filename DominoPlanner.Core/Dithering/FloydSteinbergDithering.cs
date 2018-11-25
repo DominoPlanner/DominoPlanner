@@ -1,4 +1,4 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
+﻿
 using Emgu.CV;
 using System.Collections.Generic;
 

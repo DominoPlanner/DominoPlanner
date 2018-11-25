@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ColorMine.ColorSpaces.Comparisons;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;

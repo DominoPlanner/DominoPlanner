@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Windows.Media.Imaging;
 using System.Windows.Media;
-using System.IO;
-using System.Windows.Threading;
-using ColorMine.ColorSpaces.Comparisons;
-using System.Collections.Generic;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Linq;
-using ColorMine.ColorSpaces;
-
 namespace DominoPlanner.Core
 {
     /// <summary>
