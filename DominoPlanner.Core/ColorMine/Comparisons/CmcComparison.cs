@@ -80,4 +80,5 @@ namespace ColorMine.ColorSpaces.Comparisons
             return adiv * adiv;
         }
     }
+
 }

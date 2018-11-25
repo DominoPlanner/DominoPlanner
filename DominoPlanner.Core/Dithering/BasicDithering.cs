@@ -15,12 +15,12 @@ namespace DominoPlanner.Core.Dithering
         // Die Dithering-Verfahren müssen sequenziell ausgeführt werden.
         public int maxDegreeOfParallelism = -1;
 
-        public virtual void DiffuseError(int x, int y, int v1, int v2, int v3, Image<Emgu.CV.Structure.Bgr, byte> bitmap)
+        public virtual void DiffuseError(int x, int y, int v1, int v2, int v3, Image<Emgu.CV.Structure.Bgra, byte> bitmap)
         {
             // do nothing in default implementation
         }
 
-        protected void SetPixel(int x, int y, byte r, byte g, byte b, Image<Emgu.CV.Structure.Bgr, byte> bitmap)
+        protected void SetPixel(int x, int y, byte r, byte g, byte b, Image<Emgu.CV.Structure.Bgra, byte> bitmap)
         {
             if (x >= bitmap.Width) x = bitmap.Width - 1;
             else if (x < 0) x = 0;
@@ -31,7 +31,7 @@ namespace DominoPlanner.Core.Dithering
             bitmap.Data[y, x, 2] = r;
 
         }
-        protected System.Windows.Media.Color GetPixel(int x, int y, Image<Emgu.CV.Structure.Bgr, byte> bitmap)
+        protected System.Windows.Media.Color GetPixel(int x, int y, Image<Emgu.CV.Structure.Bgra, byte> bitmap)
         {
             if (x >= bitmap.Width) x = bitmap.Width - 1;
             else if (x < 0) x = 0;

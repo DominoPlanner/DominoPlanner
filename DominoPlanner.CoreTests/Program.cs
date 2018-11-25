@@ -28,7 +28,7 @@ namespace DominoPlanner.CoreTests
             Thread.Sleep(3000);
             Workspace.Instance.root_path = Path.GetFullPath("tests");
             Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
-            
+
             //HistoryTreeFieldTest("tests/NewField.jpg");
             /*try
             {
@@ -48,14 +48,16 @@ namespace DominoPlanner.CoreTests
             //WallTest("tests/NewField.jpg");
             //FieldTest("tests/NewField.jpg");
             ColorRepoSaveTest();
-            var result1 = ColorRepoLoadTest("colors.xml");
-            var result2 = ColorRepoLoadTest("colors.xml");
+            var result1 = ColorRepoLoadTest("colors.DColor");
+            var result2 = ColorRepoLoadTest("colors.DColor");
             Console.WriteLine($"zurückgegebene Objekte identisch? { result1 == result2}");
             for (int i = 0; i < result1.Length; i++)
             {
                 Console.WriteLine(result1[i].name + " " + (i > 0 ? result1.Anzeigeindizes[i-1] : -1));
             }
             Console.WriteLine(String.Join("\n", result1.RepresentionForCalculation.Select(x => $"{x.name}, {x.mediaColor}").ToArray()));
+
+            FieldTest("tests/bird.jpg");
 
             //Console.WriteLine(Test());
             Console.ReadLine();
@@ -72,6 +74,7 @@ namespace DominoPlanner.CoreTests
             repo.Add(new DominoColor(Colors.Green, 2000, "green"));
             repo.Add(new DominoColor(Colors.Yellow, 2000, "yellow"));
             repo.Add(new DominoColor(Colors.Red, 2000, "red"));
+            repo.Add(new DominoColor(Colors.LightBlue, 2000, "light_blue"));
             repo.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "white"));
             repo.MoveUp((DominoColor) repo[3]);
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
@@ -81,7 +84,7 @@ namespace DominoPlanner.CoreTests
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
             repo.MoveUp((DominoColor)repo[4]);
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
-            repo.Save("colors.xml");
+            repo.Save("colors.DColor");
         }
         private static ColorRepository ColorRepoLoadTest(String path)
         {
@@ -102,16 +105,8 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 100000, Inter.Lanczos4,
-                new JarvisJudiceNinkeDithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
-            p.colors.Add(new DominoColor(Colors.Black, 2000, "black"));
-            p.colors.Add(new DominoColor(Colors.Blue, 2000, "blue"));
-            p.colors.Add(new DominoColor(Colors.Gray, 2000, "gray"));
-            p.colors.Add(new DominoColor(Colors.DarkGreen, 2000, "dark_green"));
-            p.colors.Add(new DominoColor(Colors.Green, 2000, "green"));
-            p.colors.Add(new DominoColor(Colors.Yellow, 2000, "yellow"));
-            p.colors.Add(new DominoColor(Colors.Red, 2000, "red"));
-            p.colors.Add(new DominoColor(Color.FromArgb(255, 230, 230, 230), 2000, "white"));
+            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 10000, Inter.Lanczos4,
+                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new IterativeColorRestriction(60, 0.1));
 
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
 
@@ -120,7 +115,7 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            Mat b2 = t.GenerateImage(Colors.Black);
+            Mat b2 = t.GenerateImage(Colors.Transparent);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/FieldTest.png");
@@ -170,7 +165,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            SpiralParameters p = new SpiralParameters(mat, 220, 24, 8, 8, 8, new List<DominoColor>(), 
+            SpiralParameters p = new SpiralParameters(mat, 220, 24, 8, 8, 8, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
@@ -226,14 +221,8 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(mat, 200, 8, 24, 8, 8, new List<DominoColor>(),
+            CircleParameters p = new CircleParameters(mat, 200, 8, 24, 8, 8, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-            p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            p.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            p.colors.Add(new DominoColor(Colors.White, 1000, "white"));
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -284,13 +273,7 @@ namespace DominoPlanner.CoreTests
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
             StructureParameters p = new StructureParameters(mat, xml.Elements().ElementAt(1), 200000, 
-                new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction(), true);
-            p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            p.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            p.colors.Add(new DominoColor(Colors.LightGray, 1000, "white"));
+                "colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction(), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
 
@@ -340,14 +323,8 @@ namespace DominoPlanner.CoreTests
 
             BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            FieldParameters p = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 10000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 10000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
-            p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            p.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            p.colors.Add(new DominoColor(Colors.White, 1000, "white"));
             FieldParameters state = p.current.getState();
             state.Generate().GenerateImage(2000, false).Save("Tests/before_resize");
             ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};

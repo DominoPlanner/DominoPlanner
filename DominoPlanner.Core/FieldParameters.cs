@@ -228,8 +228,8 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int width, int height, 
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorSpaceComparison colormode, IterationInformation iterationInformation) 
+        public FieldParameters(Mat bitmap, String colors, int a, int b, int c, int d, int width, int height, 
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison colormode, IterationInformation iterationInformation) 
             : base(bitmap, colormode, colors, iterationInformation)
         {
             this.a = a;
@@ -263,8 +263,8 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
-        public FieldParameters(Mat bitmap, List<DominoColor> colors, int a, int b, int c, int d, int targetSize, 
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorSpaceComparison interpolationMode, IterationInformation iterationInformation) 
+        public FieldParameters(Mat bitmap, string colors, int a, int b, int c, int d, int targetSize, 
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
             : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
             targetCount = targetSize;
@@ -342,14 +342,15 @@ namespace DominoPlanner.Core
             //foreach (PreFilter f in PreFilters) f.Apply(colors);
             // remove transparency
             Console.WriteLine("Debug Flag");
-            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Count).ToArray();
-            if (IterationInformation is IterativeColorRestriction)
+            var colors = this.colors.RepresentionForCalculation;
+            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
+            /*if (IterationInformation is IterativeColorRestriction)
             {
-                if (colors.Sum(color => color.count) < resizedImage.Width * resizedImage.Height)
+                if (colors.Sum(color => ) < resizedImage.Width * resizedImage.Height)
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
-            }
+            }*/
             int[] field = new int[resizedImage.Width * resizedImage.Height];
-            using (Image<Emgu.CV.Structure.Bgr, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgr, Byte>())
+            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {
                 // tatsächlich genutzte Farben auslesen
                 for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
@@ -360,19 +361,19 @@ namespace DominoPlanner.Core
                     {
                         for (int y = resizedImage.Height - 1; y >= 0; y--)
                         {
-                            Rgb rgb = new Rgb()
-                            {
+                            Emgu.CV.Structure.Bgra bgra = bitmap[y, x];
+                            /*Color rgb = Color.FromArgb(
                                 R = bitmap.Data[y, x, 2],
                                 G = bitmap.Data[y, x, 1],
                                 B = bitmap.Data[y, x, 0]
-                            };
-                            Lab lab = rgb.To<Lab>();
+                            )};*/
+                            /*Lab lab = rgb.To<Lab>();*/
                             int Minimum = 0;
                             double min = Int32.MaxValue;
                             double temp = Int32.MaxValue;
-                            for (int z = colors.Count - 1; z >= 0; z--)
+                            for (int z = colors.Length - 1; z >= 0; z--)
                             {
-                                temp = colorMode.Compare(colors[z].labColor, lab) * IterationInformation.weights[z];
+                                temp = colors[z].distance(bgra, colorMode) * IterationInformation.weights[z];
                                 if (min > temp)
                                 {
                                     min = temp;
@@ -382,14 +383,14 @@ namespace DominoPlanner.Core
                             Color newpixel = colors[Minimum].mediaColor;
                             field[resizedImage.Height * x + y] = Minimum;
                             ditherMode.DiffuseError(
-                                x, y, (int)(rgb.R) - newpixel.R, (int)(rgb.G) - newpixel.G, (int)(rgb.B) - newpixel.B, bitmap);
+                                x, y, (int)(bgra.Red) - newpixel.R, (int)(bgra.Green) - newpixel.G, (int)(bgra.Blue) - newpixel.B, bitmap);
                         }
                     });
-                    IterationInformation.EvaluateSolution(colors.ToArray(), field);
+                    IterationInformation.EvaluateSolution(colors, field);
                     if (IterationInformation.colorRestrictionsFulfilled != false) break;
                 }
             }
-            last = new DominoTransfer(field, shapes, colors);
+            last = new DominoTransfer(field, shapes, this.colors);
             lastValid = true;
         }
         /// <summary>
@@ -421,8 +422,8 @@ namespace DominoPlanner.Core
             res.last = (DominoTransfer) last?.Clone();
             return res;
         }
-        private FieldParameters(Mat mat, List<DominoColor> list, IColorSpaceComparison colorMode, IterationInformation iterationInformation)
-            : base(mat,  colorMode, list, iterationInformation)
+        private FieldParameters(Mat mat, String colors, IColorComparison colorMode, IterationInformation iterationInformation)
+            : base(mat, colorMode, colors, iterationInformation)
         {
 
         }

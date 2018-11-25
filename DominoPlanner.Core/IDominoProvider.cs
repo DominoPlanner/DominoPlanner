@@ -32,12 +32,9 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
         public virtual IterationInformation IterationInformation { get; set; }
-
-        private List<DominoColor> _colors;
-        /// <summary>
-        /// Die Farben, die für dieses Objekt verwendet werden sollen.
-        /// </summary>
-        public List<DominoColor> colors
+        // das Repo wird nicht serialisiert, nur der Pfad dazu
+        private ColorRepository _colors;
+        public ColorRepository colors
         {
             get
             {
@@ -49,16 +46,29 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
+        private string _colorPath;
+        public string ColorPath
+        {
+            get
+            {
+                return _colorPath;
+            }
+            set
+            {
+                _colorPath = value;
+                colors = ColorRepository.Load(value);
+            }
+        }
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
         /// </summary>
         public abstract int targetCount { set; }
-        private IColorSpaceComparison _colorMode;
+        private IColorComparison _colorMode;
         /// <summary>
         /// Der Interpolationsmodus, der zur Farberkennung berechnet wird.
         /// </summary>
-        public IColorSpaceComparison colorMode
+        public IColorComparison colorMode
         {
             get
             {
@@ -87,8 +97,8 @@ namespace DominoPlanner.Core
         {
             get
             {
-                if (!shapesValid || !lastValid) throw new InvalidOperationException("Unreflected Changes in this object, please recalculate to get counts");
-                int[] counts = new int[colors.Count];
+                if (!shapesValid || !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
+                int[] counts = new int[colors.Length];
                 if (last != null)
                 {
                     foreach (int item in last.dominoes)
@@ -108,11 +118,11 @@ namespace DominoPlanner.Core
 
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(Mat bitmap, IColorSpaceComparison comp, List<DominoColor> colors, IterationInformation iterationInformation)
+        protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation)
         {
             source = overlayImage(bitmap);
             this.colorMode = comp;
-            this.colors = colors;
+            this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
         }
         #endregion

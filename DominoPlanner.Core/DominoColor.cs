@@ -27,8 +27,8 @@ namespace DominoPlanner.Core
             }
             set { mediaColor = (Color)ColorConverter.ConvertFromString(value);}
         }
-        internal Lab labColor;
-        public abstract double distance(Color color, IColorSpaceComparison comp);
+        internal Emgu.CV.Structure.Lab labColor;
+        public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp);
         private Color _mediacolor;
         public Color mediaColor { get { return _mediacolor; }
             set { _mediacolor = value; labColor = value.ToLab(); } }
@@ -51,9 +51,9 @@ namespace DominoPlanner.Core
         {
             get { return true; }
         }
-        public override double distance(Color color, IColorSpaceComparison comp)
+        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp)
         {
-            if (color.A < 128) return 0;
+            if (color.Alpha < 128) return 0;
             else return Int32.MaxValue;
         }
         public override XElement Save()
@@ -63,7 +63,7 @@ namespace DominoPlanner.Core
         }
         public EmptyDomino()
         {
-            mediaColor = Colors.Transparent;
+            mediaColor = System.Windows.Media.Colors.Transparent;
             name = "[empty]";
         }
         
@@ -72,10 +72,10 @@ namespace DominoPlanner.Core
     [ProtoContract]
     public class DominoColor : IDominoColor
     {
-        public override double distance(Color color, IColorSpaceComparison comp)
+        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp)
         {
             if (count == 0) return Int32.MaxValue;
-            return comp.Compare(color.ToLab(), mediaColor.ToLab());
+            return comp.Distance(color.ToLab(), mediaColor.ToLab());
         }
         public DominoColor(XElement source)
         {
@@ -249,7 +249,7 @@ namespace DominoPlanner.Core
             }
             xml.Save(path);
             */
-            using (var file = new FileStream(path, FileMode.Truncate))
+            using (var file = new FileStream(path, FileMode.Create))
             {
                 Serializer.Serialize<ColorRepository>(file, this);
             }

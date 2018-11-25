@@ -30,7 +30,7 @@ namespace DominoPlanner.Core
             }
         }
 
-        public List<DominoColor> colors { get; set; }
+        public ColorRepository colors { get; set; }
 
         public int[] counts { get; set; }
 

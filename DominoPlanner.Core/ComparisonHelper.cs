@@ -1,17 +1,16 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DominoPlanner.Core.ColorMine.Comparisons
+namespace DominoPlanner.Core
 {
     public abstract class ColorDetectionMode
     {
         // singleton
         private static CieDe2000Comparison comp1;
-        public static IColorSpaceComparison CieDe2000Comparison
+        public static IColorComparison CieDe2000Comparison
         {
             get
             {
@@ -23,7 +22,7 @@ namespace DominoPlanner.Core.ColorMine.Comparisons
             }
         }
         private static CmcComparison comp2;
-        public static IColorSpaceComparison CmcComparison
+        public static IColorComparison CmcComparison
         {
             get
             {
@@ -35,7 +34,7 @@ namespace DominoPlanner.Core.ColorMine.Comparisons
             }
         }
         private static Cie1976Comparison comp3;
-        public static IColorSpaceComparison Cie1976Comparison
+        public static IColorComparison Cie1976Comparison
         {
             get
             {
@@ -47,7 +46,7 @@ namespace DominoPlanner.Core.ColorMine.Comparisons
             }
         }
         private static Cie94Comparison comp4;
-        public static IColorSpaceComparison Cie94Comparison
+        public static IColorComparison Cie94Comparison
         {
             get
             {

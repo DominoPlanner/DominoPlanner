@@ -110,7 +110,7 @@ namespace DominoPlanner.Core
         public override int targetCount { set => throw new NotImplementedException(); }
 
         public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance, 
-            List<DominoColor> colors, IColorSpaceComparison colorMode, AverageMode averageMode, 
+            string colors, IColorComparison colorMode, AverageMode averageMode, 
             IterationInformation iterationInformation,  bool allowStretch = false) :
             base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {

@@ -11,7 +11,7 @@ namespace DominoPlanner.Core.Dithering
             maxDegreeOfParallelism = 1;
 
         }
-        public override void DiffuseError(int x, int y, int r, int g, int b, Image<Emgu.CV.Structure.Bgr, byte> bitmap)
+        public override void DiffuseError(int x, int y, int r, int g, int b, Image<Emgu.CV.Structure.Bgra, byte> bitmap)
         {
             if (x + 1 < bitmap.Width)
             {

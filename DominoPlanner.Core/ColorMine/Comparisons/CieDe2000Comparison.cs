@@ -8,10 +8,6 @@ namespace ColorMine.ColorSpaces.Comparisons
     /// </summary>
     internal class CieDe2000Comparison : IColorSpaceComparison
     {
-        /// <summary>
-        /// Calculates the DE2000 delta-e value: http://en.wikipedia.org/wiki/Color_difference#CIEDE2000
-        /// Correct implementation provided courtesy of Jonathan Hofinger, jaytar42
-        /// </summary>
         public double Compare(Lab lab1, Lab lab2)
         {
             //Set weighting factors to 1

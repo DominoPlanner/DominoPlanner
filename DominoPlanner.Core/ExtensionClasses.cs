@@ -55,10 +55,5 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static Lab ToLab(this System.Windows.Media.Color input)
-        {
-            Rgb color = new Rgb() { R = input.R, B = input.B, G = input.G };
-            return color.To<Lab>();
-        }
     }
 }

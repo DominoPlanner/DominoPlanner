@@ -85,7 +85,7 @@
     <Compile Include="ColorMine\Comparisons\Cie94Comparison.cs" />
     <Compile Include="ColorMine\Comparisons\CieDe2000Comparison.cs" />
     <Compile Include="ColorMine\Comparisons\CmcComparison.cs" />
-    <Compile Include="ColorMine\Comparisons\ComparisonHelper.cs" />
+    <Compile Include="ComparisonHelper.cs" />
     <Compile Include="ColorMine\Comparisons\EuklideanComparison.cs" />
     <Compile Include="ColorMine\Comparisons\IColorSpaceComparison.cs" />
     <Compile Include="ColorMine\Conversions\CmyConverter.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="ColorMine\Conversions\Utility\DoubleExtension.cs" />
     <Compile Include="ColorMine\Conversions\XyzConverter.cs" />
     <Compile Include="ColorMine\Conversions\YxyConverter.cs" />
+    <Compile Include="Colors.cs" />
     <Compile Include="Dithering\BasicDithering.cs" />
     <Compile Include="Dithering\FloydSteinbergDithering.cs" />
     <Compile Include="Dithering\JarvisJudiceNinkeDithering.cs" />

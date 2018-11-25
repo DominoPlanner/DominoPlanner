@@ -17,7 +17,7 @@ namespace DominoPlanner.Core
     {
         public int[] dominoes { get; set; }
         public IDominoShape[] shapes;
-        List<DominoColor> colors;
+        ColorRepository colors;
         public IterationInformation iterationInfo {get; set;}
         public int length
         {
@@ -44,7 +44,7 @@ namespace DominoPlanner.Core
                 return new Tuple<IDominoShape, Color, string>(shapes[index], colors[dominoes[index]].mediaColor, colors[dominoes[index]].name);
             }
         }
-        public DominoTransfer(int[] dominoColors, IDominoShape[] shapes, List<DominoColor> colors)
+        public DominoTransfer(int[] dominoColors, IDominoShape[] shapes, ColorRepository colors)
         {
             if (dominoColors.Length != shapes.Length) throw new InvalidOperationException("Colors and shapes must have the same length");
             this.dominoes = dominoColors;
@@ -176,7 +176,7 @@ namespace DominoPlanner.Core
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public virtual void EvaluateSolution(DominoColor[] palette, int[] field)
+        public virtual void EvaluateSolution(IDominoColor[] palette, int[] field)
         {
 
         }
@@ -234,7 +234,7 @@ namespace DominoPlanner.Core
             maxNumberOfIterations = nit;
             this.iterationWeight = iterationWeight;
         }
-        public override void EvaluateSolution(DominoColor[] palette, int[] field)
+        public override void EvaluateSolution(IDominoColor[] palette, int[] field)
         {
             int[] counts = new int[palette.Length];
             for (int j = field.Length - 1; j >= 0; j--)

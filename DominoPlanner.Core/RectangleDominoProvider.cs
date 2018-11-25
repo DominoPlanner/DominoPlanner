@@ -8,11 +8,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using DominoPlanner.Core.Dithering;
-using ColorMine.ColorSpaces;
 using System.Windows;
 using Emgu.CV;
 using Emgu.CV.Util;
 using System.ComponentModel;
+using Emgu.CV.Structure;
 //using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
@@ -86,7 +86,7 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected RectangleDominoProvider(Mat bitmap, List<DominoColor> colors, IColorSpaceComparison comp, 
+        protected RectangleDominoProvider(Mat bitmap, string colors, IColorComparison comp, 
             AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
             : base(bitmap, comp, colors, iterationInformation)
         {
@@ -128,14 +128,15 @@ namespace DominoPlanner.Core
         /// <returns>ein Int-Array mit den Farbindizes</returns>
         private int[] CalculateDominoes()
         {
+            var colors = this.colors.RepresentionForCalculation;
             if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
-            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Count).ToArray();
+            IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
             if (IterationInformation is IterativeColorRestriction)
             {
                 if (colors.Sum(color => color.count) < source.Width * source.Height)
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }
-            Lab[] usecolors = getUseColors();
+            Bgra[] usecolors = getUseColors();
             int[] dominoes = new int[shapes.dominoes.Length];
             // tatsächlich genutzte Farben auslesen
             for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
@@ -144,10 +145,10 @@ namespace DominoPlanner.Core
                 Console.WriteLine($"Iteration {iter}");
                 Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
                 {
-                    for (int color = 0; color < colors.Count; color++)
+                    for (int color = 0; color < colors.Length; color++)
                     {
                         double minimum = int.MaxValue;
-                        double value = colorMode.Compare(usecolors[i], colors[color].labColor) * IterationInformation.weights[color];
+                        double value = colors[color].distance(usecolors[i], colorMode) * IterationInformation.weights[color];
                         if (value < minimum)
                         {
                             minimum = value;
@@ -161,10 +162,10 @@ namespace DominoPlanner.Core
             }
             return dominoes;
         }
-        private Lab[] getUseColors()
+        private Bgra[] getUseColors()
         {
-            Lab[] usecolors = new Lab[shapes.dominoes.Length];
-            using (Image<Emgu.CV.Structure.Bgr, Byte> img = source.ToImage<Emgu.CV.Structure.Bgr, Byte>())
+            var usecolors = new Bgra[shapes.dominoes.Length];
+            using (Image<Bgra, Byte> img = source.ToImage<Bgra, Byte>())
             {
                 double scalingX = (source.Width - 1) / shapes.width;
                 double scalingY = (source.Height - 1) / shapes.height;
@@ -177,23 +178,19 @@ namespace DominoPlanner.Core
                 // tatsächlich genutzte Farben auslesen
                 Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
                 {
-                    Rgb c = new Rgb();
+                    Bgra c = new Bgra();
                     if (average == AverageMode.Corner)
                     {
                         DominoRectangle container = shapes.dominoes[i].GetContainer(scalingX, scalingY);
-                        c = new Rgb()
-                        {
-                            R = img.Data[container.y1, container.x1, 2],
-                            G = img.Data[container.y1, container.x1, 1],
-                            B = img.Data[container.y1, container.x1, 0]
-                        };
+                        c = new Bgra(img.Data[container.y1, container.x1, 0], img.Data[container.y1, container.x1, 1],
+                            img.Data[container.y1, container.x1, 2], img.Data[container.y1, container.x1, 3]);
                     }
                     else if (average == AverageMode.Average)
                     {
                         DominoRectangle container = shapes.dominoes[i].GetContainer(scalingX, scalingY);
 
 
-                        int R = 0, G = 0, B = 0;
+                        double R = 0, G = 0, B = 0, A = 0;
                         int counter = 0;
 
                         // for loop: each container
@@ -206,30 +203,21 @@ namespace DominoPlanner.Core
                                     R += img.Data[container.y1, container.x1, 2];
                                     G += img.Data[container.y1, container.x1, 1];
                                     B += img.Data[container.y1, container.x1, 0];
+                                    A += img.Data[container.y1, container.x1, 3];
                                     counter++;
                                 }
                             }
                         }
                         if (counter != 0)
                         {
-                            c = new Rgb()
-                            {
-                                R = (byte)(R / counter),
-                                G = (byte)(G / counter),
-                                B = (byte)(B / counter)
-                            };
+                            c = new Bgra((byte)(B / counter), (byte)(G / counter), (byte)(R / counter), (byte)(A / counter));
                         }
                         else // rectangle too small
                         {
-                            c = new Rgb()
-                            {
-                                R = img.Data[container.y1, container.x1, 2],
-                                G = img.Data[container.y1, container.x1, 1],
-                                B = img.Data[container.y1, container.x1, 0]
-                            };
+                            c = new Bgra(img.Data[container.y1, container.x1, 0], img.Data[container.y1, container.x1, 1],
+                            img.Data[container.y1, container.x1, 2], img.Data[container.y1, container.x1, 3]);
                         }
                     }
-                    usecolors[i] = c.To<Lab>();
                 });
             }
             return usecolors;
