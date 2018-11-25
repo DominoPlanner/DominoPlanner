@@ -31,6 +31,9 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
         public virtual IterationInformation IterationInformation { get; set; }
+        private byte _TransparencySetting;
+            
+        public byte TransparencySetting { get => _TransparencySetting; set { lastValid = false; _TransparencySetting = value; }}
         // das Repo wird nicht serialisiert, nur der Pfad dazu
         private ColorRepository _colors;
         public ColorRepository colors
@@ -119,7 +122,8 @@ namespace DominoPlanner.Core
         #region const
         protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation)
         {
-            source = overlayImage(bitmap);
+            //source = overlayImage(bitmap);
+            source = bitmap;
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;

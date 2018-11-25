@@ -26,7 +26,7 @@ namespace DominoPlanner.Core
             set { mediaColor = (Color)ColorConverter.ConvertFromString(value);}
         }
         internal Emgu.CV.Structure.Lab labColor;
-        public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp);
+        public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
         private Color _mediacolor;
         public Color mediaColor { get { return _mediacolor; }
             set { _mediacolor = value; labColor = value.ToLab(); } }
@@ -49,9 +49,9 @@ namespace DominoPlanner.Core
         {
             get { return true; }
         }
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp)
+        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
         {
-            if (color.Alpha < 128) return 0;
+            if (color.Alpha < transparencyThreshold) return 0;
             else return Int32.MaxValue;
         }
         public override XElement Save()
@@ -64,13 +64,11 @@ namespace DominoPlanner.Core
             mediaColor = System.Windows.Media.Colors.Transparent;
             name = "[empty]";
         }
-        
-        
     }
     [ProtoContract]
     public class DominoColor : IDominoColor
     {
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp)
+        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
         {
             if (count == 0) return Int32.MaxValue;
             return comp.Distance(color.ToLab(), labColor);

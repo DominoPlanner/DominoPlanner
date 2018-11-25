@@ -45,9 +45,9 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static System.Drawing.Color ToSD(this Color c)
+        public static System.Drawing.Color ToSD(this Color c, bool removeTransparency= false)
         {
-            return System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
+            return System.Drawing.Color.FromArgb(removeTransparency ? 255 :c.A, c.R, c.G, c.B);
         }
         /// <summary>
         /// Konvertiert die Farbe in den Lab-Farbraum.

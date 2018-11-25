@@ -295,7 +295,8 @@ namespace DominoPlanner.Core
             if (length < 2) length = 2;
             if (height < 2) height = 2;
             resizedImage = new Mat();
-            CvInvoke.Resize(source, resizedImage, new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
+            CvInvoke.Resize(source, resizedImage, 
+                new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
             imageValid = true;
             if (!shapesValid) GenerateShapes();
             //shapes = new IDominoShape[height*length];
@@ -343,7 +344,11 @@ namespace DominoPlanner.Core
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }*/
             int[] field = new int[resizedImage.Width * resizedImage.Height];
-            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgra, Byte>())
+            source.Save("tests/source.png");
+            resizedImage.Save("tests/resized.png");
+            var transpfix = (TransparencySetting == 0) ? overlayImage(resizedImage) : resizedImage;
+            transpfix.Save("tests/transparency_saved.png");
+            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = transpfix.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {
                 // tatsächlich genutzte Farben auslesen
                 for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
@@ -355,18 +360,12 @@ namespace DominoPlanner.Core
                         for (int y = resizedImage.Height - 1; y >= 0; y--)
                         {
                             Emgu.CV.Structure.Bgra bgra = bitmap[y, x];
-                            /*Color rgb = Color.FromArgb(
-                                R = bitmap.Data[y, x, 2],
-                                G = bitmap.Data[y, x, 1],
-                                B = bitmap.Data[y, x, 0]
-                            )};*/
-                            /*Lab lab = rgb.To<Lab>();*/
                             int Minimum = 0;
                             double min = Int32.MaxValue;
                             double temp = Int32.MaxValue;
                             for (int z = colors.Length - 1; z >= 0; z--)
                             {
-                                temp = colors[z].distance(bgra, colorMode) * IterationInformation.weights[z];
+                                temp = colors[z].distance(bgra, colorMode, TransparencySetting) * IterationInformation.weights[z];
                                 if (min > temp)
                                 {
                                     min = temp;

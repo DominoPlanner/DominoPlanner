@@ -130,11 +130,11 @@ namespace DominoPlanner.Core
             var colors = this.colors.RepresentionForCalculation;
             if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
-            if (IterationInformation is IterativeColorRestriction)
+            /*if (IterationInformation is IterativeColorRestriction)
             {
                 if (colors.Sum(color => color.count) < source.Width * source.Height)
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
-            }
+            }*/
             Bgra[] usecolors = getUseColors();
             int[] dominoes = new int[shapes.dominoes.Length];
             // tatsächlich genutzte Farben auslesen
@@ -147,7 +147,8 @@ namespace DominoPlanner.Core
                     double minimum = int.MaxValue;
                     for (int color = 0; color < colors.Length; color++)
                     {
-                        double value = colors[color].distance(usecolors[i], colorMode) * IterationInformation.weights[color];
+                        double value = colors[color].distance(usecolors[i], colorMode, TransparencySetting)
+                        * IterationInformation.weights[color];
                         if (value < minimum)
                         {
                             minimum = value;
@@ -163,8 +164,9 @@ namespace DominoPlanner.Core
         }
         private Bgra[] getUseColors()
         {
+            var transpfix = (TransparencySetting == 0) ? overlayImage(source) : source;
             var usecolors = new Bgra[shapes.dominoes.Length];
-            using (Image<Bgra, Byte> img = source.ToImage<Bgra, Byte>())
+            using (Image<Bgra, Byte> img = transpfix.ToImage<Bgra, Byte>())
             {
                 double scalingX = (source.Width - 1) / shapes.width;
                 double scalingY = (source.Height - 1) / shapes.height;

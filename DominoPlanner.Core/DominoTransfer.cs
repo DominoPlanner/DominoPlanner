@@ -71,7 +71,7 @@ namespace DominoPlanner.Core
             }
             Image<Emgu.CV.Structure.Bgra, byte> bitmap
                 = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor), (int)(heigth * scalingFactor),
-                new Emgu.CV.Structure.Bgra() { Alpha = 255, Blue = background.B, Green = background.G, Red = background.R });
+                new Emgu.CV.Structure.Bgra() { Alpha = background.A, Blue = background.B, Green = background.G, Red = background.R });
             
 
             Parallel.For(0, dominoes.Length, (i) =>
@@ -82,7 +82,7 @@ namespace DominoPlanner.Core
                {
                    DominoRectangle rect = shapes[i].GetContainer(scalingFactor);
                    CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle() { X = (int)rect.x, Y = (int)rect.y,
-                       Width = (int)rect.width, Height = (int)rect.height }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, 255), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
+                       Width = (int)rect.width, Height = (int)rect.height }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, c.A), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
                    if (borders)
                    {
                        CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
@@ -99,7 +99,7 @@ namespace DominoPlanner.Core
                {
                    DominoPath shape = this[i].Item1.GetPath(scalingFactor);
                    bitmap.FillConvexPoly(shape.getSDPath(),
-                       new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, 255), Emgu.CV.CvEnum.LineType.AntiAlias);
+                       new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
                    if (borders)
                    {
                        bitmap.DrawPolyline(shape.getSDPath(), true, 

@@ -38,7 +38,7 @@ namespace DominoPlanner.Core
                 + "<html>\n"
                 + "    <head>\n"
                 + "    <meta http-equiv=\"Content-Style-Type\" content=\"text/css\">   <title>" + (title + " Procotol")
-                + "</title>\n    <meta http-equiv=\"Content-Type\" content=\"text/css\"; charset=UTF-8\">\n    </head>\n    <body>");
+                + "</title>\n    <meta http-equiv=\"Content-Type\" content=\"text/css\"; charset=\"UTF-8\">\n    </head>\n    <body>");
             html.AppendLine(textFormat + "    <h3 align=\"left\">" + title + "</h3>");
             html.AppendLine("        <table border=0 cellspacing=3 cellpadding=5 style=\"border-collapse:collapse\">");
             if (obj.dominoes == null) return "Dominoes are empty!";
@@ -78,20 +78,6 @@ namespace DominoPlanner.Core
                             html.Append(ParseRegex(obj.colors[obj.dominoes[i][j][k].Item1].name, obj.dominoes[i][j][k].Item2) + "</font></td>\n");
 
                         }
-                        else if (obj.dominoes[i][j][k].Item1 == -1)
-                        {
-                            html.Append("                <td bgcolor='");
-                            html.Append(Colors.White.ToHTML());
-                            html.Append("'");
-                            if (k == obj.dominoes[i][j].Count - 1) // if end of block, draw right border in intelligent black/white
-                            {
-                                html.Append(" style='width:115.15pt;border-right:solid " + Colors.Black.ToHTML() + " 5.0pt'");
-                            }
-                            html.Append("> <font color='" + Colors.Black.ToHTML() + "'>");
-                            html.Append(ParseRegex(@"[empty]", obj.dominoes[i][j][k].Item2) + "</font></td>\n");
-                        }
-
-
                     }
                 }
                 html.AppendLine("            </tr>");
@@ -205,10 +191,17 @@ namespace DominoPlanner.Core
                                 {
                                     case ColorMode.Normal: b = trans.colors[trans.dominoes[i][j][k].Item1].mediaColor; break; // normal color
                                     case ColorMode.Inverted: b = trans.colors[trans.dominoes[i][j][k].Item1].mediaColor.Invert(); break; // inverted color
-                                    case ColorMode.Fixed: b = fixedBackColor; break; // intelligent BW
+                                    case ColorMode.Fixed: b = fixedBackColor; break; // fixed
                                 }
-                                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                cell.Style.Fill.BackgroundColor.SetColor(b.ToSD());
+                                if ((trans.colors[trans.dominoes[i][j][k].Item1] is EmptyDomino))
+                                {
+                                    cell.Style.Fill.PatternType = ExcelFillStyle.DarkUp;
+                                    cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.White);
+                                    cell.Style.Fill.PatternColor.SetColor(System.Drawing.Color.Black);
+                                }
+                                else cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                var background = b.ToSD(true);
+                                cell.Style.Fill.BackgroundColor.SetColor(background);
 
                                 if (k == trans.dominoes[i][j].Count - 1) // if end of block, draw right border in intelligent black/white
                                 {
@@ -224,32 +217,20 @@ namespace DominoPlanner.Core
                                     case ColorMode.Intelligent: f = b.IntelligentBW(); break; // intelligent BW
                                 }
                                 cell.Style.Font.Color.SetColor(f.ToSD());
-                                cell.Style.Numberformat.Format = "@";
-                                cell.Value = ParseRegex(trans.colors[trans.dominoes[i][j][k].Item1].name, trans.dominoes[i][j][k].Item2);
-
-                            }
-                        }
-                        else if (trans.dominoes[i][j][k] != null && trans.dominoes[i][j][k].Item1 == -1)
-                        {
-                            using (ExcelRange cell = ws.Cells[rowcounter, cellcounter++])
-                            {
-                                Color b = Colors.White;
-                                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                cell.Style.Fill.BackgroundColor.SetColor(b.ToSD());
-
-                                if (k == trans.dominoes[i][j].Count - 1) // if end of block, draw right border in intelligent black/white
-                                {
-                                    System.Drawing.Color border = Colors.Black.ToSD();
-                                    cell.Style.Border.Right.Style = ExcelBorderStyle.Thick;
-                                    cell.Style.Border.Right.Color.SetColor(border);
-                                }
-                                Color f = Colors.Black;
                                 
-                                cell.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                                cell.Style.Border.Bottom.Color.SetColor(System.Drawing.Color.Black);
-                                cell.Style.Font.Color.SetColor(f.ToSD());
-                                cell.Style.Numberformat.Format = "@";
-                                cell.Value = ParseRegex(trans.colors[trans.dominoes[i][j][k].Item1].name, trans.dominoes[i][j][k].Item2);
+
+                                string parsed = ParseRegex(trans.colors[trans.dominoes[i][j][k].Item1].name, trans.dominoes[i][j][k].Item2);
+                                // Bugfix für Warnung "Zahl als Text" in Excel
+                                if (parsed.Trim().All(char.IsDigit))
+                                {
+                                    cell.Value = Int32.Parse(parsed);
+                                }
+                                else
+                                {
+                                    cell.Value = parsed;
+                                }
+                            
+
 
                             }
                         }

@@ -23,7 +23,7 @@ namespace DominoPlanner.CoreTests
         static void Main(string[] args)
 
         {
-            Thread.Sleep(3000);
+            //Thread.Sleep(3000);
             Workspace.Instance.root_path = Path.GetFullPath("tests");
             Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
 
@@ -43,8 +43,8 @@ namespace DominoPlanner.CoreTests
             }*/
             //CircleTest("tests/NewField.jpg");
             //
-            WallTest("tests/bird.jpg");
-            //FieldTest("tests/NewField.jpg");
+            //WallTest("tests/bird.jpg");
+            FieldTest("tests/transparent_white.png");
             ColorRepoSaveTest();
             var result1 = ColorRepoLoadTest("colors.DColor");
             var result2 = ColorRepoLoadTest("colors.DColor");
@@ -122,14 +122,16 @@ namespace DominoPlanner.CoreTests
         static void FieldTest(String path)
         {
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-            Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
+            Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 10000, Inter.Lanczos4,
-                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new IterativeColorRestriction(60, 0.1));
+            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 30000, Inter.Lanczos4,
+                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            p.TransparencySetting = 128;
 
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
 
             DominoTransfer t = p.Generate();
+            Console.WriteLine(String.Join("\n", p.counts));
             Console.WriteLine("Size: " + t.dominoes.Count());
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
@@ -138,9 +140,9 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/FieldTest.png");
-            FileStream fs = new FileStream(@"FieldPlanTest.html", FileMode.Create);
+            FileStream fs = new FileStream(@"tests/FieldPlanTest.html", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
-            /*sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
+            sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
             {
                 backColorMode = ColorMode.Normal,
                 foreColorMode = ColorMode.Intelligent,
@@ -151,21 +153,21 @@ namespace DominoPlanner.CoreTests
                 templateLength = 20,
                 textRegex = "%count% %color%",
                 title = "Field"
-            }));*/
-            //p.SaveXLSFieldPlan("ExcelFieldPlanTest.xlsx", new ObjectProtocolParameters()
-            //{
-            //    backColorMode = ColorMode.Normal,
-            //    foreColorMode = ColorMode.Intelligent,
-            //    orientation = Orientation.Horizontal,
-            //    reverse = false,
-            //    summaryMode = SummaryMode.Large,
-            //    textFormat = "<font face=\"Verdana\">",
-            //    templateLength = 20,
-            //    textRegex = "%count%",
-            //    title = "Field",
-            //    path = Directory.GetCurrentDirectory()
+            }));
+            p.SaveXLSFieldPlan("tests/ExcelFieldPlanTest.xlsx", new ObjectProtocolParameters()
+            {
+                backColorMode = ColorMode.Normal,
+                foreColorMode = ColorMode.Intelligent,
+                orientation = Core.Orientation.Horizontal,
+                reverse = false,
+                summaryMode = SummaryMode.Large,
+                textFormat = "<font face=\"Verdana\">",
+                templateLength = 20,
+                textRegex = "%count%",
+                title = "Field",
+                path = Directory.GetCurrentDirectory()
 
-            //});
+            });
             sw.Close();
 
 
@@ -186,12 +188,6 @@ namespace DominoPlanner.CoreTests
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             SpiralParameters p = new SpiralParameters(mat, 220, 24, 8, 8, 8, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-            p.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            p.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            p.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            p.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            p.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            p.colors.Add(new DominoColor(Colors.White, 1000, "white"));
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -291,8 +287,8 @@ namespace DominoPlanner.CoreTests
             Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters p = new StructureParameters(mat, xml.Elements().ElementAt(1), 200000, 
-                "colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction(), true);
+            StructureParameters p = new StructureParameters(mat, xml.Elements().ElementAt(1), 10000, 
+                "colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new IterativeColorRestriction(50, 0.05), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
 
