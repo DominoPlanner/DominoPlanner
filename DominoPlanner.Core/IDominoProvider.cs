@@ -8,6 +8,8 @@ using OfficeOpenXml;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using ProtoBuf;
 
 namespace DominoPlanner.Core
 {
@@ -61,6 +63,9 @@ namespace DominoPlanner.Core
                 colors = ColorRepository.Load(value);
             }
         }
+        public ColorRepository color_filtered { get; private set; }
+        public Mat image_filtered { get; private set; }
+        public DominoTransfer last_filtered;
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
@@ -86,12 +91,11 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Liste der Filter, die vor der Berechnung angewendet werden
         /// </summary>
-        public List<PreFilter> PreFilters { get; set; }
+        public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
 
-        public List<ImageFilter> ImageFilters { get; set; }
+        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
 
-
-        public List<PostFilter> PostFilters { get; set; }
+        public ObservableCollection<PostFilter> PostFilters { get; private set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
         /// </summary>
@@ -117,7 +121,8 @@ namespace DominoPlanner.Core
         #endregion
         protected bool shapesValid = false;
         public bool lastValid = false;
-
+        public bool colorsValid = false;
+        public bool imageValid = false;
         public DominoTransfer last;
         #region const
         protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation)
@@ -127,6 +132,12 @@ namespace DominoPlanner.Core
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
+            this.ColorFilters.CollectionChanged += 
+                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => colorsValid = false);
+            this.ImageFilters.CollectionChanged +=
+                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => imageValid = false);
+            this.PostFilters.CollectionChanged +=
+                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => lastValid = false);
         }
         #endregion
         #region public methods
@@ -298,7 +309,22 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
-
+        internal void ApplyColorFilters()
+        {
+            color_filtered = Serializer.DeepClone(colors);
+            foreach (ColorFilter filter in ColorFilters)
+            {
+                filter.Apply(color_filtered);
+            }
+        }
+        internal void ApplyImageFilters()
+        {
+            image_filtered = source.Clone();
+            foreach (ImageFilter filter in ImageFilters)
+            {
+                filter.Apply(image_filtered);
+            }
+        }
         public abstract object Clone();
         #endregion
     }

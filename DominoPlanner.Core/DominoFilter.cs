@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Emgu.CV;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Core
 {
-    public abstract class PreFilter
+    public abstract class ColorFilter
     {
-        public abstract void Apply(List<DominoColor> input);
+        public abstract void Apply(ColorRepository input);
     }
     public abstract class PostFilter
     {
@@ -15,9 +16,9 @@ namespace DominoPlanner.Core
     }
     public abstract class ImageFilter
     {
-        public abstract void Apply(RenderTargetBitmap input);
+        public abstract void Apply(Mat input);
     }
-    public class RemoveColorPreFilter : PreFilter
+    public class RemoveColorPreFilter : ColorFilter
     {
         private List<DominoColor> _toRemove;
         public List<DominoColor> toRemove
@@ -25,15 +26,15 @@ namespace DominoPlanner.Core
             get { return _toRemove; }
             set { _toRemove = value; }
         }
-        public override void Apply(List<DominoColor> input)
+        public override void Apply(ColorRepository input)
         {
             foreach (DominoColor c in toRemove)
             {
-                input = (List<DominoColor>) input.Where(t => t.Equals(c));
+                throw new NotImplementedException();
             }
         }
     }
-    public class ChangeCountFilter : PreFilter
+    public class ChangeCountFilter : ColorFilter
     {
         private DominoColor _newCount;
         public DominoColor newCount
@@ -42,9 +43,9 @@ namespace DominoPlanner.Core
             set { _newCount = value; }
         }
 
-        public override void Apply(List<DominoColor> input)
+        public override void Apply(ColorRepository input)
         {
-            input = (List<DominoColor>)input.Select(x => (x.Equals(newCount)) ? newCount : x);
+            throw new NotImplementedException();
         }
     }
 }

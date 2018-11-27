@@ -45,7 +45,7 @@ namespace DominoPlanner.Core
             set
             {
                 _a = value;
-                imageValid = false;
+                resizedValid = false;
                 shapesValid = false;
                 lastValid = false;
             }
@@ -64,7 +64,7 @@ namespace DominoPlanner.Core
             set
             {
                 _b = value;
-                imageValid = false;
+                resizedValid = false;
                 shapesValid = false;
                 lastValid = false;
             }
@@ -83,7 +83,7 @@ namespace DominoPlanner.Core
             set
             {
                 _c = value;
-                imageValid = false;
+                resizedValid = false;
                 shapesValid = false;
                 lastValid = false;
             }
@@ -102,7 +102,7 @@ namespace DominoPlanner.Core
             set
             {
                 _d = value;
-                imageValid = false;
+                resizedValid = false;
                 shapesValid = false;
                 lastValid = false;
             }
@@ -123,7 +123,7 @@ namespace DominoPlanner.Core
             {
                 _resizeMode = value;
                 shapesValid = false;
-                imageValid = false;
+                resizedValid = false;
                 lastValid = false;
             }
         }
@@ -157,7 +157,7 @@ namespace DominoPlanner.Core
             {
                 _length = value;
                 shapesValid = false;
-                imageValid = false;
+                resizedValid = false;
                 lastValid = false;
             }
         }
@@ -175,7 +175,7 @@ namespace DominoPlanner.Core
             {
                 _height = value;
                 shapesValid = false;
-                imageValid = false;
+                resizedValid = false;
                 lastValid = false;
             }
         }
@@ -200,7 +200,7 @@ namespace DominoPlanner.Core
         #region private properties
         private Mat resizedImage;
         private IDominoShape[] shapes;
-        private bool imageValid = false;
+        private bool resizedValid = false;
         #endregion
         #region public constructors
         /// <summary>
@@ -272,7 +272,17 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Feld erhält.</returns>
         public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            if (!colorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
+                ApplyColorFilters();
+            }
             if (!imageValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
+                ApplyImageFilters();
+            }
+            if (!resizedValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Resizing Image");
                 ResizeImage();
@@ -295,13 +305,10 @@ namespace DominoPlanner.Core
             if (length < 2) length = 2;
             if (height < 2) height = 2;
             resizedImage = new Mat();
-            CvInvoke.Resize(source, resizedImage, 
+            CvInvoke.Resize(image_filtered, resizedImage, 
                 new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
-            imageValid = true;
+            resizedValid = true;
             if (!shapesValid) GenerateShapes();
-            //shapes = new IDominoShape[height*length];
-            GC.SuppressFinalize(resizedImage);
-            GC.SuppressFinalize(source);
         }
         /// <summary>
         /// Berechnet die Shapes mit den angegebenen Parametern.
@@ -336,17 +343,17 @@ namespace DominoPlanner.Core
             //foreach (PreFilter f in PreFilters) f.Apply(colors);
             // remove transparency
             Console.WriteLine("Debug Flag");
-            var colors = this.colors.RepresentionForCalculation;
+            var colors = this.color_filtered.RepresentionForCalculation;
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
             /*if (IterationInformation is IterativeColorRestriction)
             {
                 if (colors.Sum(color => ) < resizedImage.Width * resizedImage.Height)
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }*/
-            int[] field = new int[resizedImage.Width * resizedImage.Height];
+            int[] field = new int[image_filtered.Width * image_filtered.Height];
             source.Save("tests/source.png");
             resizedImage.Save("tests/resized.png");
-            var transpfix = (TransparencySetting == 0) ? overlayImage(resizedImage) : resizedImage;
+            var transpfix = (TransparencySetting == 0) ? overlayImage(image_filtered) : image_filtered;
             transpfix.Save("tests/transparency_saved.png");
             using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = transpfix.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {
@@ -392,7 +399,7 @@ namespace DominoPlanner.Core
         /// <returns>Das Basisfeld als int[,]-Array.</returns>
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!shapesValid || !imageValid) throw new InvalidOperationException("There are unreflected changes in this field.");
+            if (!shapesValid || !resizedValid) throw new InvalidOperationException("There are unreflected changes in this field.");
             int[,] result = new int[length, height];
                 for (int i = 0; i < length; i++)
                 {
