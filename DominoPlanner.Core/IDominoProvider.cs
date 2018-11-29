@@ -132,6 +132,9 @@ namespace DominoPlanner.Core
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
+            this.ColorFilters = new ObservableCollection<ColorFilter>();
+            this.ImageFilters = new ObservableCollection<ImageFilter>();
+            this.PostFilters = new ObservableCollection<PostFilter>();
             this.ColorFilters.CollectionChanged += 
                 new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => colorsValid = false);
             this.ImageFilters.CollectionChanged +=

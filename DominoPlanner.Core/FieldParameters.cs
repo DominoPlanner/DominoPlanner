@@ -316,7 +316,7 @@ namespace DominoPlanner.Core
         public void GenerateShapes()
         {
             IDominoShape[] array = new IDominoShape[length*height];
-            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism=1}, (xi) =>
+            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism= -1}, (xi) =>
             {
                 for (int yi = 0; yi < height; yi++)
                 {
@@ -350,10 +350,10 @@ namespace DominoPlanner.Core
                 if (colors.Sum(color => ) < resizedImage.Width * resizedImage.Height)
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }*/
-            int[] field = new int[image_filtered.Width * image_filtered.Height];
+            int[] field = new int[resizedImage.Width * resizedImage.Height];
             source.Save("tests/source.png");
             resizedImage.Save("tests/resized.png");
-            var transpfix = (TransparencySetting == 0) ? overlayImage(image_filtered) : image_filtered;
+            var transpfix = (TransparencySetting == 0) ? overlayImage(resizedImage) : resizedImage;
             transpfix.Save("tests/transparency_saved.png");
             using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = transpfix.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {

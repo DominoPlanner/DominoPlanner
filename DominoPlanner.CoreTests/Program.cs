@@ -41,9 +41,9 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            //CircleTest("tests/NewField.jpg");
-            //
-            //WallTest("tests/bird.jpg");
+            CircleTest("tests/bird.jpg");
+            SpiralTest("tests/bird.jpg");
+            WallTest("tests/bird.jpg");
             FieldTest("tests/transparent_white.png");
             ColorRepoSaveTest();
             var result1 = ColorRepoLoadTest("colors.DColor");
@@ -142,7 +142,7 @@ namespace DominoPlanner.CoreTests
             b2.Save("tests/FieldTest.png");
             FileStream fs = new FileStream(@"tests/FieldPlanTest.html", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
-            sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
+            /*sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
             {
                 backColorMode = ColorMode.Normal,
                 foreColorMode = ColorMode.Intelligent,
@@ -153,8 +153,8 @@ namespace DominoPlanner.CoreTests
                 templateLength = 20,
                 textRegex = "%count% %color%",
                 title = "Field"
-            }));
-            p.SaveXLSFieldPlan("tests/ExcelFieldPlanTest.xlsx", new ObjectProtocolParameters()
+            }));*/
+            /*p.SaveXLSFieldPlan("tests/ExcelFieldPlanTest.xlsx", new ObjectProtocolParameters()
             {
                 backColorMode = ColorMode.Normal,
                 foreColorMode = ColorMode.Intelligent,
@@ -167,7 +167,7 @@ namespace DominoPlanner.CoreTests
                 title = "Field",
                 path = Directory.GetCurrentDirectory()
 
-            });
+            });*/
             sw.Close();
 
 
