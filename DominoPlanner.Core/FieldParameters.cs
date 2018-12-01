@@ -203,28 +203,13 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
-        IterationInformation _iterationInfo;
-        [ProtoMember(10)]
-        public override IterationInformation IterationInformation
-        {
-            get
-            {
-                return _iterationInfo;
-            }
-            set
-            {
-                _iterationInfo = value;
-                _iterationInfo.PropertyChanged +=
-                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
-                lastValid = false;
-            }
-        }
         public HistoryTree<FieldParameters> history { get; set; }
         public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
         private Mat resizedImage;
         private IDominoShape[] shapes;
+        [ProtoMember(1000)]
         private bool resizedValid = false;
         #endregion
         #region public constructors

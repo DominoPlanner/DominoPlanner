@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,24 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Stellt die Eigenschaften und Methoden bereit, eine Struktur zu erstellen.
     /// </summary>
+    [ProtoContract]
     public class StructureParameters : RectangleDominoProvider
     {
+        // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
+        private string __structureDefXML;
+        [ProtoMember(3)]
+        private string _structureDefinitionXML
+        {
+            set
+            {
+                __structureDefXML = value;
+                structureDefinitionXML = XElement.Parse(value);
+            }
+            get
+            {
+                return __structureDefXML;
+            }
+        }
         #region public properties
         /// <summary>
         /// Das XElement, das die Strukturdefinition beinhaltet.
@@ -23,6 +40,7 @@ namespace DominoPlanner.Core
             set
             {
                 structuredef = new ClusterStructureDefinition(value);
+                __structureDefXML = value.ToString();
                 hasProcotolDefinition = structuredef.hasProtocolDefinition;
                 shapesValid = false;
                 lastValid = false;
@@ -32,6 +50,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die Länge der Struktur (Wiederholungen des mittleren Blocks in x-Richtung)
         /// </summary>
+        [ProtoMember(1)]
         public int length
         {
             get
@@ -49,6 +68,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die Breite der Struktur (Wiederholungen des mittleren Blocks in y-Richtung)
         /// </summary>
+        [ProtoMember(2)]
         public int height
         {
             get
@@ -65,6 +85,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die Zielgröße des Objekts. Setzen überschreibt Länge und Breite.
         /// </summary>
+
         public override int targetCount
         {
             // Maple sagt, dass diese Formel passt... ;)
@@ -102,6 +123,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         private ClusterStructureDefinition structuredef;
+        
         internal ClusterStructureDefinition structureDefinition
         {
             get
@@ -150,6 +172,7 @@ namespace DominoPlanner.Core
         {
             targetCount = targetSize;
         }
+        private StructureParameters() : base() { }
         #endregion
         #region private helper methods
         protected override void GenerateShapes()

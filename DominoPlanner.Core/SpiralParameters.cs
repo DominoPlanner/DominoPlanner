@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +15,15 @@ namespace DominoPlanner.Core
     /// Stellt Methoden und Eigenschaften bereit, um eine Spirale zu erstellen.
     /// Derzeit nur Einfachspiralen, Mehrfachspiralen folgen.
     /// </summary>
-    public class SpiralParameters : RectangleDominoProvider
+    [ProtoContract]
+    public class SpiralParameters : RectangleDominoProvider 
     {
         #region public properties
         private int _tangentialWidth;
         /// <summary>
         /// Breite eines Steins in tangentialer Richtung.
         /// </summary>
+        [ProtoMember(1)]
         public int tangentialWidth
         {
             get
@@ -38,6 +41,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Breite eines Steins in normaler (senkrecht zur Kurve) Richtung
         /// </summary>
+        [ProtoMember(2)]
         public int normalWidth
         {
             get
@@ -55,6 +59,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Abstand zwischen zwei Steinen in tangentialer Richtung
         /// </summary>
+        [ProtoMember(3)]
         public int tangentialDistance
         {
             get
@@ -72,6 +77,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Abstand zwischen zwei Steinen in normaler Richtung
         /// </summary>
+        [ProtoMember(4)]
         public int normalDistance
         {
             get
@@ -107,7 +113,10 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region private properties
+        [ProtoMember(5)]
         private double theta_min = 2* Math.PI;
+
+        [ProtoMember(6)]
         private double theta_max;
         /// <summary>
         /// Der Parameter a in der Spiralformel, a.k.a. Abstand zwischen zwei Umdrehungen
@@ -149,6 +158,7 @@ namespace DominoPlanner.Core
             this.tangentialWidth = tangentialWidth;
             hasProcotolDefinition = true;
         }
+        private SpiralParameters() : base() { }
         #endregion
         #region private methods
         protected override void GenerateShapes()

@@ -1,5 +1,6 @@
 ﻿
 using Emgu.CV;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,109 +10,116 @@ using System.Windows;
 
 namespace DominoPlanner.Core
 {
+    [ProtoContract]
     public class CircleParameters : RectangleDominoProvider
     {
-        
-            int _tangential_width;
-            public int tangentialWidth
-            {
-                get
-                {
-                    return _tangential_width;
-                }
-                set
-                {
-                    if (value > 1)
-                    {
-                        _tangential_width = value;
-                    }
-                }
-            }
-            int _normal_width;
-            public int normalWidth
-            {
-                get
-                {
-                    return _normal_width;
-                }
-                set
-                {
-                    if (value > 1)
-                    {
-                        _normal_width = value;
-                    }
-                }
-            }
 
-            int _tangential_distance;
-            public int tangentialDistance
+        int _tangential_width;
+        [ProtoMember(1)]
+        public int tangentialWidth
+        {
+            get
             {
-                get
+                return _tangential_width;
+            }
+            set
+            {
+                if (value > 1)
                 {
-                    return _tangential_distance;
+                    _tangential_width = value;
+                }
+            }
+        }
+        int _normal_width;
+        [ProtoMember(2)]
+        public int normalWidth
+        {
+            get
+            {
+                return _normal_width;
+            }
+            set
+            {
+                if (value > 1)
+                {
+                    _normal_width = value;
+                }
+            }
+        }
 
-                }
-                set
-                {
-                    if (value > 1)
-                    {
-                        _tangential_distance = value;
-                    }
-                }
-            }
-            int _normal_distance;
-            public int normalDistance
+        int _tangential_distance;
+        [ProtoMember(3)]
+        public int tangentialDistance
+        {
+            get
             {
-                get
-                {
-                    return _normal_distance;
-                }
-                set
-                {
-                    if (value > 1)
-                    {
-                        _normal_distance = value;
-                    }
-                }
-            }
-            int _rotations;
-            public int rotations
-            {
-                get
-                {
-                    return _rotations;
-                }
-                set
-                {
-                    if (value > 4 && value < 5000)
-                    {
-                        _rotations = value;
-                    }
+                return _tangential_distance;
 
-                }
             }
-            int _start_diameter;
-            public int start_diameter
+            set
             {
-                get
+                if (value > 1)
                 {
-                    return _start_diameter;
-                }
-                set
-                {
-                    if (value > _normal_width * 2)
-                    {
-                        _start_diameter = value;
-                    }
-
+                    _tangential_distance = value;
                 }
             }
+        }
+        int _normal_distance;
+        [ProtoMember(4)]
+        public int normalDistance
+        {
+            get
+            {
+                return _normal_distance;
+            }
+            set
+            {
+                if (value > 1)
+                {
+                    _normal_distance = value;
+                }
+            }
+        }
+        int _rotations;
+        [ProtoMember(5)]
+        public int rotations
+        {
+            get
+            {
+                return _rotations;
+            }
+            set
+            {
+                if (value > 4 && value < 5000)
+                {
+                    _rotations = value;
+                }
+
+            }
+        }
+        int _start_diameter;
+        [ProtoMember(6)]
+        public int start_diameter
+        {
+            get
+            {
+                return _start_diameter;
+            }
+            set
+            {
+                if (value > _normal_width * 2)
+                {
+                    _start_diameter = value;
+                }
+
+            }
+        }
 
         public override int targetCount { set => throw new NotImplementedException(); }
 
-        public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance, 
-            string colors, IColorComparison colorMode, AverageMode averageMode, 
-            IterationInformation iterationInformation,  bool allowStretch = false) :
+        public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
+            string colors, IColorComparison colorMode, AverageMode averageMode,
+            IterationInformation iterationInformation, bool allowStretch = false) :
             base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
             this.rotations = rotations;
@@ -121,7 +129,7 @@ namespace DominoPlanner.Core
             this.tangentialWidth = tangentialWidth;
             hasProcotolDefinition = true;
         }
-
+        private CircleParameters() : base() { }
         protected override void GenerateShapes()
         {
             List<PathDomino> dominos = new List<PathDomino>();
@@ -166,8 +174,8 @@ namespace DominoPlanner.Core
             shapesValid = true;
         }
 
-            
-        
+
+
         private PathDomino GenerateDomino(int diameter, double angle, double domino_angle)
         {
             double normal_angle = angle + domino_angle / 2;
@@ -183,7 +191,7 @@ namespace DominoPlanner.Core
             {
                 points = new Point[] { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3), new Point(x4, y4) },
                 position = new ProtocolDefinition() { x = 1, y = 1 }
-               
+
             };
             return d;
 

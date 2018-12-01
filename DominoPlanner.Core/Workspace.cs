@@ -23,14 +23,15 @@ namespace DominoPlanner.Core
                 Uri test = new Uri(value, UriKind.RelativeOrAbsolute);
                 if (test.IsAbsoluteUri) _root_path = value;
                 else throw new InvalidOperationException("Der Roodpfad muss absolut sein");
+                openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
             }
         }
-        public List<Tuple<String, object>> openedFiles;
+        public List<Tuple<String, IWorkspaceLoadable>> openedFiles;
         // threadsicheres Singleton
         private static readonly Lazy<Workspace> _mySingleton = new Lazy<Workspace>(() => new Workspace());
 
         private Workspace() {
-            openedFiles = new List<Tuple<string, object>>();
+            openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
         }
 
         public static Workspace Instance
@@ -77,9 +78,9 @@ namespace DominoPlanner.Core
             if (result.Count() == 0) return null;
             return result.First().Item2;
         }
-        public void AddToWorkspace(string path, object obj)
+        public void AddToWorkspace(string path, IWorkspaceLoadable obj)
         {
-            openedFiles.Add(new Tuple<string, object>(MakePathAbsolute(path), obj));
+            openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(MakePathAbsolute(path), obj));
         }
         public string MakePathAbsolute(string path)
         {

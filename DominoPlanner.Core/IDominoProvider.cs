@@ -10,6 +10,7 @@ using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace DominoPlanner.Core
 {
@@ -51,12 +52,26 @@ namespace DominoPlanner.Core
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
         protected Mat source;
+        IterationInformation _iterationInfo;
         /// <summary>
         /// Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
         [ProtoMember(5)]
-        public virtual IterationInformation IterationInformation { get; set; }
+        public IterationInformation IterationInformation
+        {
+            get
+            {
+                return _iterationInfo;
+            }
+            set
+            {
+                _iterationInfo = value;
+                _iterationInfo.PropertyChanged +=
+                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
+                lastValid = false;
+            }
+        }
         private byte _TransparencySetting;
         [ProtoMember(6)]
         public byte TransparencySetting { get => _TransparencySetting; set { lastValid = false; _TransparencySetting = value; }}
@@ -180,6 +195,7 @@ namespace DominoPlanner.Core
             }
             private set { }
         }
+
         #endregion
         // müssen nach den Unterklassen deserialisiert werden
         [ProtoMember(1000)]

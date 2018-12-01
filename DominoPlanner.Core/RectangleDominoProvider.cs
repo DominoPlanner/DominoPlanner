@@ -12,6 +12,7 @@ using Emgu.CV;
 using Emgu.CV.Util;
 using System.ComponentModel;
 using Emgu.CV.Structure;
+using ProtoBuf;
 //using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
@@ -19,6 +20,10 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Oberklasse für alle Strukturen, deren Farben aus beliebig angeordneten Rechtecken oder Pfaden berechnet werden.
     /// </summary>
+    [ProtoContract]
+    [ProtoInclude(100, typeof(StructureParameters))]
+    [ProtoInclude(101, typeof(SpiralParameters))]
+    [ProtoInclude(102, typeof(CircleParameters))]
     public abstract class RectangleDominoProvider : IDominoProvider
     {
         #region public properties
@@ -27,6 +32,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Gibt an, ob nur ein Punkt des Dominos (linke obere Ecke) oder ein Durchschnittswert aller Pixel unter dem Pfad verwendet werden soll, um die Farbe auszuwählen.
         /// </summary>
+        [ProtoMember(1)]
         public AverageMode average
         {
             get
@@ -44,6 +50,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.
         /// </summary>
+        [ProtoMember(2)]
         public bool allowStretch
         {
             get
@@ -54,21 +61,6 @@ namespace DominoPlanner.Core
             set
             {
                 _allowStretch = value;
-                lastValid = false;
-            }
-        }
-        IterationInformation _iterationInfo;
-        public override IterationInformation IterationInformation
-        {
-            get
-            {
-                return _iterationInfo;
-            }
-            set
-            {
-                _iterationInfo = value;
-                _iterationInfo.PropertyChanged +=
-                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
                 lastValid = false;
             }
         }
@@ -92,6 +84,7 @@ namespace DominoPlanner.Core
             this.allowStretch = allowStretch;
             average = averageMode;
         }
+        protected RectangleDominoProvider() : base() { }
         #endregion
         #region public methods
         /// <summary>
@@ -102,6 +95,16 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            if (!colorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
+                ApplyColorFilters();
+            }
+            if (!imageValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
+                ApplyImageFilters();
+            }
             if (!shapesValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Calculating Domino Positions...");
