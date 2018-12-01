@@ -23,7 +23,7 @@ namespace DominoPlanner.CoreTests
         static void Main(string[] args)
 
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(500);
             Workspace.Instance.root_path = Path.GetFullPath("tests");
             Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
 
@@ -41,7 +41,7 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            CircleTest("tests/bird.jpg");
+           // CircleTest("tests/bird.jpg");
             SpiralTest("tests/bird.jpg");
             //WallTest("tests/bird.jpg");
             //FieldTest("tests/transparent_white.png");
@@ -203,7 +203,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            SpiralParameters p = new SpiralParameters(mat, 500, 24, 8, 8, 8, "colors.DColor", 
+            SpiralParameters p = new SpiralParameters(mat, 50, 24, 8, 8, 8, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
