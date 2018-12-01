@@ -38,7 +38,6 @@ namespace DominoPlanner.Core
         public abstract XElement Save();
     }
     [ProtoContract]
-    [ProtoInclude(500, typeof(DominoColor))]
     public class EmptyDomino : IDominoColor
     {
         public override int count
@@ -65,7 +64,7 @@ namespace DominoPlanner.Core
             name = "[empty]";
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     public class DominoColor : IDominoColor
     {
         public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
@@ -90,7 +89,6 @@ namespace DominoPlanner.Core
             this.name = name;
             mediaColor = c;
         }
-        private DominoColor() { }
         public override XElement Save()
         {
             return new XElement("DominoColor",
@@ -101,7 +99,7 @@ namespace DominoPlanner.Core
                 new XAttribute("b", mediaColor.B));
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     public class ColorRepository
     {
         [ProtoMember(3)]
@@ -193,29 +191,7 @@ namespace DominoPlanner.Core
             {
                 
                 Console.WriteLine($"Datei {path} öffnen");
-                /*var xml = XDocument.Load(path);
-                var root = xml.Descendants("ColorRepository").First();
-                string version = root.Attribute("version").Value;
-                if (version == "1.0")
-                {
-                    var empty = new EmptyDomino()
-                    { name = root.Descendants("EmptyDomino").First().Attribute("name").Value };
-                    var result = root.Descendants("DominoColor")
-                        .Select(x => new Tuple<DominoColor, int>(new DominoColor(
-                        Color.FromArgb(255, byte.Parse(x.Attribute("r").Value), byte.Parse(x.Attribute("g").Value),
-                        byte.Parse(x.Attribute("b").Value)),
-                        int.Parse(x.Attribute("count").Value), x.Attribute("name").Value), int.Parse(x.Attribute("index").Value)));
-                    var repo = new ColorRepository();
-                    repo.colors = result.Select(x => x.Item1).ToList();
-                    repo.Anzeigeindizes = result.Select(x => x.Item2).ToList();
-                    repo.first = empty;
-                    Workspace.Instance.AddToWorkspace(path, repo);
-                    return repo;
-                }
-                throw new InvalidOperationException("Version der Farbdatei nicht unterstützt");
-                */
                 ColorRepository repo;
-                
                 using (var file = File.OpenRead(path))
                 {
                     repo = Serializer.Deserialize<ColorRepository>(file);
@@ -234,17 +210,6 @@ namespace DominoPlanner.Core
         {
             
             path = Workspace.Instance.MakePathAbsolute(path);
-            /*var xml = new XDocument();
-            var root = new XElement("ColorRepository", new XAttribute("version", "1.0"));
-            xml.Add(root);
-            for (int i = 0; i <= colors.Count; i++)
-            {
-                var current = this[i].Save();
-                current.Add(new XAttribute("index", Anzeigeindizes[i]));
-                root.Add(current);
-            }
-            xml.Save(path);
-            */
             using (var file = new FileStream(path, FileMode.Create))
             {
                 Serializer.Serialize<ColorRepository>(file, this);

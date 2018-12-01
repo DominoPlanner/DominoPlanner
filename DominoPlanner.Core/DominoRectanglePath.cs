@@ -1,4 +1,5 @@
 ﻿using ClipperLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -29,15 +30,16 @@ namespace DominoPlanner.Core
     /// </summary>
     public class DominoPath
     {
-        public System.Windows.Point[] points;
+        public Point[] points;
         public PointCollection getWPFPath()
         {
-            var pointcol = new PointCollection();
+            throw new NotImplementedException();
+            /*var pointcol = new PointCollection();
             for (int i = 0; i < points.Length; i++)
             {
                 pointcol.Add(points[i]);
             }
-            return pointcol;
+            return pointcol;*/
         }
         public System.Drawing.Point[] getSDPath()
         {
@@ -70,7 +72,7 @@ namespace DominoPlanner.Core
             co.Execute(ref solution, offset);
             if (solution.Count == 0)
                 return this;
-            return new DominoPath() { points = solution[0].Select(p => new System.Windows.Point(p.X, p.Y)).ToArray() };
+            return new DominoPath() { points = solution[0].Select(p => new Point(p.X, p.Y)).ToArray() };
         }
     }
 }

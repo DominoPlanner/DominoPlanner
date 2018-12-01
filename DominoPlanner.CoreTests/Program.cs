@@ -41,9 +41,9 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            CircleTest("tests/bird.jpg");
-            SpiralTest("tests/bird.jpg");
-            WallTest("tests/bird.jpg");
+            //CircleTest("tests/bird.jpg");
+            //SpiralTest("tests/bird.jpg");
+            //WallTest("tests/bird.jpg");
             FieldTest("tests/transparent_white.png");
             ColorRepoSaveTest();
             var result1 = ColorRepoLoadTest("colors.DColor");
@@ -124,7 +124,7 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 30000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 100000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.TransparencySetting = 128;
 
@@ -136,10 +136,10 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            Mat b2 = t.GenerateImage(Colors.Transparent);
+            //Mat b2 = t.GenerateImage(Colors.Transparent);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
-            b2.Save("tests/FieldTest.png");
+            //b2.Save("tests/FieldTest.png");
             FileStream fs = new FileStream(@"tests/FieldPlanTest.html", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
             /*sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
@@ -169,6 +169,19 @@ namespace DominoPlanner.CoreTests
 
             });*/
             sw.Close();
+            p.Save("FieldTest.DField");
+            watch = Stopwatch.StartNew();
+            int[] counts = IDominoProvider.LoadPreview("FieldTest.DField");
+            watch.Stop();
+            Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
+            Console.WriteLine(String.Join(", ", counts));
+            
+            watch = Stopwatch.StartNew();
+            FieldParameters loaded = (FieldParameters)IDominoProvider.Load("FieldTest.DField");
+            watch.Stop();
+            Console.WriteLine("Load Time: " + watch.ElapsedMilliseconds);
+            //loaded.last.GenerateImage(Colors.Transparent).Save("tests/afterLoad.png");
+            Console.WriteLine(p.colors == loaded.colors);
 
 
         }

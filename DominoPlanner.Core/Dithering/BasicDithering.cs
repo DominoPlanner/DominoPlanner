@@ -11,6 +11,7 @@ namespace DominoPlanner.Core.Dithering
     public class Dithering
     {
         // Die Dithering-Verfahren müssen sequenziell ausgeführt werden.
+        // Die Basisimplementierung kann aber multicore laufen
         public int maxDegreeOfParallelism = -1;
 
         public virtual void DiffuseError(int x, int y, int v1, int v2, int v3, Image<Emgu.CV.Structure.Bgra, byte> bitmap)

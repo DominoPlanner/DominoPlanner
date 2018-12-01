@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,17 +11,17 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Interface für alle Formen von Steinen (Pfad-Stein, Rechteck-Stein). 
     /// Stellt Methoden wie IsInside, GetContainer oder GetPath bereit.
-    /// In dieser Klasse wird nur die Form angegeben, die Verknüpfung mit der Farbe erfolgt in 
+    /// In dieser Klasse wird nur die Form angegeben, die Verknüpfung mit der Farbe erfolgt in DominoTransfer
     /// </summary>
+    [ProtoContract(SkipConstructor =true)]
+    [ProtoInclude(10, typeof(RectangleDomino))]
+    [ProtoInclude(11, typeof(PathDomino))]
     public abstract class IDominoShape : IEquatable<IDominoShape>
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
         /// </summary>
-        public bool hasProtocolDefinition { get; set; }
-        /// <summary>
-        /// Gibt an, ob der Stein eine verschiebbare Protokolldefinition enthält (z.B. bei Feldern oder Walls)
-        /// </summary>
+        
         public bool hasTransformableProtocolDefinition
         {
             get
@@ -31,6 +32,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die ProtocolDefinition des Steins.
         /// </summary>
+        [ProtoMember(1)]
         public ProtocolDefinition position;
         /// <summary>
         /// Gibt die Grenze eines Steins als Punktliste zurück.  
@@ -66,14 +68,14 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract bool IsInside(System.Windows.Point point, double scaling_x, double scaling_y);
+        public abstract bool IsInside(Point point, double scaling_x, double scaling_y);
         /// <summary>
         /// Überprüft, ob ein Punkt innerhalb des Steins liegt, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="point">Punkt, der geprüft werden soll</param>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public bool IsInside(System.Windows.Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
+        public bool IsInside(Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
         /// <summary>
         /// Überprüft, ob zwei Dominosteine gleich sind. 
         /// Berücksichtigt keine Unterschiede in der Protokolldefinition

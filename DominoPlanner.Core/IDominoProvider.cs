@@ -16,6 +16,9 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Die allgemeine Basisklasse für die Erstellung jeglicher Domino-Objekte.
     /// </summary>
+    [ProtoContract]
+    [ProtoInclude(100, typeof(FieldParameters))]
+    [ProtoInclude(101, typeof(RectangleDominoProvider))]
     public abstract class IDominoProvider : ICloneable
     {
         #region public properties
@@ -23,7 +26,27 @@ namespace DominoPlanner.Core
         /// Gibt an, ob das Objekt eine Protokolldefinition besitzt oder nicht.
         /// Auf der Basis dieser Information sollten die entsprechenden Buttons angezeigt werden oder nicht.
         /// </summary>
+        [ProtoMember(3)]
         public bool hasProcotolDefinition { get; set; }
+        [ProtoMember(4, OverwriteList = true)]
+        private byte[] source_surrogate
+        {
+            get
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    source.Bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                    return memoryStream.GetBuffer();
+                }
+            }
+            set
+            {
+                using (MemoryStream memoryStream = new MemoryStream(value))
+                {
+                    source = new Image<Emgu.CV.Structure.Bgra, byte>(new System.Drawing.Bitmap(memoryStream)).Mat;
+                }
+            }
+        }
         /// <summary>
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
@@ -32,9 +55,10 @@ namespace DominoPlanner.Core
         /// Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
+        [ProtoMember(5)]
         public virtual IterationInformation IterationInformation { get; set; }
         private byte _TransparencySetting;
-            
+        [ProtoMember(6)]
         public byte TransparencySetting { get => _TransparencySetting; set { lastValid = false; _TransparencySetting = value; }}
         // das Repo wird nicht serialisiert, nur der Pfad dazu
         private ColorRepository _colors;
@@ -51,6 +75,7 @@ namespace DominoPlanner.Core
             }
         }
         private string _colorPath;
+        [ProtoMember(7)]
         public string ColorPath
         {
             get
@@ -64,7 +89,27 @@ namespace DominoPlanner.Core
             }
         }
         public ColorRepository color_filtered { get; private set; }
+        [ProtoMember(8, OverwriteList = true)]
+        private byte[] image_filtered_surrogate
+        {
+            get
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    image_filtered.Bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                    return memoryStream.GetBuffer();
+                }
+            }
+            set
+            {
+                using (MemoryStream memoryStream = new MemoryStream(value))
+                {
+                    image_filtered = new Image<Emgu.CV.Structure.Bgra, byte>(new System.Drawing.Bitmap(memoryStream)).Mat;
+                }
+            }
+        }
         public Mat image_filtered { get; private set; }
+        [ProtoMember(9)]
         public DominoTransfer last_filtered;
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
@@ -75,6 +120,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Der Interpolationsmodus, der zur Farberkennung berechnet wird.
         /// </summary>
+        
         public IColorComparison colorMode
         {
             get
@@ -87,18 +133,33 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
-
+        [ProtoMember(11)]
+        public string colorMode_surrogate
+        {
+            get
+            {
+                Console.WriteLine(_colorMode.GetType().AssemblyQualifiedName);
+                Console.WriteLine(_colorMode.GetType().Name);
+                return _colorMode.GetType().Name;
+            }
+            set
+            {
+                _colorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+            }
+        }
         /// <summary>
         /// Liste der Filter, die vor der Berechnung angewendet werden
         /// </summary>
+        [ProtoMember(12)]
         public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
-
+        [ProtoMember(13)]
         public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
-
+        [ProtoMember(14)]
         public ObservableCollection<PostFilter> PostFilters { get; private set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
         /// </summary>
+        [ProtoMember(1, OverwriteList = true)]
         public int[] counts
         {
             get
@@ -117,25 +178,35 @@ namespace DominoPlanner.Core
                 }
                 return counts;
             }
+            private set { }
         }
         #endregion
+        // müssen nach den Unterklassen deserialisiert werden
+        [ProtoMember(1000)]
         protected bool shapesValid = false;
+        [ProtoMember(1001)]
         public bool lastValid = false;
+        [ProtoMember(1002)]
         public bool colorsValid = false;
+        [ProtoMember(1003)]
         public bool imageValid = false;
+        [ProtoMember(2)]
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation)
+        protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation) : this()
         {
             //source = overlayImage(bitmap);
             source = bitmap;
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
+        }
+        protected IDominoProvider()
+        {
             this.ColorFilters = new ObservableCollection<ColorFilter>();
             this.ImageFilters = new ObservableCollection<ImageFilter>();
             this.PostFilters = new ObservableCollection<PostFilter>();
-            this.ColorFilters.CollectionChanged += 
+            this.ColorFilters.CollectionChanged +=
                 new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => colorsValid = false);
             this.ImageFilters.CollectionChanged +=
                 new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => imageValid = false);
@@ -312,6 +383,7 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
+        [ProtoAfterDeserialization]
         internal void ApplyColorFilters()
         {
             color_filtered = Serializer.DeepClone(colors);
@@ -328,8 +400,65 @@ namespace DominoPlanner.Core
                 filter.Apply(image_filtered);
             }
         }
+        public void Save(string filepath)
+        {
+            filepath = Workspace.Instance.MakePathAbsolute(filepath);
+            using (FileStream stream = new FileStream(filepath, FileMode.Create))
+            {
+                Serializer.Serialize(stream, this);
+            }
+        }
+        public static IDominoProvider Load(string path)
+        {
+            path = Workspace.Instance.MakePathAbsolute(path);
+            var open = (IDominoProvider)Workspace.Instance.Find(path);
+            if (open == null)
+            {
+                Console.WriteLine($"Datei {path} öffnen");
+                IDominoProvider repo;
+                using (var file = File.OpenRead(path))
+                {
+                    repo = Serializer.Deserialize<IDominoProvider>(file);
+                }
+                Workspace.Instance.AddToWorkspace(path, repo);
+                return repo;
+            }
+            else
+            {
+                Console.WriteLine($"Datei {path} bereits geöffnet");
+                return open;
+            }
+        }
+        public static int[] LoadPreview(string path)
+        {
+            path = Workspace.Instance.MakePathAbsolute(path);
+            var open = (IDominoProvider)Workspace.Instance.Find(path);
+            if (open == null)
+            {
+                Console.WriteLine($"Vorschau von Datei {path} öffnen");
+                IDominoProviderPreview repo;
+                using (var file = File.OpenRead(path))
+                {
+                    repo = Serializer.Deserialize<IDominoProviderPreview>(file);
+                }
+                return repo.counts;
+            }
+            else
+            {
+                Console.WriteLine($"Datei {path} bereits geöffnet, Vorschau wird aus geladenem Objekt verwendet");
+                return open.counts;
+            }
+        }
         public abstract object Clone();
         #endregion
     }
+    [ProtoContract]
+    public class IDominoProviderPreview
+    {
+        [ProtoMember(1)]
+        public int[] counts { get; set; }
+    }
+
+
 }
 

@@ -58,4 +58,11 @@ namespace DominoPlanner.Core
             }
         }
     }
+    public enum ColorModeEnum
+    {
+        Cie94Comparison,
+        CieDe2000Comparison,
+        CmcComparison,
+        Cie1976Comparison
+    }
 }

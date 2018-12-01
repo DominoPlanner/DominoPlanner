@@ -219,7 +219,7 @@ namespace DominoPlanner.Core
         /// <returns>Der Punkt, der sich für den angegebenen Winkel aus der Polarfunktion ergibt.</returns>
         private Point getPoint(double theta)
         {
-            return new Point() { X = theta * Math.Cos(theta) * a, Y = theta * Math.Sin(theta) * a };
+            return new Point(theta * Math.Cos(theta) * a, theta * Math.Sin(theta) * a);
         }
         /// <summary>
         /// Erstellt einen Pathdomino am angegebenen Punkt (Winkel)
