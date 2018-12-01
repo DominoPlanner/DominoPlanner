@@ -27,6 +27,7 @@ namespace DominoPlanner.Core
                 if (value > 1)
                 {
                     _tangential_width = value;
+                    shapesValid = false;
                 }
             }
         }
@@ -43,6 +44,7 @@ namespace DominoPlanner.Core
                 if (value > 1)
                 {
                     _normal_width = value;
+                    shapesValid = false;
                 }
             }
         }
@@ -61,6 +63,7 @@ namespace DominoPlanner.Core
                 if (value > 1)
                 {
                     _tangential_distance = value;
+                    shapesValid = false;
                 }
             }
         }
@@ -77,6 +80,7 @@ namespace DominoPlanner.Core
                 if (value > 1)
                 {
                     _normal_distance = value;
+                    shapesValid = false;
                 }
             }
         }
@@ -93,6 +97,7 @@ namespace DominoPlanner.Core
                 if (value > 4 && value < 5000)
                 {
                     _rotations = value;
+                    shapesValid = false;
                 }
 
             }
@@ -110,11 +115,31 @@ namespace DominoPlanner.Core
                 if (value > _normal_width * 2)
                 {
                     _start_diameter = value;
+                    shapesValid = false;
                 }
 
             }
         }
+        double? _angle_shift_factor;
+        
+        [ProtoMember(7)]
+        public double? angle_shift_factor
+        {
+            get
+            {
+                if (_angle_shift_factor != null)
+                    return _angle_shift_factor;
+                else
+                    return r.NextDouble() * 3.141 * 2;
+            }
+            set
+            {
+                _angle_shift_factor = value;
+                shapesValid = false;
 
+            }
+        }
+        private Random r;
         public override int targetCount { set => throw new NotImplementedException(); }
 
         public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
@@ -129,6 +154,7 @@ namespace DominoPlanner.Core
             this.tangentialWidth = tangentialWidth;
             this.start_diameter = 4 * tangentialWidth;
             hasProcotolDefinition = true;
+            r = new Random();
         }
         private CircleParameters() : base() { }
         protected override void GenerateShapes()
@@ -146,7 +172,7 @@ namespace DominoPlanner.Core
                 // equally space the distance between all dominoes
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes
-                double angle = 0.05*circlecount;
+                double angle = (double)angle_shift_factor*circlecount;
                 dominos[circlecount] = new PathDomino[current_domino_count];
                 for (int i = 0; i < current_domino_count; i++)
                 {
