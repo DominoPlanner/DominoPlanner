@@ -259,7 +259,7 @@ namespace DominoPlanner.CoreTests
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             CircleParameters p = new CircleParameters(mat, 50, 8, 24, 8, 8, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-            p.angle_shift_factor = -0.05;
+            p.angle_shift_factor = -0.02;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
 

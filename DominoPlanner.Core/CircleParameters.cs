@@ -139,6 +139,21 @@ namespace DominoPlanner.Core
 
             }
         }
+        private int _force_divisibilty = 1;
+        public int force_divisibility
+        {
+            get
+            {
+                return _force_divisibilty;
+            }
+            set
+            {
+                if (force_divisibility >= 1)
+                {
+                    _force_divisibilty = value;
+                }
+            }
+        }
         private Random r;
         public override int targetCount { set => throw new NotImplementedException(); }
 
@@ -169,6 +184,7 @@ namespace DominoPlanner.Core
                 double domino_angle = Math.Asin((double)tangentialWidth / diameter) * 2;
                 double distance_angle = Math.Asin((double)tangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
+                current_domino_count = (int)Math.Round((double)current_domino_count / _force_divisibilty) * _force_divisibilty;
                 // equally space the distance between all dominoes
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes
