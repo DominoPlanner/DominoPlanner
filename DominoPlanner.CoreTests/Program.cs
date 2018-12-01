@@ -41,7 +41,7 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            //CircleTest("tests/bird.jpg");
+            CircleTest("tests/bird.jpg");
             SpiralTest("tests/bird.jpg");
             //WallTest("tests/bird.jpg");
             //FieldTest("tests/transparent_white.png");
@@ -124,7 +124,7 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 100000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(mat, "colors.DColor", 8, 8, 24, 8, 300000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.TransparencySetting = 128;
 
@@ -203,7 +203,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            SpiralParameters p = new SpiralParameters(mat, 2000, 24, 8, 8, 8, "colors.DColor", 
+            SpiralParameters p = new SpiralParameters(mat, 500, 24, 8, 8, 8, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -257,7 +257,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(mat, 2000, 8, 24, 8, 8, "colors.DColor",
+            CircleParameters p = new CircleParameters(mat, 500, 8, 24, 8, 8, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
 
             var watch = System.Diagnostics.Stopwatch.StartNew();

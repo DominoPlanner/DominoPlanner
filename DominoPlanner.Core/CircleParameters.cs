@@ -132,13 +132,14 @@ namespace DominoPlanner.Core
         private CircleParameters() : base() { }
         protected override void GenerateShapes()
         {
-            List<PathDomino> dominos = new List<PathDomino>();
-            int circlecount = 0;
+            PathDomino[][] dominos = new PathDomino[rotations][];
             int diameter = start_diameter;
-            while (circlecount < rotations)
+            Parallel.For(0,  rotations,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
+            (circlecount) =>
             {
+                
                 diameter += 2 * normalWidth + 2 * normalDistance;
-                // get number of dominoes in this spiral
+
                 double domino_angle = Math.Asin((double)tangentialWidth / diameter) * 2;
                 double distance_angle = Math.Asin((double)tangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
@@ -146,25 +147,27 @@ namespace DominoPlanner.Core
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes
                 double angle = 0;
+                dominos[circlecount] = new PathDomino[current_domino_count];
                 for (int i = 0; i < current_domino_count; i++)
                 {
                     PathDomino d = GenerateDomino(diameter, angle, domino_angle);
                     angle += domino_angle + distance_angle;
                     d.position = new ProtocolDefinition() { x = i, y = circlecount };
-                    dominos.Add(d);
+                    dominos[circlecount][i] = d;
                 }
-                circlecount++;
-            }
-            IDominoShape[] dominoes = dominos.ToArray();
-            double x_min = dominoes.Min(x => x.GetContainer().x);
-            double y_min = dominoes.Min(x => x.GetContainer().y);
-            double x_max = dominoes.Max(x => x.GetContainer().width + x.GetContainer().x);
-            double y_max = dominoes.Max(x => x.GetContainer().height + x.GetContainer().y);
-            for (int i = 0; i < dominoes.Length; i++)
+            });
+            IDominoShape[] dominoes = dominos.SelectMany(x => x).ToArray();
+            DominoRectangle[] containers = dominoes.AsParallel().Select(x => x.GetContainer()).ToArray();
+            
+            double x_min = containers.Min(x => x.x);
+            double y_min = containers.Min(x => x.y);
+            double x_max = containers.Max(x => x.width + x.x);
+            double y_max = containers.Max(x => x.height + x.y);
+            Parallel.For(0, dominoes.Length, (i) =>
             {
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
 
-            }
+            });
             GenStructHelper g = new GenStructHelper();
             g.HasProtocolDefinition = true;
             g.dominoes = dominoes;

@@ -189,15 +189,17 @@ namespace DominoPlanner.Core
                 theta = theta_new;
             }
             IDominoShape[] dominoes = dominolist.ToArray();
-            float x_min = dominoes.Min(x => x.GetContainer().x1);
-            float y_min = dominoes.Min(x => x.GetContainer().y1);
-            float x_max = dominoes.Max(x => x.GetContainer().x2);
-            float y_max = dominoes.Max(x => x.GetContainer().y2);
+            DominoRectangle[] containers = dominoes.AsParallel().Select(x => x.GetContainer()).ToArray();
 
-            for (int i = 0; i < dominoes.Length; i++)
+            double x_min = containers.Min(x => x.x);
+            double y_min = containers.Min(x => x.y);
+            double x_max = containers.Max(x => x.width + x.x);
+            double y_max = containers.Max(x => x.height + x.y);
+            Parallel.For(0, dominoes.Length, (i) =>
             {
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
-            }
+
+            });
             GenStructHelper g = new GenStructHelper();
             g.HasProtocolDefinition = true;
             g.dominoes = dominoes;
