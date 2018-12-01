@@ -107,7 +107,7 @@ namespace DominoPlanner.CoreTests
         }
         private static ColorRepository ColorRepoLoadTest(String path)
         {
-            return ColorRepository.Load(path);
+            return Workspace.Load<ColorRepository>(path);
         }
         static async Task<String> Test()
         {
@@ -171,17 +171,22 @@ namespace DominoPlanner.CoreTests
             sw.Close();
             p.Save("FieldTest.DField");
             watch = Stopwatch.StartNew();
-            int[] counts = IDominoProvider.LoadPreview("FieldTest.DField");
+            int[] counts = Workspace.LoadColorList<FieldParameters>("FieldTest.DField");
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
             
             watch = Stopwatch.StartNew();
-            FieldParameters loaded = (FieldParameters)IDominoProvider.Load("FieldTest.DField");
+            FieldParameters loaded = Workspace.Load<FieldParameters>("FieldTest.DField");
             watch.Stop();
             Console.WriteLine("Load Time: " + watch.ElapsedMilliseconds);
             //loaded.last.GenerateImage(Colors.Transparent).Save("tests/afterLoad.png");
             Console.WriteLine(p.colors == loaded.colors);
+            watch = Stopwatch.StartNew();
+            int[] counts2 = Workspace.LoadColorList<FieldParameters>("FieldTest.DField");
+            watch.Stop();
+            Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
+            Console.WriteLine(String.Join(", ", counts2));
 
 
         }

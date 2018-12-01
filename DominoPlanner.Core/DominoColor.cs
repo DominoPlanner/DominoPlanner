@@ -100,7 +100,7 @@ namespace DominoPlanner.Core
         }
     }
     [ProtoContract(SkipConstructor =true)]
-    public class ColorRepository
+    public class ColorRepository : IWorkspaceLoadable
     {
         [ProtoMember(3)]
         public List<int> Anzeigeindizes;
@@ -181,30 +181,6 @@ namespace DominoPlanner.Core
                 list.AddRange(colors);
                 return list.ToArray();
             }
-        }
-        
-        public static ColorRepository Load(string path)
-        {
-            path = Workspace.Instance.MakePathAbsolute(path);
-            var open = (ColorRepository)Workspace.Instance.Find(path);
-            if (open == null)
-            {
-                
-                Console.WriteLine($"Datei {path} öffnen");
-                ColorRepository repo;
-                using (var file = File.OpenRead(path))
-                {
-                    repo = Serializer.Deserialize<ColorRepository>(file);
-                }
-                Workspace.Instance.AddToWorkspace(path, repo);
-                return repo;
-            }
-            else
-            {
-                Console.WriteLine($"Datei {path} bereits geöffnet");
-                return open;
-            }
-            
         }
         public void Save(string path)
         {

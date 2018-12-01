@@ -19,7 +19,7 @@ namespace DominoPlanner.Core
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
     [ProtoInclude(101, typeof(RectangleDominoProvider))]
-    public abstract class IDominoProvider : ICloneable
+    public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList
     {
         #region public properties
         /// <summary>
@@ -85,7 +85,7 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = ColorRepository.Load(value);
+                colors = Workspace.Load<ColorRepository>(value);
             }
         }
         public ColorRepository color_filtered { get; private set; }
@@ -408,50 +408,19 @@ namespace DominoPlanner.Core
                 Serializer.Serialize(stream, this);
             }
         }
-        public static IDominoProvider Load(string path)
-        {
-            path = Workspace.Instance.MakePathAbsolute(path);
-            var open = (IDominoProvider)Workspace.Instance.Find(path);
-            if (open == null)
-            {
-                Console.WriteLine($"Datei {path} öffnen");
-                IDominoProvider repo;
-                using (var file = File.OpenRead(path))
-                {
-                    repo = Serializer.Deserialize<IDominoProvider>(file);
-                }
-                Workspace.Instance.AddToWorkspace(path, repo);
-                return repo;
-            }
-            else
-            {
-                Console.WriteLine($"Datei {path} bereits geöffnet");
-                return open;
-            }
-        }
-        public static int[] LoadPreview(string path)
-        {
-            path = Workspace.Instance.MakePathAbsolute(path);
-            var open = (IDominoProvider)Workspace.Instance.Find(path);
-            if (open == null)
-            {
-                Console.WriteLine($"Vorschau von Datei {path} öffnen");
-                IDominoProviderPreview repo;
-                using (var file = File.OpenRead(path))
-                {
-                    repo = Serializer.Deserialize<IDominoProviderPreview>(file);
-                }
-                return repo.counts;
-            }
-            else
-            {
-                Console.WriteLine($"Datei {path} bereits geöffnet, Vorschau wird aus geladenem Objekt verwendet");
-                return open.counts;
-            }
-        }
         public abstract object Clone();
         #endregion
     }
+
+    public interface IWorkspaceLoadColorList : IWorkspaceLoadable
+    {
+        int[] counts { get; }
+    }
+    public interface IWorkspaceLoadable
+    {
+
+    }
+
     [ProtoContract]
     public class IDominoProviderPreview
     {
