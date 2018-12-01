@@ -214,10 +214,10 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            //Mat b2 = t.GenerateImage(1000, false);
+            Mat b2 = t.GenerateImage(Colors.Transparent);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
-            //b2.Save("tests/SpiralTest.png");
+            b2.Save("tests/SpiralTest.png");
             FileStream fs = new FileStream(@"SpiralPlanTest.html", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
             sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
@@ -257,9 +257,8 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(mat, 500, 8, 24, 8, 8, "colors.DColor",
+            CircleParameters p = new CircleParameters(mat, 50, 8, 24, 8, 8, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
 

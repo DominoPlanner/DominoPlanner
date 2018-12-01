@@ -127,18 +127,18 @@ namespace DominoPlanner.Core
             this.normalWidth = normalWidth;
             this.tangentialDistance = tangentialDistance;
             this.tangentialWidth = tangentialWidth;
+            this.start_diameter = 4 * tangentialWidth;
             hasProcotolDefinition = true;
         }
         private CircleParameters() : base() { }
         protected override void GenerateShapes()
         {
             PathDomino[][] dominos = new PathDomino[rotations][];
-            int diameter = start_diameter;
             Parallel.For(0,  rotations,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
             (circlecount) =>
             {
                 
-                diameter += 2 * normalWidth + 2 * normalDistance;
+                int diameter = start_diameter + circlecount * (2 * normalWidth + 2 * normalDistance);
 
                 double domino_angle = Math.Asin((double)tangentialWidth / diameter) * 2;
                 double distance_angle = Math.Asin((double)tangentialDistance / diameter) * 2;
@@ -146,7 +146,7 @@ namespace DominoPlanner.Core
                 // equally space the distance between all dominoes
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes
-                double angle = 0;
+                double angle = 0.05*circlecount;
                 dominos[circlecount] = new PathDomino[current_domino_count];
                 for (int i = 0; i < current_domino_count; i++)
                 {
