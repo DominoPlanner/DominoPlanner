@@ -25,6 +25,8 @@ namespace DominoPlanner.Core
     [ProtoInclude(100, typeof(BlendImageFilter))]
     [ProtoInclude(101, typeof(ContrastLightFilter))]
     [ProtoInclude(102, typeof(GammaCorrectFilter))]
+    [ProtoInclude(103, typeof(GaussianBlurFilter))]
+    [ProtoInclude(103, typeof(ReplaceColorFilter))]
     public abstract class ImageFilter : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;

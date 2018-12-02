@@ -68,8 +68,9 @@ namespace DominoPlanner.Core
         [ProtoMember(4)]
         public FontStyle FontStyle { get => _fontStyle; set { if (SetField(ref _fontStyle, value)) mat_valid = false; } }
 
-        private Color _color;
         [ProtoMember(5)]
+        private string before_surrogate { get { return ColorTranslator.ToHtml(_color); } set { _color = ColorTranslator.FromHtml(value); } }
+        private Color _color;
         public Color Color { get => _color; set { SetField(ref _color, value); mat_valid = false; } }
         [ProtoAfterDeserialization]
         public override void UpdateMat()
@@ -197,6 +198,44 @@ namespace DominoPlanner.Core
                 var blurred = new Mat();
                 CvInvoke.GaussianBlur(image, blurred, new Size(KernelSize, KernelSize), StandardDeviation);
                 CvInvoke.AddWeighted(image, (1.0 + weight), blurred, -weight, 0, input, Emgu.CV.CvEnum.DepthType.Cv8U);
+            }
+        }
+    }
+    [ProtoContract]
+    public class ReplaceColorFilter : ImageFilter
+    {
+        [ProtoMember(2)]
+        private string before_surrogate { get { return ColorTranslator.ToHtml(_before); } set { _before = ColorTranslator.FromHtml(value); } }
+        private Color _before;
+        public Color BeforeColor { get => _before; set { SetField(ref _before, value); } }
+        [ProtoMember(3)]
+        private string after_surrogate { get { return ColorTranslator.ToHtml(_after); } set { _after = ColorTranslator.FromHtml(value); } }
+        private Color _after;
+        public Color AfterColor { get => _after; set { SetField(ref _after, value); } }
+        private int _tol;
+        [ProtoMember(1)]
+        public int Tolerance { get => _tol; set { if (value % 2 == 1) SetField(ref _tol, value); } }
+
+        public override void Apply(Mat input)
+        {
+            using (Image<Bgra, byte> image = input.ToImage<Bgra, byte>())
+            {
+                Parallel.For(0, input.Height, (y) =>
+                {
+                    for (int x = input.Width - 1; x >= 0; x--)
+                    {
+                        if (Math.Abs(image.Data[y, x, 0] - BeforeColor.B) < Tolerance &&
+                        Math.Abs(image.Data[y, x, 1] - BeforeColor.G) < Tolerance &&
+                        Math.Abs(image.Data[y, x, 2] - BeforeColor.R) < Tolerance)
+                        {
+                            image.Data[y, x, 0] = AfterColor.B;
+                            image.Data[y, x, 1] = AfterColor.G;
+                            image.Data[y, x, 2] = AfterColor.R;
+                            image.Data[y, x, 3] = AfterColor.A;
+                        }
+                    }
+                });
+                input = image.Mat;
             }
         }
     }
