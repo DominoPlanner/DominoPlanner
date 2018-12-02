@@ -158,10 +158,10 @@ namespace DominoPlanner.Core
         private Random r;
         public override int targetCount { set => throw new NotImplementedException(); }
 
-        public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
+        public CircleParameters(string imagepath, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
             string colors, IColorComparison colorMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            base(imagepath, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
             this.Rotations = rotations;
             this.NormalDistance = normalDistance;
