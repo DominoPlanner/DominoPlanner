@@ -165,6 +165,41 @@ namespace DominoPlanner.Core
             }            
         }
     }
+    [ProtoContract]
+    [ProtoInclude(100, typeof(GaussianSharpenFilter))]
+    public class GaussianBlurFilter : ImageFilter
+    {
+        private int kernel_size = 1;
+        [ProtoMember(1)]
+        public int KernelSize { get => kernel_size; set { if (value % 2 == 1) SetField(ref kernel_size, value);  } }
+        private double std_dev = 1;
+        [ProtoMember(2)]
+        public double StandardDeviation { get => std_dev; set {  SetField(ref std_dev, value); } }
+        
+        public override void Apply(Mat input)
+        {
+            using (var image = input.ToImage<Bgra, byte>())
+            {
+                CvInvoke.GaussianBlur(image, input, new Size(KernelSize, KernelSize), StandardDeviation);
+            }
+        }
+    }
+    [ProtoContract]
+    public class GaussianSharpenFilter : GaussianBlurFilter
+    {
+        private double weight = 1;
+        [ProtoMember(1)]
+        public double SharpenWeight { get => weight; set { SetField(ref weight, value); } }
+        public override void Apply(Mat input)
+        {
+            using (var image = input.ToImage<Bgra, byte>())
+            {
+                var blurred = new Mat();
+                CvInvoke.GaussianBlur(image, blurred, new Size(KernelSize, KernelSize), StandardDeviation);
+                CvInvoke.AddWeighted(image, (1.0 + weight), blurred, -weight, 0, input, Emgu.CV.CvEnum.DepthType.Cv8U);
+            }
+        }
+    }
     public static class ImageExtensions
     {
         public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
