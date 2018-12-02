@@ -239,7 +239,7 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public SpiralParameters(Mat bitmap, double quarterRotations, int normalWidth, int tangentialWidth, 
+        public SpiralParameters(string bitmap, double quarterRotations, int normalWidth, int tangentialWidth, 
             int normalDistance, int tangentialDistance, string colors, 
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)

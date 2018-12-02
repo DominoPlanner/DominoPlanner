@@ -12,7 +12,7 @@ namespace DominoPlanner.Core
 {
     [ProtoContract]
     [ProtoInclude(100, typeof(BlendTextFilter))]
-    [ProtoInclude(100, typeof(BlendFileFilter))]
+    [ProtoInclude(101, typeof(BlendFileFilter))]
     public abstract class BlendImageFilter : ImageFilter
     {
         private double center_x;
@@ -22,28 +22,42 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public double CenterY { get => center_y; set { SetField(ref center_y, value); } }
         
-        private double scale_x;
+        private double scale_x = 1;
         [ProtoMember(3)]
         public double ScaleX { get => scale_x; set => SetField(ref scale_x, value); }
         
-        private double scale_y;
+        private double scale_y = 1;
         [ProtoMember(4)]
         public double ScaleY { get => scale_y; set => SetField(ref scale_y, value); }
         
-        private double rotate_angle;
+        private double rotate_angle = 0;
         [ProtoMember(5)]
         public double RotateAngle { get => rotate_angle; set => SetField(ref rotate_angle, value); }
-        
-        internal Mat to_blend;
-        public override void Apply(Mat input)
+        private Image<Bgra, byte> _to_blend;
+        internal Image<Bgra, byte> to_blend
+        {
+            get { return _to_blend; }
+            set
+            {
+                _to_blend = value; center_x = value.Width / 2; center_y = value.Height / 2;
+            }
+        }
+        public override void Apply(Image<Bgra, byte> input)
         {
             if (!mat_valid) UpdateMat();
-            using (var image = to_blend.ToImage<Bgra, byte>())
+            using (var image = to_blend.Clone())
             {
-                image.Resize((int)(image.Width * scale_x), (int)(image.Height * scale_y), Emgu.CV.CvEnum.Inter.Lanczos4);
-                image.Rotate(rotate_angle, new Bgra(0, 0, 0, 255), false);
-                input.OverlayImage(image, (int) (center_x - image.Width / 2d), (int) (center_y - image.Height / 2d));
+                if (scale_x != 1 && scale_y != 1)
+                    image.Resize((int)(image.Width * scale_x), (int)(image.Height * scale_y), Emgu.CV.CvEnum.Inter.Lanczos4);
+                if (rotate_angle != 0)
+                    image.Rotate(rotate_angle, new Bgra(0, 0, 0, 255), false);
+                input.OverlayImage(image, (int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d));
             }
+            input.Save("tests/blended.png");
+        }
+        public Size GetSizeOfMat()
+        {
+            return to_blend.Size;
         }
         public bool mat_valid;
         public abstract void UpdateMat();
@@ -86,24 +100,29 @@ namespace DominoPlanner.Core
             graphics = Graphics.FromImage(bmp);
             graphics.Clear(Color.Transparent);
             graphics.DrawString(Text, font, new SolidBrush(Color), new PointF(0, 0));
-            to_blend = new Image<Bgra, byte>(bmp).Mat;
-
+            to_blend = new Image<Bgra, byte>(bmp);
+            mat_valid = true;
         }
     }
     [ProtoContract]
     public class BlendFileFilter : BlendImageFilter
     {
+        
         string _filepath;
         [ProtoMember(1)]
         public string FilePath
         {
             get => _filepath;
-            set { if (SetField(ref _filepath, value)) mat_valid = false; }
+            set { if (SetField(ref _filepath, value)) UpdateMat(); }
         }
         [ProtoAfterDeserialization]
         public override void UpdateMat()
         {
-            to_blend = new Mat(Workspace.Instance.MakePathAbsolute(_filepath));
+            to_blend = new Image<Bgra, byte>(Workspace.Instance.MakePathAbsolute(_filepath));
+        }
+        public BlendFileFilter()
+        {
+            mat_valid = true;
         }
     }
     public class ContrastLightFilter : ImageFilter
@@ -112,50 +131,43 @@ namespace DominoPlanner.Core
         public double Alpha { get => _a; set => SetField(ref _a, value); }
         private double _b;
         public double Beta { get => _b; set => SetField(ref _b, value); }
-        public override void Apply(Mat input)
+        public override void Apply(Image<Bgra, byte> input)
         {
-            using (Image<Bgra, byte> image = input.ToImage<Bgra, byte>())
+            Parallel.For(0, input.Height, (y) =>
             {
-                Parallel.For(0, input.Height, (y) =>
+                for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    for (int x = input.Width - 1; x >= 0; x--)
+                    for (int c = 2; c >= 0; c--)
                     {
-                        for (int c = 2; c >= 0; c--)
-                        {
-                            image.Data[y, x, c] = Saturate(image.Data[y, x, c] * Alpha + Beta);
-                        }
+                        input.Data[y, x, c] = Saturate(input.Data[y, x, c] * Alpha + Beta);
                     }
-                });
-                input = image.Mat;
-            }
+                }
+            });
         }
+    }
         
     
-    }
+    
     public class GammaCorrectFilter : ImageFilter
     {
         private double _gamma;
         public double Gamma { get => _gamma; set { SetField(ref _gamma, value); updateLUT(); } }
 
         private byte[] LUT;
-        public override void Apply(Mat input)
+        public override void Apply(Image<Bgra, byte> input)
         {
-            using (Image<Bgra, byte> image = input.ToImage<Bgra, byte>())
+            Parallel.For(0, input.Height, (y) =>
             {
-                Parallel.For(0, input.Height, (y) =>
+                for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    for (int x = input.Width - 1; x >= 0; x--)
+                    for (int c = 2; c >= 0; c--)
                     {
-                        for (int c = 2; c >= 0; c--)
-                        {
-                            image.Data[y, x, c] = LUT[image.Data[y, x, c]];
+                        input.Data[y, x, c] = LUT[input.Data[y, x, c]];
 
-                        }
                     }
-                });
-                input = image.Mat;
-            }
-            
+                }
+            });
+
         }
         public void updateLUT()
         {
@@ -176,13 +188,11 @@ namespace DominoPlanner.Core
         private double std_dev = 1;
         [ProtoMember(2)]
         public double StandardDeviation { get => std_dev; set {  SetField(ref std_dev, value); } }
-        
-        public override void Apply(Mat input)
+
+        public override void Apply(Image<Bgra, byte> input)
         {
-            using (var image = input.ToImage<Bgra, byte>())
-            {
-                CvInvoke.GaussianBlur(image, input, new Size(KernelSize, KernelSize), StandardDeviation);
-            }
+
+            CvInvoke.GaussianBlur(input.Clone(), input, new Size(KernelSize, KernelSize), StandardDeviation);
         }
     }
     [ProtoContract]
@@ -191,9 +201,9 @@ namespace DominoPlanner.Core
         private double weight = 1;
         [ProtoMember(1)]
         public double SharpenWeight { get => weight; set { SetField(ref weight, value); } }
-        public override void Apply(Mat input)
+        public override void Apply(Image<Bgra, byte>  input)
         {
-            using (var image = input.ToImage<Bgra, byte>())
+            using (var image = input.Clone())
             {
                 var blurred = new Mat();
                 CvInvoke.GaussianBlur(image, blurred, new Size(KernelSize, KernelSize), StandardDeviation);
@@ -216,27 +226,23 @@ namespace DominoPlanner.Core
         [ProtoMember(1)]
         public int Tolerance { get => _tol; set { if (value % 2 == 1) SetField(ref _tol, value); } }
 
-        public override void Apply(Mat input)
+        public override void Apply(Image<Bgra, byte> input)
         {
-            using (Image<Bgra, byte> image = input.ToImage<Bgra, byte>())
+            Parallel.For(0, input.Height, (y) =>
             {
-                Parallel.For(0, input.Height, (y) =>
+                for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    for (int x = input.Width - 1; x >= 0; x--)
+                    if (Math.Abs(input.Data[y, x, 0] - BeforeColor.B) < Tolerance &&
+                    Math.Abs(input.Data[y, x, 1] - BeforeColor.G) < Tolerance &&
+                    Math.Abs(input.Data[y, x, 2] - BeforeColor.R) < Tolerance)
                     {
-                        if (Math.Abs(image.Data[y, x, 0] - BeforeColor.B) < Tolerance &&
-                        Math.Abs(image.Data[y, x, 1] - BeforeColor.G) < Tolerance &&
-                        Math.Abs(image.Data[y, x, 2] - BeforeColor.R) < Tolerance)
-                        {
-                            image.Data[y, x, 0] = AfterColor.B;
-                            image.Data[y, x, 1] = AfterColor.G;
-                            image.Data[y, x, 2] = AfterColor.R;
-                            image.Data[y, x, 3] = AfterColor.A;
-                        }
+                        input.Data[y, x, 0] = AfterColor.B;
+                        input.Data[y, x, 1] = AfterColor.G;
+                        input.Data[y, x, 2] = AfterColor.R;
+                        input.Data[y, x, 3] = AfterColor.A;
                     }
-                });
-                input = image.Mat;
-            }
+                }
+            });
         }
     }
     public static class ImageExtensions
@@ -256,19 +262,12 @@ namespace DominoPlanner.Core
                             background.Data[y, x, c] = (byte)(background.Data[y, x, c] * (1 - opacity_overlay)
                             + overlay.Data[y + start_y, x + start_x, c] * opacity_overlay);
                         }
-                        background.Data[y, x, 3] += overlay.Data[y + start_y, x + start_x, 3];
+                        int transp_neu = background.Data[y, x, 3] + overlay.Data[y + start_y, x + start_x, 3];
+                        background.Data[y, x, 3] = (byte)(transp_neu > 255 ? 255 : transp_neu);
                     }
 
                 }
             });
-        }
-        public static void OverlayImage(this Mat background, Image<Bgra, byte> overlay, int start_x=0, int start_y =0)
-        {
-            using (var bg = background.ToImage<Bgra, byte>())
-            {
-                OverlayImage(bg, overlay, start_x, start_y);
-                background = bg.Mat;
-            }
         }
     }
 }
