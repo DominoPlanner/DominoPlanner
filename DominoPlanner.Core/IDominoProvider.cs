@@ -247,6 +247,8 @@ namespace DominoPlanner.Core
             
             ImageWidth = BlendFileFilter.GetSizeOfMat().Width;
             ImageHeight = BlendFileFilter.GetSizeOfMat().Height;
+            BlendFileFilter.CenterX = ImageWidth / 2;
+            BlendFileFilter.CenterY = ImageHeight / 2;
             UpdateSource();
             this.ImageFilters.Add(BlendFileFilter);
             this.colorMode = comp;
@@ -469,7 +471,7 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
-        [ProtoAfterDeserialization]
+        
         internal void ApplyColorFilters()
         {
             color_filtered = Serializer.DeepClone(colors);
@@ -479,6 +481,13 @@ namespace DominoPlanner.Core
             }
             lastValid = false;
             colorsValid = true;
+        }
+        [ProtoAfterDeserialization]
+        internal void ColorAfterDeserial()
+        {
+            bool last_valid = this.lastValid;
+            ApplyColorFilters();
+            lastValid = last_valid;
         }
         internal void ApplyImageFilters()
         {

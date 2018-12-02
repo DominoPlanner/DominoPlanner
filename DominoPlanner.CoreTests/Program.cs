@@ -45,7 +45,7 @@ namespace DominoPlanner.CoreTests
             for (int i = 0; i < 1; i++)
             //    SpiralTest("bird.jpg");
             //WallTest("tests/bird.jpg");
-            FieldTest("transparent_white.png");
+            FieldTest("bird.jpg");
             //ColorRepoSaveTest();
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -132,7 +132,41 @@ namespace DominoPlanner.CoreTests
             DominoTransfer t = p.Generate();
             p.background = System.Windows.Media.Colors.White;
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
+            // Filtertests für ein Logo oder ähnliches
+            /*var erster = ((BlendFileFilter)p.ImageFilters[0]);
+            erster.RotateAngle = 30;
+            erster.ScaleX = 0.5;
+            erster.ScaleY = 0.3;
+            erster.CenterX = erster.GetSizeOfMat().Width * 0.6;
+            erster.CenterY = erster.GetSizeOfMat().Height * 0.6;
+            var zweiter = new BlendTextFilter();
+            zweiter.FontSize = 40;
+            zweiter.FontFamily = "Calibri";
+            zweiter.Text = "Hallo Welt";
+            zweiter.Color = System.Drawing.Color.Green;
+            p.ImageFilters.Add(zweiter);
+            zweiter.CenterX = 500;
+            zweiter.CenterY = 500;*/
+            // Filtertests für Bilder
+            // Helligkeit / Kontrast
+            /*var hell = new ContrastLightFilter();
+            hell.Alpha = 1.5;
+            hell.Beta = -150;
+            p.ImageFilters.Add(hell);*/
+            //var gamma = new GammaCorrectFilter();
+            //gamma.Gamma = 1.1;
+            //p.ImageFilters.Add(gamma);
 
+            /*var blur = new GaussianSharpenFilter();
+            blur.KernelSize = 21;
+            blur.StandardDeviation = 5;
+            blur.SharpenWeight = 0.5;
+            p.ImageFilters.Add(blur);*/
+            /*var replace = new ReplaceColorFilter();
+            replace.BeforeColor = System.Drawing.Color.LightBlue;
+            replace.AfterColor = System.Drawing.Color.Red;
+            replace.Tolerance = 50;
+            p.ImageFilters.Add(replace);*/
             t = p.Generate();
             Console.WriteLine(String.Join("\n", p.counts));
             Console.WriteLine("Size: " + t.dominoes.Count());
@@ -178,7 +212,7 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
-            /*
+            
             watch = Stopwatch.StartNew();
             FieldParameters loaded = Workspace.Load<FieldParameters>("FieldTest.DObject");
             watch.Stop();
@@ -189,7 +223,12 @@ namespace DominoPlanner.CoreTests
             int[] counts2 = Workspace.LoadColorList<FieldParameters>("FieldTest.DObject");
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
-            Console.WriteLine(String.Join(", ", counts2));*/
+            Console.WriteLine(String.Join(", ", counts2));
+            Console.WriteLine("Number of image filters: " + loaded.ImageFilters.Count);
+            //loaded.ImageHeight = 1500;
+            loaded.Generate();
+            
+            Console.WriteLine(String.Join(", ", loaded.counts));
         }
         static void WBXTest()
         {
@@ -211,7 +250,7 @@ namespace DominoPlanner.CoreTests
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
-
+            
             DominoTransfer t = p.Generate();
             Console.WriteLine(t.length);
             watch.Stop();

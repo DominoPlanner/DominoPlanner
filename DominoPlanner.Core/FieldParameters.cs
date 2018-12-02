@@ -331,6 +331,7 @@ namespace DominoPlanner.Core
             image_filtered.Save("tests/resized.png");
             resizedValid = true;
             if (!shapesValid) GenerateShapes();
+            if (shapes == null) restoreShapes();
         }
         /// <summary>
         /// Berechnet die Shapes mit den angegebenen Parametern.
