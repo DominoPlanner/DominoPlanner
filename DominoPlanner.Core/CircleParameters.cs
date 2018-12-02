@@ -16,7 +16,7 @@ namespace DominoPlanner.Core
 
         int _tangential_width;
         [ProtoMember(1)]
-        public int tangentialWidth
+        public int TangentialWidth
         {
             get
             {
@@ -33,7 +33,7 @@ namespace DominoPlanner.Core
         }
         int _normal_width;
         [ProtoMember(2)]
-        public int normalWidth
+        public int NormalWidth
         {
             get
             {
@@ -51,7 +51,7 @@ namespace DominoPlanner.Core
 
         int _tangential_distance;
         [ProtoMember(3)]
-        public int tangentialDistance
+        public int TangentialDistance
         {
             get
             {
@@ -69,7 +69,7 @@ namespace DominoPlanner.Core
         }
         int _normal_distance;
         [ProtoMember(4)]
-        public int normalDistance
+        public int NormalDistance
         {
             get
             {
@@ -86,7 +86,7 @@ namespace DominoPlanner.Core
         }
         int _rotations;
         [ProtoMember(5)]
-        public int rotations
+        public int Rotations
         {
             get
             {
@@ -104,7 +104,7 @@ namespace DominoPlanner.Core
         }
         int _start_diameter;
         [ProtoMember(6)]
-        public int start_diameter
+        public int StartDiameter
         {
             get
             {
@@ -123,7 +123,7 @@ namespace DominoPlanner.Core
         double? _angle_shift_factor;
         
         [ProtoMember(7)]
-        public double? angle_shift_factor
+        public double? AngleShiftFactor
         {
             get
             {
@@ -140,7 +140,8 @@ namespace DominoPlanner.Core
             }
         }
         private int _force_divisibilty = 1;
-        public int force_divisibility
+        [ProtoMember(8)]
+        public int ForceDivisibility
         {
             get
             {
@@ -148,7 +149,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (force_divisibility >= 1)
+                if (value >= 1)
                 {
                     _force_divisibilty = value;
                 }
@@ -162,33 +163,33 @@ namespace DominoPlanner.Core
             IterationInformation iterationInformation, bool allowStretch = false) :
             base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
-            this.rotations = rotations;
-            this.normalDistance = normalDistance;
-            this.normalWidth = normalWidth;
-            this.tangentialDistance = tangentialDistance;
-            this.tangentialWidth = tangentialWidth;
-            this.start_diameter = 4 * tangentialWidth;
+            this.Rotations = rotations;
+            this.NormalDistance = normalDistance;
+            this.NormalWidth = normalWidth;
+            this.TangentialDistance = tangentialDistance;
+            this.TangentialWidth = tangentialWidth;
+            this.StartDiameter = 4 * tangentialWidth;
             hasProcotolDefinition = true;
             r = new Random();
         }
-        private CircleParameters() : base() { }
+        private CircleParameters() : base() { r = new Random(); }
         protected override void GenerateShapes()
         {
-            PathDomino[][] dominos = new PathDomino[rotations][];
-            Parallel.For(0,  rotations,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
+            PathDomino[][] dominos = new PathDomino[Rotations][];
+            Parallel.For(0,  Rotations,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
             (circlecount) =>
             {
                 
-                int diameter = start_diameter + circlecount * (2 * normalWidth + 2 * normalDistance);
+                int diameter = StartDiameter + circlecount * (2 * NormalWidth + 2 * NormalDistance);
 
-                double domino_angle = Math.Asin((double)tangentialWidth / diameter) * 2;
-                double distance_angle = Math.Asin((double)tangentialDistance / diameter) * 2;
+                double domino_angle = Math.Asin((double)TangentialWidth / diameter) * 2;
+                double distance_angle = Math.Asin((double)TangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
                 current_domino_count = (int)Math.Round((double)current_domino_count / _force_divisibilty) * _force_divisibilty;
                 // equally space the distance between all dominoes
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes
-                double angle = (double)angle_shift_factor*circlecount;
+                double angle = (double)AngleShiftFactor*circlecount;
                 dominos[circlecount] = new PathDomino[current_domino_count];
                 for (int i = 0; i < current_domino_count; i++)
                 {
@@ -228,10 +229,10 @@ namespace DominoPlanner.Core
             double y1 = diameter / 2d * Math.Sin(angle);
             double x2 = diameter / 2d * Math.Cos(angle + domino_angle);
             double y2 = diameter / 2d * Math.Sin(angle + domino_angle);
-            double x4 = diameter / 2d * Math.Cos(angle) + Math.Cos(normal_angle) * normalWidth;
-            double y4 = diameter / 2d * Math.Sin(angle) + Math.Sin(normal_angle) * normalWidth;
-            double x3 = diameter / 2d * Math.Cos(angle + domino_angle) + Math.Cos(normal_angle) * normalWidth;
-            double y3 = diameter / 2d * Math.Sin(angle + domino_angle) + Math.Sin(normal_angle) * normalWidth;
+            double x4 = diameter / 2d * Math.Cos(angle) + Math.Cos(normal_angle) * NormalWidth;
+            double y4 = diameter / 2d * Math.Sin(angle) + Math.Sin(normal_angle) * NormalWidth;
+            double x3 = diameter / 2d * Math.Cos(angle + domino_angle) + Math.Cos(normal_angle) * NormalWidth;
+            double y3 = diameter / 2d * Math.Sin(angle + domino_angle) + Math.Sin(normal_angle) * NormalWidth;
             PathDomino d = new PathDomino()
             {
                 points = new Point[] { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3), new Point(x4, y4) },
