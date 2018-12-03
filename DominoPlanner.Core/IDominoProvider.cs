@@ -239,7 +239,8 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(string bitmapPath, IColorComparison comp, string colorpath, IterationInformation iterationInformation) : this()
+        protected IDominoProvider(string bitmapPath, IColorComparison comp, string colorpath, IterationInformation iterationInformation) 
+            : this()
         {
             //source = overlayImage(bitmap);
             var BlendFileFilter = new BlendFileFilter() { FilePath = bitmapPath };
@@ -267,6 +268,17 @@ namespace DominoPlanner.Core
             this.PostFilters.CollectionChanged +=
                 new NotifyCollectionChangedEventHandler((sender, e) => lastValid = false);
             background = Colors.Transparent;
+        }
+        protected IDominoProvider(int imageWidth, int imageHeight, Color background, 
+            IColorComparison comp, string colorpath, IterationInformation iterationInformation) : this()
+        {
+            ImageWidth = imageWidth;
+            ImageHeight = imageHeight;
+            this.background = background;
+            UpdateSource();
+            this.colorMode = comp;
+            this.ColorPath = colorpath;
+            this.IterationInformation = iterationInformation;
         }
         #endregion
         #region public methods

@@ -245,7 +245,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            SpiralParameters p = new SpiralParameters(path, 7, 24, 8, 8, 8, "colors.DColor", 
+            SpiralParameters p = new SpiralParameters(path, 7, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -299,7 +299,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(path, 50, 8, 24, 8, 8, "colors.DColor",
+            CircleParameters p = new CircleParameters(path, 50, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;

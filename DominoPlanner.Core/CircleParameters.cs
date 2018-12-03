@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace DominoPlanner.Core
 {
@@ -14,7 +15,7 @@ namespace DominoPlanner.Core
     public class CircleParameters : RectangleDominoProvider
     {
 
-        int _tangential_width;
+        int _tangential_width = 24;
         [ProtoMember(1)]
         public int TangentialWidth
         {
@@ -31,7 +32,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        int _normal_width;
+        int _normal_width = 8;
         [ProtoMember(2)]
         public int NormalWidth
         {
@@ -49,7 +50,7 @@ namespace DominoPlanner.Core
             }
         }
 
-        int _tangential_distance;
+        int _tangential_distance = 8;
         [ProtoMember(3)]
         public int TangentialDistance
         {
@@ -67,7 +68,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        int _normal_distance;
+        int _normal_distance = 8;
         [ProtoMember(4)]
         public int NormalDistance
         {
@@ -84,25 +85,25 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        int _rotations;
+        int _circles;
         [ProtoMember(5)]
-        public int Rotations
+        public int Circles
         {
             get
             {
-                return _rotations;
+                return _circles;
             }
             set
             {
                 if (value > 4 && value < 5000)
                 {
-                    _rotations = value;
+                    _circles = value;
                     shapesValid = false;
                 }
 
             }
         }
-        int _start_diameter;
+        int _start_diameter = 0;
         [ProtoMember(6)]
         public int StartDiameter
         {
@@ -120,7 +121,7 @@ namespace DominoPlanner.Core
 
             }
         }
-        double? _angle_shift_factor;
+        double? _angle_shift_factor = 0.05;
         
         [ProtoMember(7)]
         public double? AngleShiftFactor
@@ -156,27 +157,34 @@ namespace DominoPlanner.Core
             }
         }
         private Random r;
-        public override int targetCount { set => throw new NotImplementedException(); }
 
-        public CircleParameters(string imagepath, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
+        public CircleParameters(string imagepath, int circles,
             string colors, IColorComparison colorMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
             base(imagepath, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
-            this.Rotations = rotations;
-            this.NormalDistance = normalDistance;
-            this.NormalWidth = normalWidth;
-            this.TangentialDistance = tangentialDistance;
-            this.TangentialWidth = tangentialWidth;
-            this.StartDiameter = 4 * tangentialWidth;
+
+            this.StartDiameter = 4 * TangentialWidth;
+            Circles = circles;
+            hasProcotolDefinition = true;
+            r = new Random();
+        }
+        public CircleParameters(int imageWidth, int imageHeight, Color background, int circles,
+            string colors, IColorComparison colorMode, AverageMode averageMode,
+            IterationInformation iterationInformation, bool allowStretch = false) :
+            base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+        {
+
+            this.StartDiameter = 4 * TangentialWidth;
+            Circles = circles;
             hasProcotolDefinition = true;
             r = new Random();
         }
         private CircleParameters() : base() { r = new Random(); }
         protected override void GenerateShapes()
         {
-            PathDomino[][] dominos = new PathDomino[Rotations][];
-            Parallel.For(0,  Rotations,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
+            PathDomino[][] dominos = new PathDomino[Circles][];
+            Parallel.For(0,  Circles,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
             (circlecount) =>
             {
                 

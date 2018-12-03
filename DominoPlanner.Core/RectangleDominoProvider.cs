@@ -83,6 +83,13 @@ namespace DominoPlanner.Core
             this.allowStretch = allowStretch;
             average = averageMode;
         }
+        protected RectangleDominoProvider(int imageWidth, int imageHeight, Color background, string colors, IColorComparison comp,
+            AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
+            : base(imageWidth, imageHeight, background, comp, colors, iterationInformation)
+        {
+            this.allowStretch = allowStretch;
+            average = averageMode;
+        }
         protected RectangleDominoProvider() : base() { }
         #endregion
         #region public methods

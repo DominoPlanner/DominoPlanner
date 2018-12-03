@@ -216,8 +216,8 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Erstellt ein FieldParameters-Objekt mit der angegebenen Länge und Breite.
         /// </summary>
-        /// <param name="bitmap">Das Bitmap, welchem dem Feld zugrunde liegen soll.</param>
-        /// <param name="colors">Die Farben, die für dieses Objekt verwendet werden sollen.</param>
+        /// <param name="imagePath">Der (relative) Pfad zum Quellbild</param>
+        /// <param name="colors">Der (relative) Pfad zur Farbendatei</param>
         /// <param name="a">Der horizontale Abstand zwischen zwei Spalten/Steinen.</param>
         /// <param name="b">Die horizonale Breite der Steine.</param>
         /// <param name="c">Die vertikale Breite der Steine.</param>
@@ -227,13 +227,13 @@ namespace DominoPlanner.Core
         /// <param name="scalingMode">Gibt an, mit welcher Genauigkeit das Bild verkleinert werden soll.
         /// Eine niedrige Genauigkeit eignet sich v.a. bei Logos.</param>
         /// <param name="ditherMode">Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        /// <param name="interpolationMode">Der Interpolationsmodus, der zur Farberkennung berechnet wird.</param>
-        /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
+        /// <param name="colorMode">Der Interpolationsmodus, der zur Farberkennung berechnet wird.</param>
+        /// <param name="iterationInformation">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison colormode, IterationInformation iterationInformation) 
-            : base(imagePath, colormode, colors, iterationInformation)
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison colorMode, IterationInformation iterationInformation) 
+            : base(imagePath, colorMode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -251,17 +251,19 @@ namespace DominoPlanner.Core
         /// Erzeugt ein Feld, dessen Steineanzahl möglichst nahe an einem bestimmten Wert liegt.
         /// Es wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
         /// </summary>
-        /// <param name="bitmap">Das Bitmap, welchem dem Feld zugrunde liegen soll.</param>
-        /// <param name="colors">Die Farben, die für dieses Objekt verwendet werden sollen.</param>
+        /// <param name="imagePath">Der (relative) Pfad zum Quellbild</param>
+        /// <param name="colors">Der (relative) Pfad zur Farbendatei</param>
         /// <param name="a">Der horizontale Abstand zwischen zwei Spalten/Steinen.</param>
         /// <param name="b">Die horizonale Breite der Steine.</param>
         /// <param name="c">Die vertikale Breite der Steine.</param>
         /// <param name="d">Der vertikale Abstand zwischen zwei Reihen/Steinen.</param>
+        /// <param name="width">Die Anzahl der Steine in horizonaler Richtung.</param>
+        /// <param name="height">Die Anzahl der Steine in vertikaler Richtung.</param>
         /// <param name="scalingMode">Gibt an, mit welcher Genauigkeit das Bild verkleinert werden soll.
         /// Eine niedrige Genauigkeit eignet sich v.a. bei Logos.</param>
         /// <param name="ditherMode">Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        /// <param name="interpolationMode">Der Interpolationsmodus, der zur Farberkennung verwendet wird.</param>
-        /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
+        /// <param name="colorMode">Der Interpolationsmodus, der zur Farberkennung berechnet wird.</param>
+        /// <param name="iterationInformation">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
@@ -270,6 +272,19 @@ namespace DominoPlanner.Core
             Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
             : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
+            TargetCount = targetSize;
+        }
+        public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int a, int b, int c, int d, int targetSize,
+            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation)
+            : base(imageWidth, imageHeight, background, interpolationMode, colors, iterationInformation)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+            this.resizeMode = scalingMode;
+            this.ditherMode = ditherMode;
+            hasProcotolDefinition = true;
             TargetCount = targetSize;
         }
         private FieldParameters() : base() { }

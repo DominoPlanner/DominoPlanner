@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
@@ -170,6 +171,14 @@ namespace DominoPlanner.Core
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : this(imagepath, definition, 1, 1, colors, colorMode, averageMode, iterationInformation, allowStretch)
         {
+            TargetCount = targetSize;
+        }
+        public StructureParameters(int imageWidth, int imageHeight, Color background, XElement definition,
+            int targetSize, String colors,
+            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+        {
+            structureDefinitionXML = definition;
             TargetCount = targetSize;
         }
         private StructureParameters() : base() { }
