@@ -231,9 +231,9 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        public FieldParameters(Mat bitmap, String colors, int a, int b, int c, int d, int width, int height, 
+        public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
             Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison colormode, IterationInformation iterationInformation) 
-            : base(bitmap, colormode, colors, iterationInformation)
+            : base(imagePath, colormode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -244,8 +244,8 @@ namespace DominoPlanner.Core
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
             hasProcotolDefinition = true;
-            this.history = new EmptyOperation<FieldParameters>(this);
-            current = history;
+            //this.history = new EmptyOperation<FieldParameters>(this);
+            //current = history;
         }
         /// <summary>
         /// Erzeugt ein Feld, dessen Steineanzahl möglichst nahe an einem bestimmten Wert liegt.
@@ -266,9 +266,9 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
-        public FieldParameters(Mat bitmap, string colors, int a, int b, int c, int d, int targetSize, 
+        public FieldParameters(String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
             Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
-            : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
+            : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
@@ -283,6 +283,11 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Feld erhält.</returns>
         public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            if (!sourceValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating source image");
+                UpdateSource();
+            }
             if (!colorsValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
@@ -292,9 +297,12 @@ namespace DominoPlanner.Core
             {
                 if (progressIndicator != null) progressIndicator.Report("Applying image filters");
                 ApplyImageFilters();
+                image_filtered.Save("tests/field_filtered.png");
+                resizedValid = false;
             }
             if (!resizedValid)
             {
+                image_filtered.Save("tests/field_filtered_inside_resize.png");
                 if (progressIndicator != null) progressIndicator.Report("Resizing Image");
                 ResizeImage();
             }
@@ -317,10 +325,13 @@ namespace DominoPlanner.Core
             if (length < 2) length = 2;
             if (height < 2) height = 2;
             resizedImage = new Mat();
+            image_filtered.Save("tests/image_filtered.png");
             CvInvoke.Resize(image_filtered, resizedImage, 
                 new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
+            image_filtered.Save("tests/resized.png");
             resizedValid = true;
             if (!shapesValid) GenerateShapes();
+            if (shapes == null) restoreShapes();
         }
         /// <summary>
         /// Berechnet die Shapes mit den angegebenen Parametern.
@@ -370,12 +381,9 @@ namespace DominoPlanner.Core
                     throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
             }*/
             int[] field = new int[resizedImage.Width * resizedImage.Height];
-            source.Save("tests/source.png");
-            resizedImage.Save("tests/resized.png");
-            var transpfix = (TransparencySetting == 0) ? overlayImage(resizedImage) : resizedImage;
-            transpfix.Save("tests/transparency_saved.png");
-            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = transpfix.ToImage<Emgu.CV.Structure.Bgra, Byte>())
+            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {
+                bitmap.Save("tests/field_filtered_bitmap.png");
                 // tatsächlich genutzte Farben auslesen
                 for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
                 {
@@ -386,6 +394,7 @@ namespace DominoPlanner.Core
                         for (int y = resizedImage.Height - 1; y >= 0; y--)
                         {
                             Emgu.CV.Structure.Bgra bgra = bitmap[y, x];
+                            
                             int Minimum = 0;
                             double min = Int32.MaxValue;
                             double temp = Int32.MaxValue;
@@ -434,14 +443,14 @@ namespace DominoPlanner.Core
         public override object Clone()
         {
             FieldParameters res = (FieldParameters)this.MemberwiseClone();
-            res.source = source.Clone();
+            //res.source = source.Clone();
             res.resizedImage = resizedImage?.Clone();
             // History-Objekt soll immer gleich bleiben. Keinesfalls klonen. 
             res.last = (DominoTransfer) last?.Clone();
             return res;
         }
-        private FieldParameters(Mat mat, String colors, IColorComparison colorMode, IterationInformation iterationInformation)
-            : base(mat, colorMode, colors, iterationInformation)
+        private FieldParameters(String imagePath, String colors, IColorComparison colorMode, IterationInformation iterationInformation)
+            : base(imagePath, colorMode, colors, iterationInformation)
         {
 
         }
