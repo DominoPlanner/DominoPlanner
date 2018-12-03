@@ -130,7 +130,6 @@ namespace DominoPlanner.Core
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
         /// </summary>
-        public abstract int targetCount { set; }
         private IColorComparison _colorMode;
         /// <summary>
         /// Der Interpolationsmodus, der zur Farberkennung berechnet wird.
@@ -444,6 +443,10 @@ namespace DominoPlanner.Core
         public int[] counts { get; set; }
     }
 
+    public interface ICountTargetable
+    {
+        int TargetCount { set; }
+    }
 
 }
 

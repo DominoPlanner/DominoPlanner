@@ -27,7 +27,6 @@ namespace DominoPlanner.Core
     public abstract class RectangleDominoProvider : IDominoProvider
     {
         #region public properties
-        public abstract override int targetCount { set; }
         private AverageMode _average;
         /// <summary>
         /// Gibt an, ob nur ein Punkt des Dominos (linke obere Ecke) oder ein Durchschnittswert aller Pixel unter dem Pfad verwendet werden soll, um die Farbe auszuwählen.

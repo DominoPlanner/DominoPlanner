@@ -156,8 +156,6 @@ namespace DominoPlanner.Core
             }
         }
         private Random r;
-        public override int targetCount { set => throw new NotImplementedException(); }
-
         public CircleParameters(Mat bitmap, int rotations, int normalWidth, int tangentialWidth, int normalDistance, int tangentialDistance,
             string colors, IColorComparison colorMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
@@ -169,7 +167,7 @@ namespace DominoPlanner.Core
             this.TangentialDistance = tangentialDistance;
             this.TangentialWidth = tangentialWidth;
             this.StartDiameter = 4 * tangentialWidth;
-            hasProcotolDefinition = true;
+            hasProcotolDefinition = false;
             r = new Random();
         }
         private CircleParameters() : base() { r = new Random(); }

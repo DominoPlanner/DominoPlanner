@@ -14,7 +14,7 @@ namespace DominoPlanner.Core
     /// Stellt die Eigenschaften und Methoden bereit, eine Struktur zu erstellen.
     /// </summary>
     [ProtoContract]
-    public class StructureParameters : RectangleDominoProvider
+    public class StructureParameters : RectangleDominoProvider, ICountTargetable
     {
         // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
         private string __structureDefXML;
@@ -86,7 +86,7 @@ namespace DominoPlanner.Core
         /// Die Zielgröße des Objekts. Setzen überschreibt Länge und Breite.
         /// </summary>
 
-        public override int targetCount
+        public int TargetCount
         {
             // Maple sagt, dass diese Formel passt... ;)
             set
@@ -170,7 +170,7 @@ namespace DominoPlanner.Core
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : this(bitmap, definition, 1, 1, colors, colorMode, averageMode, iterationInformation, allowStretch)
         {
-            targetCount = targetSize;
+            TargetCount = targetSize;
         }
         private StructureParameters() : base() { }
         #endregion

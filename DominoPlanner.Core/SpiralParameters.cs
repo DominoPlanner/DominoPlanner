@@ -104,13 +104,6 @@ namespace DominoPlanner.Core
                 ThetaMax = value * Math.PI / 2 + ThetaMin;
             }
         }
-        public override int targetCount
-        {
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
         private double _theta_min = 3 * Math.PI;
         [ProtoMember(5)]
         public double ThetaMin 

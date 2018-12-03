@@ -15,10 +15,10 @@ namespace DominoPlanner.Core
     /// Stellt die Methoden und Eigenschaften zum Erstellen und Bearbeiten eines Feldes zur Verfügung.
     /// </summary>
     [ProtoContract]
-    public class FieldParameters : IDominoProvider
+    public class FieldParameters : IDominoProvider, ICountTargetable
     {
         #region public properties
-        public override int targetCount
+        public int TargetCount
         {
             set
             {
@@ -270,7 +270,7 @@ namespace DominoPlanner.Core
             Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
             : this(bitmap, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
-            targetCount = targetSize;
+            TargetCount = targetSize;
         }
         private FieldParameters() : base() { }
         #endregion
