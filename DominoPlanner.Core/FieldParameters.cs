@@ -312,12 +312,10 @@ namespace DominoPlanner.Core
             {
                 if (progressIndicator != null) progressIndicator.Report("Applying image filters");
                 ApplyImageFilters();
-                image_filtered.Save("tests/field_filtered.png");
                 resizedValid = false;
             }
             if (!resizedValid)
             {
-                image_filtered.Save("tests/field_filtered_inside_resize.png");
                 if (progressIndicator != null) progressIndicator.Report("Resizing Image");
                 ResizeImage();
             }
@@ -340,10 +338,8 @@ namespace DominoPlanner.Core
             if (length < 2) length = 2;
             if (height < 2) height = 2;
             resizedImage = new Mat();
-            image_filtered.Save("tests/image_filtered.png");
             CvInvoke.Resize(image_filtered, resizedImage, 
                 new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
-            image_filtered.Save("tests/resized.png");
             resizedValid = true;
             if (!shapesValid) GenerateShapes();
             if (shapes == null) restoreShapes();
@@ -398,7 +394,6 @@ namespace DominoPlanner.Core
             int[] field = new int[resizedImage.Width * resizedImage.Height];
             using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgra, Byte>())
             {
-                bitmap.Save("tests/field_filtered_bitmap.png");
                 // tatsächlich genutzte Farben auslesen
                 for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
                 {

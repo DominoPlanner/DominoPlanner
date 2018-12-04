@@ -55,10 +55,7 @@ namespace DominoPlanner.Core
                 image = image.Resize((int)(image.Width * scale_x), (int)(image.Height * scale_y), Emgu.CV.CvEnum.Inter.Lanczos4);
             if (rotate_angle != 0)
                 image = image.Rotate(rotate_angle, new Bgra(0, 0, 0, 0), false);
-            image.Save("tests/rotated.png");
             input.OverlayImage(image, (int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d));
-
-            input.Save("tests/blended.png");
         }
         public Size GetSizeOfMat()
         {
@@ -204,7 +201,6 @@ namespace DominoPlanner.Core
             //var result = input.Clone();
             CvInvoke.GaussianBlur(input, input, new Size(KernelSize, KernelSize), StandardDeviation);
             //input = result;
-            input.Save("tests/blursave.png");
         }
     }
     [ProtoContract]

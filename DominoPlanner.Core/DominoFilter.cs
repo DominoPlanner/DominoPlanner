@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Core
 { 
     [ProtoContract]
-    //[ProtoInclude()]
+    [ProtoInclude(100, typeof(ChangeCountColorFilter))]
+    [ProtoInclude(101, typeof(ChangeRGBColorFilter))]
     public abstract class ColorFilter : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -63,40 +65,37 @@ namespace DominoPlanner.Core
         }
     }
     [ProtoContract]
-    [ProtoInclude(100, typeof(RemoveColorPreFilter))]
-    [ProtoInclude(101, typeof(ChangeCountFilter))]
-    public class RemoveColorPreFilter : ColorFilter
+    public class ChangeCountColorFilter : ColorFilter
     {
-        private List<DominoColor> _toRemove;
-        [ProtoMember(1, AsReference =true)]
-        public List<DominoColor> toRemove
-        {
-            get { return _toRemove; }
-            set { _toRemove = value; }
-        }
+        private int _index;
+        [ProtoMember(1)]
+        public int Index { get => _index; set { SetField(ref _index, value); } }
+        private int _newcount;
+        [ProtoMember(2)]
+        public int NewCount { get => _newcount; set { SetField(ref _newcount, value); } }
         public override void Apply(ColorRepository input)
         {
-            foreach (DominoColor c in toRemove)
-            {
-                throw new NotImplementedException();
-            }
+            input.RepresentionForCalculation[Index].count = NewCount;
         }
     }
     [ProtoContract]
-    public class ChangeCountFilter : ColorFilter
+    public class ChangeRGBColorFilter : ColorFilter
     {
-
-        private DominoColor _newCount;
-        [ProtoMember(1, AsReference =true)]
-        public DominoColor newCount
+        private int _index;
+        [ProtoMember(1)]
+        public int Index { get => _index; set { SetField(ref _index, value); } }
+        private Color _color;
+        public Color Color { get => _color; set { SetField(ref _color, value); } }
+        [ProtoMember(2)]
+        private String ColorSerialized
         {
-            get { return _newCount; }
-            set { _newCount = value; }
+            get { return Color.ToString(); }
+            set { Color = (Color)ColorConverter.ConvertFromString(value); }
         }
-
         public override void Apply(ColorRepository input)
         {
-            throw new NotImplementedException();
+            input.RepresentionForCalculation[Index].mediaColor = Color;
         }
     }
+    
 }

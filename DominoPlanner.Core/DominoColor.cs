@@ -69,7 +69,8 @@ namespace DominoPlanner.Core
     {
         public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
         {
-            if (count == 0) return Int32.MaxValue;
+            if (count == 0)
+                return Int32.MaxValue;
             return comp.Distance(color.ToLab(), labColor);
         }
         public DominoColor(XElement source)

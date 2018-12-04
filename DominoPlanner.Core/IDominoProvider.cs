@@ -262,7 +262,7 @@ namespace DominoPlanner.Core
             this.ImageFilters = new ObservableCollection<ImageFilter>();
             this.PostFilters = new ObservableCollection<PostFilter>();
             this.ColorFilters.CollectionChanged +=
-                new NotifyCollectionChangedEventHandler((sender, e) => colorsValid = false);
+                new NotifyCollectionChangedEventHandler((sender, e) => ColorFiltersChanged(sender,e));
             this.ImageFilters.CollectionChanged +=
                new NotifyCollectionChangedEventHandler((sender, e) => ImageFiltersChanged(sender, e));
             this.PostFilters.CollectionChanged +=
@@ -395,15 +395,22 @@ namespace DominoPlanner.Core
         }
         private void ColorFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
+            if (color_filtered == null)
+            {
+                this.color_filtered = Serializer.DeepClone(colors);
+            }
+            // dann nur den neu hinzugekommenen Filter anwenden und mit einem Event versehen
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 var newitems = e.NewItems;
                 foreach (var item in newitems)
                 {
-                    ((ColorFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => imageValid = false);
+                    ((ColorFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => ApplyColorFilters());
+                    ((ColorFilter)item).Apply(color_filtered);
                 }
             }
-            imageValid = false;
+            else ApplyColorFilters();
+            lastValid = false;
         }
         internal void UpdateSource()
         {
@@ -457,8 +464,7 @@ namespace DominoPlanner.Core
                    }
                }
            });
-            
-            overlay_img.Save("tests/res.png");
+           
             watch.Stop();
             Console.WriteLine("Blend " + watch.ElapsedMilliseconds);
             return overlay_img.Mat;
@@ -496,9 +502,8 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         internal void ColorAfterDeserial()
         {
-            bool last_valid = this.lastValid;
-            ApplyColorFilters();
-            lastValid = last_valid;
+            // Beim Load werden Stück für Stück die Farbfilter angewendet, da die Liste mit den Events versehen wird 
+            // LastValid wird erst nach der Liste deserialisiert, das sollte also passen
         }
         internal void ApplyImageFilters()
         {

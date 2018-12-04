@@ -131,6 +131,7 @@ namespace DominoPlanner.CoreTests
             p.TransparencySetting = 128;
             DominoTransfer t = p.Generate();
             p.background = System.Windows.Media.Colors.White;
+            p.Generate().GenerateImage(2000).Save("tests/fieldtests_before_filters.png");
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
             // Filtertests für ein Logo oder ähnliches
             /*var erster = ((BlendFileFilter)p.ImageFilters[0]);
@@ -167,13 +168,15 @@ namespace DominoPlanner.CoreTests
             replace.AfterColor = System.Drawing.Color.Red;
             replace.Tolerance = 50;
             p.ImageFilters.Add(replace);*/
+            p.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
+            p.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
             t = p.Generate();
             Console.WriteLine(String.Join("\n", p.counts));
             Console.WriteLine("Size: " + t.dominoes.Count());
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            Mat b2 = t.GenerateImage(Colors.Transparent);
+            Mat b2 = t.GenerateImage(Colors.Transparent, 2000);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/FieldTest.png");
@@ -226,8 +229,11 @@ namespace DominoPlanner.CoreTests
             Console.WriteLine(String.Join(", ", counts2));
             Console.WriteLine("Number of image filters: " + loaded.ImageFilters.Count);
             //loaded.ImageHeight = 1500;
-            loaded.Generate();
-            
+            //loaded.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
+            //loaded.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
+            //t = loaded.Generate();
+            t.GenerateImage().Save("tests/fieldtest_after_load.png");
+
             Console.WriteLine(String.Join(", ", loaded.counts));
         }
         static void WBXTest()
