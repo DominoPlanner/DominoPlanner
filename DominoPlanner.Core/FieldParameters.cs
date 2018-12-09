@@ -8,6 +8,7 @@ using System.Linq;
 using ProtoBuf;
 using System.IO;
 using System.Reflection;
+using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {
@@ -51,9 +52,7 @@ namespace DominoPlanner.Core
             set
             {
                 _a = value;
-                resizedValid = false;
                 shapesValid = false;
-                lastValid = false;
             }
         }
 
@@ -71,9 +70,7 @@ namespace DominoPlanner.Core
             set
             {
                 _b = value;
-                resizedValid = false;
                 shapesValid = false;
-                lastValid = false;
             }
         }
 
@@ -91,9 +88,7 @@ namespace DominoPlanner.Core
             set
             {
                 _c = value;
-                resizedValid = false;
                 shapesValid = false;
-                lastValid = false;
             }
         }
 
@@ -111,9 +106,7 @@ namespace DominoPlanner.Core
             set
             {
                 _d = value;
-                resizedValid = false;
                 shapesValid = false;
-                lastValid = false;
             }
         }
     
@@ -132,16 +125,14 @@ namespace DominoPlanner.Core
             set
             {
                 _resizeMode = value;
-                shapesValid = false;
-                resizedValid = false;
-                lastValid = false;
+                usedColorsValid = false;
             }
         }
-        private Dithering.Dithering _ditherMode;
+        private Dithering _ditherMode;
         /// <summary>
         /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
         /// </summary>
-        public Dithering.Dithering ditherMode
+        public Dithering ditherMode
         {
             get
             {
@@ -162,7 +153,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _ditherMode = (Dithering.Dithering) Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.Dithering.{value}"));
+                _ditherMode = (Dithering) Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
             }
         }
         private int _length;
@@ -180,8 +171,6 @@ namespace DominoPlanner.Core
             {
                 _length = value;
                 shapesValid = false;
-                resizedValid = false;
-                lastValid = false;
             }
         }
         private int _height;
@@ -199,8 +188,6 @@ namespace DominoPlanner.Core
             {
                 _height = value;
                 shapesValid = false;
-                resizedValid = false;
-                lastValid = false;
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
@@ -209,8 +196,6 @@ namespace DominoPlanner.Core
         #region private properties
         private Mat resizedImage;
         private IDominoShape[] shapes;
-        [ProtoMember(1000)]
-        private bool resizedValid = false;
         #endregion
         #region public constructors
         /// <summary>
@@ -232,7 +217,7 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison colorMode, IterationInformation iterationInformation) 
+            Inter scalingMode, Dithering ditherMode, IColorComparison colorMode, IterationInformation iterationInformation) 
             : base(imagePath, colorMode, colors, iterationInformation)
         {
             this.a = a;
@@ -269,13 +254,13 @@ namespace DominoPlanner.Core
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
         public FieldParameters(String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
+            Inter scalingMode, Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
             : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
         public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int a, int b, int c, int d, int targetSize,
-            Inter scalingMode, Dithering.Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation)
+            Inter scalingMode, Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation)
             : base(imageWidth, imageHeight, background, interpolationMode, colors, iterationInformation)
         {
             this.a = a;
@@ -290,67 +275,32 @@ namespace DominoPlanner.Core
         private FieldParameters() : base() { }
         #endregion
         #region override methods
-        /// <summary>
-        /// Generiert das Feld.
-        /// Die Methode erkennt automatisch, welche Teile des DominoTransfers regeneriert werden müssen.
-        /// </summary>
-        /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
-        /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Feld erhält.</returns>
-        public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
+        internal override void ReadUsedColors()
         {
-            if (!sourceValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Updating source image");
-                UpdateSource();
-            }
-            if (!colorsValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
-                ApplyColorFilters();
-            }
-            if (!imageValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
-                ApplyImageFilters();
-                resizedValid = false;
-            }
-            if (!resizedValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Resizing Image");
-                ResizeImage();
-            }
-            if (!lastValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Calculating ideal domino colors");
-                GetDominoes();
-            }
-            return last;
-        }
-        #endregion
-        #region private helper methods
-        /// <summary>
-        /// Verkleinert das Bild mit der spezifizierten Genauigkeit und auf die spezifizierte Größe.
-        /// </summary>
-        /// <param name="image">Das zu verkleinernde Bild.</param>
-        [ProtoAfterDeserialization]
-        private void ResizeImage()
-        {
+            if (!shapesValid) throw new InvalidOperationException("erst die Shapes aktualisieren");
             if (length < 2) length = 2;
             if (height < 2) height = 2;
             resizedImage = new Mat();
-            CvInvoke.Resize(image_filtered, resizedImage, 
-                new System.Drawing.Size() { Height = height, Width=length}, interpolation: resizeMode);
-            resizedValid = true;
-            if (!shapesValid) GenerateShapes();
-            if (shapes == null) restoreShapes();
+            CvInvoke.Resize(image_filtered, resizedImage,
+                new System.Drawing.Size() { Height = height, Width = length }, interpolation: resizeMode);
+            using (var image = resizedImage.ToImage<Bgra, byte>())
+            {
+                Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
+                {
+                    for (int yi = 0; yi < height; yi++)
+                    {
+                        usedColorsValid = true;
+                        if (shapes == null) restoreShapes();
+                        shapes[height * xi + yi].originalColor = image[yi, xi]; ;
+                    }
+                });
+            }
         }
-        /// <summary>
-        /// Berechnet die Shapes mit den angegebenen Parametern.
-        /// </summary>
-        public void GenerateShapes()
+        internal override void GenerateShapes()
         {
-            IDominoShape[] array = new IDominoShape[length*height];
-            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism= -1}, (xi) =>
+            IDominoShape[] array = new IDominoShape[length * height];
+
+            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
             {
                 for (int yi = 0; yi < height; yi++)
                 {
@@ -367,68 +317,82 @@ namespace DominoPlanner.Core
             });
             shapes = array;
             shapesValid = true;
+            usedColorsValid = false;
         }
+        #endregion
+        #region private helper methods
+        /// <summary>
+        /// Verkleinert das Bild mit der spezifizierten Genauigkeit und auf die spezifizierte Größe.
+        /// </summary>
+        /// <param name="image">Das zu verkleinernde Bild.</param>
+        [ProtoAfterDeserialization]
+        
+        /// <summary>
+        /// Berechnet die Shapes mit den angegebenen Parametern.
+        /// </summary>
+        
         public void restoreShapes()
         {
             //bool last_valid_temp = lastValid;
             shapes = last.shapes;
-            ResizeImage();
+            ReadUsedColors();
             //lastValid = last_valid_temp;
         }
         /// <summary>
         /// Berechnet aus dem Shape-Array die Farben.
         /// </summary>
-        private void GetDominoes()
+        internal override void CalculateColors()
         {
-            // apply filters to color list
-            //foreach (PreFilter f in PreFilters) f.Apply(colors);
-            // remove transparency
-            Console.WriteLine("Debug Flag");
             var colors = this.color_filtered.RepresentionForCalculation;
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
-            /*if (IterationInformation is IterativeColorRestriction)
+            
+            for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
             {
-                if (colors.Sum(color => ) < resizedImage.Width * resizedImage.Height)
-                    throw new InvalidOperationException("Gesamtsteineanzahl ist größer als vorhandene Anzahl, kann nicht konvergieren");
-            }*/
-            int[] field = new int[resizedImage.Width * resizedImage.Height];
-            using (Image<Emgu.CV.Structure.Bgra, Byte> bitmap = resizedImage.ToImage<Emgu.CV.Structure.Bgra, Byte>())
-            {
-                // tatsächlich genutzte Farben auslesen
-                for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
+                ResetDitherColors();
+                IterationInformation.numberofiterations = iter;
+                Console.WriteLine($"Iteration {iter}");
+                Parallel.For(0, length, new ParallelOptions() { MaxDegreeOfParallelism = ditherMode.maxDegreeOfParallelism }, (x) =>
                 {
-                    IterationInformation.numberofiterations = iter;
-                    Console.WriteLine($"Iteration {iter}");
-                    Parallel.For(0, resizedImage.Width, new ParallelOptions() { MaxDegreeOfParallelism = ditherMode.maxDegreeOfParallelism }, (x) =>
+                    for (int y = 0; y < height; y++)
                     {
-                        for (int y = resizedImage.Height - 1; y >= 0; y--)
-                        {
-                            Emgu.CV.Structure.Bgra bgra = bitmap[y, x];
-                            
-                            int Minimum = 0;
-                            double min = Int32.MaxValue;
-                            double temp = Int32.MaxValue;
-                            for (int z = colors.Length - 1; z >= 0; z--)
-                            {
-                                temp = colors[z].distance(bgra, colorMode, TransparencySetting) * IterationInformation.weights[z];
-                                if (min > temp)
-                                {
-                                    min = temp;
-                                    Minimum = z;
-                                }
-                            }
-                            Color newpixel = colors[Minimum].mediaColor;
-                            field[resizedImage.Height * x + y] = Minimum;
-                            ditherMode.DiffuseError(
-                                x, y, (int)(bgra.Red) - newpixel.R, (int)(bgra.Green) - newpixel.G, (int)(bgra.Blue) - newpixel.B, bitmap);
-                        }
-                    });
-                    IterationInformation.EvaluateSolution(colors, field);
-                    if (IterationInformation.colorRestrictionsFulfilled != false) break;
+                        shapes[height * x + y].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                        DiffuseErrorField(
+                            x, y,
+                            (int)(shapes[height * x + y].originalColor.Red - colors[shapes[height * x + y].color].mediaColor.R),
+                            (int)(shapes[height * x + y].originalColor.Green - colors[shapes[height * x + y].color].mediaColor.G),
+                            (int)(shapes[height * x + y].originalColor.Blue - colors[shapes[height * x + y].color].mediaColor.B),
+                            shapes, height);
+                    }
+                });
+                IterationInformation.EvaluateSolution(colors, shapes);
+                if (IterationInformation.colorRestrictionsFulfilled != false) break;
+            }
+            last = new DominoTransfer(shapes, this.colors);
+            lastValid = true;
+        }
+        internal void ResetDitherColors()
+        {
+            foreach (var domino in shapes)
+            {
+                domino.ditherColor = domino.originalColor;
+            }
+        }
+        public virtual void DiffuseErrorField(int x, int y, int v1, int v2, int v3, IDominoShape[] shapes, int height)
+        {
+            for (int j = 0; j < ditherMode.weights.GetLength(0); j++)
+            {
+                for (int i = ditherMode.startindizes[j]; i < ditherMode.weights.GetLength(1); i++)
+                {
+                    int akt_x = x + i - ditherMode.startindizes[0] + 1;
+                    int akt_y = y + j;
+                    if (akt_x >= length || akt_x < 0) continue;
+                    if (akt_y >= height || akt_y < 0) continue;
+                    ditherMode.AddToPixel(ref shapes[akt_x * height + akt_y].ditherColor,
+                        v1 * ditherMode.weights[j, i] / ditherMode.divisor,
+                        v2 * ditherMode.weights[j, i] / ditherMode.divisor,
+                        v3 * ditherMode.weights[j, i] / ditherMode.divisor);
                 }
             }
-            last = new DominoTransfer(field, shapes, this.colors);
-            lastValid = true;
         }
         /// <summary>
         /// Berechnet das Basisfeld für ein Feldprotokoll
@@ -437,13 +401,13 @@ namespace DominoPlanner.Core
         /// <returns>Das Basisfeld als int[,]-Array.</returns>
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!shapesValid || !resizedValid) throw new InvalidOperationException("There are unreflected changes in this field.");
+            if (!shapesValid || !usedColorsValid) throw new InvalidOperationException("There are unreflected changes in this field.");
             int[,] result = new int[length, height];
                 for (int i = 0; i < length; i++)
                 {
                     for (int j = 0; j < height; j++)
                     {
-                        result[i, j] = last.dominoes[i*height + j];
+                        result[i, j] = last.shapes[i*height + j].color;
                     }
                 }
             if (o == Orientation.Vertical) result = TransposeArray(result);

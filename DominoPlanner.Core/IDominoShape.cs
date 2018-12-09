@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core.RTree;
+using Emgu.CV.Structure;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -149,6 +150,30 @@ namespace DominoPlanner.Core
         public DominoRectangle getBoundingRectangle()
         {
             return GetContainer();
+        }
+        Bgra _originalColor;
+        public Bgra originalColor
+        {
+            get { return _originalColor; }
+            set { _originalColor = value;  ditherColor = originalColor; }
+        }
+        public Bgra ditherColor;
+
+        [ProtoMember(2)]
+        public int color;
+
+        public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
+        {
+            double minimum = int.MaxValue;
+            for (int color = 0; color < colors.Length; color++)
+            {
+                double value = colors[color].distance(ditherColor, comp, TransparencyThreshold) * weights[color];
+                if (value < minimum)
+                {
+                    minimum = value;
+                    this.color = color;
+                }
+            }
         }
     }
 }

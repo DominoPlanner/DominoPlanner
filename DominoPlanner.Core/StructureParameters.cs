@@ -44,7 +44,6 @@ namespace DominoPlanner.Core
                 __structureDefXML = value.ToString();
                 hasProcotolDefinition = structuredef.hasProtocolDefinition;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         private int _length;
@@ -62,7 +61,6 @@ namespace DominoPlanner.Core
             {
                 _length = value;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         private int _height;
@@ -80,7 +78,6 @@ namespace DominoPlanner.Core
             {
                 _height = value;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         /// <summary>
@@ -184,7 +181,7 @@ namespace DominoPlanner.Core
         private StructureParameters() : base() { }
         #endregion
         #region private helper methods
-        protected override void GenerateShapes()
+        internal override void GenerateShapes()
         {
             shapes = structuredef.GenerateStructure(length, height);
             shapesValid = true;

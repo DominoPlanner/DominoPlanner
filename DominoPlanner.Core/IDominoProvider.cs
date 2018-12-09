@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using ProtoBuf;
 using System.ComponentModel;
 using System.Collections.Specialized;
+using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {
@@ -183,12 +184,9 @@ namespace DominoPlanner.Core
                 int[] counts = new int[colors.Length];
                 if (last != null)
                 {
-                    foreach (int item in last.dominoes)
+                    foreach (var shape in last.shapes)
                     {
-                        if (item >= 0)
-                        {
-                            counts[item]++;
-                        }
+                        counts[shape.color]++;
                     }
                 }
                 return counts;
@@ -236,6 +234,8 @@ namespace DominoPlanner.Core
         public bool imageValid = false;
         [ProtoMember(1004)]
         public bool sourceValid = false;
+        [ProtoMember(1005)]
+        public bool usedColorsValid = false;
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
@@ -288,7 +288,43 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
-        public abstract DominoTransfer Generate(IProgress<string> progressIndicator = null);
+        public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
+        {
+            if (!sourceValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating source image");
+                UpdateSource();
+            }
+            if (!colorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
+                ApplyColorFilters();
+            }
+            if (!imageValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
+                ApplyImageFilters();
+            }
+            if (!shapesValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Calculating domino shapes...");
+                GenerateShapes();
+                usedColorsValid = false;
+            }
+            if (!usedColorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Reading pixels from image...");
+                ReadUsedColors();
+                lastValid = false;
+            }
+            if (!lastValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Calculating ideal colors...");
+                CalculateColors();
+                lastValid = true;
+            }
+            return last;
+        }
         /// <summary>
         /// Liefert das HTML-Protokoll eines Objekts.
         /// Falls das Objekt keine Strukturdefinition besitzt, wird eine InvalidOperationException geworfen.
@@ -380,7 +416,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region internal methods
-
+        
         private void ImageFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
@@ -419,6 +455,13 @@ namespace DominoPlanner.Core
             imageValid = false;
             sourceValid = true;
         }
+        internal abstract void GenerateShapes();
+
+        internal abstract void ReadUsedColors();
+
+        internal abstract void CalculateColors();
+
+        
         /// <summary>
         /// Berechnet das Basisfeld eines Objekts aus dessen Protokolldefinition. 
         /// </summary>
@@ -438,9 +481,9 @@ namespace DominoPlanner.Core
             }
             for (int i = 0; i < last.length; i++)
             {
-                if (last[i].Item1.position != null) // to avoid null reference
+                if (last[i].position != null)
                 {
-                    basefield[last[i].Item1.position.x, last[i].Item1.position.y] = last.dominoes[i];
+                    basefield[last[i].position.x, last[i].position.y] = last[i].color;
                 }
             }
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
@@ -526,6 +569,7 @@ namespace DominoPlanner.Core
         }
         public abstract object Clone();
         #endregion
+        
     }
 
     public interface IWorkspaceLoadColorList : IWorkspaceLoadable

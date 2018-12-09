@@ -16,8 +16,8 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     public class DominoTransfer : ICloneable
     {
-        [ProtoMember(2, IsPacked = true)]
-        public int[] dominoes { get; set; }
+        //[ProtoMember(2, IsPacked = true)]
+        //public int[] dominoes { get; set; }
         [ProtoMember(1)]
         public IDominoShape[] shapes;
         [ProtoMember(3, AsReference = true)]
@@ -26,7 +26,7 @@ namespace DominoPlanner.Core
         public IterationInformation iterationInfo {get; set;}
         public int length
         {
-            get { return dominoes.Length; }
+            get { return shapes.Length; }
         }
         public int dominoLength
         {
@@ -42,17 +42,15 @@ namespace DominoPlanner.Core
                 return shapes.Max(y => (y.position != null) ? y.position.y : 0) + 1;
             }
         }
-        public Tuple<IDominoShape, Color, string> this[int index]
+        public IDominoShape this[int index]
         {
             get
             {
-                return new Tuple<IDominoShape, Color, string>(shapes[index], colors[dominoes[index]].mediaColor, colors[dominoes[index]].name);
+                return shapes[index];
             }
         }
-        public DominoTransfer(int[] dominoColors, IDominoShape[] shapes, ColorRepository colors)
+        public DominoTransfer(IDominoShape[] shapes, ColorRepository colors)
         {
-            if (dominoColors.Length != shapes.Length) throw new InvalidOperationException("Colors and shapes must have the same length");
-            this.dominoes = dominoColors;
             this.shapes = shapes;
             this.colors = colors;
         }
@@ -79,9 +77,9 @@ namespace DominoPlanner.Core
                 new Emgu.CV.Structure.Bgra() { Alpha = background.A, Blue = background.B, Green = background.G, Red = background.R });
             
 
-            Parallel.For(0, dominoes.Length, (i) =>
+            Parallel.For(0, shapes.Length, (i) =>
            {
-               Color c = colors[dominoes[i]].mediaColor;
+               Color c = colors[shapes[i].color].mediaColor;
 
                if (shapes[i] is RectangleDomino)
                {
@@ -102,7 +100,7 @@ namespace DominoPlanner.Core
                }
                else
                {
-                   DominoPath shape = this[i].Item1.GetPath(scalingFactor);
+                   DominoPath shape = shapes[i].GetPath(scalingFactor);
                    bitmap.FillConvexPoly(shape.getSDPath(),
                        new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
                    if (borders)
@@ -111,53 +109,8 @@ namespace DominoPlanner.Core
                            new Emgu.CV.Structure.Bgra(0, 0, 0, 255), 1, Emgu.CV.CvEnum.LineType.AntiAlias);
                    }
                }
-                    //bitmap.FillPolygon(shape.getWBXPath(), c);
-                
-               //else
-               //{
-
-                    //bitmap.FillPolygon(shape.GetPath(scalingFactor).getWBXPath(), c);
-                    //for (int k = 0; k < shape.points.Length - 1; k++)
-                    //{
-                    //   bitmap.AaWidthLine(shape.points[k].X, shape.points[k].Y, shape.points[k + 1].Y, shape.points[k + 1].Y, Colors.Black, scalingFactor)
-                    //}
-
-                    //bitmap.DrawPolyline(shape.GetPath(scalingFactor).getWBXPath(), Colors.Black);
-                    //bitmap.FillPolygon(shape.GetPath(scalingFactor).getOffsetRectangle((int)Math.Ceiling(scalingFactor)).getWBXPath(), Colors.Black); // outline
-                    //bitmap.FillPolygon(shape.GetPath(scalingFactor).getOffsetRectangle(-(int)Math.Ceiling(scalingFactor)).getWBXPath(), c); // fill
-                //}
-
            });
             return bitmap.Mat;
-            /*WriteableBitmap bitmap = BitmapFactory.New((int)(width * scalingFactor), (int)(heigth * scalingFactor));
-            using (bitmap.GetBitmapContext())
-            {
-                bitmap.Clear(Colors.White);
-                for (int i = 0; i < dominoes.Length; i++)
-                {
-                    DominoPath shape = this[i].Item1.GetPath(scalingFactor);
-                    Color c = this[i].Item2;
-                    if (!borders)
-                    {
-                        bitmap.FillPolygon(shape.getWBXPath(), c);
-                    }
-                    else
-                    {
-                        
-                        //bitmap.FillPolygon(shape.GetPath(scalingFactor).getWBXPath(), c);
-                        //for (int k = 0; k < shape.points.Length - 1; k++)
-                        //{
-                         //   bitmap.AaWidthLine(shape.points[k].X, shape.points[k].Y, shape.points[k + 1].Y, shape.points[k + 1].Y, Colors.Black, scalingFactor)
-                        //}
-
-                        //bitmap.DrawPolyline(shape.GetPath(scalingFactor).getWBXPath(), Colors.Black);
-                        //bitmap.FillPolygon(shape.GetPath(scalingFactor).getOffsetRectangle((int)Math.Ceiling(scalingFactor)).getWBXPath(), Colors.Black); // outline
-                        //bitmap.FillPolygon(shape.GetPath(scalingFactor).getOffsetRectangle(-(int)Math.Ceiling(scalingFactor)).getWBXPath(), c); // fill
-                    }
-                }
-            }
-            return bitmap;
-            */
         }
 
         public object Clone()

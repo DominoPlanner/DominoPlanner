@@ -85,10 +85,7 @@
     <Compile Include="clipper.cs" />
     <Compile Include="ComparisonHelper.cs" />
     <Compile Include="Colors.cs" />
-    <Compile Include="Dithering\BasicDithering.cs" />
-    <Compile Include="Dithering\FloydSteinbergDithering.cs" />
-    <Compile Include="Dithering\JarvisJudiceNinkeDithering.cs" />
-    <Compile Include="Dithering\StuckiDithering.cs" />
+    <Compile Include="Dithering.cs" />
     <Compile Include="DominoColor.cs" />
     <Compile Include="DominoFilter.cs" />
     <Compile Include="DominoRectanglePath.cs" />

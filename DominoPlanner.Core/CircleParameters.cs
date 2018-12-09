@@ -181,7 +181,7 @@ namespace DominoPlanner.Core
             r = new Random();
         }
         private CircleParameters() : base() { r = new Random(); }
-        protected override void GenerateShapes()
+        internal override void GenerateShapes()
         {
             PathDomino[][] dominos = new PathDomino[Circles][];
             Parallel.For(0,  Circles,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
