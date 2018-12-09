@@ -27,7 +27,6 @@ namespace DominoPlanner.Core
     public abstract class RectangleDominoProvider : IDominoProvider
     {
         #region public properties
-        public abstract override int targetCount { set; }
         private AverageMode _average;
         /// <summary>
         /// Gibt an, ob nur ein Punkt des Dominos (linke obere Ecke) oder ein Durchschnittswert aller Pixel unter dem Pfad verwendet werden soll, um die Farbe auszuwählen.
@@ -77,9 +76,16 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected RectangleDominoProvider(Mat bitmap, string colors, IColorComparison comp, 
+        protected RectangleDominoProvider(string imagePath, string colors, IColorComparison comp, 
             AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
-            : base(bitmap, comp, colors, iterationInformation)
+            : base(imagePath, comp, colors, iterationInformation)
+        {
+            this.allowStretch = allowStretch;
+            average = averageMode;
+        }
+        protected RectangleDominoProvider(int imageWidth, int imageHeight, Color background, string colors, IColorComparison comp,
+            AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
+            : base(imageWidth, imageHeight, background, comp, colors, iterationInformation)
         {
             this.allowStretch = allowStretch;
             average = averageMode;
@@ -95,6 +101,11 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public override DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            if (!sourceValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating source image");
+                UpdateSource();
+            }
             if (!colorsValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
@@ -167,9 +178,8 @@ namespace DominoPlanner.Core
         }
         private Bgra[] getUseColors()
         {
-            var transpfix = (TransparencySetting == 0) ? overlayImage(source) : source;
             var usecolors = new Bgra[shapes.dominoes.Length];
-            using (Image<Bgra, Byte> img = transpfix.ToImage<Bgra, Byte>())
+            using (Image<Bgra, Byte> img = image_filtered.ToImage<Bgra, Byte>())
             {
                 double scalingX = (source.Width - 1) / shapes.width;
                 double scalingY = (source.Height - 1) / shapes.height;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
@@ -19,7 +20,7 @@ namespace DominoPlanner.Core
     public class SpiralParameters : RectangleDominoProvider 
     {
         #region public properties
-        private int _tangentialWidth;
+        private int _tangentialWidth = 8;
         /// <summary>
         /// Breite eines Steins in tangentialer Richtung.
         /// </summary>
@@ -37,7 +38,7 @@ namespace DominoPlanner.Core
             }
         }
 
-        private int _normalWidth;
+        private int _normalWidth = 24;
         /// <summary>
         /// Breite eines Steins in normaler (senkrecht zur Kurve) Richtung
         /// </summary>
@@ -55,7 +56,7 @@ namespace DominoPlanner.Core
             }
         }
 
-        private int _tangentialDistance;
+        private int _tangentialDistance=8;
         /// <summary>
         /// Abstand zwischen zwei Steinen in tangentialer Richtung
         /// </summary>
@@ -73,7 +74,7 @@ namespace DominoPlanner.Core
             }
         }
 
-        private int _normalDistance;
+        private int _normalDistance=8;
         /// <summary>
         /// Abstand zwischen zwei Steinen in normaler Richtung
         /// </summary>
@@ -102,13 +103,6 @@ namespace DominoPlanner.Core
             set
             {
                 ThetaMax = value * Math.PI / 2 + ThetaMin;
-            }
-        }
-        public override int targetCount
-        {
-            set
-            {
-                throw new NotImplementedException();
             }
         }
         private double _theta_min = 3 * Math.PI;
@@ -151,7 +145,7 @@ namespace DominoPlanner.Core
                 return ((NormalWidth + NormalDistance) * nGroup + NormalGroupDistance) * nArms / (2d * Math.PI);
             }
         }
-        private int _normalGroupDistance = 20;
+        private int _normalGroupDistance = 8;
         [ProtoMember(7)]
         public int NormalGroupDistance
         {
@@ -165,7 +159,7 @@ namespace DominoPlanner.Core
                 _normalGroupDistance = value;
             }
         }
-        private int nGroup = 5;
+        private int nGroup = 1;
         [ProtoMember(8)]
         public int NumberOfGroups
         {
@@ -179,7 +173,7 @@ namespace DominoPlanner.Core
                 shapesValid = false;
             }
         }
-        private int nArms = 2;
+        private int nArms = 1;
         [ProtoMember(9)]
         public int NumberOfArms
         {
@@ -239,17 +233,19 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public SpiralParameters(Mat bitmap, double quarterRotations, int normalWidth, int tangentialWidth, 
-            int normalDistance, int tangentialDistance, string colors, 
+        public SpiralParameters(string bitmap, int rotations, string colors, 
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
         {
-            this.QuarterRotations = quarterRotations;
-            this.NormalDistance = normalDistance;
-            this.NormalWidth = normalWidth;
-            this.TangentialDistance = tangentialDistance;
-            this.TangentialWidth = tangentialWidth;
-            hasProcotolDefinition = true;
+            hasProcotolDefinition = false;
+            ThetaMax = rotations * 2 * Math.PI + ThetaMin;
+        }
+        public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors, 
+            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+        {
+            hasProcotolDefinition = false;
+            ThetaMax = rotations * 2 * Math.PI + ThetaMin;
         }
         private SpiralParameters() : base() { }
         #endregion

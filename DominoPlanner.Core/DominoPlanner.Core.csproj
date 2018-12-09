@@ -58,6 +58,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
@@ -97,6 +98,7 @@
     <Compile Include="IDominoProvider.cs" />
     <Compile Include="IDominoShape.cs" />
     <Compile Include="IFinalizable.cs" />
+    <Compile Include="ImageFilter.cs" />
     <Compile Include="IterationInformation.cs" />
     <Compile Include="ObjectProtocolParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

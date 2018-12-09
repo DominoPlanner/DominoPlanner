@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
@@ -14,7 +15,7 @@ namespace DominoPlanner.Core
     /// Stellt die Eigenschaften und Methoden bereit, eine Struktur zu erstellen.
     /// </summary>
     [ProtoContract]
-    public class StructureParameters : RectangleDominoProvider
+    public class StructureParameters : RectangleDominoProvider, ICountTargetable
     {
         // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
         private string __structureDefXML;
@@ -86,7 +87,7 @@ namespace DominoPlanner.Core
         /// Die Zielgröße des Objekts. Setzen überschreibt Länge und Breite.
         /// </summary>
 
-        public override int targetCount
+        public int TargetCount
         {
             // Maple sagt, dass diese Formel passt... ;)
             set
@@ -145,9 +146,9 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public StructureParameters(Mat bitmap, XElement definition, int length, int height, string colors, 
+        public StructureParameters(string imagepath, XElement definition, int length, int height, string colors, 
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(bitmap, colors, colorMode,  averageMode, allowStretch, iterationInformation)
+            base(imagepath, colors, colorMode,  averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
             this.length = length;
@@ -166,11 +167,19 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         /// <param name="targetSize">Die Zielgröße des Objekts.</param>
-        public StructureParameters(Mat bitmap, XElement definition, int targetSize, String colors, 
+        public StructureParameters(string imagepath, XElement definition, int targetSize, String colors, 
             IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : this(bitmap, definition, 1, 1, colors, colorMode, averageMode, iterationInformation, allowStretch)
+            : this(imagepath, definition, 1, 1, colors, colorMode, averageMode, iterationInformation, allowStretch)
         {
-            targetCount = targetSize;
+            TargetCount = targetSize;
+        }
+        public StructureParameters(int imageWidth, int imageHeight, Color background, XElement definition,
+            int targetSize, String colors,
+            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+        {
+            structureDefinitionXML = definition;
+            TargetCount = targetSize;
         }
         private StructureParameters() : base() { }
         #endregion
