@@ -27,6 +27,7 @@ namespace DominoPlanner.CoreTests
             Workspace.Instance.root_path = Path.GetFullPath("tests");
             Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
 
+            TreeTests.TreeTest();
             //HistoryTreeFieldTest("tests/NewField.jpg");
             /*try
             {
@@ -42,10 +43,10 @@ namespace DominoPlanner.CoreTests
                 throw;
             }*/
             //CircleTest("bird.jpg");
-            for (int i = 0; i < 1; i++)
+            //for (int i = 0; i < 1; i++)
             //    SpiralTest("bird.jpg");
             //WallTest("tests/bird.jpg");
-            FieldTest("bird.jpg");
+            //FieldTest("bird.jpg");
             //ColorRepoSaveTest();
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -59,6 +60,7 @@ namespace DominoPlanner.CoreTests
             //FieldTest("tests/bird.jpg");
 
             //Console.WriteLine(Test());
+
             Console.ReadLine();
             
         }

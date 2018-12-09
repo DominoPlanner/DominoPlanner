@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using DominoPlanner.Core.RTree;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(10, typeof(RectangleDomino))]
     [ProtoInclude(11, typeof(PathDomino))]
-    public abstract class IDominoShape : IEquatable<IDominoShape>
+    public abstract class IDominoShape : IEquatable<IDominoShape>, Geometry
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
@@ -29,6 +30,7 @@ namespace DominoPlanner.Core
                 return (position != null && position.xParams != null && position.yParams != null);
             }
         }
+
         /// <summary>
         /// Die ProtocolDefinition des Steins.
         /// </summary>
@@ -137,6 +139,16 @@ namespace DominoPlanner.Core
 
 
             return dominoDefinition;
+        }
+
+        public virtual bool Intersects(DominoRectangle rect)
+        {
+            return GetContainer().Intersects(rect);
+        }
+
+        public DominoRectangle getBoundingRectangle()
+        {
+            return GetContainer();
         }
     }
 }
