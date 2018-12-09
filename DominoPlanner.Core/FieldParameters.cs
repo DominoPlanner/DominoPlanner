@@ -5,11 +5,16 @@ using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Linq;
+using ProtoBuf;
+using System.IO;
+using System.Reflection;
+
 namespace DominoPlanner.Core
 {
     /// <summary>
     /// Stellt die Methoden und Eigenschaften zum Erstellen und Bearbeiten eines Feldes zur Verfügung.
     /// </summary>
+    [ProtoContract]
     public class FieldParameters : IDominoProvider
     {
         #region public properties
@@ -36,6 +41,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Der horizontale Abstand zwischen zwei Reihen/Steinen.
         /// </summary>
+        [ProtoMember(2)]
         public int a
         {
             get
@@ -55,6 +61,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die horizontale Breite der Steine.
         /// </summary>
+        [ProtoMember(3)]
         public int b
         {
             get
@@ -74,6 +81,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die vertikale Breite der Steine.
         /// </summary>
+        [ProtoMember(4)]
         public int c
         {
             get
@@ -93,6 +101,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Der vertikale Abstand zwischen zwei Steinen/Reihen.
         /// </summary>
+        [ProtoMember(5)]
         public int d
         {
             get
@@ -107,12 +116,13 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
-
+    
         private Inter _resizeMode;
         /// <summary>
         /// Gibt an, mit welcher Genauigkeit das Bild verkleinert werden soll.
         /// Bicubic eignet sich für Fotos, NearestNeighbor für Logos
         /// </summary>
+        [ProtoMember(6)]
         public Inter resizeMode
         {
             get
@@ -143,10 +153,23 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
+        [ProtoMember(7)]
+        private string DitheringSurrogate
+        {
+            get
+            {
+                return (_ditherMode.GetType().Name);
+            }
+            set
+            {
+                _ditherMode = (Dithering.Dithering) Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.Dithering.{value}"));
+            }
+        }
         private int _length;
         /// <summary>
         /// Die horizontale Steineanzahl.
         /// </summary>
+        [ProtoMember(8)]
         public int length
         {
             get
@@ -165,6 +188,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Die vertikale Steineanzahl.
         /// </summary>
+        [ProtoMember(9)]
         public int height
         {
             get
@@ -179,27 +203,13 @@ namespace DominoPlanner.Core
                 lastValid = false;
             }
         }
-        IterationInformation _iterationInfo;
-        public override IterationInformation IterationInformation
-        {
-            get
-            {
-                return _iterationInfo;
-            }
-            set
-            {
-                _iterationInfo = value;
-                _iterationInfo.PropertyChanged +=
-                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
-                lastValid = false;
-            }
-        }
         public HistoryTree<FieldParameters> history { get; set; }
         public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
         private Mat resizedImage;
         private IDominoShape[] shapes;
+        [ProtoMember(1000)]
         private bool resizedValid = false;
         #endregion
         #region public constructors
@@ -262,6 +272,7 @@ namespace DominoPlanner.Core
         {
             targetCount = targetSize;
         }
+        private FieldParameters() : base() { }
         #endregion
         #region override methods
         /// <summary>
@@ -300,6 +311,7 @@ namespace DominoPlanner.Core
         /// Verkleinert das Bild mit der spezifizierten Genauigkeit und auf die spezifizierte Größe.
         /// </summary>
         /// <param name="image">Das zu verkleinernde Bild.</param>
+        [ProtoAfterDeserialization]
         private void ResizeImage()
         {
             if (length < 2) length = 2;
@@ -333,6 +345,13 @@ namespace DominoPlanner.Core
             });
             shapes = array;
             shapesValid = true;
+        }
+        public void restoreShapes()
+        {
+            //bool last_valid_temp = lastValid;
+            shapes = last.shapes;
+            ResizeImage();
+            //lastValid = last_valid_temp;
         }
         /// <summary>
         /// Berechnet aus dem Shape-Array die Farben.
@@ -426,6 +445,7 @@ namespace DominoPlanner.Core
         {
 
         }
+        
         #endregion
     }
 }

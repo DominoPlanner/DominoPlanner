@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,14 +23,15 @@ namespace DominoPlanner.Core
                 Uri test = new Uri(value, UriKind.RelativeOrAbsolute);
                 if (test.IsAbsoluteUri) _root_path = value;
                 else throw new InvalidOperationException("Der Roodpfad muss absolut sein");
+                openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
             }
         }
-        public List<Tuple<String, object>> openedFiles;
+        public List<Tuple<String, IWorkspaceLoadable>> openedFiles;
         // threadsicheres Singleton
         private static readonly Lazy<Workspace> _mySingleton = new Lazy<Workspace>(() => new Workspace());
 
         private Workspace() {
-            openedFiles = new List<Tuple<string, object>>();
+            openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
         }
 
         public static Workspace Instance
@@ -38,15 +41,46 @@ namespace DominoPlanner.Core
                 return _mySingleton.Value;
             }
         }
-        public object Find(string path)
+        public static T Load<T>(string path) where T : IWorkspaceLoadable
         {
-            var result = openedFiles.Where(x => x.Item1 == MakePathAbsolute(path));
+            path = Workspace.Instance.MakePathAbsolute(path);
+            var result = (T)Workspace.Instance.Find<T>(path);
+            Console.WriteLine("Datei " + path + " öffnen");
+            if (result == null)
+            {
+                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                using (var file = File.OpenRead(path))
+                {
+                    result = Serializer.Deserialize<T>(file);
+                }
+                Workspace.Instance.AddToWorkspace(path, result);
+            }
+            return result;
+        }
+        public static int[] LoadColorList<T>(string path) where T : IWorkspaceLoadColorList
+        {
+            path = Workspace.Instance.MakePathAbsolute(path);
+            var result = (T)Workspace.Instance.Find<T>(path);
+            Console.WriteLine("Datei " + path + " als Vorschau öffnen");
+            if (result == null)
+            {
+                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                using (var file = File.OpenRead(path))
+                {
+                    return Serializer.Deserialize<IDominoProviderPreview>(file).counts;
+                }
+            }
+            return result.counts;
+        }
+        public object Find<T>(string path)
+        {
+            var result = openedFiles.Where(x => x.Item1 == MakePathAbsolute(path) && x.Item2 is T);
             if (result.Count() == 0) return null;
             return result.First().Item2;
         }
-        public void AddToWorkspace(string path, object obj)
+        public void AddToWorkspace(string path, IWorkspaceLoadable obj)
         {
-            openedFiles.Add(new Tuple<string, object>(MakePathAbsolute(path), obj));
+            openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(MakePathAbsolute(path), obj));
         }
         public string MakePathAbsolute(string path)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,16 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
+    [ProtoContract]
     public class ProtocolDefinition
     {
+        [ProtoMember(1)]
         public int x;
+        [ProtoMember(2)]
         public int y;
+        [ProtoMember(3)]
         public ProtocolPositionParameters xParams;
+        [ProtoMember(4)]
         public ProtocolPositionParameters yParams;
         public ProtocolDefinition() { }
         public ProtocolDefinition(XElement protocol)

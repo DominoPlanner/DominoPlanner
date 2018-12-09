@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Util;
+using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,12 +13,16 @@ using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Core
 {
-
+    [ProtoContract(SkipConstructor =true)]
     public class DominoTransfer : ICloneable
     {
+        [ProtoMember(2, IsPacked = true)]
         public int[] dominoes { get; set; }
+        [ProtoMember(1)]
         public IDominoShape[] shapes;
+        [ProtoMember(3, AsReference = true)]
         ColorRepository colors;
+        [ProtoMember(4, AsReference = true)]
         public IterationInformation iterationInfo {get; set;}
         public int length
         {
@@ -157,97 +162,9 @@ namespace DominoPlanner.Core
 
         public object Clone()
         {
-            DominoTransfer res = (DominoTransfer) this.MemberwiseClone();
-            dominoes.CopyTo(res.dominoes, 0);
-            res.iterationInfo = (IterationInformation) iterationInfo.Clone();
-
-            return res;
+            return Serializer.DeepClone<DominoTransfer>(this);
         }
     }
 
-    public abstract class IterationInformation : INotifyPropertyChanged, ICloneable
-    {
-        public int numberofiterations;
-        public double[] weights;
-        public bool? colorRestrictionsFulfilled;
-        public virtual int maxNumberOfIterations { get; set; }
-        public event PropertyChangedEventHandler PropertyChanged;
-        internal void OnNotifyPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public virtual void EvaluateSolution(IDominoColor[] palette, int[] field)
-        {
-
-        }
-
-        public object Clone()
-        {
-            IterationInformation res = (IterationInformation) this.MemberwiseClone();
-            this.weights.CopyTo(res.weights, 0);
-            return res;
-        }
-    }
-    public class NoColorRestriction : IterationInformation
-    {
-        public NoColorRestriction()
-        {
-            maxNumberOfIterations = 1;
-            colorRestrictionsFulfilled = null;
-        }
-        public override int maxNumberOfIterations { get => 1; set => base.maxNumberOfIterations = 1;  }
-
-    }
-    public class IterativeColorRestriction : IterationInformation
-    {
-        
-        private int _maxnumberofiterations;
-        
-        public override int maxNumberOfIterations
-        {
-            get
-            {
-                return _maxnumberofiterations;
-            }
-            set
-            {
-                _maxnumberofiterations = value;
-                OnNotifyPropertyChanged("numberofiterations");
-            }
-        }
-        
-        private double _iterationWeight;
-        public double iterationWeight
-        {
-            get
-            {
-                return _iterationWeight;
-            }
-            set
-            {
-                _iterationWeight = value;
-                OnNotifyPropertyChanged("iterationWeight");
-            }
-        }
-        public IterativeColorRestriction(int nit, double iterationWeight)
-        {
-            maxNumberOfIterations = nit;
-            this.iterationWeight = iterationWeight;
-        }
-        public override void EvaluateSolution(IDominoColor[] palette, int[] field)
-        {
-            int[] counts = new int[palette.Length];
-            for (int j = field.Length - 1; j >= 0; j--)
-            {
-                counts[field[j]]++;
-            }
-                this.colorRestrictionsFulfilled = true;
-                for (int j = 0; j < counts.Length; j++)
-                {
-                    if (counts[j] > palette[j].count) colorRestrictionsFulfilled = false;
-                    weights[j] = weights[j] * (1 + Math.Max(0.0, 1.0 * (counts[j] - palette[j].count) / palette[j].count * iterationWeight));
-                    Console.WriteLine($"Farbe: {palette[j].name}, vorhanden: {palette[j].count}, verwendet: {counts[j]}, neues Gewicht: {weights[j]}");
-                }
-            }
-    }
+    
 }

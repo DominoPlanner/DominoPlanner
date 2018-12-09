@@ -19,7 +19,6 @@
     {
         Horizontal,
         Vertical
-            
     }
     public enum SummaryMode
     {

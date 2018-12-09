@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,11 +15,16 @@ namespace DominoPlanner.Core
     /// Stellt einen rechteckigen Stein bereit (nicht gedrehtes Rechteck!)
     /// Implementiert IDominoShape.
     /// </summary>
+    [ProtoContract]
     public class RectangleDomino : IDominoShape
     {
+        [ProtoMember(1)]
         public double x;
+        [ProtoMember(2)]
         public double y;
+        [ProtoMember(3)]
         public double width;
+        [ProtoMember(4)]
         public double height;
 
         public override DominoRectangle GetContainer(double scaling_x, double scaling_y)
@@ -149,6 +155,19 @@ namespace DominoPlanner.Core
                 new Point(
                     double.Parse(p.Attribute("x").Value, CultureInfo.InvariantCulture),
                     double.Parse(p.Attribute("y").Value, CultureInfo.InvariantCulture))).ToArray();
+        }
+    }
+    [ProtoContract]
+    public class Point
+    {
+        [ProtoMember(1)]
+        public double X { get; set; }
+        [ProtoMember(2)]
+        public double Y { get; set; }
+        public Point(double X, double Y)
+        {
+            this.X = X;
+            this.Y = Y;
         }
     }
 }
