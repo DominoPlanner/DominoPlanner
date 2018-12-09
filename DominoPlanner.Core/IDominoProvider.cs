@@ -461,7 +461,14 @@ namespace DominoPlanner.Core
 
         internal abstract void CalculateColors();
 
-        
+        internal void ResetDitherColors(IDominoShape[] shapes)
+        {
+            foreach (var domino in shapes)
+            {
+                domino.ditherColor = domino.originalColor;
+            }
+        }
+
         /// <summary>
         /// Berechnet das Basisfeld eines Objekts aus dessen Protokolldefinition. 
         /// </summary>

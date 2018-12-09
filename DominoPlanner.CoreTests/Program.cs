@@ -44,8 +44,8 @@ namespace DominoPlanner.CoreTests
             //CircleTest("bird.jpg");
             //for (int i = 0; i < 1; i++)
             //SpiralTest("bird.jpg");
-            //WallTest("bird.jpg");
-            FieldTest("bird.jpg");
+            WallTest("bird.jpg");
+            //FieldTest("bird.jpg");
             //ColorRepoSaveTest();
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -126,19 +126,37 @@ namespace DominoPlanner.CoreTests
             Console.WriteLine("=======   FIELD TEST   =======");
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             //Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            
             FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.TransparencySetting = 128;
-            p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            p.Generate();//.GenerateImage().Save("tests/fieldtests_before_filters.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            watch.Restart();
             p.ditherMode = new FloydSteinbergDithering();
-            p.Generate().GenerateImage().Save("tests/fieldtest_floyd_steinberg.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            watch.Restart();
+            p.Generate();//.GenerateImage().Save("tests/fieldtest_floyd_steinberg.png");
             p.ditherMode = new Dithering();
-            p.Generate().GenerateImage().Save("tests/fieldtest_after_dithering.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            watch.Restart();
+            p.Generate();//.GenerateImage().Save("tests/fieldtest_after_dithering.png");
             p.ditherMode = new StuckiDithering();
-            p.Generate().GenerateImage().Save("tests/fieldtest_stucki.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            watch.Restart();
+            p.Generate();//.GenerateImage().Save("tests/fieldtest_stucki.png");
             p.ditherMode = new JarvisJudiceNinkeDithering();
-            p.Generate().GenerateImage().Save("tests/fieldtest_jjn.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            watch.Restart();
+            p.Generate();//.GenerateImage().Save("tests/fieldtest_jjn.png");
+            watch.Stop();
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
             // Filtertests für ein Logo oder ähnliches
             /*var erster = ((BlendFileFilter)p.ImageFilters[0]);

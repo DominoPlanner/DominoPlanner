@@ -348,7 +348,7 @@ namespace DominoPlanner.Core
             
             for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
             {
-                ResetDitherColors();
+                ResetDitherColors(shapes);
                 IterationInformation.numberofiterations = iter;
                 Console.WriteLine($"Iteration {iter}");
                 Parallel.For(0, length, new ParallelOptions() { MaxDegreeOfParallelism = ditherMode.maxDegreeOfParallelism }, (x) =>
@@ -370,13 +370,7 @@ namespace DominoPlanner.Core
             last = new DominoTransfer(shapes, this.colors);
             lastValid = true;
         }
-        internal void ResetDitherColors()
-        {
-            foreach (var domino in shapes)
-            {
-                domino.ditherColor = domino.originalColor;
-            }
-        }
+        
         public virtual void DiffuseErrorField(int x, int y, int v1, int v2, int v3, IDominoShape[] shapes, int height)
         {
             for (int j = 0; j < ditherMode.weights.GetLength(0); j++)

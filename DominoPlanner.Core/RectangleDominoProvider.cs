@@ -105,6 +105,7 @@ namespace DominoPlanner.Core
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
             for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
             {
+                ResetDitherColors(shapes.dominoes);
                 IterationInformation.numberofiterations = iter;
                 Console.WriteLine($"Iteration {iter}");
                 Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
@@ -129,7 +130,7 @@ namespace DominoPlanner.Core
                     else scalingY = scalingX;
                 }
                 // tatsächlich genutzte Farben auslesen
-                Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i) =>
                 {
                     if (average == AverageMode.Corner)
                     {
