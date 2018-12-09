@@ -20,9 +20,9 @@ namespace DominoPlanner.Usage
         public ProtocolVM(string filePath)
         {
             //hier muss dann mal die Datei geladen werden
-            Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
+            /*Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
             //fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1500, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
-            fParameters = new FieldParameters(new Emgu.CV.Mat(), @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            fParameters = new FieldParameters("sdf", @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             fParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             fParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
             fParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
@@ -30,7 +30,7 @@ namespace DominoPlanner.Usage
             fParameters.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
             fParameters.colors.Add(new DominoColor(Colors.White, 1000, "white"));
             dominoTransfer = fParameters.Generate(progress);
-
+            */
             Init();
         }
 

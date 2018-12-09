@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     xElement = XElement.Parse(sr.ReadToEnd());
                     //structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, 
                       //  new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner);
-                    structureParameters = new StructureParameters(new Emgu.CV.Mat(), xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500,
+                    structureParameters = new StructureParameters("..\\..\\Icons\\colorPicker.ico", xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500,
                         @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
                 }
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
@@ -41,15 +41,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             else
             {
                 CurrentViewModel = new RoundSizeVM();
-
-                BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.Relative));
-                WriteableBitmap wb = new WriteableBitmap(b);
+                
                 //structureParameters = new SpiralParameters(wb, 80, 24, 8, 8, 10, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
-                structureParameters = new SpiralParameters(new Emgu.CV.Mat(), 80, 24, 8, 8, 10, @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-                ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).normalWidth;
-                ((RoundSizeVM)CurrentViewModel).dHeight = ((SpiralParameters)structureParameters).tangentialWidth;
-                ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).normalDistance;
-                ((RoundSizeVM)CurrentViewModel).beDominoes = ((SpiralParameters)structureParameters).tangentialDistance;
+                //structureParameters = new SpiralParameters("..\\..\\Icons\\colorPicker.ico", 80, 24, 8, 8, 10, @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
+                ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).NormalWidth;
+                ((RoundSizeVM)CurrentViewModel).dHeight = ((SpiralParameters)structureParameters).TangentialWidth;
+                ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).NormalDistance;
+                ((RoundSizeVM)CurrentViewModel).beDominoes = ((SpiralParameters)structureParameters).TangentialDistance;
             }
             structureParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             structureParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
@@ -340,22 +338,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (e.PropertyName.Equals("dWidth"))
                 {
-                    ((SpiralParameters)structureParameters).normalWidth = ((RoundSizeVM)CurrentViewModel).dWidth;
+                    ((SpiralParameters)structureParameters).NormalWidth = ((RoundSizeVM)CurrentViewModel).dWidth;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("dHeight"))
                 {
-                    ((SpiralParameters)structureParameters).tangentialWidth = ((RoundSizeVM)CurrentViewModel).dHeight;
+                    ((SpiralParameters)structureParameters).TangentialWidth = ((RoundSizeVM)CurrentViewModel).dHeight;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("beLines"))
                 {
-                    ((SpiralParameters)structureParameters).normalDistance = ((RoundSizeVM)CurrentViewModel).beLines;
+                    ((SpiralParameters)structureParameters).NormalDistance = ((RoundSizeVM)CurrentViewModel).beLines;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("beDominoes"))
                 {
-                    ((SpiralParameters)structureParameters).tangentialDistance = ((RoundSizeVM)CurrentViewModel).beDominoes;
+                    ((SpiralParameters)structureParameters).TangentialDistance = ((RoundSizeVM)CurrentViewModel).beDominoes;
                     changed = true;
                 }
             }

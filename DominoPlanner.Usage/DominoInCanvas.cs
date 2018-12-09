@@ -9,7 +9,7 @@ namespace DominoPlanner.Usage
     public class DominoInCanvas : Shape
     {
         public int idx;
-        public Point[] canvasPoints = new Point[4];
+        public System.Windows.Point[] canvasPoints = new System.Windows.Point[4];
         
         private Color _StoneColor;
         public Color StoneColor
@@ -88,16 +88,16 @@ namespace DominoPlanner.Usage
             StrokeThickness = 2;
             this.Margin = new Thickness(marginLeft, marginTop, 0, 0);
 
-            canvasPoints[0] = new Point(0, 0);
-            canvasPoints[1] = new Point(stoneWidth, 0);
-            canvasPoints[2] = new Point(stoneWidth, stoneHeight);
-            canvasPoints[3] = new Point(0, stoneHeight);
+            canvasPoints[0] = new System.Windows.Point(0, 0);
+            canvasPoints[1] = new System.Windows.Point(stoneWidth, 0);
+            canvasPoints[2] = new System.Windows.Point(stoneWidth, stoneHeight);
+            canvasPoints[3] = new System.Windows.Point(0, stoneHeight);
         }
 
         private void DrawGeometry(StreamGeometryContext context)
         {
             context.BeginFigure(canvasPoints[0], true, true); //Top Left
-            IList<Point> points = new List<Point>();
+            IList<System.Windows.Point> points = new List<System.Windows.Point>();
             points.Add(canvasPoints[1]); //Top Right
             points.Add(canvasPoints[2]); // Bottom Right
             points.Add(canvasPoints[3]); // Bottom Left

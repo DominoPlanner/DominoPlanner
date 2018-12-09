@@ -169,5 +169,10 @@ namespace DominoPlanner.Core
             this.X = X;
             this.Y = Y;
         }
+
+        public static implicit operator System.Windows.Point(Point v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

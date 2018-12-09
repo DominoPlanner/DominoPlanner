@@ -31,9 +31,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             WriteableBitmap wb = new WriteableBitmap(b);
             //ProjectProperties = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1000, BitmapScalingMode.NearestNeighbor, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
             BitmapImage bi = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
-            Emgu.CV.Mat mat = CvInvoke.Imread(ImageSource, ImreadModes.AnyColor);
             //ProjectProperties = new FieldParameters(mat, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
-            ProjectProperties = new FieldParameters(mat, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 6, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            ProjectProperties = new FieldParameters(ImageSource, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 6, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
 
             DominoList = new ObservableCollection<DominoColor>(ProjectProperties.colors.colors);
             
