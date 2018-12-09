@@ -113,6 +113,7 @@
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="DominoInCanvas.cs" />
     <Compile Include="DominoStone.cs" />
+    <Compile Include="HelperClass\ImageConvert.cs" />
     <Compile Include="LiveBuildHelperV.xaml.cs">
       <DependentUpon>LiveBuildHelperV.xaml</DependentUpon>
     </Compile>
@@ -146,6 +147,7 @@
     <Compile Include="UserControls\ViewModel\CreateStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\EditProjectVM.cs" />
     <Compile Include="UserControls\ViewModel\FieldSizeVM.cs" />
+    <Compile Include="UserControls\ViewModel\OnlyOwnStonesVM.cs" />
     <Compile Include="UserControls\ViewModel\RectangularSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\RoundSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\StructureViewModel.cs" />
@@ -170,6 +172,9 @@
     </Compile>
     <Compile Include="UserControls\View\FieldSize.xaml.cs">
       <DependentUpon>FieldSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\View\OnlyOwnStonesV.xaml.cs">
+      <DependentUpon>OnlyOwnStonesV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\RectangularSize.xaml.cs">
       <DependentUpon>RectangularSize.xaml</DependentUpon>
@@ -238,6 +243,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\View\FieldSize.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\OnlyOwnStonesV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

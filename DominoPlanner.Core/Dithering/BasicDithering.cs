@@ -10,6 +10,9 @@ namespace DominoPlanner.Core.Dithering
 {
     public class Dithering
     {
+        protected DitherMode mode = DitherMode.NoDithering;
+        public DitherMode Mode { get { return mode; } }
+
         // Die Dithering-Verfahren müssen sequenziell ausgeführt werden.
         public int maxDegreeOfParallelism = -1;
 

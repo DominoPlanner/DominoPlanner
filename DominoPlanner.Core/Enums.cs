@@ -7,6 +7,14 @@
         JarvisJudiceNinke,
         Stucki
     }
+    public enum ColorComparisonMode
+    {
+        Cie76,
+        CmcComparison,
+        Cie94,
+        Cie2000
+    }
+
     public enum Orientation
     {
         Horizontal,

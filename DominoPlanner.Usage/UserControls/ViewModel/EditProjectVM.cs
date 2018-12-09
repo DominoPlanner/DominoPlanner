@@ -1,5 +1,6 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,42 +26,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
-            ImageSource = @"C:\Users\jonat\Dropbox\JoJoJo\bayern.png";
+            ImageSource = @"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png";
             BitmapImage b = new BitmapImage(new Uri(ImageSource, UriKind.RelativeOrAbsolute));
             WriteableBitmap wb = new WriteableBitmap(b);
-            ProjectProperties = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1000, BitmapScalingMode.NearestNeighbor, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
-            ProjectProperties.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.White, 1000, "white"));
+            //ProjectProperties = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1000, BitmapScalingMode.NearestNeighbor, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
+            BitmapImage bi = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
+            Emgu.CV.Mat mat = CvInvoke.Imread(ImageSource, ImreadModes.AnyColor);
+            //ProjectProperties = new FieldParameters(mat, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            ProjectProperties = new FieldParameters(mat, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 6, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
 
-/*            BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.Relative));
-            WriteableBitmap wb = new WriteableBitmap(b);
-            ProjectProperties = new SpiralParameters(wb, 80, 24, 8, 8, 10, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
-            ProjectProperties.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.White, 1000, "white"));*/
-
-            /*BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.Relative));
-            WriteableBitmap wb = new WriteableBitmap(b);
-            StreamReader sr = new StreamReader(new FileStream(@"D:\Dropbox\Dropbox\Structures.xml", FileMode.Open));
-            XElement xml = XElement.Parse(sr.ReadToEnd());
-            ProjectProperties = new StructureParameters(wb, xml.Elements().ElementAt(3), 1000, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Average, false);
-            ProjectProperties.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            ProjectProperties.colors.Add(new DominoColor(Colors.LightGray, 1000, "white"));*/
-
-
-            DominoList = new ObservableCollection<DominoColor>(ProjectProperties.colors);
-
+            DominoList = new ObservableCollection<DominoColor>(ProjectProperties.colors.colors);
+            
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { MessageBox.Show("asdf"); });
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
@@ -249,7 +225,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 Process.Start(ImageSource);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 
             }

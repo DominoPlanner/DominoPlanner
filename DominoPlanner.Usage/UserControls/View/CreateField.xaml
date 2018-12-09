@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="720" MinWidth="720">
+             d:DesignHeight="600" d:DesignWidth="720" MinWidth="850">
     <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -16,7 +17,8 @@
         <Grid Grid.Row="1" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="373"/>
-                <ColumnDefinition Width="327"/>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
             <local:FieldSize Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" DataContext="{Binding fsvm}"/>
             <Grid Grid.Column="1">
@@ -40,7 +42,7 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="Pixel" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iResizeMode}"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="5" Value="{Binding iResizeMode}"/>
                     <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
                 <Label Grid.Row="3" Content="Color Approximation Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
@@ -68,6 +70,7 @@
                     <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
             </Grid>
+            <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
         </Grid>
         <Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">

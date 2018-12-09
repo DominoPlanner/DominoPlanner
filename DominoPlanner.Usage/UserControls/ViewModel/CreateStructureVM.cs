@@ -1,6 +1,5 @@
-﻿using ColorMine.ColorSpaces.Comparisons;
-using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,8 +30,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 using (StreamReader sr = new StreamReader(new FileStream(@"D:\Dropbox\Dropbox\Structures.xml", FileMode.Open)))
                 {
                     xElement = XElement.Parse(sr.ReadToEnd());
-                    structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, 
-                        new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner);
+                    //structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, 
+                      //  new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner);
+                    structureParameters = new StructureParameters(new Emgu.CV.Mat(), xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500,
+                        @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
                 }
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
@@ -43,7 +44,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                 BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.Relative));
                 WriteableBitmap wb = new WriteableBitmap(b);
-                structureParameters = new SpiralParameters(wb, 80, 24, 8, 8, 10, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
+                //structureParameters = new SpiralParameters(wb, 80, 24, 8, 8, 10, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
+                structureParameters = new SpiralParameters(new Emgu.CV.Mat(), 80, 24, 8, 8, 10, @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
                 ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).normalWidth;
                 ((RoundSizeVM)CurrentViewModel).dHeight = ((SpiralParameters)structureParameters).tangentialWidth;
                 ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).normalDistance;
@@ -78,7 +80,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        private IColorSpaceComparison cdMode;
+        private IColorComparison cdMode;
         RectangleDominoProvider structureParameters;
         private bool structureIsRectangular;
         XElement xElement;
@@ -292,13 +294,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 DominoTransfer t = structureParameters.Generate(progress);
                 CurrentViewModel.StrucSize = t.dominoes.Count();
-                DestinationImage = t.GenerateImage(2000, draw_borders);
+                DestinationImage = ImageConvert.ToWriteableBitmap(t.GenerateImage(2000, draw_borders).Bitmap);
                 if (structureParameters.hasProcotolDefinition)
                     VisibleFieldplan = Visibility.Visible;
                 else
                     VisibleFieldplan = Visibility.Hidden;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 System.Diagnostics.Debug.WriteLine("adf");
             }

@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
@@ -170,8 +169,8 @@ namespace DominoPlanner.Usage
                         File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
                         BitmapImage bI = new BitmapImage(new Uri(((AddFieldVM)CurrentViewModel).pImage, UriKind.Relative));
                         WriteableBitmap wbi = new WriteableBitmap(bI);
-                        FieldParameters p = new FieldParameters(wbi, ColorList, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, BitmapScalingMode.HighQuality, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
-
+                        //FieldParameters p = new FieldParameters(wbi, ColorList, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, BitmapScalingMode.HighQuality, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
+                        FieldParameters p = new FieldParameters(new Emgu.CV.Mat(), @"C:\Users\johan\Desktop\colors.DColor", ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
                         DominoTransfer t = p.Generate(progress);
                         //t.Save(); Was auch immer hier dann Übergeben werden kann und so
                         
@@ -197,7 +196,8 @@ namespace DominoPlanner.Usage
                         RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
                         BitmapImage b = new BitmapImage(new Uri(((AddStructureVM)CurrentViewModel).pImage, UriKind.Relative));
                         WriteableBitmap wb = new WriteableBitmap(b);
-                        new SpiralParameters(wb, rsvm.StrucSize, rsvm.dWidth, rsvm.dHeight, rsvm.beLines, rsvm.beDominoes, ColorList, ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
+                        //new SpiralParameters(wb, rsvm.StrucSize, rsvm.dWidth, rsvm.dHeight, rsvm.beLines, rsvm.beDominoes, ColorList, ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
+                        MessageBox.Show("hier mal spirale machen");
                         break;
                     default: break;
                 }

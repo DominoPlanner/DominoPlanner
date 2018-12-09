@@ -107,7 +107,7 @@ namespace DominoPlanner.Core
         [ProtoMember(3)]
         public List<int> Anzeigeindizes;
         [ProtoMember(2)]
-        private List<DominoColor> colors;
+        public List<DominoColor> colors; //todo - nur vorrübergehend public
         [ProtoMember(1)]
         private EmptyDomino first;
         public int Length

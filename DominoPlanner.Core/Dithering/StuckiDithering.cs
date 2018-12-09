@@ -12,6 +12,7 @@ namespace DominoPlanner.Core.Dithering
         public StuckiDithering()
         {
             maxDegreeOfParallelism = 1;
+            mode = DitherMode.Stucki;
         }
 
         public override void DiffuseError(int x, int y, int r, int g, int b, Image<Emgu.CV.Structure.Bgra, byte> bitmap)

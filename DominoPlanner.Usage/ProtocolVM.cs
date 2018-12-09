@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
@@ -22,7 +21,8 @@ namespace DominoPlanner.Usage
         {
             //hier muss dann mal die Datei geladen werden
             Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
-            fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1500, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
+            //fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1500, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
+            fParameters = new FieldParameters(new Emgu.CV.Mat(), @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             fParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
             fParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
             fParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
@@ -37,7 +37,7 @@ namespace DominoPlanner.Usage
         public ProtocolVM(IDominoProvider fieldParameters)
         {
             fParameters = fieldParameters;
-            dominoTransfer = fParameters.Generate(progress);
+            dominoTransfer = fParameters.last;
             Init();
         }
         #endregion

@@ -13,6 +13,7 @@ namespace DominoPlanner.Core.Dithering
         public JarvisJudiceNinkeDithering()
         {
             maxDegreeOfParallelism = 1;
+            mode = DitherMode.JarvisJudiceNinke;
         }
         
         public override void DiffuseError(int x, int y, int r, int g, int b, Image<Emgu.CV.Structure.Bgra, byte> bitmap)

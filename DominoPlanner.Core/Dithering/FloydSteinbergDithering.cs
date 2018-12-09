@@ -9,7 +9,7 @@ namespace DominoPlanner.Core.Dithering
         public FloydSteinbergDithering() 
             : base() {
             maxDegreeOfParallelism = 1;
-
+            mode = DitherMode.FloydSteinberg;
         }
         public override void DiffuseError(int x, int y, int r, int g, int b, Image<Emgu.CV.Structure.Bgra, byte> bitmap)
         {

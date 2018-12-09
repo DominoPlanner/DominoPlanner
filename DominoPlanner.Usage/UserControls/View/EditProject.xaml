@@ -112,18 +112,9 @@
                     <RowDefinition Height="150"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="0"/>
-                <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5">
-                    <Slider.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform Angle="180"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Slider.RenderTransform>
-                </Slider>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="2"/>
+                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
+                <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
+                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="2"/>
             </Grid>
         </Grid>
 
