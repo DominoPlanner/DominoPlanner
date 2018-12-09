@@ -385,7 +385,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(1), 10000, 
+            StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(6), 30000, 
                 "colors.DColor", ColorDetectionMode.CieDe2000Comparison, 
                 AverageMode.Corner, new NoColorRestriction(), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -400,6 +400,8 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/WallTest.png");
+            p.ditherMode = new JarvisJudiceNinkeDithering();
+            p.Generate().GenerateImage().Save("tests/Wall_dithered.png");
             sr.Close();
             //FileStream fs = new FileStream(@"WallPlanTest.html", FileMode.Create);
             //StreamWriter sw = new StreamWriter(fs);

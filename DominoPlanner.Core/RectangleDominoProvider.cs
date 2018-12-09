@@ -12,6 +12,7 @@ using Emgu.CV.Util;
 using System.ComponentModel;
 using Emgu.CV.Structure;
 using ProtoBuf;
+using DominoPlanner.Core.RTree;
 //using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
@@ -89,6 +90,8 @@ namespace DominoPlanner.Core
             this.allowStretch = allowStretch;
             average = averageMode;
         }
+        public Dithering ditherMode = new Dithering();
+        public int charLength = 20;
         protected RectangleDominoProvider() : base() { }
         #endregion
         #region public methods
@@ -103,18 +106,96 @@ namespace DominoPlanner.Core
             var colors = this.colors.RepresentionForCalculation;
             if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
+            RTree<IDominoShape> tree = new RTree<IDominoShape>(9, new GuttmannQuadraticSplit<IDominoShape>());
+            // wird nur beim Dithering benötigt und nur dann ausgeführt; sortiert alle Shapes nach deren Mittelpunktskoordinate 
+            // erst nach x, bei gleichem x nach y
+            var list = shapes.dominoes.OrderBy(x =>
+            {
+                var container = x.GetContainer();
+                return container.x + container.width / 2;
+            }).ThenBy(x =>
+            {
+                var container = x.GetContainer();
+                return container.y + container.height / 2;
+            }).ToList();
+            if (ditherMode.weights.GetLength(0) + ditherMode.weights.GetLength(1) > 2)
+            {
+                for (int i = 0; i < shapes.dominoes.Length; i++)
+                {
+                    tree.Insert(shapes.dominoes[i]);
+                }
+            }
             for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
             {
-                ResetDitherColors(shapes.dominoes);
-                IterationInformation.numberofiterations = iter;
-                Console.WriteLine($"Iteration {iter}");
-                Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                if (ditherMode.weights.GetLength(0) + ditherMode.weights.GetLength(1) > 2)
                 {
-                    shapes.dominoes[i].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
-                });
-                // Farben zählen
-                IterationInformation.EvaluateSolution(colors.ToArray(), shapes.dominoes);
-                if (IterationInformation.colorRestrictionsFulfilled != false) break;
+                    double extent_r = (ditherMode.matrix_width - ditherMode.start_first_row) * charLength;
+                    double extent_l = (ditherMode.start_first_row - 1) * charLength;
+                    double extent_u = (ditherMode.matrix_height - 1) * charLength;
+                    // ditherColors im Baum ersetzen
+                    // TODO
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        // finde das entsprechende Shape im Baum
+                        var treerect = tree.Search(list[i].getBoundingRectangle())[0];
+                        var originalColor = treerect.ditherColor;
+                        treerect.CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                        list[i].color = treerect.color;
+                        // Abweichung der beiden Farben bestimmen
+                        int fehler_r = (int)(originalColor.Red - colors[treerect.color].mediaColor.R);
+                        int fehler_g = (int)(originalColor.Green - colors[treerect.color].mediaColor.G);
+                        int fehler_b = (int)(originalColor.Blue - colors[treerect.color].mediaColor.B);
+                        // bestimme Abmessungen des Suchbereichs
+                        DominoRectangle orig = treerect.getBoundingRectangle();
+                        double orig_x = orig.x + orig.width / 2;
+                        double orig_y = orig.y + orig.height / 2;
+                        DominoRectangle viewport = new DominoRectangle()
+                        {
+                            x = orig_x - extent_l,
+                            y = orig_y - extent_u,
+                            width = extent_r + extent_l,
+                            height = extent_u
+                        };
+                        var result = tree.Search(viewport);
+                        var weights = new double[result.Count];
+                        // Rohgewichte aller gefundenen Shapes finden
+                        for (int j = 0; j < result.Count; j++)
+                        {
+                            var bounding = result[j].getBoundingRectangle();
+                            // alle rausschmeißen, die nicht komplett im Viewport liegen
+                            //if (!viewport.Contains(bounding)) continue;
+                            double center_x = bounding.x + bounding.width / 2;
+                            double center_y = bounding.y + bounding.height / 2;
+                            // überprüfen, ob das Shape schon abgearbeitet wurde
+                            if (center_y == orig_y && center_x < orig_x) continue; 
+                            weights[j] = ditherMode.Weight((center_x - orig_x) / charLength, (center_y - orig_y) / charLength);
+                        }
+                        var divisor = weights.Sum();
+                        for (int j = 0; j < result.Count; j++)
+                        {
+                            if (weights[j] == 0) continue;
+                            ditherMode.AddToPixel(ref result[j].ditherColor,
+                        (int)(fehler_r * weights[j] / divisor),
+                        (int)(fehler_g * weights[j] / divisor),
+                        (int)(fehler_b * weights[j] / divisor));
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    ResetDitherColors(shapes.dominoes);
+                    IterationInformation.numberofiterations = iter;
+                    Console.WriteLine($"Iteration {iter}");
+                    Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                    {
+                        shapes.dominoes[i].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                    });
+                }
+                    // Farben zählen
+                    IterationInformation.EvaluateSolution(colors.ToArray(), shapes.dominoes);
+                    if (IterationInformation.colorRestrictionsFulfilled != false) break;
+                
             }
             last = new DominoTransfer(shapes.dominoes, this.colors);
         }

@@ -358,9 +358,9 @@ namespace DominoPlanner.Core
                         shapes[height * x + y].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
                         DiffuseErrorField(
                             x, y,
-                            (int)(shapes[height * x + y].originalColor.Red - colors[shapes[height * x + y].color].mediaColor.R),
-                            (int)(shapes[height * x + y].originalColor.Green - colors[shapes[height * x + y].color].mediaColor.G),
-                            (int)(shapes[height * x + y].originalColor.Blue - colors[shapes[height * x + y].color].mediaColor.B),
+                            (int)(shapes[height * x + y].ditherColor.Red - colors[shapes[height * x + y].color].mediaColor.R),
+                            (int)(shapes[height * x + y].ditherColor.Green - colors[shapes[height * x + y].color].mediaColor.G),
+                            (int)(shapes[height * x + y].ditherColor.Blue - colors[shapes[height * x + y].color].mediaColor.B),
                             shapes, height);
                     }
                 });
