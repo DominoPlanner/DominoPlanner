@@ -285,8 +285,7 @@ namespace DominoPlanner.Core
                 new System.Drawing.Size() { Height = height, Width = length }, interpolation: resizeMode);
             using (var image = resizedImage.ToImage<Bgra, byte>())
             {
-                image.Save("tests/image_saved.png");
-                Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
+                Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (xi) =>
                 {
                     for (int yi = 0; yi < height; yi++)
                     {
@@ -296,6 +295,7 @@ namespace DominoPlanner.Core
                     }
                 });
             }
+            
         }
         internal override void GenerateShapes()
         {
@@ -357,16 +357,12 @@ namespace DominoPlanner.Core
                     for (int x = 0; x < length; x++)
                     {
                         shapes[length * y + x].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                        int error_r = (int)(shapes[length * y + x].ditherColor.Red - colors[shapes[length * y + x].color].mediaColor.R);
+                        int error_g = (int)(shapes[length * y + x].ditherColor.Green - colors[shapes[length * y + x].color].mediaColor.G);
+                        int error_b = (int)(shapes[length * y + x].ditherColor.Blue - colors[shapes[length * y + x].color].mediaColor.B);
                         DiffuseErrorField(
-                            x, y,
-                            (int)(shapes[length * y + x].ditherColor.Red - colors[shapes[length * y + x].color].mediaColor.R),
-                            (int)(shapes[length * y + x].ditherColor.Green - colors[shapes[length * y + x].color].mediaColor.G),
-                            (int)(shapes[length * y + x].ditherColor.Blue - colors[shapes[length * y + x].color].mediaColor.B),
+                            x, y,(int) (error_r), (int)(error_g), (int)(error_b),
                             shapes, height);
-                        if (shapes[length * y + x].originalColor.Blue < 150)
-                        {
-
-                        }
                     }
                 });
                 IterationInformation.EvaluateSolution(colors, shapes);
@@ -374,6 +370,7 @@ namespace DominoPlanner.Core
             }
             last = new DominoTransfer(shapes, this.colors);
             lastValid = true;
+            
         }
         
         public virtual void DiffuseErrorField(int x, int y, int v1, int v2, int v3, IDominoShape[] shapes, int height)
@@ -384,11 +381,13 @@ namespace DominoPlanner.Core
                 {
                     int akt_x = x + i - ditherMode.startindizes[0] + 1;
                     int akt_y = y + j;
-                    if (akt_x >= length || akt_x < 0) continue;
-                    if (akt_y >= height || akt_y < 0) continue;
-                    ditherMode.AddToPixel(ref shapes[akt_y * length + akt_x].ditherColor,
-                        v1 * ditherMode.weights[j, i] / ditherMode.divisor,
-                        v2 * ditherMode.weights[j, i] / ditherMode.divisor,
+                    if (akt_x >= length) akt_x = length - 1;
+                    if (akt_x < 0) akt_x = 0;
+                    if (akt_y < 0) akt_y = 0;
+                    if (akt_y >= height) akt_y = height - 1;
+                    ditherMode.AddToPixel(shapes[akt_y * length + akt_x],
+                       v1 * ditherMode.weights[j, i] / ditherMode.divisor,
+                       v2 *ditherMode.weights[j, i] / ditherMode.divisor,
                         v3 * ditherMode.weights[j, i] / ditherMode.divisor);
                 }
             }

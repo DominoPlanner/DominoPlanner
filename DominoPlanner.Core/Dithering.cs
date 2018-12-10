@@ -30,11 +30,11 @@ namespace DominoPlanner.Core
             
         }
         
-        public void AddToPixel(ref Bgra color, int r, int g, int b)
+        public void AddToPixel(IDominoShape shape, int r, int g, int b)
         {
-            color.Red = Saturate(color.Red + r);
-            color.Blue = Saturate(color.Blue + b);
-            color.Green = Saturate(color.Green + g);
+            shape.ditherColor.Red = Saturate(shape.ditherColor.Red + r);
+            shape.ditherColor.Blue = Saturate(shape.ditherColor.Blue + b);
+            shape.ditherColor.Green = Saturate(shape.ditherColor.Green + g);
         }
         double Saturate(double input)
         {
@@ -59,7 +59,7 @@ namespace DominoPlanner.Core
                     weights[j, i] = (int)Weight(i - startindizes[0] + 1, j);
                 }
             }
-            divisor = weights.Cast<int>().Sum();
+            divisor = (int)(weights.Cast<int>().Sum());
         }
     }
     public class FloydSteinbergDithering : Dithering

@@ -80,7 +80,8 @@ namespace DominoPlanner.Core
             Parallel.For(0, shapes.Length, (i) =>
            {
                Color c = colors[shapes[i].color].mediaColor;
-
+               //Color c = Color.FromArgb((byte)shapes[i].ditherColor.Alpha, (byte)shapes[i].ditherColor.Red, 
+               //    (byte)shapes[i].ditherColor.Green, (byte)shapes[i].ditherColor.Blue);
                if (shapes[i] is RectangleDomino)
                {
                    DominoRectangle rect = shapes[i].GetContainer(scalingFactor);

@@ -174,7 +174,7 @@ namespace DominoPlanner.Core
                         for (int j = 0; j < result.Count; j++)
                         {
                             if (weights[j] == 0) continue;
-                            ditherMode.AddToPixel(ref result[j].ditherColor,
+                            ditherMode.AddToPixel(result[j],
                         (int)(fehler_r * weights[j] / divisor),
                         (int)(fehler_g * weights[j] / divisor),
                         (int)(fehler_b * weights[j] / divisor));

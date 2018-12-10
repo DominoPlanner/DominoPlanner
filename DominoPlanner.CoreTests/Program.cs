@@ -45,7 +45,7 @@ namespace DominoPlanner.CoreTests
             //for (int i = 0; i < 1; i++)
             //SpiralTest("bird.jpg");
             //WallTest("bird.jpg");
-            FieldTest("bird.jpg");
+            FieldTest("gre.jpg");
             //ColorRepoSaveTest();
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -128,11 +128,11 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             //Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             
-            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 200000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
+            //p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
@@ -196,8 +196,8 @@ namespace DominoPlanner.CoreTests
             p.ImageFilters.Add(replace);*/
             p.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
             p.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
-            p.Generate();
-            Console.WriteLine(String.Join("\n", p.counts));
+            //p.Generate();
+            /*Console.WriteLine(String.Join("\n", p.counts));
             Console.WriteLine("Size: " + p.Generate().shapes.Count());
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
@@ -207,7 +207,7 @@ namespace DominoPlanner.CoreTests
             Console.WriteLine(watch.ElapsedMilliseconds);
             b2.Save("tests/FieldTest.png");
             FileStream fs = new FileStream(@"tests/FieldPlanTest.html", FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
+            StreamWriter sw = new StreamWriter(fs);*/
             /*sw.Write(p.GetHTMLProcotol(new ObjectProtocolParameters()
             {
                 backColorMode = ColorMode.Normal,
@@ -234,8 +234,8 @@ namespace DominoPlanner.CoreTests
                 path = Directory.GetCurrentDirectory()
 
             });*/
-            sw.Close();
-            p.Save("FieldTest.DObject");
+            //sw.Close();
+            /*p.Save("FieldTest.DObject");
             watch = Stopwatch.StartNew();
             int[] counts = Workspace.LoadColorList<FieldParameters>("FieldTest.DObject");
             watch.Stop();
@@ -260,7 +260,7 @@ namespace DominoPlanner.CoreTests
             //t = loaded.Generate();
             p.Generate().GenerateImage().Save("tests/fieldtest_after_load.png");
 
-            Console.WriteLine(String.Join(", ", loaded.counts));
+            Console.WriteLine(String.Join(", ", loaded.counts));*/
         }
         static void WBXTest()
         {
