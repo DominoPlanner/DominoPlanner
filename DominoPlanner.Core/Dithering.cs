@@ -38,7 +38,11 @@ namespace DominoPlanner.Core
         }
         double Saturate(double input)
         {
-            return input > 255 ? 255 : input;
+            if (input > 255)
+                return 255;
+            else if (input < 0)
+                return 0;
+            return input;
         }
         public virtual double Weight(double x, double y) => 0;
 

@@ -44,8 +44,8 @@ namespace DominoPlanner.CoreTests
             //CircleTest("bird.jpg");
             //for (int i = 0; i < 1; i++)
             //SpiralTest("bird.jpg");
-            WallTest("bird.jpg");
-            //FieldTest("bird.jpg");
+            //WallTest("bird.jpg");
+            FieldTest("bird.jpg");
             //ColorRepoSaveTest();
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -82,7 +82,8 @@ namespace DominoPlanner.CoreTests
             repo.Add(new DominoColor(Color.FromArgb(255, 193, 126, 144), 1000, "pastellviolett"));
             repo.Add(new DominoColor(Color.FromArgb(255, 6, 46, 184), 1000, "blau"));
             repo.Add(new DominoColor(Color.FromArgb(255, 70, 131, 191), 1000, "hellblau"));
-            repo.Add(new DominoColor(Color.FromArgb(255, 51, 170, 142), 1000, "gelb"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 51, 170, 142), 1000, "gruen"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 255, 247, 102), 1000, "gelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 228, 160, 82), 1000, "maisgelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 229, 184, 134), 1000, "sandgelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 135, 98, 10), 1000, "gold"));
@@ -127,11 +128,11 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             //Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             
-            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 200000, Inter.Lanczos4,
                 new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
             p.TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            p.Generate();//.GenerateImage().Save("tests/fieldtests_before_filters.png");
+            p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
@@ -139,22 +140,22 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
-            p.Generate();//.GenerateImage().Save("tests/fieldtest_floyd_steinberg.png");
+            p.Generate().GenerateImage().Save("tests/fieldtest_floyd_steinberg.png");
             p.ditherMode = new Dithering();
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
-            p.Generate();//.GenerateImage().Save("tests/fieldtest_after_dithering.png");
+            p.Generate().GenerateImage().Save("tests/fieldtest_after_dithering.png");
             p.ditherMode = new StuckiDithering();
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
-            p.Generate();//.GenerateImage().Save("tests/fieldtest_stucki.png");
+            p.Generate().GenerateImage().Save("tests/fieldtest_stucki.png");
             p.ditherMode = new JarvisJudiceNinkeDithering();
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             watch.Restart();
-            p.Generate();//.GenerateImage().Save("tests/fieldtest_jjn.png");
+            p.Generate().GenerateImage().Save("tests/fieldtest_jjn.png");
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
@@ -330,11 +331,12 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(path, 50, "colors.DColor",
+            CircleParameters p = new CircleParameters(path, 150, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
             p.StartDiameter = 200;
+            p.ditherMode = new JarvisJudiceNinkeDithering();
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));

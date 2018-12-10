@@ -466,6 +466,7 @@ namespace DominoPlanner.Core
             foreach (var domino in shapes)
             {
                 domino.ditherColor = domino.originalColor;
+                domino.color = 0;
             }
         }
 
