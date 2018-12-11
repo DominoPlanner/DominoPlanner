@@ -257,9 +257,9 @@ namespace DominoPlanner.Core
         {
             Parallel.For(0, overlay.Height, (y) =>
             {
-                for (int x = overlay.Width - 1; x >= 0; x--)
+                for (int x = 0; x < overlay.Width; x++)
                 {
-                    if (y + start_y > 0 && x + start_x > 0 && y + start_y < background.Height && x + start_x < background.Width)
+                    if (y + start_y >= 0 && x + start_x >= 0 && y + start_y < background.Height && x + start_x < background.Width)
                     {
                         double opacity_overlay = overlay.Data[y, x , 3] / 255.0d;
 

@@ -45,7 +45,8 @@ namespace DominoPlanner.Core
         public int color_new;
         public override void executeInternal(T input)
         {
-            input.Generate();
+            throw new NotImplementedException();
+            /*input.Generate();
             input.height = (input.height + rows);
             input.GenerateShapes();
             int[] field = new int[input.length * (input.height + rows)];
@@ -55,7 +56,7 @@ namespace DominoPlanner.Core
                 {
                     if (yi < index)
                     {
-                        field[input.height * xi + yi] = input.last.dominoes[input.height * xi + yi];
+                        field[input.height * xi + yi] = input.last.shapes[input.height * xi + yi];
                     }
                     else if (yi < index + rows)
                     {
@@ -67,7 +68,7 @@ namespace DominoPlanner.Core
                     }
                 }
             }
-            input.lastValid = true;
+            input.lastValid = true;*/
             
         }
         public AddRowsOperation(HistoryTree<T> history) : base(history)
@@ -93,7 +94,7 @@ namespace DominoPlanner.Core
                 {
                     if (xi < index)
                     {
-                        field[input.height * xi + yi] = input.last.dominoes[input.height * xi + yi];
+                        field[input.height * xi + yi] = input.last.shapes[input.height * xi + yi].color;
                     }
                     else if (xi < index + columns)
                     {
@@ -101,7 +102,7 @@ namespace DominoPlanner.Core
                     }
                     else
                     {
-                        field[input.height * xi + yi] = input.last.dominoes[input.height * (xi - columns) + yi];
+                        field[input.height * xi + yi] = input.last.shapes[input.height * (xi - columns) + yi].color;
                     }
                 }
             }
@@ -122,7 +123,7 @@ namespace DominoPlanner.Core
             input.Generate();
             foreach (int index in indices)
             {
-                if (input.last.dominoes[index] == color_old) input.last.dominoes[index] = color_new;
+                if (input.last.shapes[index].color == color_old) input.last.shapes[index].color = color_new;
             }
         }
         public ReplaceColorOperation(HistoryTree<T> history) : base(history)
@@ -140,7 +141,7 @@ namespace DominoPlanner.Core
             input.Generate();
             foreach (int index in indices)
             {
-                input.last.dominoes[index] = color_new;
+                input.last.shapes[index].color = color_new;
             }
         }
         public SetColorOperation(HistoryTree<T> history) : base(history)

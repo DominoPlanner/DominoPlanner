@@ -44,7 +44,6 @@ namespace DominoPlanner.Core
                 __structureDefXML = value.ToString();
                 hasProcotolDefinition = structuredef.hasProtocolDefinition;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         private int _length;
@@ -62,7 +61,6 @@ namespace DominoPlanner.Core
             {
                 _length = value;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         private int _height;
@@ -80,7 +78,6 @@ namespace DominoPlanner.Core
             {
                 _height = value;
                 shapesValid = false;
-                lastValid = false;
             }
         }
         /// <summary>
@@ -147,8 +144,8 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         public StructureParameters(string imagepath, XElement definition, int length, int height, string colors, 
-            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode,  averageMode, allowStretch, iterationInformation)
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
+            base(imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
             this.length = length;
@@ -168,15 +165,15 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         /// <param name="targetSize">Die Zielgröße des Objekts.</param>
         public StructureParameters(string imagepath, XElement definition, int targetSize, String colors, 
-            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : this(imagepath, definition, 1, 1, colors, colorMode, averageMode, iterationInformation, allowStretch)
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : this(imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             TargetCount = targetSize;
         }
         public StructureParameters(int imageWidth, int imageHeight, Color background, XElement definition,
             int targetSize, String colors,
-            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
             TargetCount = targetSize;
@@ -184,7 +181,7 @@ namespace DominoPlanner.Core
         private StructureParameters() : base() { }
         #endregion
         #region private helper methods
-        protected override void GenerateShapes()
+        internal override void GenerateShapes()
         {
             shapes = structuredef.GenerateStructure(length, height);
             shapesValid = true;

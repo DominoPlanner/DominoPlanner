@@ -234,15 +234,15 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         public SpiralParameters(string bitmap, int rotations, string colors, 
-            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
+            base(bitmap, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             hasProcotolDefinition = false;
             ThetaMax = rotations * 2 * Math.PI + ThetaMin;
         }
         public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors, 
-            IColorComparison colorMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             hasProcotolDefinition = false;
             ThetaMax = rotations * 2 * Math.PI + ThetaMin;
@@ -250,7 +250,7 @@ namespace DominoPlanner.Core
         private SpiralParameters() : base() { }
         #endregion
         #region private methods
-        protected override void GenerateShapes()
+        internal override void GenerateShapes()
         {
             Point endpoint = getPoint(ThetaMax, nGroup * (NormalWidth + NormalDistance) / a);
             double end_radius = Math.Sqrt(endpoint.X * endpoint.X + endpoint.Y * endpoint.Y);
