@@ -31,7 +31,14 @@ namespace DominoPlanner.Core
                 return (position != null && position.xParams != null && position.yParams != null);
             }
         }
-
+        public string midpoint
+        {
+            get
+            {
+                var rect = getBoundingRectangle();
+                return "x: " + (rect.x + rect.width / 2) + ", y: " + (rect.y + rect.height/2);
+            }
+        }
         /// <summary>
         /// Die ProtocolDefinition des Steins.
         /// </summary>

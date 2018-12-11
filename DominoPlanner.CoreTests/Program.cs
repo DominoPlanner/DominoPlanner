@@ -44,9 +44,10 @@ namespace DominoPlanner.CoreTests
             //CircleTest("bird.jpg");
             //for (int i = 0; i < 1; i++)
             //SpiralTest("bird.jpg");
-            //WallTest("bird.jpg");
-            FieldTest("gre.jpg");
+            WallTest("bird.jpg");
             //ColorRepoSaveTest();
+            //FieldTest("bird.jpg");
+            //
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
             //Console.WriteLine($"zurückgegebene Objekte identisch? { result1 == result2}");
@@ -82,8 +83,7 @@ namespace DominoPlanner.CoreTests
             repo.Add(new DominoColor(Color.FromArgb(255, 193, 126, 144), 1000, "pastellviolett"));
             repo.Add(new DominoColor(Color.FromArgb(255, 6, 46, 184), 1000, "blau"));
             repo.Add(new DominoColor(Color.FromArgb(255, 70, 131, 191), 1000, "hellblau"));
-            repo.Add(new DominoColor(Color.FromArgb(255, 51, 170, 142), 1000, "gruen"));
-            repo.Add(new DominoColor(Color.FromArgb(255, 255, 247, 102), 1000, "gelb"));
+            repo.Add(new DominoColor(Color.FromArgb(255, 51, 170, 142), 1000, "gelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 228, 160, 82), 1000, "maisgelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 229, 184, 134), 1000, "sandgelb"));
             repo.Add(new DominoColor(Color.FromArgb(255, 135, 98, 10), 1000, "gold"));
@@ -106,7 +106,7 @@ namespace DominoPlanner.CoreTests
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
             repo.MoveUp((DominoColor)repo[4]);
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"{x.name}").ToArray()));
-            repo.Save("colors.DColor");
+            repo.Save("bw.DColor");
         }
         private static ColorRepository ColorRepoLoadTest(String path)
         {
@@ -129,7 +129,7 @@ namespace DominoPlanner.CoreTests
             //Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             
             FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
-                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+                ColorDetectionMode.Cie1976Comparison, new Dithering(), new NoColorRestriction());
             p.TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
@@ -194,8 +194,8 @@ namespace DominoPlanner.CoreTests
             replace.AfterColor = System.Drawing.Color.Red;
             replace.Tolerance = 50;
             p.ImageFilters.Add(replace);*/
-            p.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
-            p.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
+            //p.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
+            //p.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
             //p.Generate();
             /*Console.WriteLine(String.Join("\n", p.counts));
             Console.WriteLine("Size: " + p.Generate().shapes.Count());
@@ -278,7 +278,7 @@ namespace DominoPlanner.CoreTests
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             SpiralParameters p = new SpiralParameters(path, 50, "colors.DColor", 
-                ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -332,7 +332,7 @@ namespace DominoPlanner.CoreTests
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             CircleParameters p = new CircleParameters(path, 150, "colors.DColor",
-                ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
             p.StartDiameter = 200;
@@ -388,20 +388,20 @@ namespace DominoPlanner.CoreTests
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
             StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(6), 30000, 
-                "colors.DColor", ColorDetectionMode.CieDe2000Comparison, 
+                "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
 
-            DominoTransfer t = p.Generate();
-            Console.WriteLine("Size: " + t.shapes.Count());
+            //DominoTransfer t = p.Generate();
+            //Console.WriteLine("Size: " + t.shapes.Count());
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             watch = System.Diagnostics.Stopwatch.StartNew();
-            Mat b2 = t.GenerateImage(borders: false);
+            //Mat b2 = t.GenerateImage(borders: false);
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
-            b2.Save("tests/WallTest.png");
+            //b2.Save("tests/WallTest.png");
             p.ditherMode = new JarvisJudiceNinkeDithering();
             p.Generate().GenerateImage().Save("tests/Wall_dithered.png");
             sr.Close();
@@ -444,7 +444,7 @@ namespace DominoPlanner.CoreTests
             BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
             Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 10000, Inter.Lanczos4,
-                new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
             FieldParameters state = p.current.getState();
             state.Generate().GenerateImage(2000, false).Save("Tests/before_resize");
             ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};

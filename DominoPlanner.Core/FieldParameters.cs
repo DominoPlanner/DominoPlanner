@@ -128,34 +128,7 @@ namespace DominoPlanner.Core
                 usedColorsValid = false;
             }
         }
-        private Dithering _ditherMode;
-        /// <summary>
-        /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
-        /// </summary>
-        public Dithering ditherMode
-        {
-            get
-            {
-                return _ditherMode;
-            }
-            set
-            {
-                _ditherMode = value;
-                lastValid = false;
-            }
-        }
-        [ProtoMember(7)]
-        private string DitheringSurrogate
-        {
-            get
-            {
-                return (_ditherMode.GetType().Name);
-            }
-            set
-            {
-                _ditherMode = (Dithering) Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
-            }
-        }
+        
         private int _length;
         /// <summary>
         /// Die horizontale Steineanzahl.
@@ -217,8 +190,8 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
-            Inter scalingMode, Dithering ditherMode, IColorComparison colorMode, IterationInformation iterationInformation) 
-            : base(imagePath, colorMode, colors, iterationInformation)
+            Inter scalingMode,IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) 
+            : base(imagePath, colorMode, ditherMode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -254,14 +227,14 @@ namespace DominoPlanner.Core
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
         public FieldParameters(String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
-            Inter scalingMode, Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation) 
-            : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode, ditherMode, interpolationMode, iterationInformation)
+            Inter scalingMode,  IColorComparison interpolationMode, Dithering ditherMode, IterationInformation iterationInformation) 
+            : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode,  interpolationMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
         public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int a, int b, int c, int d, int targetSize,
-            Inter scalingMode, Dithering ditherMode, IColorComparison interpolationMode, IterationInformation iterationInformation)
-            : base(imageWidth, imageHeight, background, interpolationMode, colors, iterationInformation)
+            Inter scalingMode, IColorComparison interpolationMode, Dithering ditherMode, IterationInformation iterationInformation)
+            : base(imageWidth, imageHeight, background, interpolationMode, ditherMode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -381,10 +354,10 @@ namespace DominoPlanner.Core
                 {
                     int akt_x = x + i - ditherMode.startindizes[0] + 1;
                     int akt_y = y + j;
-                    if (akt_x >= length) akt_x = length - 1;
-                    if (akt_x < 0) akt_x = 0;
-                    if (akt_y < 0) akt_y = 0;
-                    if (akt_y >= height) akt_y = height - 1;
+                    if (akt_x >= length) continue; //akt_x = length - 1;
+                    if (akt_x < 0) continue; //akt_x = 0;
+                    if (akt_y < 0) continue; // akt_y = 0;
+                    if (akt_y >= height) continue; // akt_y = height - 1;
                     ditherMode.AddToPixel(shapes[akt_y * length + akt_x],
                        v1 * ditherMode.weights[j, i] / ditherMode.divisor,
                        v2 *ditherMode.weights[j, i] / ditherMode.divisor,
@@ -420,11 +393,6 @@ namespace DominoPlanner.Core
             // History-Objekt soll immer gleich bleiben. Keinesfalls klonen. 
             res.last = (DominoTransfer) last?.Clone();
             return res;
-        }
-        private FieldParameters(String imagePath, String colors, IColorComparison colorMode, IterationInformation iterationInformation)
-            : base(imagePath, colorMode, colors, iterationInformation)
-        {
-
         }
         
         #endregion

@@ -222,6 +222,34 @@ namespace DominoPlanner.Core
             get { return _background; }
             set { _background = value; sourceValid = false; }
         }
+        private Dithering _ditherMode;
+        /// <summary>
+        /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
+        /// </summary>
+        public Dithering ditherMode
+        {
+            get
+            {
+                return _ditherMode;
+            }
+            set
+            {
+                _ditherMode = value;
+                lastValid = false;
+            }
+        }
+        [ProtoMember(18)]
+        private string DitheringSurrogate
+        {
+            get
+            {
+                return (_ditherMode.GetType().Name);
+            }
+            set
+            {
+                _ditherMode = (Dithering)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+            }
+        }
         #endregion
         // müssen nach den Unterklassen deserialisiert werden
         [ProtoMember(1000)]
@@ -239,7 +267,7 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(string bitmapPath, IColorComparison comp, string colorpath, IterationInformation iterationInformation) 
+        protected IDominoProvider(string bitmapPath, IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) 
             : this()
         {
             //source = overlayImage(bitmap);
@@ -254,6 +282,7 @@ namespace DominoPlanner.Core
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
+            this.ditherMode = ditherMode;
             
         }
         protected IDominoProvider()
@@ -270,7 +299,7 @@ namespace DominoPlanner.Core
             background = Colors.Transparent;
         }
         protected IDominoProvider(int imageWidth, int imageHeight, Color background, 
-            IColorComparison comp, string colorpath, IterationInformation iterationInformation) : this()
+            IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) : this()
         {
             ImageWidth = imageWidth;
             ImageHeight = imageHeight;
@@ -279,6 +308,7 @@ namespace DominoPlanner.Core
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
+            this.ditherMode = ditherMode;
         }
         #endregion
         #region public methods
