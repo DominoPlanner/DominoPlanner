@@ -16,7 +16,7 @@ namespace DominoPlanner.Core
     /// Stellt die Methoden und Eigenschaften zum Erstellen und Bearbeiten eines Feldes zur Verfügung.
     /// </summary>
     [ProtoContract]
-    public class FieldParameters : IDominoProvider, ICountTargetable
+    public partial class FieldParameters : IDominoProvider, ICountTargetable, ICopyPasteable, IRowColumnAddableDeletable
     {
         #region public properties
         public int TargetCount
@@ -164,6 +164,7 @@ namespace DominoPlanner.Core
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
+
         public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
@@ -394,7 +395,6 @@ namespace DominoPlanner.Core
             res.last = (DominoTransfer) last?.Clone();
             return res;
         }
-        
         #endregion
     }
 }

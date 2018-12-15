@@ -72,8 +72,8 @@ namespace DominoPlanner.Core
     }
     public interface IRowColumnAddableDeletable
     {
-        int current_width { get; set; }
-        int current_height { get; set; }
+        int current_width { get;  }
+        int current_height { get; }
         /// <summary>
         /// Fügt eine Reihe hinzu
         /// </summary>
@@ -86,11 +86,9 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Fügt eine Zeile hinzu und ersetzt die neu hinzugefügten Reihen durch die angegeben Shapes
         /// </summary>
-        /// <param name="position">Index der Referenz</param>
-        /// <param name="count">Anzahl an neu eingefügten Zeilen</param>
-        /// <param name="below">Gibt an, ob unter oder oder über dem aktuellen Stein eingefügt werden soll</param>
+        /// <param name="position">Indizes der hinzuzufügenden Zeilen, die neuen Zeilen werden unter der genannten eingefügt</param>
         /// <param name="shapes">Farben der hinzugefügten Steine</param>
-        void AddRow(int position, int count, bool below, IDominoShape[] shapes);
+        int[] AddRow(int[] position, IDominoShape[] shapes);
         /// <summary>
         /// Löscht eine oder mehrere Zeilen
         /// </summary>
@@ -98,10 +96,10 @@ namespace DominoPlanner.Core
         /// <param name="remaining_position">Ausgabewert: Position eines Steins, der als Referenz zum Wiedereinfügen dient</param>
         /// <param name="direction">Ausgabewert: Richtung, in der dieser Stein liegt</param>
         /// <returns>Liste der gelöschten Shapes zum Wiedereinfügen</returns>
-        IDominoShape[] DeleteRow(int[] position, out int remaining_position, out bool direction);
+        IDominoShape[] DeleteRow(int[] positions, out int[] remaining_positions);
         int[] AddColumn(int position, bool right, int color, int count);
-        IDominoShape[] DeleteColumn(int[] position, out int remaining_position, out bool direction);
-        void AddColumn(int position, int count, bool below, IDominoShape[] shapes);
+        IDominoShape[] DeleteColumn(int[] positions, out int[] remaining_positions);
+        int[] AddColumn(int[] position, IDominoShape[] shapes);
     }
     public class AddRows : PostFilter
     {
@@ -125,16 +123,15 @@ namespace DominoPlanner.Core
         }
         public override void Undo()
         {
-            bool position;
-            int remaining;
-            reference.DeleteRow(added_indizes, out remaining, out position);
+            int[] remaining;
+            reference.DeleteRow(added_indizes, out remaining);
         }
     }
     public class DeleteRow : PostFilter
     {
         IRowColumnAddableDeletable reference;
         int[] position;
-        int remaining_position;
+        int[] remaining_position;
         bool direction;
         IDominoShape[] oldShapes;
         public DeleteRow(IRowColumnAddableDeletable reference, int[] position)
@@ -145,11 +142,11 @@ namespace DominoPlanner.Core
         }
         public override void Apply()
         {
-            oldShapes = reference.DeleteRow(position, out remaining_position, out direction);
+            oldShapes = reference.DeleteRow(position, out remaining_position);
         }
         public override void Undo()
         {
-            reference.AddRow(remaining_position, position.Length, direction, oldShapes);
+            reference.AddRow(remaining_position, oldShapes);
         }
     }
     public class AddColumns : PostFilter
@@ -174,16 +171,15 @@ namespace DominoPlanner.Core
         }
         public override void Undo()
         {
-            bool position;
-            int remaining;
-            reference.DeleteColumn(added_indizes, out remaining, out position);
+            int[] remaining;
+            reference.DeleteColumn(added_indizes, out remaining);
         }
     }
     public class DeleteColumn : PostFilter
     {
         IRowColumnAddableDeletable reference;
         int[] position;
-        int remaining_position;
+        int[] remaining_position;
         bool direction;
         IDominoShape[] oldShapes;
         public DeleteColumn(IRowColumnAddableDeletable reference, int[] position)
@@ -194,11 +190,11 @@ namespace DominoPlanner.Core
         }
         public override void Apply()
         {
-            oldShapes = reference.DeleteRow(position, out remaining_position, out direction);
+            oldShapes = reference.DeleteRow(position, out remaining_position);
         }
         public override void Undo()
         {
-            reference.AddRow(remaining_position, position.Length, direction, oldShapes);
+            reference.AddRow(remaining_position, oldShapes);
         }
     }
     public interface ICopyPasteable
