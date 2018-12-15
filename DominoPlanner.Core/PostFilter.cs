@@ -8,61 +8,66 @@ namespace DominoPlanner.Core
 {
     public class ReplaceColorOperation : PostFilter
     {
-        List<IDominoShape> domain;
+        IDominoProvider reference;
+        int[] domain;
         int to_replace;
         int new_color;
-        List<Tuple<IDominoShape, int>> old_colors;
+        int[] old_colors;
         public override void Apply()
         {
-            foreach(IDominoShape shape in domain)
+            for (int i = 0; i < domain.Length; i++)
             {
-                if (shape.color == to_replace)
+                int color = reference.last[domain[i]].color;
+                if (color == to_replace)
                 {
-                    old_colors.Add(new Tuple<IDominoShape, int>(shape, shape.color));
-                    shape.color = new_color;
+                    old_colors[i] = color;
+                    reference.last[domain[i]].color = new_color;
                 }
             }
         }
         public override void Undo()
         {
-            foreach(var tuple in old_colors)
+            for (int i = 0; i < domain.Length; i++)
             {
-                tuple.Item1.color = tuple.Item2;
+                reference.last[domain[i]].color = old_colors[i];
             }
         }
-        public ReplaceColorOperation(List<IDominoShape> domain, int toReplace, int newColor)
+        public ReplaceColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
         {
             this.domain = domain;
             this.to_replace = toReplace;
             this.new_color = newColor;
-            old_colors = new List<Tuple<IDominoShape, int>>();
+            old_colors = new int[domain.Length];
         }
     }
     public class SetColorOperation : PostFilter
     {
-        List<IDominoShape> domain;
+        IDominoProvider reference;
+        int[] domain;
         int new_color;
-        List<Tuple<IDominoShape, int>> old_colors;
+        int[] old_colors;
         public override void Apply()
         {
-            foreach (IDominoShape shape in domain)
+            for (int i = 0; i < domain.Length; i++)
             {
-                old_colors.Add(new Tuple<IDominoShape, int>(shape, shape.color));
-                shape.color = new_color;
+
+                old_colors[i] = reference.last[domain[i]].color;
+                reference.last[domain[i]].color = new_color;
             }
         }
         public override void Undo()
         {
-            foreach (var tuple in old_colors)
+            for (int i = 0; i < domain.Length; i++)
             {
-                tuple.Item1.color = tuple.Item2;
+                reference.last[domain[i]].color = old_colors[i];
             }
         }
-        public SetColorOperation(List<IDominoShape> domain, int newColor)
+        public SetColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
         {
+            
             this.domain = domain;
             this.new_color = newColor;
-            old_colors = new List<Tuple<IDominoShape, int>>();
+            old_colors = new int[domain.Length];
         }
     }
     public interface IRowColumnAddableDeletable
