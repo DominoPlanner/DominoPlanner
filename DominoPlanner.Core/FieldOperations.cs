@@ -113,7 +113,7 @@ namespace DominoPlanner.Core
 
         }
     }
-    public class ReplaceColorOperation<T> : NeedsFinalizationOperation<T> where T : IDominoProvider
+    /*public class ReplaceColorOperation<T> : NeedsFinalizationOperation<T> where T : IDominoProvider
     {
         public int[] indices;
         public int color_old;
@@ -130,7 +130,7 @@ namespace DominoPlanner.Core
         {
 
         }
-    }
+    }*/
     public class SetColorOperation<T> : NeedsFinalizationOperation<T> where T: IDominoProvider
     {
         public int[] indices;

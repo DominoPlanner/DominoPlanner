@@ -32,7 +32,9 @@ namespace DominoPlanner.Core
     [ProtoContract]
     public abstract class PostFilter
     {
-        public abstract void Apply(DominoTransfer input);
+        public abstract void Apply();
+
+        public abstract void Undo();
 
     }
     [ProtoContract]
