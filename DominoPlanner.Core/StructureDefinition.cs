@@ -9,23 +9,10 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
-    class ClusterStructureDefinition
+    partial class StructureParameters
     {
         public String name;
-        public CellDefinition[,] cells;
-        public bool hasProtocolDefinition;
-        public ClusterStructureDefinition(XElement definition)
-        {
-            hasProtocolDefinition = definition.Attribute("HasProtocolDefinition").Value == "true";
-            name = definition.Attribute("Name").Value;
-            cells = new CellDefinition[3, 3];
-            foreach (XElement part in definition.Elements("PartDefinition"))
-            {
-                int col = GetIndex(part.Attribute("HorizontalPosition").Value);
-                int row = GetIndex(part.Attribute("VerticalPosition").Value);
-                cells[col, row] = new CellDefinition(part);
-            }
-        }
+        internal CellDefinition[,] cells;
         private double PreviewScaleFactor(int TargetDimension)
         {
             double largest = 0;
@@ -79,7 +66,7 @@ namespace DominoPlanner.Core
                 }
             }
             g.dominoes = DominoList.ToArray();
-            g.HasProtocolDefinition = hasProtocolDefinition;
+            g.HasProtocolDefinition = hasProcotolDefinition;
             int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;
         }
@@ -138,5 +125,6 @@ namespace DominoPlanner.Core
                 dominoes = this.dominoes.Select(d => d.TransformDomino(moveX, moveY, i, j, width, height)).ToArray()
             };
         }
+        public int Count => dominoes.Length;
     }
 }

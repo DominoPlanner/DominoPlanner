@@ -15,7 +15,7 @@ namespace DominoPlanner.Core
     /// Stellt die Eigenschaften und Methoden bereit, eine Struktur zu erstellen.
     /// </summary>
     [ProtoContract]
-    public class StructureParameters : RectangleDominoProvider, ICountTargetable
+    public partial class StructureParameters : RectangleDominoProvider, ICountTargetable
     {
         // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
         private string __structureDefXML;
@@ -40,9 +40,16 @@ namespace DominoPlanner.Core
         {
             set
             {
-                structuredef = new ClusterStructureDefinition(value);
+                hasProcotolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
+                name = value.Attribute("Name").Value;
+                cells = new CellDefinition[3, 3];
+                foreach (XElement part in value.Elements("PartDefinition"))
+                {
+                    int col = GetIndex(part.Attribute("HorizontalPosition").Value);
+                    int row = GetIndex(part.Attribute("VerticalPosition").Value);
+                    cells[col, row] = new CellDefinition(part);
+                }
                 __structureDefXML = value.ToString();
-                hasProcotolDefinition = structuredef.hasProtocolDefinition;
                 shapesValid = false;
             }
         }
@@ -89,16 +96,17 @@ namespace DominoPlanner.Core
             // Maple sagt, dass diese Formel passt... ;)
             set
             {
-                double cw = structureDefinition.cells[1, 1].width;
-                double ch = structureDefinition.cells[1, 1].height;
-                double addw = structureDefinition.cells[0, 0].width + structureDefinition.cells[2, 2].width;
-                double addh = structureDefinition.cells[0, 0].height + structureDefinition.cells[2, 2].height;
-                double lc = structureDefinition.cells[0, 1].dominoes.Length;
-                double tc = structureDefinition.cells[1, 0].dominoes.Length;
-                double rc = structureDefinition.cells[2, 1].dominoes.Length;
-                double bc = structureDefinition.cells[1, 2].dominoes.Length;
-                double cc = structureDefinition.cells[1, 1].dominoes.Length;
-                double constant = structureDefinition.cells[0, 0].dominoes.Length + structureDefinition.cells[0, 2].dominoes.Length + structureDefinition.cells[2, 0].dominoes.Length + structureDefinition.cells[2, 2].dominoes.Length;
+                double cw = cells[1, 1].width;
+                double ch = cells[1, 1].height;
+                double addw = cells[0, 0].width + cells[2, 2].width;
+                double addh = cells[0, 0].height + cells[2, 2].height;
+                double lc = cells[0, 1].dominoes.Length;
+                double tc = cells[1, 0].dominoes.Length;
+                double rc = cells[2, 1].dominoes.Length;
+                double bc = cells[1, 2].dominoes.Length;
+                double cc = cells[1, 1].dominoes.Length;
+                double constant = cells[0, 0].dominoes.Length + cells[0, 2].dominoes.Length + cells[2, 0].dominoes.Length 
+                    + cells[2, 2].dominoes.Length;
                 double root = Math.Sqrt(Math.Pow(cc * addw - cw * (lc + rc), 2) * Math.Pow(source.Height, 2) +
                     (2 * (-addh * addw * cc * cc + (((-2 * constant + 2 * value) * cw + addw * (bc + tc)) * ch + cw * addh * (lc + rc)) * cc + ch * cw * (lc + rc) * (bc + tc))) * source.Width * source.Height
                     + Math.Pow(source.Width, 2) * Math.Pow(-addh * cc + ch * (bc + tc), 2));
@@ -120,15 +128,6 @@ namespace DominoPlanner.Core
             }
         }
         #endregion
-        private ClusterStructureDefinition structuredef;
-        
-        internal ClusterStructureDefinition structureDefinition
-        {
-            get
-            {
-                return structuredef;
-            }
-        }
         #region public constructors
         /// <summary>
         /// Generiert eine Struktur mit den angegebenen Wiederholparametern in x- und y-Richtung.
@@ -183,14 +182,11 @@ namespace DominoPlanner.Core
         #region private helper methods
         internal override void GenerateShapes()
         {
-            shapes = structuredef.GenerateStructure(length, height);
+            shapes = GenerateStructure(length, height);
             shapesValid = true;
         }
 
-        public override object Clone()
-        {
-            throw new NotImplementedException();
-        }
+        
         #endregion
     }
 }
