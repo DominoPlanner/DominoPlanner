@@ -67,6 +67,7 @@ namespace DominoPlanner.Core
             set
             {
                 _length = value;
+                _current_width = value;
                 shapesValid = false;
             }
         }

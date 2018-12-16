@@ -225,13 +225,19 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             paste_target = reference.PasteTarget(position_source, paste_source, position_target);
+            int[] paste_colors = new int[paste_source.Length];
             var field = (IDominoProvider)reference;
+            // Quellfarben müssen separat ausgelesen werden
+            for (int i = 0; i < paste_target.Length; i++)
+            {
+                paste_colors[i] = field.last[paste_source[i]].color;
+            }
             for (int i = 0; i < paste_target.Length; i++)
             {
                 if (paste_target[i] < field.last.length)
                 {
                     original_colors[i] = field.last[paste_target[i]].color;
-                    field.last[paste_target[i]].color = paste_source[i];
+                    field.last[paste_target[i]].color = paste_colors[i];
                 }
             }
         }

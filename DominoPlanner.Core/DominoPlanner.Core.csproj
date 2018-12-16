@@ -110,6 +110,7 @@
     <Compile Include="RTree\Tree.cs" />
     <Compile Include="SpiralParameters.cs" />
     <Compile Include="StructureDefinition.cs" />
+    <Compile Include="StructureOperations.cs" />
     <Compile Include="StructureParameters.cs" />
     <Compile Include="ProtocolTransfer.cs" />
     <Compile Include="Workspace.cs" />
