@@ -37,7 +37,7 @@ namespace DominoPlanner.Core
         public int[] AddRow(int position, bool below, int color, int count)
         {
             int first_inserted_row = position / current_width + (below ? 1 : 0);
-            IDominoShape[] new_shapes = new IDominoShape[count * current_width * current_height];
+            IDominoShape[] new_shapes = new IDominoShape[count * current_width];
             for (int x = 0; x < current_width; x++)
             {
                 for (int y = first_inserted_row; y < first_inserted_row + height; y++)
@@ -61,7 +61,7 @@ namespace DominoPlanner.Core
             int[] counts;
             var to_add = getDistinctRows(position, out counts);
             var total_added_rows = to_add.Count(x => x);
-            IDominoShape[] new_array = new IDominoShape[(current_height + total_added_rows) * current_height];
+            IDominoShape[] new_array = new IDominoShape[(current_height + total_added_rows) * current_width];
             int[] positions = new int[total_added_rows];
             int added_counter = 0;
             for (int y = 0; y <= current_height; y++)
@@ -90,7 +90,7 @@ namespace DominoPlanner.Core
                     }
                 }
             }
-            return positions.Select(x => x * current_width).ToArray();
+            return positions;
         }
         public bool[] getDistinctRows(int[] position, out int[] counts)
         {
@@ -137,6 +137,7 @@ namespace DominoPlanner.Core
                         new_array[current_width * (y - deleted_counter) + x] = last[current_width * y + x];
                     }
                 }
+
             }
             shapes = new_array;
             return deleted;

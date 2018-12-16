@@ -106,17 +106,134 @@ namespace DominoPlanner.Core
         }
         public int[] AddRow(int position, bool below, int color, int count)
         {
-            throw new NotImplementedException();
+            int first_inserted_row = getPositionFromIndex(position).Y  + (below ? 1 : 0);
+            IDominoShape[] new_shapes = new IDominoShape[count * getShapesInRow(0)];
+            for (int x = 0; x < current_width; x++)
+            {
+                for (int y = first_inserted_row; y < first_inserted_row + height; y++)
+                {
+                    // create new shapes with the appropriate coordinates and dimensions, assign specified color
+                    var new_cells = (cells[(x == -1) ? 0 : ((x == current_width) ? 2 : 1), (y == -1) ? 0 : ((y == current_height) ? 2 : 1)]
+                        .TransformDefinition(
+                            (x == -1) ? 0 : (cells[1, 1].width * (x) + cells[0, 0].width),
+                            (y == -1) ? 0 : (cells[1, 1].height * (y) + cells[0, 0].height),
+                            (x), (y), current_width, current_height + count))
+                        .dominoes;
+                    var index = getIndexFromPosition(y - first_inserted_row, x, 0) - getShapesInRow(-1);
+                    for (int i = 0; i < new_cells.Length; i++)
+                    {
+                        new_cells[i].color = color;
+                        new_shapes[i + index] = new_cells[i];
+                    }
+                }
+            }
+            return AddRow(new int[count].Select(x => getIndexFromPosition(x, 0, 0)).ToArray(), new_shapes);
         }
-
+        public bool[] getDistinctRows(int[] position, out int[] counts)
+        {
+            bool[] rows = new bool[current_height + 1];
+            counts = new int[current_height + 1];
+            for (int i = 0; i < position.Length; i++)
+            {
+                var row = getPositionFromIndex(position[i]).Y;
+                if (row == -1 || row > current_height) throw new InvalidOperationException();
+                rows[row] = true;
+                counts[row]++;
+            }
+            return rows;
+        }
+        public int getShapesInRow(int reihe)
+        {
+            int reihentyp = (reihe == -1 ? 0 : (reihe == current_height ? 2 : 1));
+            return cells[0, reihentyp].Count + cells[1, reihentyp].Count + cells[2, reihentyp].Count;
+        }
         public int[] AddRow(int[] position, IDominoShape[] shapes)
         {
-            throw new NotImplementedException();
+            int[] counts;
+            var to_add = getDistinctRows(position, out counts);
+            var total_added_rows = to_add.Count(x => x);
+            int top_row = getShapesInRow(-1);
+            int bottom_row = getShapesInRow(current_height);
+            int center_row = getShapesInRow(0);
+            IDominoShape[] new_array = new IDominoShape[(current_height + total_added_rows) * center_row 
+                + top_row + bottom_row];
+            int[] positions = new int[total_added_rows];
+            int added_counter = 0;
+            int array_pos = 0;
+            for (int y = -1; y <= current_height; y++)
+            {
+                int steine_in_reihe = getShapesInRow(y);
+                // es wird jeweils vor der y. Reihe eingefügt
+                if (y != -1 && to_add[y])
+                {
+                    for (int y2 = 0; y2 < counts[y]; y2++)
+                    {
+                        for (int x = 0; x < steine_in_reihe; x++)
+                        {
+                            new_array[array_pos + (added_counter + y2) * steine_in_reihe + x] 
+                                = shapes[(added_counter + y2) * steine_in_reihe + x];
+                        }
+                        positions[added_counter + y2] = steine_in_reihe * (added_counter + y2) + array_pos;
+                    }
+                    // alle shapes von diesem bis zur nächsten gelöschten Zeile nach hinten schieben
+                    int next_inserted = Array.IndexOf(to_add.Skip(y).ToArray(), true);
+                    ShiftDomainShapes(0, y, current_width, y + next_inserted, 0, added_counter + counts[y]);
+                    added_counter += counts[y];
+                }
+                for (int x = 0; x < steine_in_reihe; x++)
+                {
+                    new_array[array_pos + steine_in_reihe * added_counter + x] = last[array_pos + x];
+                }
+                array_pos += steine_in_reihe;
+            }
+            return positions.Select(x => x * current_width).ToArray();
         }
 
         public IDominoShape[] DeleteRow(int[] positions, out int[] remaining_positions)
         {
-            throw new NotImplementedException();
+            int[] counts;
+            var to_delete = getDistinctRows(positions, out counts);
+            to_delete[current_height] = false;
+            var total_deleted_rows = to_delete.Count(x => x);
+            remaining_positions = new int[total_deleted_rows];
+            if (total_deleted_rows == current_height) throw new InvalidOperationException("Can't delete all rows");
+            int top_row = getShapesInRow(-1);
+            int bottom_row = getShapesInRow(current_height);
+            int center_row = getShapesInRow(0);
+            IDominoShape[] new_array = new IDominoShape[(current_height - total_deleted_rows) * center_row
+                + top_row + bottom_row];
+            IDominoShape[] deleted = new IDominoShape[total_deleted_rows * center_row];
+            int deleted_counter = 0;
+            int position = 0;
+            for (int y = -1; y < current_height; y++)
+            {
+                int steine_in_reihe = getShapesInRow(y);
+                if (y != -1 && y != current_height && to_delete[y])
+                {
+                    for (int x = 0; x < current_width; x++)
+                    {
+                        deleted[steine_in_reihe * deleted_counter + x] = last[position + x];
+                    }
+                    // alle shapes von diesem bis zur nächsten gelöschten Zeile nach vorne ziehen
+                    int next_deleted = Array.IndexOf(to_delete.Skip(y).ToArray(), true);
+                    if (next_deleted != 0) // Operation wäre unnötig, wenn direkt die nächste Zeile wieder gelöscht wird
+                    {
+                        ShiftDomainShapes(0, y, current_width, y + next_deleted, 0, -deleted_counter);
+                    }
+                    remaining_positions[deleted_counter] = (y - deleted_counter) * steine_in_reihe + top_row;
+                    deleted_counter++;
+                }
+                else
+                {
+                    for (int x = 0; x < current_width; x++)
+                    {
+                        new_array[position - deleted_counter * center_row + x] = last[position + x];
+                    }
+                }
+                position += steine_in_reihe;
+            }
+            shapes.dominoes = new_array;
+            return deleted;
         }
 
         public int[] AddColumn(int position, bool right, int color, int count)
@@ -132,6 +249,28 @@ namespace DominoPlanner.Core
         public int[] AddColumn(int[] position, IDominoShape[] shapes)
         {
             throw new NotImplementedException();
+        }
+        public void ShiftDomainShapes(int start_x, int start_y, int end_x, int end_y, int shift_x, int shift_y)
+        {
+            for (int x = start_x; x <= end_x; x++)
+            {
+                for (int y = start_x; y <= end_x; y++)
+                {
+                    var new_cells = (cells[(x == -1) ? 0 : ((x == current_width) ? 2 : 1), (y == -1) ? 0 : ((y == current_height) ? 2 : 1)]
+                        .TransformDefinition(
+                            (x == -1) ? 0 : (cells[1, 1].width * (x + shift_x) + cells[0, 0].width),
+                            (y == -1) ? 0 : (cells[1, 1].height * (y + shift_y) + cells[0, 0].height),
+                            (x + shift_x), (y + shift_y), current_width + shift_x, current_height + shift_y))
+                        .dominoes;
+                    var index = getIndexFromPosition(y, x, 0);
+                    for (int i = 0; i < new_cells.Length; i++)
+                    {
+                        new_cells[i].color = last[index + i].color;
+                        new_cells[i].originalColor = last[index + i].originalColor;
+                        last.shapes[index + i] = new_cells[i];
+                    }
+                }
+            }
         }
     }
     struct PositionWrapper
