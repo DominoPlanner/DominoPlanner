@@ -54,31 +54,33 @@ namespace DominoPlanner.Core
                     };
                 }
             }
-            return AddRow(Enumerable.Range(first_inserted_row, count).Select(x => x * current_width).ToArray(), new_shapes);
+            return AddRow(new int[count].Select(x => first_inserted_row * current_width).ToArray(), new_shapes);
         }
         public int[] AddRow(int[] position, IDominoShape[] shapes)
         {
-            var to_add = getDistinctRows(position);
+            int[] counts;
+            var to_add = getDistinctRows(position, out counts);
             var total_added_rows = to_add.Count(x => x);
             IDominoShape[] new_array = new IDominoShape[(current_height + total_added_rows) * current_height];
             int[] positions = new int[total_added_rows];
             int added_counter = 0;
-            for (int y = 0; y < current_height; y++)
+            for (int y = 0; y <= current_height; y++)
             {
+                // es wird jeweils vor der y. Reihe eingefügt
                 if (to_add[y])
                 {
-                    for (int x = 0; x < current_width; x++)
+                    for (int y2 = 0; y2 < counts[y]; y2++)
                     {
-                        new_array[current_width * (y + added_counter) + x] = shapes[added_counter * current_width + x];
+                        for (int x = 0; x < current_width; x++)
+                        {
+                            new_array[current_width * (y + added_counter + y2) + x] = shapes[(added_counter + y2) * current_width + x];
+                        }
+                        positions[added_counter + y2] = (y + added_counter + y2) * current_width;
                     }
-                    // alle shapes von diesem bis zur nächsten gelöschten Zeile nach vorne ziehen
+                    // alle shapes von diesem bis zur nächsten gelöschten Zeile nach hinten schieben
                     int next_inserted = Array.IndexOf(to_add.Skip(y).ToArray(), true);
-                    if (next_inserted != 0) // Operation wäre unnötig
-                    {
-                        ShiftDomainShapes(0, y, current_width, y + next_inserted, 0, added_counter);
-                    }
-                    positions[added_counter] = (y + added_counter) * current_width;
-                    added_counter++;
+                    ShiftDomainShapes(0, y, current_width, y + next_inserted, 0, added_counter + counts[y]);
+                    added_counter += counts[y];
                 }
                 else
                 {
@@ -89,20 +91,22 @@ namespace DominoPlanner.Core
                 }
             }
             return positions.Select(x => x * current_width).ToArray();
-
         }
-        public bool[] getDistinctRows(int[] position)
+        public bool[] getDistinctRows(int[] position, out int[] counts)
         {
-            bool[] rows = new bool[current_height];
+            bool[] rows = new bool[current_height + 1];
+            counts = new int[current_height];
             for (int i = 0; i < position.Length; i++)
             {
                 rows[position[i] / current_width] = true;
+                counts[position[i] / current_width] += 1;
             }
             return rows;
         }
         public IDominoShape[] DeleteRow(int[] positions, out int[] remaining_positions)
         {
-            var to_delete = getDistinctRows(positions);
+            int[] counts;
+            var to_delete = getDistinctRows(positions, out counts);
             var total_deleted_rows = to_delete.Count(x => x);
             remaining_positions = new int[total_deleted_rows];
             if (total_deleted_rows == current_height) throw new InvalidOperationException("Can't delete all rows");
@@ -119,11 +123,11 @@ namespace DominoPlanner.Core
                     }
                     // alle shapes von diesem bis zur nächsten gelöschten Zeile nach vorne ziehen
                     int next_deleted = Array.IndexOf(to_delete.Skip(y).ToArray(), true);
-                    if (next_deleted != 0) // Operation wäre unnötig
+                    if (next_deleted != 0) // Operation wäre unnötig, wenn direkt die nächste Zeile wieder gelöscht wird
                     {
                         ShiftDomainShapes(0, y, current_width, y + next_deleted, 0, -deleted_counter);
                     }
-                    remaining_positions[deleted_counter] = (y - deleted_counter - 1) * current_width;
+                    remaining_positions[deleted_counter] = (y - deleted_counter) * current_width;
                     deleted_counter++;
                 }
                 else
