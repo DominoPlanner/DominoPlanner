@@ -1,15 +1,10 @@
 ﻿using DominoPlanner.Core;
 using DominoPlanner.Usage.HelperClass;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
@@ -20,28 +15,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public CreateStructureVM(bool rectangular) : base()
         {
+            OnlyOwnStonesVM = new OnlyOwnStonesVM();
             structureIsRectangular = rectangular;
             if (structureIsRectangular)
             {
                 CurrentViewModel = new RectangularSizeVM();
 
-                BitmapImage b = new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.Relative));
-                WriteableBitmap wb = new WriteableBitmap(b);
-                using (StreamReader sr = new StreamReader(new FileStream(@"D:\Dropbox\Dropbox\Structures.xml", FileMode.Open)))
-                {
-                    xElement = XElement.Parse(sr.ReadToEnd());
-                    //structureParameters = new StructureParameters(wb, xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500, 
-                      //  new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner);
-                    structureParameters = new StructureParameters("..\\..\\Icons\\colorPicker.ico", xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index), 1500,
-                        @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
-                }
+                structureParameters = new StructureParameters(@"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png", CurrentViewModel.SelectedStructureElement, 1500,
+                    @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
             }
             else
             {
                 CurrentViewModel = new RoundSizeVM();
-                
+
                 //structureParameters = new SpiralParameters(wb, 80, 24, 8, 8, 10, new List<DominoColor>(), ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
                 //structureParameters = new SpiralParameters("..\\..\\Icons\\colorPicker.ico", 80, 24, 8, 8, 10, @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, AverageMode.Corner, new NoColorRestriction());
                 ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).NormalWidth;
@@ -49,39 +37,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).NormalDistance;
                 ((RoundSizeVM)CurrentViewModel).beDominoes = ((SpiralParameters)structureParameters).TangentialDistance;
             }
-            structureParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            structureParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            structureParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            structureParameters.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            structureParameters.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            structureParameters.colors.Add(new DominoColor(Colors.White, 1000, "white"));
 
             allow_stretch = structureParameters.allowStretch;
             SinglePixel = structureParameters.average == AverageMode.Corner;
-            if (structureParameters.colorMode.GetType() == typeof(Cie1976Comparison))
-                iColorApproxMode = 0;
-            else if (structureParameters.colorMode.GetType() == typeof(CmcComparison))
-                iColorApproxMode = 1;
-            else if (structureParameters.colorMode.GetType() == typeof(Cie94Comparison))
-                iColorApproxMode = 2;
-            else
-                iColorApproxMode = 3;
+            
+            iColorApproxMode = (int)structureParameters.colorMode.colorComparisonMode;
+            
             CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
-            draw_borders = false;
+            draw_borders = true;
             Refresh();
-            SourceImage = new WriteableBitmap(new BitmapImage(new Uri(@"D:\Pictures\HintergrundOrdner\TDT2016_Teamfoto.JPG", UriKind.RelativeOrAbsolute)));
             UnsavedChanges = false;
-            this.PropertyChanged += CreateStructureVM_PropertyChanged;
+            //PropertyChanged += CreateStructureVM_PropertyChanged;
             ShowFieldPlan = new RelayCommand(o => { FieldPlan(); });
         }
         #endregion
 
         #region fields
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        private IColorComparison cdMode;
         RectangleDominoProvider structureParameters;
         private bool structureIsRectangular;
-        XElement xElement;
         #endregion
 
         #region prop
@@ -102,20 +76,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_VisibleFieldplan != value)
                 {
                     _VisibleFieldplan = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private WriteableBitmap _SourceImage;
-        public WriteableBitmap SourceImage
-        {
-            get { return _SourceImage; }
-            set
-            {
-                if (_SourceImage != value)
-                {
-                    _SourceImage = value;
                     RaisePropertyChanged();
                 }
             }
@@ -232,6 +192,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private string _sDiffusionMode;
+        public string sDiffusionMode
+        {
+            get { return _sDiffusionMode; }
+            set
+            {
+                if (_sDiffusionMode != value)
+                {
+                    _sDiffusionMode = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private int _iColorApproxMode;
         public int iColorApproxMode
         {
@@ -244,22 +218,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     switch (value)
                     {
                         case 0:
-                            cdMode = ColorDetectionMode.Cie1976Comparison;
                             sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
                             structureParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
                             break;
                         case 1:
-                            cdMode = ColorDetectionMode.CmcComparison;
                             structureParameters.colorMode = ColorDetectionMode.CmcComparison;
                             sColorApproxMode = "CMC (l:c) Comparison";
                             break;
                         case 2:
-                            cdMode = ColorDetectionMode.Cie94Comparison;
                             structureParameters.colorMode = ColorDetectionMode.Cie94Comparison;
                             sColorApproxMode = "CIE-94 Comparison (DIN 99)";
                             break;
                         case 3:
-                            cdMode = ColorDetectionMode.CieDe2000Comparison;
                             structureParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
                             sColorApproxMode = "CIE-E-2000 Comparison";
                             break;
@@ -267,6 +237,94 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             break;
                     }
                     RaisePropertyChanged();
+                }
+            }
+        }
+
+        /*private int _iDiffusionMode = 1;
+        public int iDiffusionMode
+        {
+            get { return _iDiffusionMode; }
+            set
+            {
+                if (_iDiffusionMode != value)
+                {
+                    _iDiffusionMode = value;
+                    switch ((DitherMode)value)
+                    {
+                        case DitherMode.NoDithering:
+                            sDiffusionMode = "NoDiffusion";
+                            structureParameters. = new Dithering();
+                            break;
+                        case DitherMode.FloydSteinberg:
+                            sDiffusionMode = "Floyd/Steinberg Dithering";
+                            fParameters.ditherMode = new FloydSteinbergDithering();
+                            break;
+                        case DitherMode.JarvisJudiceNinke:
+                            sDiffusionMode = "Jarvis/Judice/Ninke Dithering";
+                            fParameters.ditherMode = new JarvisJudiceNinkeDithering();
+                            break;
+                        case DitherMode.Stucki:
+                            sDiffusionMode = "Stucki Dithering";
+                            fParameters.ditherMode = new StuckiDithering();
+                            break;
+                        default:
+                            break;
+                    }
+                    RaisePropertyChanged();
+                    updateField();
+                }
+            }
+        }*/
+
+        private OnlyOwnStonesVM _onlyOwnStonesVM;
+
+        public OnlyOwnStonesVM OnlyOwnStonesVM
+        {
+            get { return _onlyOwnStonesVM; }
+            set
+            {
+                if (_onlyOwnStonesVM != value)
+                {
+                    if (_onlyOwnStonesVM != null)
+                    {
+                        _onlyOwnStonesVM.PropertyChanged -= _onlyOwnStonesVM_PropertyChanged;
+                    }
+                    _onlyOwnStonesVM = value;
+                    RaisePropertyChanged();
+                    _onlyOwnStonesVM.PropertyChanged += _onlyOwnStonesVM_PropertyChanged;
+                }
+            }
+        }
+
+        private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("OnlyUse"))
+            {
+                if (OnlyOwnStonesVM.OnlyUse)
+                {
+                    structureParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                }
+                else
+                {
+                    structureParameters.IterationInformation = new NoColorRestriction();
+                }
+                Refresh();
+            }
+            else if (e.PropertyName.Equals("Iterations"))
+            {
+                if (OnlyOwnStonesVM.OnlyUse)
+                {
+                    structureParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
+                    Refresh();
+                }
+            }
+            else if (e.PropertyName.Equals("Weight"))
+            {
+                if (OnlyOwnStonesVM.OnlyUse)
+                {
+                    ((IterativeColorRestriction)structureParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
+                    Refresh();
                 }
             }
         }
@@ -300,7 +358,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (Exception)
             {
-                System.Diagnostics.Debug.WriteLine("adf");
+                System.Diagnostics.Debug.WriteLine("asdf");
             }
         }
         public override bool Save()
@@ -330,7 +388,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else if (e.PropertyName.Equals("structure_index"))
                 {
-                    ((StructureParameters)structureParameters).structureDefinitionXML = xElement.Elements().ElementAt(((RectangularSizeVM)CurrentViewModel).structure_index);
+                    ((StructureParameters)structureParameters).structureDefinitionXML = ((RectangularSizeVM)CurrentViewModel).SelectedStructureElement;
                     changed = true;
                 }
             }
@@ -366,7 +424,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private ICommand _ShowFieldPlan;
         public ICommand ShowFieldPlan { get { return _ShowFieldPlan; } set { if (value != _ShowFieldPlan) { _ShowFieldPlan = value; } } }
-
         #endregion
     }
 }

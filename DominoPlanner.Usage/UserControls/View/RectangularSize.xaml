@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="254">
-    <Grid Margin="5" Width="306">
+             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="254" Width="300">
+    <Grid Margin="5" Width="300">
         <Label Content="Structure Size:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
         <Label Content="Dominoes" HorizontalAlignment="Left" Margin="223,5,0,0" VerticalAlignment="Top"/>
-        <xctk:IntegerUpDown Minimum="0" Value="{Binding StrucSize}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
-        <ComboBox ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5, 35, 5, 0"></ComboBox>
+        <xctk:IntegerUpDown IsEnabled="False" Minimum="0" Value="{Binding StrucSize}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
+        <ComboBox ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,35,10,0"></ComboBox>
         <Grid Margin="34,65,34,0" Width="230">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="52"/>

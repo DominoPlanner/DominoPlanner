@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
-    class ClusterStructureDefinition
+    public class ClusterStructureDefinition
     {
         public String name;
         public CellDefinition[,] cells;
@@ -117,7 +117,7 @@ namespace DominoPlanner.Core
         public IDominoShape[] dominoes;
         public bool HasProtocolDefinition;
     }
-    internal class CellDefinition
+    public class CellDefinition
     {
         public double width;
         public double height;

@@ -38,8 +38,8 @@ namespace DominoPlanner.Usage
             Tabs.Add(new TabItem(50, 100, "Erstes Feld", @"\Icons\lock - Copy.ico", "", new CreateFieldVM(@"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png")));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
 
-            //Tabs.Add(new TabItem(12, 100, "Erste Rechteckige Struktur", @"\Icons\lock - Copy.ico", "", new CreateStructureVM(true)));
-            //Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
+            Tabs.Add(new TabItem(12, 100, "Erste Rechteckige Struktur", @"\Icons\lock - Copy.ico", "", new CreateStructureVM(true)));
+            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
             
             /*Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;

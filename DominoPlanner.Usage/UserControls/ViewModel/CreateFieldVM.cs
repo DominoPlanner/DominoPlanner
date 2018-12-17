@@ -20,7 +20,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             
             fParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
-
+            
             iResizeMode = (int)fParameters.resizeMode;
             iColorApproxMode = (int)fParameters.colorMode.colorComparisonMode;
             iDiffusionMode = (int)fParameters.ditherMode.Mode;
