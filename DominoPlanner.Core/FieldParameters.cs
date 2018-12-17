@@ -375,12 +375,12 @@ namespace DominoPlanner.Core
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
             if (!shapesValid || !usedColorsValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            int[,] result = new int[length, height];
-                for (int i = 0; i < length; i++)
+            int[,] result = new int[current_width, current_height];
+                for (int i = 0; i < current_width; i++)
                 {
-                    for (int j = 0; j < height; j++)
+                    for (int j = 0; j < current_height; j++)
                     {
-                        result[i, j] = last.shapes[i*height + j].color;
+                        result[i, j] = last.shapes[j*current_width + i].color;
                     }
                 }
             if (o == Orientation.Vertical) result = TransposeArray(result);

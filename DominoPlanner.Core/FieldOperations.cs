@@ -40,7 +40,7 @@ namespace DominoPlanner.Core
             IDominoShape[] new_shapes = new IDominoShape[count * current_width];
             for (int x = 0; x < current_width; x++)
             {
-                for (int y = first_inserted_row; y < first_inserted_row + height; y++)
+                for (int y = first_inserted_row; y < first_inserted_row + count; y++)
                 {
                     // create new shapes with the appropriate coordinates and dimensions, assign specified color
                     new_shapes[current_width * (y - first_inserted_row) + x] = new RectangleDomino()
@@ -60,7 +60,7 @@ namespace DominoPlanner.Core
         {
             int[] counts;
             var to_add = getDistinctRows(position, out counts);
-            var total_added_rows = to_add.Count(x => x);
+            var total_added_rows = counts.Sum();
             IDominoShape[] new_array = new IDominoShape[(current_height + total_added_rows) * current_width];
             int[] positions = new int[total_added_rows];
             int added_counter = 0;
@@ -78,11 +78,12 @@ namespace DominoPlanner.Core
                         positions[added_counter + y2] = (y + added_counter + y2) * current_width;
                     }
                     // alle shapes von diesem bis zur nächsten gelöschten Zeile nach hinten schieben
-                    int next_inserted = Array.IndexOf(to_add.Skip(y).ToArray(), true);
-                    ShiftDomainShapes(0, y, current_width, y + next_inserted, 0, added_counter + counts[y]);
+                    int next_inserted = Array.IndexOf(to_add.Skip(y + 1).ToArray(), true);
+                    next_inserted = next_inserted == -1 ? current_height - y : next_inserted + 1;
+                    ShiftDomainShapes(0, y, current_width - 1, y + next_inserted - 1, 0, added_counter + counts[y]);
                     added_counter += counts[y];
                 }
-                else
+                if (y != current_height)
                 {
                     for (int x = 0; x < current_width; x++)
                     {
@@ -90,12 +91,14 @@ namespace DominoPlanner.Core
                     }
                 }
             }
+            
+            last.shapes = new_array;
             return positions;
         }
         public bool[] getDistinctRows(int[] position, out int[] counts)
         {
             bool[] rows = new bool[current_height + 1];
-            counts = new int[current_height];
+            counts = new int[current_height + 1];
             for (int i = 0; i < position.Length; i++)
             {
                 rows[position[i] / current_width] = true;
@@ -122,11 +125,9 @@ namespace DominoPlanner.Core
                         deleted[current_width * deleted_counter + x] = last[current_width * y + x];
                     }
                     // alle shapes von diesem bis zur nächsten gelöschten Zeile nach vorne ziehen
-                    int next_deleted = Array.IndexOf(to_delete.Skip(y).ToArray(), true);
-                    if (next_deleted != 0) // Operation wäre unnötig, wenn direkt die nächste Zeile wieder gelöscht wird
-                    {
-                        ShiftDomainShapes(0, y, current_width, y + next_deleted, 0, -deleted_counter);
-                    }
+                    int next_deleted = Array.IndexOf(to_delete.Skip(y + 1).ToArray(), true);
+                    next_deleted = next_deleted == -1 ? current_height - y : next_deleted + 1;
+                    ShiftDomainShapes(0, y+1, current_width - 1, y + next_deleted - 1, 0, -deleted_counter-1);
                     remaining_positions[deleted_counter] = (y - deleted_counter) * current_width;
                     deleted_counter++;
                 }
@@ -139,7 +140,7 @@ namespace DominoPlanner.Core
                 }
 
             }
-            shapes = new_array;
+            last.shapes = new_array;
             return deleted;
         }
 
@@ -161,7 +162,7 @@ namespace DominoPlanner.Core
         {
             for (int x = start_x; x <= end_x; x++)
             {
-                for (int y = start_x; y <= end_x; y++)
+                for (int y = start_y; y <= end_y; y++)
                 {
                     // move shape, set new field plan position (although not really necessary for fields)
                     last[current_width * y + x].position = new ProtocolDefinition() { x = x + shift_x, y = y + shift_y };
