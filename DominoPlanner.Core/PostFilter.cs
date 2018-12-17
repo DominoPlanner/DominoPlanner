@@ -34,6 +34,7 @@ namespace DominoPlanner.Core
         }
         public ReplaceColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
         {
+            this.reference = reference;
             this.domain = domain;
             this.to_replace = toReplace;
             this.new_color = newColor;
@@ -64,7 +65,7 @@ namespace DominoPlanner.Core
         }
         public SetColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
         {
-            
+            this.reference = reference;
             this.domain = domain;
             this.new_color = newColor;
             old_colors = new int[domain.Length];
@@ -132,7 +133,6 @@ namespace DominoPlanner.Core
         IRowColumnAddableDeletable reference;
         int[] position;
         int[] remaining_position;
-        bool direction;
         IDominoShape[] oldShapes;
         public DeleteRow(IRowColumnAddableDeletable reference, int[] position)
         {
@@ -180,7 +180,6 @@ namespace DominoPlanner.Core
         IRowColumnAddableDeletable reference;
         int[] position;
         int[] remaining_position;
-        bool direction;
         IDominoShape[] oldShapes;
         public DeleteColumn(IRowColumnAddableDeletable reference, int[] position)
         {
@@ -190,11 +189,11 @@ namespace DominoPlanner.Core
         }
         public override void Apply()
         {
-            oldShapes = reference.DeleteRow(position, out remaining_position);
+            oldShapes = reference.DeleteColumn(position, out remaining_position);
         }
         public override void Undo()
         {
-            reference.AddRow(remaining_position, oldShapes);
+            reference.AddColumn(remaining_position, oldShapes);
         }
     }
     public interface ICopyPasteable
