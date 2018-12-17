@@ -1,4 +1,6 @@
-﻿using ProtoBuf;
+﻿using DominoPlanner.Core.RTree;
+using Emgu.CV.Structure;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(10, typeof(RectangleDomino))]
     [ProtoInclude(11, typeof(PathDomino))]
-    public abstract class IDominoShape : IEquatable<IDominoShape>
+    public abstract class IDominoShape : IEquatable<IDominoShape>, Geometry
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
@@ -27,6 +29,14 @@ namespace DominoPlanner.Core
             get
             {
                 return (position != null && position.xParams != null && position.yParams != null);
+            }
+        }
+        public string midpoint
+        {
+            get
+            {
+                var rect = getBoundingRectangle();
+                return "x: " + (rect.x + rect.width / 2) + ", y: " + (rect.y + rect.height/2);
             }
         }
         /// <summary>
@@ -137,6 +147,40 @@ namespace DominoPlanner.Core
 
 
             return dominoDefinition;
+        }
+
+        public virtual bool Intersects(DominoRectangle rect)
+        {
+            return GetContainer().Intersects(rect);
+        }
+
+        public DominoRectangle getBoundingRectangle()
+        {
+            return GetContainer();
+        }
+        Bgra _originalColor;
+        public Bgra originalColor
+        {
+            get { return _originalColor; }
+            set { _originalColor = value;  ditherColor = originalColor; }
+        }
+        public Bgra ditherColor;
+
+        [ProtoMember(2)]
+        public int color;
+
+        public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
+        {
+            double minimum = int.MaxValue;
+            for (int color = 0; color < colors.Length; color++)
+            {
+                double value = colors[color].distance(ditherColor, comp, TransparencyThreshold) * weights[color];
+                if (value < minimum)
+                {
+                    minimum = value;
+                    this.color = color;
+                }
+            }
         }
     }
 }

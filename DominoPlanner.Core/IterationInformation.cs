@@ -23,7 +23,7 @@ namespace DominoPlanner.Core
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public virtual void EvaluateSolution(IDominoColor[] palette, int[] field)
+        public virtual void EvaluateSolution(IDominoColor[] palette, IDominoShape[] field)
         {
 
         }
@@ -82,12 +82,12 @@ namespace DominoPlanner.Core
             maxNumberOfIterations = nit;
             this.iterationWeight = iterationWeight;
         }
-        public override void EvaluateSolution(IDominoColor[] palette, int[] field)
+        public override void EvaluateSolution(IDominoColor[] palette, IDominoShape[] field)
         {
             int[] counts = new int[palette.Length];
             for (int j = field.Length - 1; j >= 0; j--)
             {
-                counts[field[j]]++;
+                counts[field[j].color]++;
             }
             this.colorRestrictionsFulfilled = true;
             for (int j = 0; j < counts.Length; j++)

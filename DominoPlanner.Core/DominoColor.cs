@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using DominoPlanner.Core.Dithering;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using ProtoBuf;

@@ -159,9 +159,9 @@ namespace DominoPlanner.Core
         private Random r;
 
         public CircleParameters(string imagepath, int circles,
-            string colors, IColorComparison colorMode, AverageMode averageMode,
+            string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            base(imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
 
             this.StartDiameter = 4 * TangentialWidth;
@@ -170,9 +170,9 @@ namespace DominoPlanner.Core
             r = new Random();
         }
         public CircleParameters(int imageWidth, int imageHeight, Color background, int circles,
-            string colors, IColorComparison colorMode, AverageMode averageMode,
+            string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imageWidth, imageHeight, background, colors, colorMode, averageMode, allowStretch, iterationInformation)
+            base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
 
             this.StartDiameter = 4 * TangentialWidth;
@@ -181,7 +181,7 @@ namespace DominoPlanner.Core
             r = new Random();
         }
         private CircleParameters() : base() { r = new Random(); }
-        protected override void GenerateShapes()
+        internal override void GenerateShapes()
         {
             PathDomino[][] dominos = new PathDomino[Circles][];
             Parallel.For(0,  Circles,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
