@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DominoPlanner.Core;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -10,6 +11,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public ColorListControlVM() : base()
         {
+            ColorRepository colors = Workspace.Load<ColorRepository>(@"C:\Users\johan\Desktop\colors.DColor");
             DominoList = new ObservableCollection<DominoStone>();
             DominoList.Add(new DominoStone("Weiß", 12345, System.Windows.Media.Color.FromRgb(255, 255, 255), 0));
             DominoList.Add(new DominoStone("Schwarz", 12345, System.Windows.Media.Color.FromRgb(0, 0, 0), 1));

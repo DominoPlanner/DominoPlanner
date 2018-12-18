@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.Dithering;
 using DominoPlanner.Usage.HelperClass;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
@@ -16,10 +15,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public CreateFieldVM(string filePath = "") : base()
         {
+            this.FilePath = @"C:\Users\johan\Desktop\field.DObject"; ;
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             
-            fParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            fParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
             
             iResizeMode = (int)fParameters.resizeMode;
             iColorApproxMode = (int)fParameters.colorMode.colorComparisonMode;
@@ -258,7 +258,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
+        
         private void updateField()
         {
             dominoTransfer = fParameters.Generate(progress);
@@ -279,8 +279,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override bool Save()
         {
-
-            throw new NotImplementedException();
+            try
+            {
+                fParameters.Save(FilePath);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private void CreateFieldVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

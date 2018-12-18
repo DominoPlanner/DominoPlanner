@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             //ProjectProperties = new FieldParameters(wb, new List<DominoColor>(), 8, 8, 24, 8, 1000, BitmapScalingMode.NearestNeighbor, DitherMode.NoDithering, ColorDetectionMode.Cie94Comparison);
             BitmapImage bi = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
             //ProjectProperties = new FieldParameters(mat, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
-            ProjectProperties = new FieldParameters(ImageSource, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 6, Emgu.CV.CvEnum.Inter.Lanczos4, new Core.Dithering.Dithering(), ColorDetectionMode.CieDe2000Comparison, new NoColorRestriction());
+            ProjectProperties = new FieldParameters(ImageSource, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 6, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
             DominoList = new ObservableCollection<DominoColor>(ProjectProperties.colors.colors);
             
@@ -345,20 +345,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.Background = Brushes.LightGray;
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             dominoTransfer = ProjectProperties.Generate(progress);
-            dominoTransfer.dominoes.Count();
+            
+            dominoTransfer.shapes.Count();
 
-            for (int i = 0; i < dominoTransfer.dominoes.Count(); i++)
+            for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
-                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i].Item1.GetPath(), dominoTransfer[i].Item2);
+                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i].GetPath(), ProjectProperties.colors[dominoTransfer[i].color].mediaColor);
                 dic.MouseDown += Dic_MouseDown;
                 DominoProject.Children.Add(dic);
                 for (int k = 0; k < 4; k++)
                 {
-                    if (largestX == 0 || largestX < dominoTransfer[i].Item1.GetPath().points[k].X)
-                        largestX = dominoTransfer[i].Item1.GetPath().points[k].X;
+                    if (largestX == 0 || largestX < dominoTransfer[i].GetPath().points[k].X)
+                        largestX = dominoTransfer[i].GetPath().points[k].X;
 
-                    if (largestY == 0 || largestY < dominoTransfer[i].Item1.GetPath().points[k].Y)
-                        largestY = dominoTransfer[i].Item1.GetPath().points[k].Y;
+                    if (largestY == 0 || largestY < dominoTransfer[i].GetPath().points[k].Y)
+                        largestY = dominoTransfer[i].GetPath().points[k].Y;
                 }
             }
             DominoProject.Width = largestX;

@@ -35,6 +35,21 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region prope
+        private string _BatState;
+        public string BatState
+        {
+            get { return _BatState; }
+            set
+            {
+                if (_BatState != value)
+                {
+                    _BatState = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+
         private Canvas _currentBlock = new Canvas();
         public Canvas currentBlock
         {
@@ -113,6 +128,9 @@ namespace DominoPlanner.Usage
         #region methods
         private void RefreshCanvas()
         {
+            BatState = "Battery: " + System.Windows.Forms.SystemInformation.PowerStatus.BatteryLifePercent * 100 + " % "
+            + (((System.Windows.Forms.SystemInformation.PowerStatus.BatteryChargeStatus & System.Windows.Forms.BatteryChargeStatus.Charging) == System.Windows.Forms.BatteryChargeStatus.Charging) ? ", charging" : "");
+
             currentBlock.Children.RemoveRange(0, currentBlock.Children.Count);
             int space = 2;
 

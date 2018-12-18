@@ -9,7 +9,7 @@
     <Grid Margin="0.5,0,0.5,0" Width="300">
         <Label Content="Structure Size:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
         <Label Content="Dominoes" HorizontalAlignment="Left" Margin="223,5,0,0" VerticalAlignment="Top"/>
-        <xctk:IntegerUpDown Minimum="0" Value="{Binding StrucSize}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
+        <xctk:IntegerUpDown Minimum="0" Value="{Binding StrucSize}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120" IsEnabled="False"/>
         <Grid HorizontalAlignment="Stretch" Height="60" Margin="5,35,5,0" VerticalAlignment="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -22,8 +22,8 @@
             </Grid.ColumnDefinitions>
             <Label Content="Type" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
             <ComboBox ItemsSource="{Binding list}" SelectedValue="{Binding TypeSelected}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1"/>
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding Amount}" Grid.Column="1" Grid.Row="2" Visibility="Hidden"/>
-            <Label Content="Stones" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="2" Visibility="Hidden"/>
+            <Label Content="{Binding lType}" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="2" Visibility="Visible"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding Amount}" Grid.Column="1" Grid.Row="2" Visibility="Visible"/>
         </Grid>
 
         <Grid Margin="5,100,5,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">

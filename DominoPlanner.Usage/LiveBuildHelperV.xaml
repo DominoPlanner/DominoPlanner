@@ -47,6 +47,7 @@
                 <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <Label Grid.Column="3" Content="{Binding CountBlock}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
+            <Label Grid.Column="3" Content="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
         </Grid>
         <ContentControl Grid.Row="1" Content="{Binding currentBlock}">
             <i:Interaction.Triggers>

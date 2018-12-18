@@ -42,9 +42,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_TypeSelected != value)
                 {
                     _TypeSelected = value;
-                    if (((string)value).CompareTo("Spiral") == 0)
+                    if (value.CompareTo("Spiral") == 0)
                     {
                         lType = "Quarter rotations:";
+                    }else if(value.CompareTo("Circle Bomb") == 0)
+                    {
+                        lType = "Rounds";
                     }
                     RaisePropertyChanged();
                 }

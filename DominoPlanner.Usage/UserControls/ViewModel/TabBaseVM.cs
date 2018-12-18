@@ -40,6 +40,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private string _FilePath;
+        public string FilePath
+        {
+            get { return _FilePath; }
+            set
+            {
+                if (_FilePath != value)
+                {
+                    _FilePath = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public abstract TabItemType tabType { get; }
         #endregion
 

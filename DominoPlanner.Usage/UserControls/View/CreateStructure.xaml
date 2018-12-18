@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
@@ -50,7 +51,7 @@
                         <ColumnDefinition Width="50"/>
                     </Grid.ColumnDefinitions>
                     <Label Margin="5" Grid.Column="0">Fast</Label>
-                    <Slider Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode, Delay=500}"/>
+                    <Slider Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode, Delay=500}" TickPlacement="BottomRight"/>
                     <Label Margin="5" Grid.Column="2">Slow</Label>
                 </Grid>
                 <Label Margin="5" Grid.Row="3">Pixel Selection Mode</Label>
@@ -62,7 +63,8 @@
                     <RadioButton Grid.Column="0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding SinglePixel}"/>
                     <RadioButton Grid.Column="1" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" IsChecked="{Binding AverageArea}"/>
                 </Grid>
-                <CheckBox Margin="5" IsChecked="{Binding draw_borders}" Grid.Row="5" Content="Draw Domino Borders in Preview"></CheckBox>
+                <CheckBox Margin="5,5.4,72,5.4" IsChecked="{Binding draw_borders}" Grid.Row="5" Content="Draw Domino Borders"></CheckBox>
+                <xctk:ColorPicker Grid.Row="5" Margin="0,2.4,2,2.4" HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
                 <CheckBox Margin="5" IsChecked="{Binding allow_stretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
             </Grid>
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" Grid.Column="2">
@@ -71,7 +73,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
-                <!--Grid Grid.Row="1">
+                <Grid Grid.Row="1" Margin="0,0.4,0,50" Width="200" HorizontalAlignment="Left">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -89,7 +91,7 @@
                         <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}" TickPlacement="BottomRight"/>
                         <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                     </Grid>
-                </Grid-->
+                </Grid>
             </Grid>
         </Grid>
         <Button Grid.Row="2" Grid.Column="0" Height="30" Margin="10,10,0,10" Width="120" HorizontalAlignment="Left">

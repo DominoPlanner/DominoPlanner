@@ -2,17 +2,17 @@
 {
     public enum DitherMode
     {
-        NoDithering,
-        FloydSteinberg,
-        JarvisJudiceNinke,
-        Stucki
+        NoDithering = 0,
+        FloydSteinberg = 1,
+        JarvisJudiceNinke = 2,
+        Stucki = 3
     }
     public enum ColorComparisonMode
     {
-        Cie76,
-        CmcComparison,
-        Cie94,
-        Cie2000
+        Cie76 = 0,
+        CmcComparison = 1,
+        Cie94 = 2,
+        Cie2000 = 3
     }
 
     public enum Orientation
