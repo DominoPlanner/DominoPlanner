@@ -44,9 +44,9 @@ namespace DominoPlanner.Core
                 width = cells[0, 0].width + cells[1, 1].width * sWidth + cells[2, 2].width,
                 height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
             };
-            for (int x = -1; x < sWidth + 1; x++)
+            for (int y = -1; y < sHeight + 1; y++)
             {
-                for (int y = -1; y < sHeight + 1; y++)
+                for (int x = -1; x < sWidth + 1; x++)
                 {
                     try
                     {

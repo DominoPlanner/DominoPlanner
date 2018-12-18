@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DominoPlanner.Core;
 
 namespace DominoPlanner.CoreTests
@@ -12,7 +13,8 @@ namespace DominoPlanner.CoreTests
     {
         public static void PostFilterTest(string path)
         {
-            PostFilterFieldTest(path);
+            //PostFilterFieldTest(path);
+            PostFilterStructureTest(path);
         }
         public static void PostFilterFieldTest(string path)
         {
@@ -25,6 +27,58 @@ namespace DominoPlanner.CoreTests
             CopyPasteFieldTest(fp);
             InsertColumnFieldTest(fp);
             DeleteColumnFieldTest(fp);
+        }
+        public static void PostFilterStructureTest(string path)
+        {
+            StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
+            XElement xml = XElement.Parse(sr.ReadToEnd());
+            StructureParameters s = new StructureParameters(path, xml.Elements().ElementAt(6), 3000,
+                "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
+                AverageMode.Corner, new NoColorRestriction(), true);
+
+            s.Generate().GenerateImage().Save("tests/StructureFilterTests/vorFilter.png");
+            InsertRowStructureTest(s);
+            DeleteRowStructureTest(s);
+            CopyPasteFieldTest(s);
+            //InsertColumnFieldTest(s);
+            //DeleteColumnFieldTest(s);
+        }
+        public static void InsertRowStructureTest(StructureParameters s)
+        {
+            AddRows addRows = new AddRows(s, 40, 2, 5, true);
+            addRows.Apply();
+            AddRows addRows2 = new AddRows(s, 40, 2, 5, false);
+            addRows2.Apply();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowEinfügen.png");
+            SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachRowEinfuegen.html");
+            addRows2.Undo();
+            addRows.Undo();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowEinfügenUndo.png");
+        }
+        public static void DeleteRowStructureTest(StructureParameters s)
+        {
+            DeleteRow deleteRow = new DeleteRow(s, new int[] { 40, 200, 500});
+            deleteRow.Apply();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowLöschen.png");
+            SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachRowLöschen.html");
+            deleteRow.Undo();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowLoeschenUndo.png");
+
+        }
+        public static void CopyPasteFieldTest(StructureParameters s)
+        {
+            int[] source_area = new int[100];
+            int start = 33;
+            int end = 459+126*10;
+            for (int j = 0; j < 100; j++)
+            {
+                source_area[j] = start + j;
+            }
+            PasteFilter paste = new PasteFilter(s, start, source_area, end);
+            paste.Apply();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachPaste.png");
+            paste.Undo();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachPasteUndo.png");
         }
         public static void InsertRowFieldTest(FieldParameters fp )
         {
@@ -90,7 +144,7 @@ namespace DominoPlanner.CoreTests
             paste.Undo();
             fp.last.GenerateImage().Save("tests/FilterTests/nachPasteUndo.png");
         }
-        public static void SaveFieldPlan(FieldParameters fp, string path)
+        public static void SaveFieldPlan(IDominoProvider fp, string path)
         {
             FileStream fs = new FileStream(path, FileMode.Create);
             StreamWriter sw = new StreamWriter(fs); 
