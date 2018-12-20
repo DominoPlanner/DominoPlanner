@@ -38,34 +38,12 @@ namespace DominoPlanner.Core
         }
         public GenStructHelper GenerateStructure(int sWidth, int sHeight)
         {
-            List<IDominoShape> DominoList = new List<IDominoShape>();
             GenStructHelper g = new GenStructHelper() // Initialize GenStructHelper with final size.
             {
                 width = cells[0, 0].width + cells[1, 1].width * sWidth + cells[2, 2].width,
                 height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
             };
-            for (int y = -1; y < sHeight + 1; y++)
-            {
-                for (int x = -1; x < sWidth + 1; x++)
-                {
-                    try
-                    {
-                        DominoList.AddRange(
-                            (cells[(x == -1) ? 0 : ((x == sWidth) ? 2 : 1), (y == -1) ? 0 : ((y == sHeight) ? 2 : 1)]
-                            .TransformDefinition(
-                                (x == -1) ? 0 : (cells[1, 1].width * x + cells[0, 0].width),
-                                (y == -1) ? 0 : (cells[1, 1].height * y + cells[0, 0].height),
-                                x, y, sWidth, sHeight))
-                            .dominoes);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Caught: " + e);
-                    }
-                    
-                }
-            }
-            g.dominoes = DominoList.ToArray();
+            g.dominoes = getNewShapes(sWidth, sHeight);
             g.HasProtocolDefinition = hasProcotolDefinition;
             int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;

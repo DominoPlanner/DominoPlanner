@@ -16,7 +16,7 @@ namespace DominoPlanner.Core
     /// Stellt die Methoden und Eigenschaften zum Erstellen und Bearbeiten eines Feldes zur Verfügung.
     /// </summary>
     [ProtoContract]
-    public partial class FieldParameters : IDominoProvider, ICountTargetable, ICopyPasteable, IRowColumnAddableDeletable
+    public partial class FieldParameters : IDominoProvider, ICountTargetable
     {
         #region public properties
         public int TargetCount
@@ -274,24 +274,7 @@ namespace DominoPlanner.Core
         }
         internal override void GenerateShapes()
         {
-            IDominoShape[] array = new IDominoShape[length * height];
-
-            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
-            {
-                for (int yi = 0; yi < height; yi++)
-                {
-                    RectangleDomino shape = new RectangleDomino()
-                    {
-                        x = (b + a) * xi,
-                        y = (c + d) * yi,
-                        width = b,
-                        height = c,
-                        position = new ProtocolDefinition() { x = xi, y = yi }
-                    };
-                    array[length * yi + xi] = shape;
-                }
-            });
-            shapes = array;
+            shapes = getNewShapes(length, height);
             shapesValid = true;
             usedColorsValid = false;
         }

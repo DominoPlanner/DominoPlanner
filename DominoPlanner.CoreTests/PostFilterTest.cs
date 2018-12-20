@@ -39,15 +39,14 @@ namespace DominoPlanner.CoreTests
             s.Generate().GenerateImage().Save("tests/StructureFilterTests/vorFilter.png");
             InsertRowStructureTest(s);
             DeleteRowStructureTest(s);
-            CopyPasteFieldTest(s);
-            //InsertColumnFieldTest(s);
-            //DeleteColumnFieldTest(s);
+            InsertColumnStructureTest(s);
+            DeleteColumnStructureTest(s);
         }
         public static void InsertRowStructureTest(StructureParameters s)
         {
-            AddRows addRows = new AddRows(s, 40, 2, 5, true);
+            AddRows addRows = new AddRows(s, 40, 2, 1, true);
             addRows.Apply();
-            AddRows addRows2 = new AddRows(s, 40, 2, 5, false);
+            AddRows addRows2 = new AddRows(s, 1500, 2, 5, false);
             addRows2.Apply();
             s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowEinfügen.png");
             SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachRowEinfuegen.html");
@@ -55,14 +54,36 @@ namespace DominoPlanner.CoreTests
             addRows.Undo();
             s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowEinfügenUndo.png");
         }
+        public static void InsertColumnStructureTest(StructureParameters s)
+        {
+            AddColumns addColumns = new AddColumns(s, 40, 2, 1, true);
+            addColumns.Apply();
+            AddColumns addColumns2 = new AddColumns(s, 1500, 2, 5, false);
+            addColumns2.Apply();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachColumnEinfügen.png");
+            SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachColumnEinfuegen.html");
+            addColumns2.Undo();
+            addColumns.Undo();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachColumnEinfügenUndo.png");
+        }
         public static void DeleteRowStructureTest(StructureParameters s)
         {
-            DeleteRow deleteRow = new DeleteRow(s, new int[] { 40, 200, 500});
+            DeleteRows deleteRow = new DeleteRows(s, new int[] { 40, 200, 500});
             deleteRow.Apply();
             s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowLöschen.png");
             SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachRowLöschen.html");
             deleteRow.Undo();
             s.last.GenerateImage().Save("tests/StructureFilterTests/nachRowLoeschenUndo.png");
+
+        }
+        public static void DeleteColumnStructureTest(StructureParameters s)
+        {
+            DeleteColumns deleteColumn = new DeleteColumns(s, new int[] { 40, 200, 500 });
+            deleteColumn.Apply();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachColumnLöschen.png");
+            SaveFieldPlan(s, "tests/StructureFilterTests/FeldplanNachColumnLöschen.html");
+            deleteColumn.Undo();
+            s.last.GenerateImage().Save("tests/StructureFilterTests/nachColumnLoeschenUndo.png");
 
         }
         public static void CopyPasteFieldTest(StructureParameters s)
@@ -94,7 +115,7 @@ namespace DominoPlanner.CoreTests
         }
         public static void DeleteRowFieldTest(FieldParameters fp)
         {
-            DeleteRow deleteRow = new DeleteRow(fp, (new int[] { 0, fp.current_height -1 }).Select(x => x * fp.current_width).ToArray());
+            DeleteRows deleteRow = new DeleteRows(fp, (new int[] { 0, fp.current_height -1 }).Select(x => x * fp.current_width).ToArray());
             deleteRow.Apply();
             fp.last.GenerateImage().Save("tests/FilterTests/nachRowLöschen.png");
             SaveFieldPlan(fp, "tests/FilterTests/FeldplanNachRowLöschen.html");
@@ -116,7 +137,7 @@ namespace DominoPlanner.CoreTests
         }
         public static void DeleteColumnFieldTest(FieldParameters fp)
         {
-            DeleteColumn deleteCol = new DeleteColumn(fp, (new int[] { 0, 1, 2, 3, 5, 7, 15 }));
+            DeleteColumns deleteCol = new DeleteColumns(fp, (new int[] { 0, 1, 2, 3, 5, 7, 15, 16, 17, 18 }));
             deleteCol.Apply();
             fp.last.GenerateImage().Save("tests/FilterTests/nachColLöschen.png");
             SaveFieldPlan(fp, "tests/FilterTests/FeldplanNachColLöschen.html");
@@ -160,6 +181,7 @@ namespace DominoPlanner.CoreTests
                 textRegex = "%count% %color%",
                 title = "Field"
             }));
+            fs.Close();
         }
     }
 }
