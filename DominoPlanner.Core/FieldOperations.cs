@@ -6,147 +6,115 @@ using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
 {
-    public class ChangeDimensionOperation<T> : HistoryTree<T> where T : FieldParameters
+    public partial class FieldParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
-        public int length;
-        public int width;
-        public override void execute(T input)
+        int _current_width;
+        public int current_width { get => _current_width; set => _current_width = value; }
+        public int current_height { get => last.length / _current_width; set { } }
+        public bool IsValidPastePosition(int source_position, int target_position)
         {
-            input.length = length;
-            input.height = width;
+            return true;
         }
-        public ChangeDimensionOperation(HistoryTree<T> history) : base(history)
+        public int[] GetValidPastePositions(int source_position)
         {
-            icon_path = "icons/stuff";
+            return Enumerable.Range(0, last.length).ToArray();
         }
-    }
-    public class ChangeMarginOperation<T> : HistoryTree<T> where T : FieldParameters
-    {
-        public int a;
-        public int b;
-        public int c;
-        public int d;
-        public override void execute(T input)
+        public int[] PasteTarget(int reference, int[] source_domain, int target_reference)
         {
-            input.a = a;
-            input.b = b;
-            input.c = c;
-            input.d = d;
-        }
-        public ChangeMarginOperation(HistoryTree<T> history) : base(history)
-        {
-
-        }
-    }
-    public class AddRowsOperation<T> : NeedsFinalizationOperation<T> where T : FieldParameters
-    {
-        public int index;
-        public int rows;
-        public int color_new;
-        public override void executeInternal(T input)
-        {
-            throw new NotImplementedException();
-            /*input.Generate();
-            input.height = (input.height + rows);
-            input.GenerateShapes();
-            int[] field = new int[input.length * (input.height + rows)];
-            for (int yi = 0; yi < input.height+rows; yi++)
+            int colshift = target_reference % current_width - reference % current_width;
+            int rowshift = target_reference / current_width - reference / current_width;
+            int[] target_domain = new int[source_domain.Length];
+            for (int i = 0; i < source_domain.Length; i++)
             {
-                for (int xi = 0; xi < input.length; xi++)
+                //shapes[length * yi + xi]
+                int row = source_domain[i] / current_width;
+                int col = source_domain[i] % current_width;
+                target_domain[i] = (row + rowshift) * (current_width) + (col + colshift);
+            }
+            return target_domain;
+        }
+
+        public PositionWrapper getPositionFromIndex(int index)
+        {
+            return new PositionWrapper() { X = index % current_width, Y = index / current_width, CountInsideCell = 0 };
+        }
+
+        public int getIndexFromPosition(PositionWrapper wrapper)
+        {
+            return wrapper.X + current_width * wrapper.Y;
+        }
+
+        public int getIndexFromPosition(int row, int col, int index, bool swap_coords = false)
+        {
+            return getIndexFromPosition(row, col, index, current_width, current_height, swap_coords);
+        }
+
+        public int getIndexFromPosition(int row, int col, int index, int new_width, int new_height, bool swap_coords = false)
+        {
+            return swap_coords ? row + new_width * col : col + new_width * row;
+        }
+
+        public void copyGroup(IDominoShape[] target, 
+            int source_x, int source_y, int target_x, int target_y, int target_width, int target_height)
+        {
+            if (source_x >= 0 && source_x < current_width && source_y >= 0 && source_y < current_height)
+            {
+                if (target_x >= 0 && target_x < target_width && target_y >= 0 && target_y < target_height)
                 {
-                    if (yi < index)
-                    {
-                        field[input.height * xi + yi] = input.last.shapes[input.height * xi + yi];
-                    }
-                    else if (yi < index + rows)
-                    {
-                        field[input.height * xi + yi] = color_new;
-                    }
-                    else
-                    {
-                        field[input.height * xi + yi] = input.last.dominoes[input.height * xi + (yi - rows)];
-                    }
+                    int target_index = getIndexFromPosition(target_y, target_x, 0, target_width, target_height);
+                    int source_index = getIndexFromPosition(source_y, source_x, 0);
+                    target[target_index].color = this.last.shapes[source_index].color;
                 }
             }
-            input.lastValid = true;*/
             
         }
-        public AddRowsOperation(HistoryTree<T> history) : base(history)
-        {
 
-        }
-    }
-    public class AddColumnsOperation<T> : NeedsFinalizationOperation<T> where T : FieldParameters
-    {
-        public int index;
-        public int columns;
-        public int color_new;
-        public override void executeInternal(T input)
+        public IDominoShape[] getNewShapes(int length, int height)
         {
-            
-            input.Generate();
-            input.length = (input.height + columns);
-            input.GenerateShapes();
-            int[] field = new int[(input.length + columns) * (input.height)];
-            for (int yi = 0; yi < input.height; yi++)
+            IDominoShape[] array = new IDominoShape[length * height];
+
+            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
             {
-                for (int xi = 0; xi < input.length + columns; xi++)
+                for (int yi = 0; yi < height; yi++)
                 {
-                    if (xi < index)
+                    RectangleDomino shape = new RectangleDomino()
                     {
-                        field[input.height * xi + yi] = input.last.shapes[input.height * xi + yi].color;
-                    }
-                    else if (xi < index + columns)
-                    {
-                        field[input.height * xi + yi] = color_new;
-                    }
-                    else
-                    {
-                        field[input.height * xi + yi] = input.last.shapes[input.height * (xi - columns) + yi].color;
-                    }
+                        x = (b + a) * xi,
+                        y = (c + d) * yi,
+                        width = b,
+                        height = c,
+                        position = new ProtocolDefinition() { x = xi, y = yi }
+                    };
+                    array[length * yi + xi] = shape;
                 }
-            }
-            input.lastValid = true;
+            });
+            return array;
         }
-        public AddColumnsOperation(HistoryTree<T> history) : base(history)
-        {
 
-        }
-    }
-    public class ReplaceColorOperation<T> : NeedsFinalizationOperation<T> where T : IDominoProvider
-    {
-        public int[] indices;
-        public int color_old;
-        public int color_new;
-        public override void executeInternal(T input)
+        public int[] ExtractRowColumn(bool column, int index)
         {
-            input.Generate();
-            foreach (int index in indices)
+            int[] result = new int[getLengthOfTypicalRowColumn(column)];
+            for (int i = 0; i < result.Length; i++)
             {
-                if (input.last.shapes[index].color == color_old) input.last.shapes[index].color = color_new;
+                result[i] = last.shapes[getIndexFromPosition(index, i, 0, column)].color;
             }
+            return result;
         }
-        public ReplaceColorOperation(HistoryTree<T> history) : base(history)
-        {
 
-        }
-    }
-    public class SetColorOperation<T> : NeedsFinalizationOperation<T> where T: IDominoProvider
-    {
-        public int[] indices;
-        public int color_old;
-        public int color_new;
-        public override void executeInternal(T input)
+        public void ReinsertRowColumn(int[] rowcolumn, bool column, int index, IDominoShape[] target, int target_width, int target_height)
         {
-            input.Generate();
-            foreach (int index in indices)
+            for (int i = 0; i < rowcolumn.Length; i++)
             {
-                input.last.shapes[index].color = color_new;
+                int targetindex = getIndexFromPosition(index, i, 0, target_width, target_height, column);
+                target[targetindex].color
+                    = rowcolumn[i];
             }
         }
-        public SetColorOperation(HistoryTree<T> history) : base(history)
-        {
 
+        public int getLengthOfTypicalRowColumn(bool column)
+        {
+            return column ? current_height : current_width;
         }
+
     }
 }

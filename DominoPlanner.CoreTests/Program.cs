@@ -25,7 +25,7 @@ namespace DominoPlanner.CoreTests
             Thread.Sleep(500);
             Workspace.Instance.root_path = Path.GetFullPath("tests");
             Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
-
+            PostFilterTests.PostFilterTest("bird.jpg");
             //TreeTests.TreeTest();
             //HistoryTreeFieldTest("tests/NewField.jpg");
             /*try
@@ -44,7 +44,7 @@ namespace DominoPlanner.CoreTests
             //CircleTest("bird.jpg");
             //for (int i = 0; i < 1; i++)
             //SpiralTest("bird.jpg");
-            WallTest("bird.jpg");
+            //WallTest("bird.jpg");
             //ColorRepoSaveTest();
             //FieldTest("bird.jpg");
             //
@@ -447,9 +447,9 @@ namespace DominoPlanner.CoreTests
                 ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
             FieldParameters state = p.current.getState();
             state.Generate().GenerateImage(2000, false).Save("Tests/before_resize");
-            ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};
-            p.current = dims;
-            p.current.getState().Generate().GenerateImage(2000, false).Save("Tests/after_resize");
+            //ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};
+            //p.current = dims;
+            //p.current.getState().Generate().GenerateImage(2000, false).Save("Tests/after_resize");
         }
         public static async Task<long> OpenCVTest(string path, int threads)
         {
