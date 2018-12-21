@@ -20,7 +20,7 @@ namespace DominoPlanner.Usage
             Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
             if (Properties.Settings.Default.FirstStartup)
             {
-                Properties.Settings.Default.StandardColorArray = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "dominoes.dcol");
+                Properties.Settings.Default.StandardColorArray = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "colors.DColor");
                 Properties.Settings.Default.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner");
                 Properties.Settings.Default.OpenProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "OpenProjects.xml");
                 Directory.CreateDirectory(Path.GetDirectoryName(Properties.Settings.Default.StandardColorArray));
@@ -154,7 +154,7 @@ namespace DominoPlanner.Usage
         {
             ProjectComposite clickedValue = (ProjectComposite)sender;
             if (clickedValue.ActType == NodeType.ColorListNode)
-                Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath, new ColorListControlVM()));
+                Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath, new ColorListControlVM(clickedValue.FilePath)));
             else if (clickedValue.ActType == NodeType.FieldNode || clickedValue.ActType == NodeType.StructureNode || clickedValue.ActType == NodeType.FreeHandFieldNode)
                 Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath));
 

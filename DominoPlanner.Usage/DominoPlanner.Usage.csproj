@@ -110,6 +110,8 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BindingProxy.cs" />
+    <Compile Include="ColorListEntry.cs" />
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="DominoInCanvas.cs" />
     <Compile Include="DominoStone.cs" />

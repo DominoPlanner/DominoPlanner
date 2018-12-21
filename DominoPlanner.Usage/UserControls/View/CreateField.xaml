@@ -72,12 +72,6 @@
             </Grid>
             <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
         </Grid>
-        <Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
-                <Label Content="Save Field" />
-            </StackPanel>
-        </Button>
         <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />

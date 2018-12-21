@@ -19,8 +19,7 @@ namespace DominoPlanner.Usage
             SaveStandardPath = new RelayCommand(o => { SaveStandard(); });
             ClearList = new RelayCommand(o => { ClearListMet(); });
             standardpath = Properties.Settings.Default.StandardProjectPath;
-            //ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);
-            ColorVM = new ColorListControlVM();
+            ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);
         }
 
         #region prop
@@ -75,20 +74,20 @@ namespace DominoPlanner.Usage
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.InitialDirectory = ColorVM.Path;
-                openFileDialog.Filter = "domino color files (*.dcol)|*.dcol|All files (*.*)|*.*";
+                openFileDialog.InitialDirectory = ColorVM.FilePath;
+                openFileDialog.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
             }
             catch (Exception) { }
             
             if (openFileDialog.ShowDialog() == true)
             {
-                ColorVM.Path = openFileDialog.FileName;
+                ColorVM.Reload(openFileDialog.FileName);
             }
         }
 
         private void ClearListMet()
         {
-            ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);
+            ColorVM.ResetList();
         }
         #endregion
 

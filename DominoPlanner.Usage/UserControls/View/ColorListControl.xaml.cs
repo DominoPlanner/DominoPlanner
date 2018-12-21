@@ -1,6 +1,8 @@
 ﻿using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +30,7 @@ namespace DominoPlanner.Usage.UserControls.View
         public ColorListControl(ColorListControlVM clcvm)
         {
             DataContext = clcvm;
+            
         }
 
         private void Color_Delete(object sender, RoutedEventArgs e)
@@ -35,19 +38,68 @@ namespace DominoPlanner.Usage.UserControls.View
             System.Diagnostics.Debug.WriteLine("Delete!");
         }
 
-        private void Color_Edit(object sender, RoutedEventArgs e)
-        {
+        public static readonly DependencyProperty BindableColumnsProperty = DependencyProperty.RegisterAttached("BindableColumns", typeof(ObservableCollection<DataGridColumn>), typeof(ColorListControl), new UIPropertyMetadata(null, BindableColumnsPropertyChanged));
 
+        private static void BindableColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            DataGrid dataGrid = source as DataGrid;
+            ObservableCollection<DataGridColumn> columns = e.NewValue as ObservableCollection<DataGridColumn>;
+            if (columns == null) return;
+            foreach (DataGridColumn column in columns)
+            {
+                try
+                {
+                    dataGrid.Columns.Add(column);
+                }catch(ArgumentException ex)
+                {
+
+                }
+            }
+
+            columns.CollectionChanged += (sender, e2) =>
+            {
+                NotifyCollectionChangedEventArgs ne = e2 as NotifyCollectionChangedEventArgs;
+                switch (ne.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        if (ne.NewItems != null)
+                        {
+                            foreach (DataGridColumn column in ne.NewItems)
+                            {
+                                dataGrid.Columns.Add(column);
+                            }
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        if (ne.OldItems != null)
+                        {
+                            foreach (DataGridColumn column in ne.OldItems)
+                            {
+                                dataGrid.Columns.Remove(column);
+                            }
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        while (dataGrid.Columns.Count > 3)
+                        {
+                            dataGrid.Columns.RemoveAt(3);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            };
         }
 
-        private void Color_MoveUp(object sender, RoutedEventArgs e)
+            
+        public static void SetBindableColumns(DependencyObject element, ObservableCollection<DataGridColumn> value)
         {
-
+            element.SetValue(BindableColumnsProperty, value);
         }
 
-        private void Color_MoveDown(object sender, RoutedEventArgs e)
+        public static ObservableCollection<DataGridColumn> GetBindableColumns(DependencyObject element)
         {
-
+            return (ObservableCollection<DataGridColumn>)element.GetValue(BindableColumnsProperty);
         }
     }
 }

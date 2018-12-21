@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage
             try
             {
                 openFileDialog.InitialDirectory = sPath;
-                openFileDialog.Filter = "domino color files (*.dpcol)|*.dcol|All files (*.*)|*.*";
+                openFileDialog.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
             }
             catch (Exception) { }
 

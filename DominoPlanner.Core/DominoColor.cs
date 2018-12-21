@@ -18,23 +18,54 @@ namespace DominoPlanner.Core
         [ProtoMember(3, DataFormat = DataFormat.FixedSize)]
         private String ColorSerialized
         {
-            get {
+            get
+            {
                 return mediaColor.ToString();
-                
+
             }
-            set { mediaColor = (Color)ColorConverter.ConvertFromString(value);}
+            set { mediaColor = (Color)ColorConverter.ConvertFromString(value); }
         }
         internal Emgu.CV.Structure.Lab labColor;
         public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
         private Color _mediacolor;
-        public Color mediaColor { get { return _mediacolor; }
-            set { _mediacolor = value; labColor = value.ToLab(); } }
+        public Color mediaColor
+        {
+            get { return _mediacolor; }
+            set { _mediacolor = value; labColor = value.ToLab(); PropertyChanged?.Invoke(this, "mediaColor"); }
+        }
+        private int _count;
         [ProtoMember(2)]
-        public virtual int count { get; set; }
+        public virtual int count
+        {
+            get { return _count; }
+            set
+            {
+                if (_count != value)
+                {
+                    _count = value;
+                    PropertyChanged?.Invoke(this, "count");
+                }
+            }
+        }
+
+        private string _name;
         [ProtoMember(1)]
-        public string name { get; set; }
+        public string name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    PropertyChanged?.Invoke(this, "name");
+                }
+            }
+        }
         public virtual bool show { get { return count != 0; } }
         public abstract XElement Save();
+
+        public event EventHandler<string> PropertyChanged;
     }
     [ProtoContract]
     public class EmptyDomino : IDominoColor
@@ -63,7 +94,7 @@ namespace DominoPlanner.Core
             name = "[empty]";
         }
     }
-    [ProtoContract(SkipConstructor =true)]
+    [ProtoContract(SkipConstructor = true)]
     public class DominoColor : IDominoColor
     {
         public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
@@ -99,11 +130,11 @@ namespace DominoPlanner.Core
                 new XAttribute("b", mediaColor.B));
         }
     }
-    [ProtoContract(SkipConstructor =true)]
+    [ProtoContract(SkipConstructor = true)]
     public class ColorRepository : IWorkspaceLoadable
     {
         [ProtoMember(3)]
-        public List<int> Anzeigeindizes;
+        public ObservableCollection<int> Anzeigeindizes;
         [ProtoMember(2)]
         public List<DominoColor> colors; //todo - nur vorrübergehend public
         [ProtoMember(1)]
@@ -133,12 +164,12 @@ namespace DominoPlanner.Core
         public void Add(DominoColor color)
         {
             colors.Add(color);
-            Anzeigeindizes.Add((Anzeigeindizes.Count == 0) ? 0 : Anzeigeindizes.Max() +1);
+            Anzeigeindizes.Add((Anzeigeindizes.Count == 0) ? 0 : Anzeigeindizes.Max() + 1);
         }
         public ColorRepository()
         {
             first = new EmptyDomino();
-            Anzeigeindizes = new List<int>();
+            Anzeigeindizes = new ObservableCollection<int>();
             colors = new List<DominoColor>();
         }
         public void MoveUp(DominoColor color)
@@ -161,7 +192,8 @@ namespace DominoPlanner.Core
         }
         public IEnumerable<IDominoColor> SortedRepresentation
         {
-            get {
+            get
+            {
                 var list = new List<IDominoColor>();
                 list.Add(first);
                 list.AddRange(colors);
@@ -184,7 +216,11 @@ namespace DominoPlanner.Core
         }
         public void Save(string path)
         {
-            
+            using (var file = new FileStream(path, FileMode.Create))
+            {
+                Serializer.Serialize<ColorRepository>(file, this);
+            }
+            return;
             path = Workspace.Instance.MakePathAbsolute(path);
             using (var file = new FileStream(path, FileMode.Create))
             {

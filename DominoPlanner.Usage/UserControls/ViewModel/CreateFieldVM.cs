@@ -1,11 +1,9 @@
 ﻿using DominoPlanner.Core;
 using DominoPlanner.Usage.HelperClass;
-using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
 using System.Linq;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -19,11 +17,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             
-            fParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-            
-            iResizeMode = (int)fParameters.resizeMode;
-            iColorApproxMode = (int)fParameters.colorMode.colorComparisonMode;
-            iDiffusionMode = (int)fParameters.ditherMode.Mode;
+            fieldParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+
+            //fieldParameters =  Workspace.Load<FieldParameters>(FilePath);
+
+            iResizeMode = (int)fieldParameters.resizeMode;
+            iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;
+            iDiffusionMode = (int)fieldParameters.ditherMode.Mode;
 
             ReloadSizes();
 
@@ -35,7 +35,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        FieldParameters fParameters;
+        FieldParameters fieldParameters;
         DominoTransfer dominoTransfer;
         #endregion
 
@@ -88,11 +88,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                    fieldParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
                 }
                 else
                 {
-                    fParameters.IterationInformation = new NoColorRestriction();
+                    fieldParameters.IterationInformation = new NoColorRestriction();
                 }
                 updateField();
             }
@@ -100,7 +100,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
+                    fieldParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
                     updateField();
                 }
             }
@@ -108,7 +108,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    ((IterativeColorRestriction)fParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
+                    ((IterativeColorRestriction)fieldParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
                     updateField();
                 }
             }
@@ -179,8 +179,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_iResizeMode != value)
                 {
                     _iResizeMode = value;
-                    fParameters.resizeMode = (Inter)value;
-                    sResizeMode = fParameters.resizeMode.ToString();
+                    fieldParameters.resizeMode = (Inter)value;
+                    sResizeMode = fieldParameters.resizeMode.ToString();
                     RaisePropertyChanged();
                     updateField();
                 }
@@ -199,19 +199,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     switch (value)
                     {
                         case 0:
-                            fParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
+                            fieldParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
                             sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
                             break;
                         case 1:
-                            fParameters.colorMode = ColorDetectionMode.CmcComparison;
+                            fieldParameters.colorMode = ColorDetectionMode.CmcComparison;
                             sColorApproxMode = "CMC (l:c) Comparison";
                             break;
                         case 2:
-                            fParameters.colorMode = ColorDetectionMode.Cie94Comparison;
+                            fieldParameters.colorMode = ColorDetectionMode.Cie94Comparison;
                             sColorApproxMode = "CIE-94 Comparison (DIN 99)";
                             break;
                         case 3:
-                            fParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
+                            fieldParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
                             sColorApproxMode = "CIE-E-2000 Comparison";
                             break;
                         default:
@@ -236,19 +236,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         case DitherMode.NoDithering:
                             sDiffusionMode = "NoDiffusion";
-                            fParameters.ditherMode = new Dithering();
+                            fieldParameters.ditherMode = new Dithering();
                             break;
                         case DitherMode.FloydSteinberg:
                             sDiffusionMode = "Floyd/Steinberg Dithering";
-                            fParameters.ditherMode = new FloydSteinbergDithering();
+                            fieldParameters.ditherMode = new FloydSteinbergDithering();
                             break;
                         case DitherMode.JarvisJudiceNinke:
                             sDiffusionMode = "Jarvis/Judice/Ninke Dithering";
-                            fParameters.ditherMode = new JarvisJudiceNinkeDithering();
+                            fieldParameters.ditherMode = new JarvisJudiceNinkeDithering();
                             break;
                         case DitherMode.Stucki:
                             sDiffusionMode = "Stucki Dithering";
-                            fParameters.ditherMode = new StuckiDithering();
+                            fieldParameters.ditherMode = new StuckiDithering();
                             break;
                         default:
                             break;
@@ -261,7 +261,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
         private void updateField()
         {
-            dominoTransfer = fParameters.Generate(progress);
+            dominoTransfer = fieldParameters.Generate(progress);
             CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
         }
         #endregion
@@ -281,7 +281,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                fParameters.Save(FilePath);
+                fieldParameters.Save(FilePath);
                 return true;
             }
             catch (Exception)
@@ -295,28 +295,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             bool important = false;
             if (e.PropertyName.Equals("FieldSize"))
             {
-                fParameters.TargetCount = fsvm.FieldSize;
+                fieldParameters.TargetCount = fsvm.FieldSize;
                 important = true;
             }
             else if (e.PropertyName.Equals("Length"))
             {
-                fParameters.length = (int)fsvm.Length;
+                fieldParameters.length = (int)fsvm.Length;
                 if (fsvm.BindSize)
                 {
-                    double fieldWidth = fsvm.Length * (fParameters.a + fParameters.b);
-                    double stoneHeightWidhSpace = fParameters.c + fParameters.d;
-                    fParameters.height = (int)(fieldWidth / (double)fParameters.image_filtered.Size.Width * fParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
+                    double fieldWidth = fsvm.Length * (fieldParameters.a + fieldParameters.b);
+                    double stoneHeightWidhSpace = fieldParameters.c + fieldParameters.d;
+                    fieldParameters.height = (int)(fieldWidth / (double)fieldParameters.image_filtered.Size.Width * fieldParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
                 }
                 important = true;
             }
             else if (e.PropertyName.Equals("Height"))
             {
-                fParameters.height = (int)fsvm.Height;
+                fieldParameters.height = (int)fsvm.Height;
                 if (fsvm.BindSize)
                 {
-                    double fieldHeight = fsvm.Height * (fParameters.c + fParameters.d);
-                    double stoneWidthWidthSpace = fParameters.a + fParameters.b;
-                    fParameters.length = (int)(fieldHeight / (double)fParameters.image_filtered.Size.Height * fParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
+                    double fieldHeight = fsvm.Height * (fieldParameters.c + fieldParameters.d);
+                    double stoneWidthWidthSpace = fieldParameters.a + fieldParameters.b;
+                    fieldParameters.length = (int)(fieldHeight / (double)fieldParameters.image_filtered.Size.Height * fieldParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
                 }
                 important = true;
             }
@@ -347,17 +347,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (fsvm.Vertical)
             {
-                fParameters.a = fsvm.SelectedItem.Sizes.d;
-                fParameters.b = fsvm.SelectedItem.Sizes.c;
-                fParameters.c = fsvm.SelectedItem.Sizes.b;
-                fParameters.d = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.a = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.b = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.c = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.d = fsvm.SelectedItem.Sizes.a;
             }
             else
             {
-                fParameters.a = fsvm.SelectedItem.Sizes.a;
-                fParameters.b = fsvm.SelectedItem.Sizes.b;
-                fParameters.c = fsvm.SelectedItem.Sizes.c;
-                fParameters.d = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.a = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.b = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.c = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.d = fsvm.SelectedItem.Sizes.d;
             }
         }
 
@@ -371,11 +371,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void ReloadSizes()
         {
             fsvm.PropertyChanged -= CreateFieldVM_PropertyChanged;
-            fsvm.FieldSize = fParameters.height * fParameters.length;
-            fsvm.Length = fParameters.length;
-            fsvm.Height = fParameters.height;
+            fsvm.FieldSize = fieldParameters.height * fieldParameters.length;
+            fsvm.Length = fieldParameters.length;
+            fsvm.Height = fieldParameters.height;
 
-            Sizes currentSize = new Sizes(fParameters.a, fParameters.b, fParameters.c, fParameters.d);
+            Sizes currentSize = new Sizes(fieldParameters.a, fieldParameters.b, fieldParameters.c, fieldParameters.d);
             bool found = false;
             foreach (StandardSize sSize in fsvm.field_templates)
             {
@@ -421,7 +421,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(fParameters);
+            protocolV.DataContext = new ProtocolVM(fieldParameters);
             protocolV.ShowDialog();
         }
         #endregion
