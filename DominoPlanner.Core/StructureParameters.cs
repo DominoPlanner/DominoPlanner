@@ -51,6 +51,8 @@ namespace DominoPlanner.Core
                 }
                 __structureDefXML = value.ToString();
                 shapesValid = false;
+                // calculate and set characteristic lengths for Dithering
+                charLength = (int)(Math.Sqrt((cells[1, 1].width * cells[1, 1].height)/cells[1,1].Count) * 1.5d);
             }
         }
         private int _length;

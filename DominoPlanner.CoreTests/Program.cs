@@ -41,10 +41,10 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            CircleTest("bird.jpg");
+            //CircleTest("gre.jpg");
             //for (int i = 0; i < 1; i++)
-            SpiralTest("bird.jpg");
-            //WallTest("bird.jpg");
+            //SpiralTest("gre.jpg");
+            WallTest("gre.jpg");
             //ColorRepoSaveTest();
             //FieldTest("bird.jpg");
             //
@@ -278,7 +278,7 @@ namespace DominoPlanner.CoreTests
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             SpiralParameters p = new SpiralParameters(path, 50, "colors.DColor", 
-                ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new FloydSteinbergDithering(), AverageMode.Corner, new NoColorRestriction());
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -332,11 +332,11 @@ namespace DominoPlanner.CoreTests
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             CircleParameters p = new CircleParameters(path, 150, "colors.DColor",
-                ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new FloydSteinbergDithering(), AverageMode.Corner, new NoColorRestriction());
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
             p.StartDiameter = 200;
-            p.ditherMode = new Dithering();
+            p.ditherMode = new FloydSteinbergDithering();
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -387,12 +387,12 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(6), 30000, 
+            StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(1), 30000, 
                 "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
-
+            sr.Close();
             //DominoTransfer t = p.Generate();
             //Console.WriteLine("Size: " + t.shapes.Count());
             watch.Stop();

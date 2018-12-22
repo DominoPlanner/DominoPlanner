@@ -89,7 +89,7 @@ namespace DominoPlanner.Core
             this.allowStretch = allowStretch;
             average = averageMode;
         }
-        public int charLength = 20;
+        public int charLength;
         protected GeneralShapesProvider() : base() { }
         #endregion
         #region public methods
@@ -170,6 +170,10 @@ namespace DominoPlanner.Core
                             weights[j] = ditherMode.Weight((center_x - orig_x) / charLength, (orig_y - center_y) / charLength);
                         }
                         var divisor = weights.Sum();
+                        if (divisor == 0)
+                        {
+
+                        }
                         for (int j = 0; j < result.Count; j++)
                         {
                             if (weights[j] == 0) continue;

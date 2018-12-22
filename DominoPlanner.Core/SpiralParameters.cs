@@ -32,6 +32,7 @@ namespace DominoPlanner.Core
             {
                 _dominoWidth = value;
                 shapesValid = false;
+                
             }
         }
         private int _dominoLength;
@@ -49,6 +50,7 @@ namespace DominoPlanner.Core
             {
                 _dominoLength = value;
                 shapesValid = false;
+                charLength = DominoLength + TangentialDistance;
             }
         }
 
@@ -67,6 +69,7 @@ namespace DominoPlanner.Core
             {
                 _tangentialDistance = value;
                 shapesValid = false;
+                charLength = DominoLength + TangentialDistance;
             }
         }
 

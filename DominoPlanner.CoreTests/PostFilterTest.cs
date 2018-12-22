@@ -35,7 +35,7 @@ namespace DominoPlanner.CoreTests
             StructureParameters s = new StructureParameters(path, xml.Elements().ElementAt(6), 3000,
                 "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
-
+            sr.Close();
             s.Generate().GenerateImage().Save("tests/StructureFilterTests/vorFilter.png");
             InsertRowStructureTest(s);
             DeleteRowStructureTest(s);
