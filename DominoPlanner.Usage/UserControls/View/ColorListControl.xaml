@@ -12,7 +12,6 @@
     <UserControl.Resources>
         <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
-        <parent:BoolVisibilityConverter x:Key="BoolVisibilityConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">

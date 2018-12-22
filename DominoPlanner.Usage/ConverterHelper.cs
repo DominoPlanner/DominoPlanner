@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace DominoPlanner.Usage
@@ -42,32 +43,6 @@ namespace DominoPlanner.Usage
                 return new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
 
             }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class BoolVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            
-            return System.Windows.Visibility.Collapsed;
-            if(value is bool visibility)
-            {
-                if (visibility)
-                {
-                    return System.Windows.Visibility.Visible;
-                }
-                else
-                {
-                    return System.Windows.Visibility.Hidden;
-                }
-            }
-            return System.Windows.Visibility.Hidden;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

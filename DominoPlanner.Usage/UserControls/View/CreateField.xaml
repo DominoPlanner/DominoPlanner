@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="720" MinWidth="850">
-    <Grid ShowGridLines="False">
+    <Grid ShowGridLines="False" Cursor="{Binding cursor, Delay=200}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="205"/>
@@ -42,7 +42,7 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="Pixel" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="5" Value="{Binding iResizeMode, Delay=500}" TickPlacement="BottomRight"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="5" Value="{Binding iResizeMode}" TickPlacement="BottomRight"/>
                     <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
                 <Label Grid.Row="3" Content="Color Approximation Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
@@ -54,11 +54,11 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="Fast" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode, Delay=500}" TickPlacement="BottomRight"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}" TickPlacement="BottomRight"/>
                     <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
                 <Label Grid.Row="6" Content="Diffusion Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Top" Margin="0,-2,0,0"/>
-                <Label Grid.Row="7" Content="{Binding sDiffusionMode, Delay=500}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Label Grid.Row="7" Content="{Binding sDiffusionMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 <Grid Grid.Row="8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
@@ -66,11 +66,34 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="None" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode, Delay=500}" TickPlacement="BottomRight"/>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}" TickPlacement="BottomRight"/>
                     <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
             </Grid>
-            <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="85"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
+                <Grid Grid.Row="1" Height="60">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Use Transparency" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Top" Height="31" Grid.RowSpan="2"/>
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="No" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                        <Slider Grid.Column="1" TickFrequency="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="255" Value="{Binding TransparencyValue}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="Full" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Grid>
         <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">

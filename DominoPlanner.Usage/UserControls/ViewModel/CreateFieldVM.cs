@@ -3,6 +3,8 @@ using DominoPlanner.Usage.HelperClass;
 using Emgu.CV.CvEnum;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -16,7 +18,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             this.FilePath = @"C:\Users\johan\Desktop\field.DObject"; ;
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
-            
+
+            filePath = @"C:\Users\johan\Desktop\DominoJOJO - todolist.png";
+
             fieldParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
             //fieldParameters =  Workspace.Load<FieldParameters>(FilePath);
@@ -24,6 +28,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             iResizeMode = (int)fieldParameters.resizeMode;
             iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;
             iDiffusionMode = (int)fieldParameters.ditherMode.Mode;
+            TransparencyValue = fieldParameters.TransparencySetting;
 
             ReloadSizes();
 
@@ -36,10 +41,34 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters;
-        DominoTransfer dominoTransfer;
+        private DominoTransfer _dominoTransfer;
+
+        public DominoTransfer dominoTransfer
+        {
+            get { return _dominoTransfer; }
+            set
+            {
+                _dominoTransfer = value;
+                refreshPlanPic();
+            }
+        }
         #endregion
 
         #region prope
+        private Cursor _cursorState;
+        public Cursor cursor
+        {
+            get { return _cursorState; }
+            set
+            {
+                if (_cursorState != value)
+                {
+                    _cursorState = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
         public override TabItemType tabType
         {
             get
@@ -223,6 +252,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private byte _TransparencyValue;
+        public byte TransparencyValue
+        {
+            get { return _TransparencyValue; }
+            set
+            {
+                if (_TransparencyValue != value)
+                {
+                    _TransparencyValue = value;
+                    fieldParameters.TransparencySetting = _TransparencyValue;
+                    updateField();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
         private int _iDiffusionMode = 1;
         public int iDiffusionMode
         {
@@ -258,11 +303,30 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        
-        private void updateField()
+
+        public System.Windows.Threading.Dispatcher dispatcher;
+        private void refreshPlanPic()
         {
-            dominoTransfer = fieldParameters.Generate(progress);
-            CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+            if (dispatcher == null)
+            {
+                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                cursor = null;
+            }
+            else
+            {
+                dispatcher.BeginInvoke((Action)(() =>
+                {
+                    CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                    cursor = null;
+                }));
+            }
+        }
+
+        private async void updateField()
+        {
+            cursor = Cursors.Wait;
+            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(progress));
+            dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(function);
         }
         #endregion
 
@@ -427,10 +491,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Commands
-
         private ICommand _BuildtoolsClick;
         public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
-
         #endregion
     }
 }
