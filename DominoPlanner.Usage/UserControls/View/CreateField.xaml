@@ -7,7 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="720" MinWidth="850">
-    <Grid ShowGridLines="False" Cursor="{Binding cursor, Delay=200}">
+    <Grid ShowGridLines="False" Cursor="{Binding cursor, Delay=200}" Background="#02FFFFFF">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="205"/>

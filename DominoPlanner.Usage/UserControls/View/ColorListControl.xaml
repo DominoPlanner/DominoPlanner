@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl"
              mc:Ignorable="d" 

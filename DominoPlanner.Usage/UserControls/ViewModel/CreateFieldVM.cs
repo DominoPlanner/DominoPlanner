@@ -13,15 +13,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class CreateFieldVM : TabBaseVM
     {
         #region CTOR
-        public CreateFieldVM(string filePath = "") : base()
+        public CreateFieldVM(string filePath) : base()
         {
-            this.FilePath = @"C:\Users\johan\Desktop\field.DObject"; ;
+            this.FilePath = filePath;
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
-
-            filePath = @"C:\Users\johan\Desktop\DominoJOJO - todolist.png";
-
-            fieldParameters = new FieldParameters(filePath, @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+            
+            fieldParameters = new FieldParameters(@"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png", @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
             //fieldParameters =  Workspace.Load<FieldParameters>(FilePath);
 
@@ -32,7 +30,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             ReloadSizes();
 
-            updateField();
+            refresh();
             UnsavedChanges = false;
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
         }
@@ -123,14 +121,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     fieldParameters.IterationInformation = new NoColorRestriction();
                 }
-                updateField();
+                refresh();
             }
             else if (e.PropertyName.Equals("Iterations"))
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     fieldParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
-                    updateField();
+                    refresh();
                 }
             }
             else if (e.PropertyName.Equals("Weight"))
@@ -138,7 +136,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((IterativeColorRestriction)fieldParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
-                    updateField();
+                    refresh();
                 }
             }
         }
@@ -211,7 +209,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     fieldParameters.resizeMode = (Inter)value;
                     sResizeMode = fieldParameters.resizeMode.ToString();
                     RaisePropertyChanged();
-                    updateField();
+                    refresh();
                 }
             }
         }
@@ -247,7 +245,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             break;
                     }
                     RaisePropertyChanged();
-                    updateField();
+                    refresh();
                 }
             }
         }
@@ -262,7 +260,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _TransparencyValue = value;
                     fieldParameters.TransparencySetting = _TransparencyValue;
-                    updateField();
+                    refresh();
                     RaisePropertyChanged();
                 }
             }
@@ -299,7 +297,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             break;
                     }
                     RaisePropertyChanged();
-                    updateField();
+                    refresh();
                 }
             }
         }
@@ -322,7 +320,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private async void updateField()
+        private async void refresh()
         {
             cursor = Cursors.Wait;
             Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(progress));
@@ -402,7 +400,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             if (important)
             {
-                updateField();
+                refresh();
                 ReloadSizes();
             }
         }
@@ -428,7 +426,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void Sizes_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             UpdateStoneSizes();
-            updateField();
+            refresh();
             ReloadSizes();
         }
 

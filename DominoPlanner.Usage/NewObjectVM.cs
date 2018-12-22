@@ -164,13 +164,11 @@ namespace DominoPlanner.Usage
                             MessageBox.Show("You forget to choose an image.", "Missing Values", MessageBoxButton.OK);
                             return;
                         }
-
+                        
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
                         File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
                         FieldParameters p = new FieldParameters(((AddFieldVM)CurrentViewModel).pImage, @"C:\Users\johan\Desktop\colors.DColor", ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
-                        DominoTransfer t = p.Generate(progress);
-                        //t.Save(); Was auch immer hier dann Übergeben werden kann und so
-                        
+                        p.Save(Path.Combine(this.ProjectPath, filename));
                         break;
                     case 1: //Free Field
                         internPictureName = "";

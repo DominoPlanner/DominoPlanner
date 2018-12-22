@@ -4,6 +4,7 @@ using System.Windows.Media.Imaging;
 using System.IO;
 using System.Xml.Linq;
 using System.Linq;
+using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -23,20 +24,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prop
-        private string _Path = @"C:\Users\johan\Dropbox\JoJoJo\Structures.xml";
-        public string Path
-        {
-            get { return _Path; }
-            set
-            {
-                if (_Path != value)
-                {
-                    _Path = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         private List<string> _list;
         public List<string> list
         {
@@ -90,7 +77,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _structure_index = value;
                     selectedStructureElement = structures.ElementAt(_structure_index);
                     RaisePropertyChanged();
-                    FillDescriptionImages();
                 }
             }
         }
@@ -132,15 +118,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private void FillDescriptionImages()
+        public void RefreshDescriptionImages(StructureParameters structureParameters)
         {
-            Core.ClusterStructureDefinition csd = new Core.ClusterStructureDefinition(structures.ElementAt(structure_index));
             description_imgs = new BitmapSource[9];
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    description_imgs[i + j * 3] = csd.DrawPreview(i, j, 50);
+                    description_imgs[i + j * 3] = structureParameters.DrawPreview(i, j, 50);
                 }
             }
             RaisePropertyChanged("description_imgs");

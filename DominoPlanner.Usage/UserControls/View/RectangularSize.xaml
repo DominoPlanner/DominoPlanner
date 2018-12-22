@@ -61,8 +61,8 @@
                                    Margin="1" Source="{Binding Path=description_imgs[8]}"/>
             </Border>
 
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sLength}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="20" Width="50"/>
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight}" Grid.Row="1" Grid.Column="3" Height="20" Margin="0,16,10,16"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding sLength, Delay=200}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="20" Width="50"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Grid.Row="1" Grid.Column="3" Height="20" Margin="0,16,10,16"/>
         </Grid>
     </Grid>
 </UserControl>

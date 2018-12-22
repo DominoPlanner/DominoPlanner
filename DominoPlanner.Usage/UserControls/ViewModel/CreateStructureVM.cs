@@ -2,6 +2,7 @@
 using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -11,18 +12,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class CreateStructureVM : TabBaseVM
     {
         #region CTOR
-        public CreateStructureVM(bool rectangular) : base()
+        public CreateStructureVM(string filePath, bool rectangular) : base()
         {
+            this.FilePath = filePath;
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             structureIsRectangular = rectangular;
             if (structureIsRectangular)
             {
                 CurrentViewModel = new RectangularSizeVM();
-                FilePath = @"C:\Users\johan\Desktop\colors.DObject";
                 structureParameters = Workspace.Load<StructureParameters>(FilePath);
-                /*structureParameters = new StructureParameters(@"c:\Users\johan\Pictures\Screenshots\Screenshot (5).png", CurrentViewModel.SelectedStructureElement, 1500,
-                    @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());*/
-
 
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
@@ -30,24 +28,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             else
             {
                 CurrentViewModel = new RoundSizeVM();
-                //SpiralParameters sp = Workspace.Load<SpiralParameters>(@"C:\Users\johan\Desktop\colors.DObject");
-                
-                structureParameters = new SpiralParameters(@"c:\Users\johan\Pictures\Screenshots\Screenshot (5).png", 50, @"C:\Users\Johan\Desktop\colors.Dcolor",
-                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-
-                ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
-
-                ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).NormalWidth;
-                ((RoundSizeVM)CurrentViewModel).dHeight = ((SpiralParameters)structureParameters).TangentialWidth;
-                ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).NormalDistance;
-                ((RoundSizeVM)CurrentViewModel).beDominoes = ((SpiralParameters)structureParameters).TangentialDistance;
-
-                /*structureParameters = new CircleParameters(@"c:\Users\johan\Pictures\Screenshots\Screenshot (5).png", 50, @"C:\Users\Johan\Desktop\colors.Dcolor",
-                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                ((RoundSizeVM)CurrentViewModel).dWidth = ((CircleParameters)structureParameters).NormalWidth;
-                ((RoundSizeVM)CurrentViewModel).dHeight = ((CircleParameters)structureParameters).TangentialWidth;
-                ((RoundSizeVM)CurrentViewModel).beLines = ((CircleParameters)structureParameters).NormalDistance;
-                ((RoundSizeVM)CurrentViewModel).beDominoes = ((CircleParameters)structureParameters).TangentialDistance;*/
+                structureParameters = Workspace.Load<SpiralParameters>(FilePath);
+                if (structureParameters is SpiralParameters sp)
+                {
+                    ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
+                }
+                else if (structureParameters is CircleParameters cp)
+                {
+                    ((RoundSizeVM)CurrentViewModel).Amount = cp.Circles;
+                }
+                ((RoundSizeVM)CurrentViewModel).dWidth = ((CircularStructure)structureParameters).DominoWidth;
+                ((RoundSizeVM)CurrentViewModel).dHeight = ((CircularStructure)structureParameters).DominoLength;
+                ((RoundSizeVM)CurrentViewModel).beLines = ((CircularStructure)structureParameters).NormalDistance;
+                ((RoundSizeVM)CurrentViewModel).beDominoes = ((CircularStructure)structureParameters).TangentialDistance;
             }
 
             allow_stretch = structureParameters.allowStretch;
@@ -55,6 +48,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             AverageArea = !SinglePixel;
             iDiffusionMode = (int)structureParameters.ditherMode.Mode;
             iColorApproxMode = (int)structureParameters.colorMode.colorComparisonMode;
+            TransparencyValue = structureParameters.TransparencySetting;
 
             CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
             draw_borders = true;
@@ -65,12 +59,79 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        public System.Windows.Threading.Dispatcher dispatcher;
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        RectangleDominoProvider structureParameters;
+        private GeneralShapesProvider _structureParameters;
+        private GeneralShapesProvider structureParameters
+        {
+            get { return _structureParameters; }
+            set
+            {
+                if (_structureParameters != value)
+                {
+                    _structureParameters = value;
+                    if (_structureParameters is StructureParameters sp)
+                    {
+                        if (CurrentViewModel is RectangularSizeVM rsvm)
+                        {
+                            rsvm.RefreshDescriptionImages(sp);
+                        }
+                    }
+                    if (structureParameters != null)
+                    {
+                        if (structureParameters.hasProcotolDefinition)
+                            VisibleFieldplan = Visibility.Visible;
+                        else
+                            VisibleFieldplan = Visibility.Hidden;
+                    }
+                }
+            }
+        }
         private bool structureIsRectangular;
+        private DominoTransfer _dominoTransfer;
+
+        private DominoTransfer dominoTransfer
+        {
+            get { return _dominoTransfer; }
+            set
+            {
+                _dominoTransfer = value;
+                refreshPlanPic();
+            }
+        }
         #endregion
 
         #region prop
+        private Cursor _cursorState;
+        public Cursor cursor
+        {
+            get { return _cursorState; }
+            set
+            {
+                if (_cursorState != value)
+                {
+                    _cursorState = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private byte _TransparencyValue;
+        public byte TransparencyValue
+        {
+            get { return _TransparencyValue; }
+            set
+            {
+                if (_TransparencyValue != value)
+                {
+                    _TransparencyValue = value;
+                    structureParameters.TransparencySetting = _TransparencyValue;
+                    Refresh();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         public override TabItemType tabType
         {
             get
@@ -184,6 +245,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_CurrentViewModel != value)
                 {
                     _CurrentViewModel = value;
+                    if (CurrentViewModel is RectangularSizeVM rsvm)
+                    {
+                        if (_structureParameters is StructureParameters sp)
+                        {
+                            rsvm.RefreshDescriptionImages(sp);
+                        }
+                    }
                     RaisePropertyChanged();
                 }
             }
@@ -326,6 +394,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
+        private void refreshPlanPic()
+        {
+            if (dispatcher == null)
+            {
+                CurrentViewModel.StrucSize = dominoTransfer.shapes.Count();
+                DestinationImage = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
+                cursor = null;
+            }
+            else
+            {
+                dispatcher.BeginInvoke((Action)(() =>
+                {
+                    CurrentViewModel.StrucSize = dominoTransfer.shapes.Count();
+                    DestinationImage = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
+                    cursor = null;
+                }));
+            }
+        }
         private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("OnlyUse"))
@@ -367,20 +453,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             throw new NotImplementedException();
         }
 
-        private void Refresh()
+        private async void Refresh()
         {
             try
             {
-                DominoTransfer t = structureParameters.Generate(progress);
-                CurrentViewModel.StrucSize = t.shapes.Count();
-                DestinationImage = ImageConvert.ToWriteableBitmap(t.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
-                if (structureParameters.hasProcotolDefinition)
-                    VisibleFieldplan = Visibility.Visible;
-                else
-                    VisibleFieldplan = Visibility.Hidden;
+                cursor = Cursors.Wait;
+                Func<DominoTransfer> function = new Func<DominoTransfer>(() => structureParameters.Generate(progress));
+                dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(function);
             }
             catch (Exception ex)
             {
+                cursor = null;
             }
         }
         public override bool Save()
@@ -421,6 +504,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 else if (e.PropertyName.Equals("structure_index"))
                 {
                     ((StructureParameters)structureParameters).structureDefinitionXML = ((RectangularSizeVM)CurrentViewModel).SelectedStructureElement;
+
+                    if (_structureParameters is StructureParameters sp)
+                    {
+                        if (CurrentViewModel is RectangularSizeVM rsvm)
+                        {
+                            rsvm.RefreshDescriptionImages(sp);
+                        }
+                    }
+                    
+                    if (structureParameters != null)
+                    {
+                        if (structureParameters.hasProcotolDefinition)
+                            VisibleFieldplan = Visibility.Visible;
+                        else
+                            VisibleFieldplan = Visibility.Hidden;
+                    }
+
                     changed = true;
                 }
             }
@@ -428,52 +528,54 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (e.PropertyName.Equals("dWidth"))
                 {
-                   // ((SpiralParameters)structureParameters).NormalWidth = ((RoundSizeVM)CurrentViewModel).dWidth;
+                    ((CircularStructure)structureParameters).DominoWidth = ((RoundSizeVM)CurrentViewModel).dWidth;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("dHeight"))
                 {
-                    //((SpiralParameters)structureParameters).TangentialWidth = ((RoundSizeVM)CurrentViewModel).dHeight;
+                    ((CircularStructure)structureParameters).DominoLength = ((RoundSizeVM)CurrentViewModel).dHeight;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("beLines"))
                 {
-                    //((SpiralParameters)structureParameters).NormalDistance = ((RoundSizeVM)CurrentViewModel).beLines;
+                    ((CircularStructure)structureParameters).NormalDistance = ((RoundSizeVM)CurrentViewModel).beLines;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("beDominoes"))
                 {
-                    //((SpiralParameters)structureParameters).TangentialDistance = ((RoundSizeVM)CurrentViewModel).beDominoes;
+                    ((CircularStructure)structureParameters).TangentialDistance = ((RoundSizeVM)CurrentViewModel).beDominoes;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("Amount"))
                 {
-                    //((SpiralParameters)structureParameters).QuarterRotations = ((RoundSizeVM)CurrentViewModel).Amount;
+                    if (structureParameters is SpiralParameters sp)
+                        sp.QuarterRotations = ((RoundSizeVM)CurrentViewModel).Amount;
+                    else if (structureParameters is CircleParameters cp)
+                        cp.Circles = ((RoundSizeVM)CurrentViewModel).Amount;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("TypeSelected"))
                 {
+                    if (!structureParameters.ImageFilters.Any(x => x is BlendFileFilter)) { return; }
+                    string filepath = structureParameters.ImageFilters.OfType<BlendFileFilter>().First().FilePath;
                     if (((RoundSizeVM)CurrentViewModel).TypeSelected.Equals("Spiral"))
                     {
-                        structureParameters = new SpiralParameters(@"c:\Users\johan\Pictures\Screenshots\Screenshot (5).png", ((RoundSizeVM)CurrentViewModel).Amount / 4, @"C:\Users\Johan\Desktop\colors.Dcolor",
+                        structureParameters = new SpiralParameters(filepath, ((RoundSizeVM)CurrentViewModel).Amount / 4, structureParameters.ColorPath,
                     structureParameters.colorMode, structureParameters.ditherMode, structureParameters.average, structureParameters.IterationInformation);
 
                         ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
-
-                        ((RoundSizeVM)CurrentViewModel).dWidth = ((SpiralParameters)structureParameters).NormalWidth;
-                        ((RoundSizeVM)CurrentViewModel).dHeight = ((SpiralParameters)structureParameters).TangentialWidth;
-                        ((RoundSizeVM)CurrentViewModel).beLines = ((SpiralParameters)structureParameters).NormalDistance;
-                        ((RoundSizeVM)CurrentViewModel).beDominoes = ((SpiralParameters)structureParameters).TangentialDistance;
                     }
                     else
                     {
-                        structureParameters = new CircleParameters(@"c:\Users\johan\Pictures\Screenshots\Screenshot (5).png", ((RoundSizeVM)CurrentViewModel).Amount * 4, @"C:\Users\Johan\Desktop\colors.Dcolor",
+                        structureParameters = new CircleParameters(filepath, ((RoundSizeVM)CurrentViewModel).Amount * 4, structureParameters.ColorPath,
                     structureParameters.colorMode, structureParameters.ditherMode, structureParameters.average, structureParameters.IterationInformation);
-                        ((RoundSizeVM)CurrentViewModel).dWidth = ((CircleParameters)structureParameters).NormalWidth;
-                        ((RoundSizeVM)CurrentViewModel).dHeight = ((CircleParameters)structureParameters).TangentialWidth;
-                        ((RoundSizeVM)CurrentViewModel).beLines = ((CircleParameters)structureParameters).NormalDistance;
-                        ((RoundSizeVM)CurrentViewModel).beDominoes = ((CircleParameters)structureParameters).TangentialDistance;
+                        ((RoundSizeVM)CurrentViewModel).Amount = (int)((CircleParameters)structureParameters).Circles;
                     }
+
+                    ((RoundSizeVM)CurrentViewModel).dWidth = ((CircularStructure)structureParameters).DominoWidth;
+                    ((RoundSizeVM)CurrentViewModel).dHeight = ((CircularStructure)structureParameters).DominoLength;
+                    ((RoundSizeVM)CurrentViewModel).beLines = ((CircularStructure)structureParameters).NormalDistance;
+                    ((RoundSizeVM)CurrentViewModel).beDominoes = ((CircularStructure)structureParameters).TangentialDistance;
                 }
             }
             if (changed)
@@ -482,7 +584,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Commands
-
         private ICommand _ShowFieldPlan;
         public ICommand ShowFieldPlan { get { return _ShowFieldPlan; } set { if (value != _ShowFieldPlan) { _ShowFieldPlan = value; } } }
         #endregion

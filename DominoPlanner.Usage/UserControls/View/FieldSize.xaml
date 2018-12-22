@@ -13,7 +13,7 @@
             <ColumnDefinition Width="105*"/>
         </Grid.ColumnDefinitions>
         <Label Content="Field Size [Dominoes]: " Height="24" VerticalAlignment="Top"/>
-        <xctk:IntegerUpDown Value="{Binding FieldSize}" Minimum="0" Margin="125,4,1,0" Height="20" VerticalAlignment="Top"/>
+        <xctk:IntegerUpDown Value="{Binding FieldSize, Delay=200}" Minimum="0" Margin="125,4,1,0" Height="20" VerticalAlignment="Top"/>
         <Grid Margin="0,27,0,0" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Width="268">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50" />
@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
             <!--Length and Height Setters-->
             <Label Content="Length:" Grid.Column="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="50"/>
-            <xctk:IntegerUpDown Value="{Binding Length}" IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
+            <xctk:IntegerUpDown Value="{Binding Length, Delay=200}" IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
             <Image Source="{Binding BindUnbind}"  IsEnabled="{Binding EditState}" Margin="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <intr:Interaction.Triggers>
                     <intr:EventTrigger EventName="MouseUp">
@@ -33,7 +33,7 @@
                 </intr:Interaction.Triggers>
             </Image>
             <Label Content="Height:" Grid.Column="3" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
-            <xctk:IntegerUpDown Value="{Binding Height}"  IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="4" HorizontalAlignment="Stretch"/>
+            <xctk:IntegerUpDown Value="{Binding Height, Delay=200}"  IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="4" HorizontalAlignment="Stretch"/>
         </Grid>
         <Label Content="Choose Standard: " Margin="0,70,0,0" HorizontalAlignment="Left" Width="102" Height="28" VerticalAlignment="Top"/>
         <ComboBox SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding field_templates}" Margin="107,70,1,0" Height="22" VerticalAlignment="Top"/>
