@@ -9,23 +9,10 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
-    public class ClusterStructureDefinition
+    partial class StructureParameters
     {
         public String name;
-        public CellDefinition[,] cells;
-        public bool hasProtocolDefinition;
-        public ClusterStructureDefinition(XElement definition)
-        {
-            hasProtocolDefinition = definition.Attribute("HasProtocolDefinition").Value == "true";
-            name = definition.Attribute("Name").Value;
-            cells = new CellDefinition[3, 3];
-            foreach (XElement part in definition.Elements("PartDefinition"))
-            {
-                int col = GetIndex(part.Attribute("HorizontalPosition").Value);
-                int row = GetIndex(part.Attribute("VerticalPosition").Value);
-                cells[col, row] = new CellDefinition(part);
-            }
-        }
+        internal CellDefinition[,] cells;
         private double PreviewScaleFactor(int TargetDimension)
         {
             double largest = 0;
@@ -51,35 +38,13 @@ namespace DominoPlanner.Core
         }
         public GenStructHelper GenerateStructure(int sWidth, int sHeight)
         {
-            List<IDominoShape> DominoList = new List<IDominoShape>();
             GenStructHelper g = new GenStructHelper() // Initialize GenStructHelper with final size.
             {
                 width = cells[0, 0].width + cells[1, 1].width * sWidth + cells[2, 2].width,
                 height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
             };
-            for (int x = -1; x < sWidth + 1; x++)
-            {
-                for (int y = -1; y < sHeight + 1; y++)
-                {
-                    try
-                    {
-                        DominoList.AddRange(
-                            (cells[(x == -1) ? 0 : ((x == sWidth) ? 2 : 1), (y == -1) ? 0 : ((y == sHeight) ? 2 : 1)]
-                            .TransformDefinition(
-                                (x == -1) ? 0 : (cells[1, 1].width * x + cells[0, 0].width),
-                                (y == -1) ? 0 : (cells[1, 1].height * y + cells[0, 0].height),
-                                x, y, sWidth, sHeight))
-                            .dominoes);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Caught: " + e);
-                    }
-                    
-                }
-            }
-            g.dominoes = DominoList.ToArray();
-            g.HasProtocolDefinition = hasProtocolDefinition;
+            g.dominoes = getNewShapes(sWidth, sHeight);
+            g.HasProtocolDefinition = hasProcotolDefinition;
             int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;
         }
@@ -138,5 +103,6 @@ namespace DominoPlanner.Core
                 dominoes = this.dominoes.Select(d => d.TransformDomino(moveX, moveY, i, j, width, height)).ToArray()
             };
         }
+        public int Count => dominoes.Length;
     }
 }

@@ -12,51 +12,49 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
-    /// <summary>
-    /// Stellt Methoden und Eigenschaften bereit, um eine Spirale zu erstellen.
-    /// Derzeit nur Einfachspiralen, Mehrfachspiralen folgen.
-    /// </summary>
     [ProtoContract]
-    public class SpiralParameters : RectangleDominoProvider 
+    [ProtoInclude(100, typeof(SpiralParameters))]
+    [ProtoInclude(101, typeof(CircleParameters))]
+    public abstract class CircularStructure : GeneralShapesProvider
     {
-        #region public properties
-        private int _tangentialWidth = 8;
+        private int _dominoWidth;
         /// <summary>
         /// Breite eines Steins in tangentialer Richtung.
         /// </summary>
         [ProtoMember(1)]
-        public int TangentialWidth
+        public int DominoWidth
         {
             get
             {
-                return _tangentialWidth;
+                return _dominoWidth;
             }
             set
             {
-                _tangentialWidth = value;
+                _dominoWidth = value;
                 shapesValid = false;
+                
             }
         }
-
-        private int _normalWidth = 24;
+        private int _dominoLength;
         /// <summary>
         /// Breite eines Steins in normaler (senkrecht zur Kurve) Richtung
         /// </summary>
         [ProtoMember(2)]
-        public int NormalWidth
+        public int DominoLength
         {
             get
             {
-                return _normalWidth;
+                return _dominoLength;
             }
             set
             {
-                _normalWidth = value;
+                _dominoLength = value;
                 shapesValid = false;
+                charLength = DominoLength + TangentialDistance;
             }
         }
 
-        private int _tangentialDistance=8;
+        private int _tangentialDistance;
         /// <summary>
         /// Abstand zwischen zwei Steinen in tangentialer Richtung
         /// </summary>
@@ -71,10 +69,11 @@ namespace DominoPlanner.Core
             {
                 _tangentialDistance = value;
                 shapesValid = false;
+                charLength = DominoLength + TangentialDistance;
             }
         }
 
-        private int _normalDistance=8;
+        private int _normalDistance;
         /// <summary>
         /// Abstand zwischen zwei Steinen in normaler Richtung
         /// </summary>
@@ -91,6 +90,49 @@ namespace DominoPlanner.Core
                 shapesValid = false;
             }
         }
+        public CircularStructure(string bitmap, string colors,
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+            : base(bitmap, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+        {
+
+        }
+        public CircularStructure(int imageWidth, int imageHeight, Color background, string colors,
+           IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
+           : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+        {
+
+        }
+        internal PathDomino CreateDominoAtCoordinates(double x, double y, double angle, int protocol_x, int protocol_y)
+        {
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            double p1_x = x + sin * DominoLength / 2d + cos * DominoWidth / 2d;
+            double p1_y = y - cos * DominoLength / 2d + sin * DominoWidth / 2d;
+            double p2_x = p1_x - sin * DominoLength;
+            double p2_y = p1_y + cos * DominoLength;
+            double p3_x = p2_x - cos * DominoWidth;
+            double p3_y = p2_y - sin * DominoWidth;
+            double p4_x = p3_x + sin * DominoLength;
+            double p4_y = p3_y - cos * DominoLength;
+            return new PathDomino()
+            {
+                points = new Point[] { new Point(p1_x, p1_y), new Point(p2_x, p2_y), new Point(p3_x, p3_y), new Point(p4_x, p4_y) },
+                position = new ProtocolDefinition() { x = protocol_x, y = protocol_y }
+            };
+        }
+        internal CircularStructure()
+        {
+
+        }
+    }
+    /// <summary>
+    /// Stellt Methoden und Eigenschaften bereit, um eine Spirale zu erstellen. 
+    /// Mehrfachspiralen sind möglich.
+    /// </summary>
+    [ProtoContract]
+    public class SpiralParameters : CircularStructure 
+    {
+        #region public properties
         /// <summary>
         /// Die Viertelumdrehungen der Spirale.
         /// </summary>
@@ -106,7 +148,7 @@ namespace DominoPlanner.Core
             }
         }
         private double _theta_min = 3 * Math.PI;
-        [ProtoMember(5)]
+        [ProtoMember(1)]
         public double ThetaMin 
         {
             get
@@ -120,7 +162,7 @@ namespace DominoPlanner.Core
             }
         }
         private double _theta_max;
-        [ProtoMember(6)]
+        [ProtoMember(2)]
         public double ThetaMax
         {
             get
@@ -133,20 +175,7 @@ namespace DominoPlanner.Core
                 shapesValid = false;
             }
         }
-        #endregion
-        #region private properties
-        /// <summary>
-        /// Der Parameter a in der Spiralformel, a.k.a. Abstand zwischen zwei Umdrehungen
-        /// </summary>
-        private double a
-        {
-            get
-            {
-                return ((NormalWidth + NormalDistance) * nGroup + NormalGroupDistance) * nArms / (2d * Math.PI);
-            }
-        }
-        private int _normalGroupDistance = 8;
-        [ProtoMember(7)]
+        [ProtoMember(3)]
         public int NormalGroupDistance
         {
             get
@@ -160,7 +189,7 @@ namespace DominoPlanner.Core
             }
         }
         private int nGroup = 1;
-        [ProtoMember(8)]
+        [ProtoMember(4)]
         public int NumberOfGroups
         {
             get
@@ -174,7 +203,7 @@ namespace DominoPlanner.Core
             }
         }
         private int nArms = 1;
-        [ProtoMember(9)]
+        [ProtoMember(5)]
         public int NumberOfArms
         {
             get
@@ -188,7 +217,7 @@ namespace DominoPlanner.Core
             }
         }
         private bool closeEnds = true;
-        [ProtoMember(10)]
+        [ProtoMember(6)]
         public bool CloseEnds
         {
             get
@@ -202,7 +231,7 @@ namespace DominoPlanner.Core
             }
         }
         private double shiftfactor = 0;
-        [ProtoMember(11)]
+        [ProtoMember(7)]
         public double ShiftFactor
         {
             get
@@ -215,6 +244,20 @@ namespace DominoPlanner.Core
                 shapesValid = false;
             }
         }
+        #endregion
+        #region private properties
+        /// <summary>
+        /// Der Parameter a in der Spiralformel, a.k.a. Abstand zwischen zwei Umdrehungen
+        /// </summary>
+        private double a
+        {
+            get
+            {
+                return ((DominoLength + NormalDistance) * nGroup + NormalGroupDistance) * nArms / (2d * Math.PI);
+            }
+        }
+        private int _normalGroupDistance = 8;
+        
         #endregion
         #region constructors
 
@@ -235,37 +278,45 @@ namespace DominoPlanner.Core
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         public SpiralParameters(string bitmap, int rotations, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            base(bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             hasProcotolDefinition = false;
-            ThetaMax = rotations * 2 * Math.PI + ThetaMin;
+            init(rotations);
         }
         public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation,allowStretch )
         {
             hasProcotolDefinition = false;
+            init(rotations);
+        }
+        private void init(int rotations)
+        {
             ThetaMax = rotations * 2 * Math.PI + ThetaMin;
+            DominoWidth = 8;
+            DominoLength = 24;
+            TangentialDistance = 8;
+            DominoWidth = 8;
         }
         private SpiralParameters() : base() { }
         #endregion
         #region private methods
         internal override void GenerateShapes()
         {
-            Point endpoint = getPoint(ThetaMax, nGroup * (NormalWidth + NormalDistance) / a);
+            Point endpoint = getPoint(ThetaMax, nGroup * (DominoLength + NormalDistance) / a);
             double end_radius = Math.Sqrt(endpoint.X * endpoint.X + endpoint.Y * endpoint.Y);
             List<PathDomino> dominolist = new List<PathDomino>();
             double pi2 = 1 / (2d * Math.PI); // spart ein paar Gleitkommadivisionen
             for (int i = 0; i < nGroup; i++)
             {
-                double shift = i * (NormalWidth + NormalDistance) / a;
-                shift = shift - shiftfactor * nGroup * (NormalWidth + NormalDistance) / a;
+                double shift = i * (DominoLength + NormalDistance) / a;
+                shift = shift - shiftfactor * nGroup * (DominoLength + NormalDistance) / a;
                 double theta = ThetaMin;
                 int ycounter = 0;
                 double current_radius = 0;
                 while (closeEnds ? current_radius < end_radius : theta < ThetaMax) 
                 {
-                    Point current_point = getPoint(theta, i * (NormalWidth + NormalDistance) / a);
+                    Point current_point = getPoint(theta, i * (DominoLength + NormalDistance) / a);
                     current_radius = Math.Sqrt(current_point.X * current_point.X + current_point.Y * current_point.Y);
                     for (int k = 0; k < nArms; k++)
                     {
@@ -280,7 +331,7 @@ namespace DominoPlanner.Core
                     do
                     {
                         start_value += 0.01d;
-                        theta_new = approximate_archimedean(theta, start_value, TangentialDistance + TangentialWidth, shift);
+                        theta_new = approximate_archimedean(theta, start_value, TangentialDistance + DominoWidth, shift);
                     }
                     while (theta_new < theta);
                     ycounter++;
@@ -302,7 +353,7 @@ namespace DominoPlanner.Core
 
             });
             GenStructHelper g = new GenStructHelper();
-            g.HasProtocolDefinition = true;
+            g.HasProtocolDefinition = false;
             g.dominoes = dominoes;
             g.width = x_max - x_min;
             g.height = y_max - y_min;
@@ -373,31 +424,21 @@ namespace DominoPlanner.Core
         /// <returns>Der PathDomino.</returns>
         private PathDomino CreateDomino(double theta, double shift, double rotate)
         {
-            double normal_angle = GetNormalAngle(theta, shift, rotate);
-            double x1 = getPoint(theta, shift, rotate).X + 0.5d * TangentialWidth * Math.Cos(0.5d * Math.PI - normal_angle) - 0.5d * NormalWidth * Math.Cos(normal_angle);
-            double y1 = getPoint(theta, shift, rotate).Y - 0.5d * TangentialWidth * Math.Sin(0.5d * Math.PI - normal_angle) - 0.5d * NormalWidth * Math.Sin(normal_angle);
-            double x2 = x1 - TangentialWidth * Math.Cos(0.5d * Math.PI - normal_angle);
-            double y2 = y1 + TangentialWidth * Math.Sin(0.5d * Math.PI - normal_angle);
-            double x3 = x2 + Math.Cos(normal_angle) * NormalWidth;
-            double y3 = y2 + Math.Sin(normal_angle) * NormalWidth;
-            double x4 = x3 + TangentialWidth * Math.Cos(0.5d * Math.PI - normal_angle);
-            double y4 = y3 - TangentialWidth * Math.Sin(0.5d * Math.PI - normal_angle);
-            PathDomino d = new PathDomino()
-            {
-                points = new Point[] { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3), new Point(x4, y4) }
-            };
-            return d;
+            double normal_angle = GetTangentialAngle(theta, shift, rotate);
+            double x1 = getPoint(theta, shift, rotate).X;
+            double y1 = getPoint(theta, shift, rotate).Y;
+            return CreateDominoAtCoordinates(x1, y1, normal_angle, 1, 1);
         }
         /// <summary>
         /// Berechnet den Winkel normal zur Spirale am angegebenen Punkt.
         /// </summary>
         /// <param name="theta">Der Winkel, der den Punkt charakterisiert.</param>
         /// <returns>Ein Winkel, normal zur Spirale.</returns>
-        private double GetNormalAngle(double theta, double shift, double rotate = 0)
+        private double GetTangentialAngle(double theta, double shift, double rotate = 0)
         {
             Point point = getPoint(theta, shift, rotate);
             Point point2 = getPoint(theta + 0.00001, shift, rotate);
-            return Math.PI * 0.5d - Math.Atan((point.Y - point2.Y) / (point2.X - point.X));
+            return -Math.Atan((point.Y - point2.Y) / (point2.X - point.X));
         }
 
         public override object Clone()

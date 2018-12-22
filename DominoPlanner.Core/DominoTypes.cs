@@ -88,7 +88,7 @@ namespace DominoPlanner.Core
     /// Stellt einen Dominostein beliebiger Form bereit, der durch Eckpunkte definiert wird.
     /// Implementiert IDominoShape.
     /// </summary>
-    class PathDomino : IDominoShape
+    public class PathDomino : IDominoShape
     {
         public Point[] points;
         public override bool Equals(IDominoShape other)

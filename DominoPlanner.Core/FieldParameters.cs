@@ -16,7 +16,7 @@ namespace DominoPlanner.Core
     /// Stellt die Methoden und Eigenschaften zum Erstellen und Bearbeiten eines Feldes zur Verfügung.
     /// </summary>
     [ProtoContract]
-    public class FieldParameters : IDominoProvider, ICountTargetable
+    public partial class FieldParameters : IDominoProvider, ICountTargetable
     {
         #region public properties
         public int TargetCount
@@ -143,6 +143,7 @@ namespace DominoPlanner.Core
             set
             {
                 _length = value;
+                _current_width = value;
                 shapesValid = false;
             }
         }
@@ -164,6 +165,7 @@ namespace DominoPlanner.Core
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
+
         public HistoryTree<FieldParameters> current;
         #endregion
         #region private properties
@@ -272,24 +274,7 @@ namespace DominoPlanner.Core
         }
         internal override void GenerateShapes()
         {
-            IDominoShape[] array = new IDominoShape[length * height];
-
-            Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = -1 }, (xi) =>
-            {
-                for (int yi = 0; yi < height; yi++)
-                {
-                    RectangleDomino shape = new RectangleDomino()
-                    {
-                        x = (b + a) * xi,
-                        y = (c + d) * yi,
-                        width = b,
-                        height = c,
-                        position = new ProtocolDefinition() { x = xi, y = yi }
-                    };
-                    array[length * yi + xi] = shape;
-                }
-            });
-            shapes = array;
+            shapes = getNewShapes(length, height);
             shapesValid = true;
             usedColorsValid = false;
         }
@@ -373,12 +358,12 @@ namespace DominoPlanner.Core
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
             if (!shapesValid || !usedColorsValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            int[,] result = new int[length, height];
-                for (int i = 0; i < length; i++)
+            int[,] result = new int[current_width, current_height];
+                for (int i = 0; i < current_width; i++)
                 {
-                    for (int j = 0; j < height; j++)
+                    for (int j = 0; j < current_height; j++)
                     {
-                        result[i, j] = last.shapes[i*height + j].color;
+                        result[i, j] = last.shapes[j*current_width + i].color;
                     }
                 }
             if (o == Orientation.Vertical) result = TransposeArray(result);
@@ -394,7 +379,6 @@ namespace DominoPlanner.Core
             res.last = (DominoTransfer) last?.Clone();
             return res;
         }
-        
         #endregion
     }
 }

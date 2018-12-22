@@ -21,7 +21,7 @@ namespace DominoPlanner.Core
     /// </summary>
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
-    [ProtoInclude(101, typeof(RectangleDominoProvider))]
+    [ProtoInclude(101, typeof(GeneralShapesProvider))]
     public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList
     {
         #region public properties

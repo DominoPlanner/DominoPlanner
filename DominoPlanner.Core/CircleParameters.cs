@@ -12,81 +12,10 @@ using System.Windows.Media;
 namespace DominoPlanner.Core
 {
     [ProtoContract]
-    public class CircleParameters : RectangleDominoProvider
+    public class CircleParameters : CircularStructure
     {
-
-        int _tangential_width = 24;
-        [ProtoMember(1)]
-        public int TangentialWidth
-        {
-            get
-            {
-                return _tangential_width;
-            }
-            set
-            {
-                if (value > 1)
-                {
-                    _tangential_width = value;
-                    shapesValid = false;
-                }
-            }
-        }
-        int _normal_width = 8;
-        [ProtoMember(2)]
-        public int NormalWidth
-        {
-            get
-            {
-                return _normal_width;
-            }
-            set
-            {
-                if (value > 1)
-                {
-                    _normal_width = value;
-                    shapesValid = false;
-                }
-            }
-        }
-
-        int _tangential_distance = 8;
-        [ProtoMember(3)]
-        public int TangentialDistance
-        {
-            get
-            {
-                return _tangential_distance;
-
-            }
-            set
-            {
-                if (value > 1)
-                {
-                    _tangential_distance = value;
-                    shapesValid = false;
-                }
-            }
-        }
-        int _normal_distance = 8;
-        [ProtoMember(4)]
-        public int NormalDistance
-        {
-            get
-            {
-                return _normal_distance;
-            }
-            set
-            {
-                if (value > 1)
-                {
-                    _normal_distance = value;
-                    shapesValid = false;
-                }
-            }
-        }
         int _circles;
-        [ProtoMember(5)]
+        [ProtoMember(1)]
         public int Circles
         {
             get
@@ -104,7 +33,7 @@ namespace DominoPlanner.Core
             }
         }
         int _start_diameter = 0;
-        [ProtoMember(6)]
+        [ProtoMember(2)]
         public int StartDiameter
         {
             get
@@ -113,7 +42,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (value > _normal_width * 2)
+                if (value > DominoLength * 2)
                 {
                     _start_diameter = value;
                     shapesValid = false;
@@ -123,7 +52,7 @@ namespace DominoPlanner.Core
         }
         double? _angle_shift_factor = 0.05;
         
-        [ProtoMember(7)]
+        [ProtoMember(3)]
         public double? AngleShiftFactor
         {
             get
@@ -141,7 +70,7 @@ namespace DominoPlanner.Core
             }
         }
         private int _force_divisibilty = 1;
-        [ProtoMember(8)]
+        [ProtoMember(4)]
         public int ForceDivisibility
         {
             get
@@ -161,24 +90,28 @@ namespace DominoPlanner.Core
         public CircleParameters(string imagepath, int circles,
             string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            base(imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
-
-            this.StartDiameter = 4 * TangentialWidth;
-            Circles = circles;
-            hasProcotolDefinition = true;
-            r = new Random();
+            init(circles);
         }
         public CircleParameters(int imageWidth, int imageHeight, Color background, int circles,
             string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
 
-            this.StartDiameter = 4 * TangentialWidth;
+            init(circles);
+        }
+        private void init(int circles)
+        {
+            this.StartDiameter = 4 * DominoLength;
             Circles = circles;
             hasProcotolDefinition = true;
             r = new Random();
+            DominoWidth = 8;
+            DominoLength = 24;
+            NormalDistance = 8;
+            TangentialDistance = 8;
         }
         private CircleParameters() : base() { r = new Random(); }
         internal override void GenerateShapes()
@@ -188,9 +121,9 @@ namespace DominoPlanner.Core
             (circlecount) =>
             {
                 
-                int diameter = StartDiameter + circlecount * (2 * NormalWidth + 2 * NormalDistance);
+                int diameter = StartDiameter + circlecount * (2 * DominoWidth + 2 * NormalDistance);
 
-                double domino_angle = Math.Asin((double)TangentialWidth / diameter) * 2;
+                double domino_angle = Math.Asin((double)DominoLength / diameter) * 2;
                 double distance_angle = Math.Asin((double)TangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
                 current_domino_count = (int)Math.Round((double)current_domino_count / _force_divisibilty) * _force_divisibilty;
@@ -201,7 +134,7 @@ namespace DominoPlanner.Core
                 dominos[circlecount] = new PathDomino[current_domino_count];
                 for (int i = 0; i < current_domino_count; i++)
                 {
-                    PathDomino d = GenerateDomino(diameter, angle, domino_angle);
+                    PathDomino d = GenerateDomino(diameter, angle);
                     angle += domino_angle + distance_angle;
                     d.position = new ProtocolDefinition() { x = i, y = circlecount };
                     dominos[circlecount][i] = d;
@@ -220,34 +153,18 @@ namespace DominoPlanner.Core
 
             });
             GenStructHelper g = new GenStructHelper();
-            g.HasProtocolDefinition = true;
+            g.HasProtocolDefinition = false;
             g.dominoes = dominoes;
             g.width = x_max - x_min;
             g.height = y_max - y_min;
             shapes = g;
             shapesValid = true;
         }
-
-
-
-        private PathDomino GenerateDomino(int diameter, double angle, double domino_angle)
+        private PathDomino GenerateDomino(int diameter, double angle)
         {
-            double normal_angle = angle + domino_angle / 2;
             double x1 = diameter / 2d * Math.Cos(angle);
             double y1 = diameter / 2d * Math.Sin(angle);
-            double x2 = diameter / 2d * Math.Cos(angle + domino_angle);
-            double y2 = diameter / 2d * Math.Sin(angle + domino_angle);
-            double x4 = diameter / 2d * Math.Cos(angle) + Math.Cos(normal_angle) * NormalWidth;
-            double y4 = diameter / 2d * Math.Sin(angle) + Math.Sin(normal_angle) * NormalWidth;
-            double x3 = diameter / 2d * Math.Cos(angle + domino_angle) + Math.Cos(normal_angle) * NormalWidth;
-            double y3 = diameter / 2d * Math.Sin(angle + domino_angle) + Math.Sin(normal_angle) * NormalWidth;
-            PathDomino d = new PathDomino()
-            {
-                points = new Point[] { new Point(x1, y1), new Point(x2, y2), new Point(x3, y3), new Point(x4, y4) },
-                position = new ProtocolDefinition() { x = 1, y = 1 }
-
-            };
-            return d;
+            return CreateDominoAtCoordinates(x1, y1, angle, 1, 1);
 
         }
 
