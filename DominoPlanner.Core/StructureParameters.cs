@@ -15,7 +15,7 @@ namespace DominoPlanner.Core
     /// Stellt die Eigenschaften und Methoden bereit, eine Struktur zu erstellen.
     /// </summary>
     [ProtoContract]
-    public partial class StructureParameters : RectangleDominoProvider, ICountTargetable
+    public partial class StructureParameters : GeneralShapesProvider, ICountTargetable
     {
         // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
         private string __structureDefXML;

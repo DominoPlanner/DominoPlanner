@@ -79,7 +79,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region fields
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private IColorSpaceComparison cdMode;
-        RectangleDominoProvider structureParameters;
+        GeneralShapesProvider structureParameters;
         private bool structureIsRectangular;
         XElement xElement;
         #endregion

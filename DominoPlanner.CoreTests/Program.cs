@@ -41,9 +41,9 @@ namespace DominoPlanner.CoreTests
                 Console.WriteLine(ex.Message);
                 throw;
             }*/
-            //CircleTest("bird.jpg");
+            CircleTest("bird.jpg");
             //for (int i = 0; i < 1; i++)
-            //SpiralTest("bird.jpg");
+            SpiralTest("bird.jpg");
             //WallTest("bird.jpg");
             //ColorRepoSaveTest();
             //FieldTest("bird.jpg");
@@ -336,7 +336,7 @@ namespace DominoPlanner.CoreTests
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
             p.StartDiameter = 200;
-            p.ditherMode = new JarvisJudiceNinkeDithering();
+            p.ditherMode = new Dithering();
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
