@@ -81,6 +81,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        public event EventHandler SelStructureTypeChanged;
+
         private BitmapSource[] _description_imgs;
         public BitmapSource[] description_imgs
         {

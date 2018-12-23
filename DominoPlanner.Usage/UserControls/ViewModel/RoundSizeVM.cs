@@ -85,7 +85,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _dWidth;
+        private int _dWidth = 8;
         public int dWidth
         {
             get { return _dWidth; }
@@ -99,7 +99,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _dHeight;
+        private int _dHeight = 24;
         public int dHeight
         {
             get { return _dHeight; }
@@ -113,7 +113,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _beLines;
+        private int _beLines = 8;
         public int beLines
         {
             get { return _beLines; }
@@ -127,7 +127,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _beDominoes;
+        private int _beDominoes = 8;
         public int beDominoes
         {
             get { return _beDominoes; }

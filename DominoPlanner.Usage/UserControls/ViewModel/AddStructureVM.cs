@@ -41,7 +41,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         #endregion
-
+        #region
+        #endregion
         #region prop
         private ModelBase _CurrentViewModel;
         public ModelBase CurrentViewModel

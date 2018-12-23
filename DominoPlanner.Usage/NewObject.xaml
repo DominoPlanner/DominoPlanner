@@ -8,7 +8,7 @@
         x:Class="DominoPlanner.Usage.NewObject"
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         mc:Ignorable="d"
-        Title="Add New Object" Width="400" ResizeMode="CanResizeWithGrip" Icon="Icons/DominoCalculator.ico" Height="635">
+        Title="Add New Object" Width="400" ResizeMode="NoResize" Icon="Icons/DominoCalculator.ico" Height="635">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:AddFieldVM}">
             <View:AddField HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
@@ -40,7 +40,7 @@
                         </StackPanel>
                     </Border>
                 </ListBoxItem>
-                <ListBoxItem>
+                <!--ListBoxItem>
                     <Border BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch" Width="363">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="2, 0, 2, 3">
                             <Image Source="/Icons/insert_table.ico" Height="36"/>
@@ -50,7 +50,7 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
-                </ListBoxItem>
+                </-->
                 <ListBoxItem>
                     <Border BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch" Width="363">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="2, 0, 2, 3">

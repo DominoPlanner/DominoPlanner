@@ -4,14 +4,9 @@ using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
@@ -49,19 +44,19 @@ namespace DominoPlanner.Usage
                     switch (value)
                     {
                         case 0:
-                            endung = ".dpfd";
+                            endung = ".dobject";
                             CurrentViewModel = new AddFieldVM();
                             break;
-                        case 1:
-                            endung = ".dpffd";
+                        /*case 1:
+                            endung = ".dobject";
                             CurrentViewModel = new FieldSizeVM(false);
-                            break;
-                        case 2:
-                            endung = ".dpst";
+                            break;*/
+                        case 1:
+                            endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
                             break;
-                        case 3:
-                            endung = ".dpst";
+                        case 2:
+                            endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Round);
                             break;
                         default: break;
@@ -148,14 +143,7 @@ namespace DominoPlanner.Usage
                     MessageBox.Show("You forget to choose a name.", "Missing Values", MessageBoxButton.OK);
                     return;
                 }
-
-                //hier muss die colorliste geladen werden, damit amn sie dann den FieldParametern hinzufügen kann
-                Path.Combine(_ProjectPath, @"Planner Files\colors.dpcol");
-                Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-                List<DominoColor> ColorList = new List<DominoColor>();
-                ColorList.Add(new DominoColor(Colors.Black, 1000, "black"));
-                ColorList.Add(new DominoColor(Colors.White, 1000, "white"));
-
+                string colorlist = @"C:\Users\johan\Desktop\colors.DColor";
                 switch (selectedType)
                 {
                     case 0: //Field with Picture
@@ -167,32 +155,35 @@ namespace DominoPlanner.Usage
                         
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
                         File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
-                        FieldParameters p = new FieldParameters(((AddFieldVM)CurrentViewModel).pImage, @"C:\Users\johan\Desktop\colors.DColor", ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
+                        FieldParameters p = new FieldParameters(((AddFieldVM)CurrentViewModel).pImage, colorlist, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
                         p.Save(Path.Combine(this.ProjectPath, filename));
                         break;
-                    case 1: //Free Field
+                    /*case 1: //Free Field
                         internPictureName = "";
-                        break;
-                    case 2: //Rectangular Structure
-                        progress = new Progress<string>(pr => Console.WriteLine(pr));
+                        break;*/
+                    case 1: //Rectangular Structure
 
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
                         File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
-
-                        //StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
-                        //XElement xml = XElement.Parse(sr.ReadToEnd());
-                        //new StructureParameters(((AddStructureVM)CurrentViewModel).pImage, xml.Elements().ElementAt(6), ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).StrucSize, ColorList, ColorDetectionMode.CieDe2000Comparison, AverageMode.Average, true);
-                        //hier muss irgendwie noch was hin zum speichern :D
+                        
+                        StructureParameters sp = new StructureParameters(((AddStructureVM)CurrentViewModel).pImage, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).SelectedStructureElement, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        sp.Save(Path.Combine(this.ProjectPath, filename));
                         break;
-                    case 3: //Round Structure
-                        progress = new Progress<string>(pr => Console.WriteLine(pr));
+                    case 2: //Round Structure
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
                         File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
                         RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
-                        BitmapImage b = new BitmapImage(new Uri(((AddStructureVM)CurrentViewModel).pImage, UriKind.Relative));
-                        WriteableBitmap wb = new WriteableBitmap(b);
-                        //new SpiralParameters(wb, rsvm.StrucSize, rsvm.dWidth, rsvm.dHeight, rsvm.beLines, rsvm.beDominoes, ColorList, ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
-                        MessageBox.Show("hier mal spirale machen");
+                        CircularStructure circularStructure;
+                        if (rsvm.TypeSelected.Equals("Spiral"))
+                        {
+                            circularStructure = new SpiralParameters(((AddStructureVM)CurrentViewModel).pImage, rsvm.StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        }
+                        else
+                        {
+
+                            circularStructure = new CircleParameters(((AddStructureVM)CurrentViewModel).pImage, rsvm.StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        }
+                        circularStructure.Save(Path.Combine(this.ProjectPath, filename));
                         break;
                     default: break;
                 }
