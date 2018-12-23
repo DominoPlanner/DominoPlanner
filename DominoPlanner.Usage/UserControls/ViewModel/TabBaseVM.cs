@@ -61,6 +61,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public event EventHandler<bool> Changes;
         #endregion
 
+        internal virtual void Close(){ }
+
         protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.RaisePropertyChanged(propertyName);

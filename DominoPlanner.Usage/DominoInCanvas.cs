@@ -10,7 +10,10 @@ namespace DominoPlanner.Usage
     {
         public int idx;
         public System.Windows.Point[] canvasPoints = new System.Windows.Point[4];
-        
+
+        public ColorRepository colorRepository;
+        public IDominoShape domino;
+
         private Color _StoneColor;
         public Color StoneColor
         {
@@ -65,18 +68,26 @@ namespace DominoPlanner.Usage
             }
         }
 
-        public DominoInCanvas(int idx, DominoPath rectangle, Color color)
+        public DominoInCanvas(int idx, IDominoShape domino, ColorRepository colorlist)
         {
+            colorRepository = colorlist;
             this.idx = idx;
             this.ToolTip = idx.ToString();
-            StoneColor = color;
+            StoneColor = colorlist[domino.color].mediaColor;
+            this.domino = domino;
+            domino.ColorChanged += Domino_ColorChanged;
             Stroke = Brushes.Blue;
             StrokeThickness = 2;
+            DominoPath rectangle = domino.GetPath();
+            canvasPoints[0] = new System.Windows.Point(rectangle.points[0].X, rectangle.points[0].Y);
+            canvasPoints[1] = new System.Windows.Point(rectangle.points[1].X, rectangle.points[1].Y);
+            canvasPoints[2] = new System.Windows.Point(rectangle.points[2].X, rectangle.points[2].Y);
+            canvasPoints[3] = new System.Windows.Point(rectangle.points[3].X, rectangle.points[3].Y);
+        }
 
-            canvasPoints[0] = rectangle.points[0];
-            canvasPoints[1] = rectangle.points[1];
-            canvasPoints[2] = rectangle.points[2];
-            canvasPoints[3] = rectangle.points[3];
+        private void Domino_ColorChanged(object sender, System.EventArgs e)
+        {
+            StoneColor = colorRepository[(sender as IDominoShape).color].mediaColor;
         }
 
         public DominoInCanvas(int stoneWidth, int stoneHeight, int marginLeft, int marginTop, Color color)
@@ -102,6 +113,11 @@ namespace DominoPlanner.Usage
             points.Add(canvasPoints[2]); // Bottom Right
             points.Add(canvasPoints[3]); // Bottom Left
             context.PolyLineTo(points, true, true);
+        }
+
+        public void DisposeStone()
+        {
+            domino.ColorChanged -= Domino_ColorChanged; //jojoasdf - nurnoch auch wieder aufrufen eim abbauen :D
         }
     }
 }

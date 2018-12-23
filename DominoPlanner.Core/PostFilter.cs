@@ -63,7 +63,7 @@ namespace DominoPlanner.Core
                 reference.last[domain[i]].color = old_colors[i];
             }
         }
-        public SetColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
+        public SetColorOperation(IDominoProvider reference, int[] domain, int newColor)
         {
             this.reference = reference;
             this.domain = domain;
@@ -118,7 +118,7 @@ namespace DominoPlanner.Core
         {
             // get an array 
             ((IDominoProvider) reference).last.shapes = 
-                AddDeleteHelper.AddRowColumn(reference, false, position, below, color, count, out added_indizes);
+                AddDeleteHelper.AddRowColumn(reference, false, position, below, count, color, out added_indizes);
         }
         public override void Undo()
         {
@@ -168,7 +168,7 @@ namespace DominoPlanner.Core
         {
             // get an array 
             ((IDominoProvider)reference).last.shapes =
-                AddDeleteHelper.AddRowColumn(reference, true, position, right, color, count, out added_indizes);
+                AddDeleteHelper.AddRowColumn(reference, true, position, right, count, color, out added_indizes);
         }
         public override void Undo()
         {

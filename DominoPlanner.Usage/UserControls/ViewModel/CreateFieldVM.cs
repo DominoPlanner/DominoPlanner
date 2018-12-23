@@ -3,7 +3,6 @@ using DominoPlanner.Usage.HelperClass;
 using Emgu.CV.CvEnum;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -20,7 +19,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             
             fieldParameters = new FieldParameters(@"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png", @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-
+            
             //fieldParameters =  Workspace.Load<FieldParameters>(FilePath);
 
             iResizeMode = (int)fieldParameters.resizeMode;

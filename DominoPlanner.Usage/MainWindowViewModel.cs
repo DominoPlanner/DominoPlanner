@@ -44,9 +44,9 @@ namespace DominoPlanner.Usage
             Tabs.Add(new TabItem(12, 100, "Erste Runde Struktur", @"\Icons\lock - copy.ico", "", new CreateStructureVM(@"C:\Users\johan\Desktop\round.DObject", false)));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
 
-            /*Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
+            Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            */
+            
             loadProjectList();
         }
         #endregion
@@ -324,7 +324,7 @@ namespace DominoPlanner.Usage
             Path = path;
             //hier muss die DAtei unter path ausgelesen werden und dann mus Content und das Icon geladen werden
             //this.picture = new WriteableBitmap(new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute)));
-            Close = new RelayCommand(o => { CloseIt(this, EventArgs.Empty); });
+            Close = new RelayCommand(o => CloseThis());
             zusatz = "";
         }
 
@@ -421,6 +421,14 @@ namespace DominoPlanner.Usage
             else
                 zusatz = "";
             RaisePropertyChanged("Header");
+        }
+        #endregion
+
+        #region METHODS
+        private void CloseThis()
+        {
+            Content?.Close();
+            CloseIt?.Invoke(this, EventArgs.Empty);
         }
         #endregion
 

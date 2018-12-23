@@ -102,7 +102,7 @@
                         <Image Source="Icons/Paste.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Mirror">
+                <!--MenuItem Header="Mirror">
                     <MenuItem Header="Flip Horizontally" Command="{Binding SelectedTab.Content.FlipHorizontallyCom}">
                         <MenuItem.Icon>
                             <Image Source="Icons/flip hori.ico"/>
@@ -113,7 +113,7 @@
                             <Image Source="Icons/flip vertical.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                </MenuItem>
+                </-->
                 <MenuItem Header="Add">
                     <MenuItem.Icon>
                         <Image Source="Icons/add.ico"/>
@@ -127,10 +127,8 @@
                     <MenuItem.Icon>
                         <Image Source="Icons/remove.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Remove row above" ToolTip="Remove Row above selected stone" Command="{Binding SelectedTab.Content.RemoveRowAbove}"/>
-                    <MenuItem Header="Remove row below" ToolTip="Remove Row below selected stone" Command="{Binding SelectedTab.Content.RemoveRowBelow}"/>
-                    <MenuItem Header="Remove column right" ToolTip="Remove column at the right from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnRight}"/>
-                    <MenuItem Header="Remove column left" ToolTip="Remove column at the left from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnLeft}"/>
+                    <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}"/>
+                    <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
                 </MenuItem>
             </MenuItem>
         </Menu>

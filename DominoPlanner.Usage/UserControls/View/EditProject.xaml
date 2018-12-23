@@ -86,15 +86,15 @@
                                 <GridViewColumn Width="30">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Rectangle Height="24" Width="16" Fill="{Binding mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
+                                            <Rectangle Height="24" Width="16" Fill="{Binding DominoColor.mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn DisplayMemberBinding="{Binding name}" Header="Name" Width="70"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding DominoColor.name}" Header="Name" Width="70"/>
                                 <GridViewColumn Header="Count" Width="80">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Content="{Binding count}" ContentStringFormat=" {0:##,#}" />
+                                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,#}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
