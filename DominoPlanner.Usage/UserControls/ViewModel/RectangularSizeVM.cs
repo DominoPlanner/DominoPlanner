@@ -76,6 +76,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _structure_index = value;
                     selectedStructureElement = structures.ElementAt(_structure_index);
+
+                    RefreshDescriptionImages();
+
                     RaisePropertyChanged();
                 }
             }
@@ -120,14 +123,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        public void RefreshDescriptionImages(StructureParameters structureParameters)
+        public void RefreshDescriptionImages()
         {
+            WriteableBitmap[,] previews = StructureParameters.getPreviews(51, selectedStructureElement);
             description_imgs = new BitmapSource[9];
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    description_imgs[i + j * 3] = structureParameters.DrawPreview(i, j, 50);
+                    description_imgs[i + j * 3] = previews[i, j];
                 }
             }
             RaisePropertyChanged("description_imgs");

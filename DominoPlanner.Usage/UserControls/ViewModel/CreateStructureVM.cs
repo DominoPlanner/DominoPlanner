@@ -70,13 +70,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_structureParameters != value)
                 {
                     _structureParameters = value;
-                    if (_structureParameters is StructureParameters sp)
-                    {
-                        if (CurrentViewModel is RectangularSizeVM rsvm)
-                        {
-                            rsvm.RefreshDescriptionImages(sp);
-                        }
-                    }
                     if (structureParameters != null)
                     {
                         if (structureParameters.hasProcotolDefinition)
@@ -245,13 +238,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_CurrentViewModel != value)
                 {
                     _CurrentViewModel = value;
-                    if (CurrentViewModel is RectangularSizeVM rsvm)
-                    {
-                        if (_structureParameters is StructureParameters sp)
-                        {
-                            rsvm.RefreshDescriptionImages(sp);
-                        }
-                    }
                     RaisePropertyChanged();
                 }
             }
@@ -504,14 +490,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 else if (e.PropertyName.Equals("structure_index"))
                 {
                     ((StructureParameters)structureParameters).structureDefinitionXML = ((RectangularSizeVM)CurrentViewModel).SelectedStructureElement;
-
-                    if (_structureParameters is StructureParameters sp)
-                    {
-                        if (CurrentViewModel is RectangularSizeVM rsvm)
-                        {
-                            rsvm.RefreshDescriptionImages(sp);
-                        }
-                    }
                     
                     if (structureParameters != null)
                     {
