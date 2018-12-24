@@ -256,6 +256,7 @@ namespace DominoPlanner.Core
                     }
                 });
             }
+            usedColorsValid = true;
         }
         #endregion
     }

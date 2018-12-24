@@ -289,7 +289,7 @@ namespace DominoPlanner.Core
                 }
             }
             var pos = reference.getPositionFromIndex(position);
-            var index = southeast ? reference.getIndexFromPosition(pos.X + (column ? 1 : 0), pos.Y + (!column ? 1 : 0), pos.CountInsideCell) : position;
+            var index = southeast ? reference.getIndexFromPosition(pos.Y + (!column ? 1 : 0), pos.X + (column ? 1 : 0), pos.CountInsideCell) : position;
             return AddRowColumn(reference, column, Enumerable.Repeat(index, count).ToArray(), shapes, out inserted_positions);
         }
             public static void copyColors(IRowColumnAddableDeletable reference, IDominoShape[] target, 
