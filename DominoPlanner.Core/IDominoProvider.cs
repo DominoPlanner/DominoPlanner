@@ -126,8 +126,6 @@ namespace DominoPlanner.Core
             }
         }
         public Mat image_filtered { get; private set; }
-        [ProtoMember(9)]
-        public DominoTransfer last_filtered;
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
@@ -170,8 +168,6 @@ namespace DominoPlanner.Core
         public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
         [ProtoMember(13)]
         public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
-        [ProtoMember(14)]
-        public ObservableCollection<PostFilter> PostFilters { get; private set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
         /// </summary>
@@ -264,6 +260,8 @@ namespace DominoPlanner.Core
         public bool sourceValid = false;
         [ProtoMember(1005)]
         public bool usedColorsValid = false;
+        [ProtoMember(1006)]
+        public bool Editing = false;
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
@@ -289,13 +287,10 @@ namespace DominoPlanner.Core
         {
             this.ColorFilters = new ObservableCollection<ColorFilter>();
             this.ImageFilters = new ObservableCollection<ImageFilter>();
-            this.PostFilters = new ObservableCollection<PostFilter>();
             this.ColorFilters.CollectionChanged +=
                 new NotifyCollectionChangedEventHandler((sender, e) => ColorFiltersChanged(sender,e));
             this.ImageFilters.CollectionChanged +=
                new NotifyCollectionChangedEventHandler((sender, e) => ImageFiltersChanged(sender, e));
-            this.PostFilters.CollectionChanged +=
-                new NotifyCollectionChangedEventHandler((sender, e) => lastValid = false);
             background = Colors.Transparent;
         }
         protected IDominoProvider(int imageWidth, int imageHeight, Color background, 
@@ -320,6 +315,7 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            if (Editing) return last;
             if (!sourceValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Updating source image");
@@ -613,6 +609,8 @@ namespace DominoPlanner.Core
     public interface IWorkspaceLoadColorList : IWorkspaceLoadable
     {
         int[] counts { get; }
+
+        bool Editing { get; set; }
     }
     public interface IWorkspaceLoadable
     {
@@ -620,10 +618,13 @@ namespace DominoPlanner.Core
     }
 
     [ProtoContract]
-    public class IDominoProviderPreview
+    public class IDominoProviderPreview : IWorkspaceLoadColorList
     {
         [ProtoMember(1)]
         public int[] counts { get; set; }
+
+        [ProtoMember(1006)]
+        public bool Editing { get; set; }
     }
 
     public interface ICountTargetable

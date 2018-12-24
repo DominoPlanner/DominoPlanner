@@ -72,6 +72,21 @@ namespace DominoPlanner.Core
             }
             return result.counts;
         }
+        public static bool LoadEditingState<T>(string path) where T : IWorkspaceLoadColorList
+        {
+            path = Workspace.Instance.MakePathAbsolute(path);
+            var result = (T)Workspace.Instance.Find<T>(path);
+            Console.WriteLine("Datei " + path + " als Vorschau öffnen für Editing State");
+            if (result == null)
+            {
+                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                using (var file = File.OpenRead(path))
+                {
+                    return Serializer.Deserialize<IDominoProviderPreview>(file).Editing;
+                }
+            }
+            return result.Editing;
+        }
         public object Find<T>(string path)
         {
             var result = openedFiles.Where(x => x.Item1 == MakePathAbsolute(path) && x.Item2 is T);
