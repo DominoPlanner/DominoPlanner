@@ -261,7 +261,7 @@ namespace DominoPlanner.Core
         [ProtoMember(1005)]
         public bool usedColorsValid = false;
         [ProtoMember(1006)]
-        public bool Editing = false;
+        public bool Editing { get; set; }
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const

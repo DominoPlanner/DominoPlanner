@@ -26,12 +26,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
             ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 2000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
-            /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
+            StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
             ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(6), 3000,
                  @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
-            sr.Close();*/
+            sr.Close();
             
             _DominoList = new ObservableCollection<ColorListEntry>();
             
@@ -551,6 +551,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 for (int i = 0; i < DominoProject.Children.Count; i++)
                 {
+                    if (!(DominoProject.Children[i] is DominoInCanvas)) continue;
                     if (((DominoInCanvas)DominoProject.Children[i]).StoneColor == SelectedColor.DominoColor.mediaColor && ((DominoInCanvas)DominoProject.Children[i]).isSelected == false)
                     {
                         ((DominoInCanvas)DominoProject.Children[i]).isSelected = true;
