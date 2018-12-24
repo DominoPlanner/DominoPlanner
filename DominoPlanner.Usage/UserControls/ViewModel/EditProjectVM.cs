@@ -32,9 +32,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                  @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             sr.Close();*/
-            
+
             _DominoList = new ObservableCollection<ColorListEntry>();
-            
+
             _DominoList.Clear();
             ProjectProperties.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
@@ -66,6 +66,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        private double visibleWidth = 0;
+        private double visibleHeight = 0;
         private IDominoProvider ProjectProperties;
         private double largestX = 0;
         private double largestY = 0;
@@ -133,6 +135,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _DominoProject = value;
                     RaisePropertyChanged();
                     _DominoProject.SizeChanged += _DominoProject_SizeChanged;
+
                     _DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
                     _DominoProject.VerticalAlignment = VerticalAlignment.Stretch;
                 }
@@ -306,7 +309,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedDominoes = new List<DominoInCanvas>();
 
             int[] validPositions = ((ICopyPasteable)this.ProjectProperties).GetValidPastePositions(startindex);
-            
+
             foreach (DominoInCanvas dic in DominoProject.Children.OfType<DominoInCanvas>())
             {
                 if (validPositions.Contains(dic.idx))
@@ -331,7 +334,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void clearPossibleToPaste()
         {
-            foreach(DominoInCanvas dic in possibleToPaste)
+            foreach (DominoInCanvas dic in possibleToPaste)
             {
                 dic.PossibleToPaste = false;
             }
@@ -364,8 +367,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RefreshCanvas();
             }
         }
+
         internal void SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            visibleWidth = e.NewSize.Width;
+            visibleHeight = e.NewSize.Height;
             _DominoProject_SizeChanged(sender, e);
         }
         internal void PressedKey(Key key)
@@ -375,8 +381,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void _DominoProject_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             double ScaleX, ScaleY;
-            ScaleX = e.NewSize.Width / largestX * ZoomValue;
-            ScaleY = e.NewSize.Height / largestY * ZoomValue;
+
+            ScaleX = visibleWidth / largestX * ZoomValue;
+            ScaleY = visibleHeight / largestY * ZoomValue;
 
             if (ScaleX < ScaleY)
                 _DominoProject.LayoutTransform = new ScaleTransform(ScaleX, ScaleX);
@@ -385,6 +392,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             _DominoProject.UpdateLayout();
         }
+
         private void ChangeColor()
         {
             List<int> selectedIndices = new List<int>();
@@ -479,7 +487,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 DominoProject.MouseDown -= Canvas_MouseDown;
                 DominoProject.MouseMove -= Canvas_MouseMove;
-                DominoProject.MouseLeave -= DominoProject_MouseLeave;
                 DominoProject.MouseUp -= Canvas_MouseUp;
             }
             largestX = 0;
@@ -487,7 +494,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject = new Canvas();
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
-            DominoProject.MouseLeave += DominoProject_MouseLeave;
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = Brushes.LightGray;
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
@@ -526,7 +532,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override bool Save()
         {
-            throw new NotImplementedException();
+            try
+            {
+                ProjectProperties.Save(this.FilePath);
+                return true;
+            }
+            catch (Exception) { return false; }
         }
 
         private void OpenBuildTools()
@@ -595,6 +606,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return;
             }
 
+            if (rect == null) return;
+
             var pos = e.GetPosition((Canvas)sender);
 
             var x = Math.Min(pos.X, SelectionStartPoint.X);
@@ -610,13 +623,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 rect.Visibility = System.Windows.Visibility.Visible;
             else
                 rect.Visibility = Visibility.Hidden;
-            
+
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
-        }
-        private void DominoProject_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //throw new NotImplementedException();
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
