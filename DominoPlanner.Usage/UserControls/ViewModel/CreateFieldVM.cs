@@ -354,7 +354,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void CreateFieldVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             bool important = false;
-            if (e.PropertyName.Equals("FieldSize"))
+            if (e.PropertyName.Equals("FieldSize") || e.PropertyName.Equals("BindSize"))
             {
                 fieldParameters.TargetCount = fsvm.FieldSize;
                 important = true;
