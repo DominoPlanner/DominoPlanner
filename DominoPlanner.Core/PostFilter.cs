@@ -288,7 +288,8 @@ namespace DominoPlanner.Core
                     shapes[i][j] = color;
                 }
             }
-            int index = position + (southeast ? 1 : 0);
+            var pos = reference.getPositionFromIndex(position);
+            var index = southeast ? reference.getIndexFromPosition(pos.X + (column ? 1 : 0), pos.Y + (!column ? 1 : 0), pos.CountInsideCell) : position;
             return AddRowColumn(reference, column, Enumerable.Repeat(index, count).ToArray(), shapes, out inserted_positions);
         }
             public static void copyColors(IRowColumnAddableDeletable reference, IDominoShape[] target, 

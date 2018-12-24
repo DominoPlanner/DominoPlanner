@@ -74,6 +74,20 @@ namespace DominoPlanner.Core
             }
             return b;
         }
+        public static WriteableBitmap[,] getPreviews(int targetDimension, XElement structure)
+        {
+            WriteableBitmap[,] array = new WriteableBitmap[3, 3];
+            StructureParameters sp = new StructureParameters();
+            sp.structureDefinitionXML = structure;
+            for (int col = 0; col < 3; col++)
+            {
+                for (int row = 0; row < 3; row++)
+                {
+                    array[col, row] = sp.DrawPreview(col, row, targetDimension);
+                }
+            }
+            return array;
+        }
     }
     public struct GenStructHelper
     {
