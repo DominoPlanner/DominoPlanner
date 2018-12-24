@@ -26,21 +26,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
             ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 2000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
-            /*jojoasdfStreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
+            /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(1), 3000,
+            ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(6), 3000,
                  @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             sr.Close();*/
-
+            
             _DominoList = new ObservableCollection<ColorListEntry>();
             
-
-
             _DominoList.Clear();
             ProjectProperties.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
-            
+
 
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { MessageBox.Show("asdf"); });
@@ -72,6 +70,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private double largestX = 0;
         private double largestY = 0;
         private List<DominoInCanvas> selectedDominoes;
+        private List<DominoInCanvas> possibleToPaste = new List<DominoInCanvas>();
         private DominoInCanvas[] copyedDominoes;
         private int startindex;
         private System.Windows.Point SelectionStartPoint;
@@ -157,7 +156,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ObservableCollection<ColorListEntry> _DominoList;
         public ObservableCollection<ColorListEntry> DominoList
         {
-            //get { return _DominoList; }
             get { return new ObservableCollection<ColorListEntry>(_DominoList.OrderBy(x => x.SortIndex)); }
             set
             {
@@ -222,6 +220,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void clearCanvas()
         {
+            clearPossibleToPaste();
             ClearFullSelection();
             while (DominoProject.Children.Count > 0)
             {
@@ -283,6 +282,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         List<int> toCopy = new List<int>();
         private void Copy()
         {
+            toCopy.Clear();
+            clearPossibleToPaste();
             if (selectedDominoes.Count < 0)
             {
                 MessageBox.Show("gibt nichts");
@@ -290,7 +291,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             copyedDominoes = new DominoInCanvas[selectedDominoes.Count];
             selectedDominoes.CopyTo(copyedDominoes);
-            
+
             startindex = DominoProject.Children.Count - 1;
             foreach (DominoInCanvas dic in selectedDominoes)
             {
@@ -301,6 +302,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
 
             selectedDominoes = new List<DominoInCanvas>();
+
+            int[] validPositions = ((ICopyPasteable)this.ProjectProperties).GetValidPastePositions(startindex);
+            
+            foreach (DominoInCanvas dic in DominoProject.Children.OfType<DominoInCanvas>())
+            {
+                if (validPositions.Contains(dic.idx))
+                {
+                    possibleToPaste.Add(dic);
+                    dic.PossibleToPaste = true;
+                }
+            }
         }
 
         private void Paste()
@@ -311,6 +323,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PasteFilter paste = new PasteFilter(ProjectProperties as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
             undoStack.Push(paste);
             paste.Apply();
+
+            clearPossibleToPaste();
+        }
+
+        private void clearPossibleToPaste()
+        {
+            foreach(DominoInCanvas dic in possibleToPaste)
+            {
+                dic.PossibleToPaste = false;
+            }
+            possibleToPaste.Clear();
         }
 
         public override void Undo()
@@ -320,7 +343,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             redoStack.Push(undoFilter);
             undoFilter.Undo();
 
-            if(!(undoFilter is SetColorOperation || undoFilter is PasteFilter))
+            if (!(undoFilter is SetColorOperation || undoFilter is PasteFilter))
             {
                 clearCanvas();
                 RefreshCanvas();
@@ -332,7 +355,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PostFilter redoFilter = redoStack.Pop();
             undoStack.Push(redoFilter);
             redoFilter.Apply();
-            
+
             if (!(redoFilter is SetColorOperation || redoFilter is PasteFilter))
             {
                 clearCanvas();
@@ -383,7 +406,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoInCanvas selDomino = selectedDominoes.First();
                 if (ProjectProperties is IRowColumnAddableDeletable)
                 {
-                    AddRows addRows = new AddRows((ProjectProperties as IRowColumnAddableDeletable), selDomino.domino.position.y, 1, selDomino.domino.color, addBelow);
+                    AddRows addRows = new AddRows((ProjectProperties as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
                     undoStack.Push(addRows);
                     addRows.Apply();
                     clearCanvas();
@@ -394,12 +417,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddColumn(bool addRight)
         {
-            if(selectedDominoes.Count == 1)
+            if (selectedDominoes.Count == 1)
             {
                 DominoInCanvas selDomino = selectedDominoes.First();
                 if (ProjectProperties is IRowColumnAddableDeletable)
                 {
-                    AddColumns addRows = new AddColumns((ProjectProperties as IRowColumnAddableDeletable), selDomino.domino.position.x, 1, selDomino.domino.color, addRight);
+                    AddColumns addRows = new AddColumns((ProjectProperties as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
                     undoStack.Push(addRows);
                     addRows.Apply();
                     clearCanvas();
@@ -410,16 +433,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void RemoveSelRows()
         {
-            if(selectedDominoes.Count > 0)
+            if (selectedDominoes.Count > 0)
             {
                 List<int> toRemove = new List<int>();
-                foreach(DominoInCanvas selDomino in selectedDominoes)
+                foreach (DominoInCanvas selDomino in selectedDominoes)
                 {
-                    int selRow = selDomino.domino.position.y;
-                    if (!toRemove.Contains(selRow))
-                    {
-                        toRemove.Add(selDomino.domino.position.y);
-                    }
+                    toRemove.Add(selDomino.idx);
                 }
                 DeleteRows deleteRows = new DeleteRows((ProjectProperties as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteRows);
@@ -436,11 +455,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 List<int> toRemove = new List<int>();
                 foreach (DominoInCanvas selDomino in selectedDominoes)
                 {
-                    int selRow = selDomino.domino.position.x;
-                    if (!toRemove.Contains(selRow))
-                    {
-                        toRemove.Add(selDomino.domino.position.x);
-                    }
+                    toRemove.Add(selDomino.idx);
                 }
                 DeleteColumns deleteColumns = new DeleteColumns((ProjectProperties as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteColumns);
@@ -464,6 +479,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoProject.MouseMove -= Canvas_MouseMove;
                 DominoProject.MouseUp -= Canvas_MouseUp;
             }
+            largestX = 0;
+            largestY = 0;
             DominoProject = new Canvas();
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
@@ -576,16 +593,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             rect.Width = w;
             rect.Height = h;
 
-            if (w > 6 || h > 6)
+            if (w > 10 || h > 10)
                 rect.Visibility = System.Windows.Visibility.Visible;
-
+            else
+                rect.Visibility = Visibility.Hidden;
+            
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (rect == null) return;
+            if (rect == null || rect.Visibility != Visibility.Visible) return;
             double top = Canvas.GetTop(rect);
             double right = Canvas.GetLeft(rect) + rect.ActualWidth;
             double bottom = Canvas.GetTop(rect) + rect.ActualHeight;
@@ -593,16 +612,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             for (int i = 0; i < DominoProject.Children.Count - 1; i++)
             {
-                DominoInCanvas dic = (DominoInCanvas)DominoProject.Children[i];
-                if ((dic.RenderedGeometry.Bounds.Left > left && dic.RenderedGeometry.Bounds.Left < right
-                    || dic.RenderedGeometry.Bounds.Right > left && dic.RenderedGeometry.Bounds.Right < right)
-                    && (dic.RenderedGeometry.Bounds.Top > top && dic.RenderedGeometry.Bounds.Top < bottom
-                    || dic.RenderedGeometry.Bounds.Bottom > top && dic.RenderedGeometry.Bounds.Bottom < bottom))
+                if (DominoProject.Children[i] is DominoInCanvas dic)
                 {
-                    if (!((DominoInCanvas)DominoProject.Children[i]).isSelected)
+                    if ((dic.RenderedGeometry.Bounds.Left > left && dic.RenderedGeometry.Bounds.Left < right
+                        || dic.RenderedGeometry.Bounds.Right > left && dic.RenderedGeometry.Bounds.Right < right)
+                        && (dic.RenderedGeometry.Bounds.Top > top && dic.RenderedGeometry.Bounds.Top < bottom
+                        || dic.RenderedGeometry.Bounds.Bottom > top && dic.RenderedGeometry.Bounds.Bottom < bottom
+                        || (dic.RenderedGeometry.Bounds.Top < top && dic.RenderedGeometry.Bounds.Bottom > top
+                        && dic.RenderedGeometry.Bounds.Top < bottom && dic.RenderedGeometry.Bounds.Bottom > bottom)))
                     {
-                        ((DominoInCanvas)DominoProject.Children[i]).isSelected = true;
-                        selectedDominoes.Add(((DominoInCanvas)DominoProject.Children[i]));
+                        if (!((DominoInCanvas)DominoProject.Children[i]).isSelected)
+                        {
+                            ((DominoInCanvas)DominoProject.Children[i]).isSelected = true;
+                            selectedDominoes.Add(((DominoInCanvas)DominoProject.Children[i]));
+                        }
                     }
                 }
             }
@@ -651,10 +674,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private ICommand _RemoveRows;
         public ICommand RemoveRows { get { return _RemoveRows; } set { if (value != _RemoveRows) { _RemoveRows = value; } } }
-        
+
         private ICommand _RemoveColumns;
         public ICommand RemoveColumns { get { return _RemoveColumns; } set { if (value != _RemoveColumns) { _RemoveColumns = value; } } }
-        
+
         private ICommand _CopyCom;
         public ICommand CopyCom { get { return _CopyCom; } set { if (value != _CopyCom) { _CopyCom = value; } } }
 

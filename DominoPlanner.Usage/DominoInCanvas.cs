@@ -28,6 +28,30 @@ namespace DominoPlanner.Usage
             }
         }
 
+        private bool _PossibleToPaste;
+
+        public bool PossibleToPaste
+        {
+            get { return _PossibleToPaste; }
+            set
+            {
+                if(_PossibleToPaste != value)
+                {
+                    _PossibleToPaste = value;
+                    if (value)
+                    {
+                        Stroke = Brushes.Plum;
+                        StrokeThickness = 5;
+                    }
+                    else
+                    {
+                        Stroke = Brushes.Blue;
+                        StrokeThickness = 2;
+                    }
+                }
+            }
+        }
+
         private bool _isSelected;
         public bool isSelected
         {
