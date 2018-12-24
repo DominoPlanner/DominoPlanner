@@ -26,12 +26,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
             ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 2000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
-            StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
+            /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
             ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(6), 3000,
                  @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
-            sr.Close();
+            sr.Close();*/
             
             _DominoList = new ObservableCollection<ColorListEntry>();
             
@@ -127,7 +127,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_DominoProject != value)
                 {
                     if (_DominoProject != null)
+                    {
                         _DominoProject.SizeChanged -= _DominoProject_SizeChanged;
+                    }
                     _DominoProject = value;
                     RaisePropertyChanged();
                     _DominoProject.SizeChanged += _DominoProject_SizeChanged;
@@ -477,6 +479,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 DominoProject.MouseDown -= Canvas_MouseDown;
                 DominoProject.MouseMove -= Canvas_MouseMove;
+                DominoProject.MouseLeave -= DominoProject_MouseLeave;
                 DominoProject.MouseUp -= Canvas_MouseUp;
             }
             largestX = 0;
@@ -484,6 +487,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject = new Canvas();
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
+            DominoProject.MouseLeave += DominoProject_MouseLeave;
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = Brushes.LightGray;
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
@@ -563,6 +567,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("hallo WElt");
             if (e.MiddleButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) return;
 
             SelectionStartPoint = e.GetPosition(DominoProject);
@@ -580,8 +585,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Released || rect == null)
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                if (rect != null)
+                {
+                    DominoProject.Children.Remove(rect);
+                    rect = null;
+                }
                 return;
+            }
 
             var pos = e.GetPosition((Canvas)sender);
 
@@ -601,6 +613,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
+        }
+        private void DominoProject_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
