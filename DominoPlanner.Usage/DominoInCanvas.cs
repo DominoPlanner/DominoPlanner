@@ -38,16 +38,7 @@ namespace DominoPlanner.Usage
                 if(_PossibleToPaste != value)
                 {
                     _PossibleToPaste = value;
-                    if (value)
-                    {
-                        Stroke = Brushes.Plum;
-                        StrokeThickness = 5;
-                    }
-                    else
-                    {
-                        Stroke = Brushes.Blue;
-                        StrokeThickness = 2;
-                    }
+                    refreshStroke();
                 }
             }
         }
@@ -61,16 +52,7 @@ namespace DominoPlanner.Usage
                 if (_isSelected != value)
                 {
                     _isSelected = value;
-                    if (value)
-                    {
-                        Stroke = Brushes.Red;
-                        StrokeThickness = 5;
-                    }
-                    else
-                    {
-                        Stroke = Brushes.Blue;
-                        StrokeThickness = 2;
-                    }
+                    refreshStroke();
                 }
             }
         }
@@ -142,6 +124,25 @@ namespace DominoPlanner.Usage
         public void DisposeStone()
         {
             domino.ColorChanged -= Domino_ColorChanged; //jojoasdf - nurnoch auch wieder aufrufen eim abbauen :D
+        }
+        
+        private void refreshStroke()
+        {
+            if (isSelected)
+            {
+                Stroke = Brushes.Red;
+                StrokeThickness = 5;
+            }
+            else if (PossibleToPaste)
+            {
+                Stroke = Brushes.Plum;
+                StrokeThickness = 5;
+            }
+            else
+            {
+                Stroke = Brushes.Blue;
+                StrokeThickness = 1;
+            }
         }
     }
 }

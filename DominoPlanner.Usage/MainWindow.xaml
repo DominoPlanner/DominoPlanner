@@ -34,6 +34,12 @@
         <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.CopyCom}"/>
         <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.PasteCom}"/>
         <KeyBinding Key="A" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.SelectAllCom}"/>
+        <KeyBinding Key="W" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
+        <KeyBinding Key="R" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveRows}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
     </Window.InputBindings>
     <Grid >
         <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0">
@@ -118,17 +124,17 @@
                     <MenuItem.Icon>
                         <Image Source="Icons/add.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Add row above" ToolTip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
-                    <MenuItem Header="Add row below" ToolTip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
-                    <MenuItem Header="Add column right" ToolTip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
-                    <MenuItem Header="Add column left" ToolTip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
+                    <MenuItem Header="Add row above" ToolTip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}" InputGestureText="Alt+W"/>
+                    <MenuItem Header="Add row below" ToolTip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}" InputGestureText="Alt+S"/>
+                    <MenuItem Header="Add column right" ToolTip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}" InputGestureText="Alt+D"/>
+                    <MenuItem Header="Add column left" ToolTip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}" InputGestureText="Alt+A"/>
                 </MenuItem>
                 <MenuItem Header="Remove">
                     <MenuItem.Icon>
                         <Image Source="Icons/remove.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}"/>
-                    <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
+                    <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" InputGestureText="Alt+R"/>
+                    <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGestureText="Alt+C"/>
                 </MenuItem>
             </MenuItem>
         </Menu>

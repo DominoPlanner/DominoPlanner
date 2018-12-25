@@ -322,6 +322,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Paste()
         {
+            if (selectedDominoes.Count == 0) return;
             int pasteindex = selectedDominoes.First().idx;
             selectedDominoes.First().isSelected = false;
             selectedDominoes.Clear();
@@ -523,11 +524,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             DominoInCanvas dic = (DominoInCanvas)sender;
 
-            if (dic.isSelected)
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                dic.isSelected = true;
+                if (!selectedDominoes.Contains(dic))
+                {
+                    selectedDominoes.Add(dic);
+                }
+            }
+            else if (e.RightButton == MouseButtonState.Pressed)
+            {
+                dic.isSelected = false;
                 selectedDominoes.Remove(dic);
-            else
-                selectedDominoes.Add(dic);
-            dic.isSelected = !dic.isSelected;
+            }
         }
 
         public override bool Save()
@@ -578,16 +587,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("hallo WElt");
-            if (e.MiddleButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) return;
+            if (e.MiddleButton == MouseButtonState.Pressed) return;
 
             SelectionStartPoint = e.GetPosition(DominoProject);
-
-            rect = new System.Windows.Shapes.Rectangle
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Stroke = System.Windows.Media.Brushes.LightBlue,
-                StrokeThickness = 8
-            };
+                rect = new System.Windows.Shapes.Rectangle
+                {
+                    Stroke = Brushes.LightBlue,
+                    StrokeThickness = 8
+                };
+            }
+            else if (e.RightButton == MouseButtonState.Pressed)
+            {
+                rect = new System.Windows.Shapes.Rectangle
+                {
+                    Stroke = Brushes.IndianRed,
+                    StrokeThickness = 8
+                };
+            }
             Canvas.SetLeft(rect, SelectionStartPoint.X);
             Canvas.SetTop(rect, SelectionStartPoint.Y);
             rect.Visibility = System.Windows.Visibility.Hidden;
@@ -596,7 +614,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Released)
+            if (e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
             {
                 if (rect != null)
                 {
@@ -620,7 +638,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             rect.Height = h;
 
             if (w > 10 || h > 10)
-                rect.Visibility = System.Windows.Visibility.Visible;
+                rect.Visibility = Visibility.Visible;
             else
                 rect.Visibility = Visibility.Hidden;
 
@@ -640,17 +658,30 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (DominoProject.Children[i] is DominoInCanvas dic)
                 {
-                    if ((dic.RenderedGeometry.Bounds.Left > left && dic.RenderedGeometry.Bounds.Left < right
-                        || dic.RenderedGeometry.Bounds.Right > left && dic.RenderedGeometry.Bounds.Right < right)
+                  if ((dic.RenderedGeometry.Bounds.Left > left && dic.RenderedGeometry.Bounds.Left < right
+                        || dic.RenderedGeometry.Bounds.Right > left && dic.RenderedGeometry.Bounds.Right < right
+                        || dic.RenderedGeometry.Bounds.Left < left && dic.RenderedGeometry.Bounds.Right > left 
+                        && dic.RenderedGeometry.Bounds.Left < right && dic.RenderedGeometry.Bounds.Right > right)
                         && (dic.RenderedGeometry.Bounds.Top > top && dic.RenderedGeometry.Bounds.Top < bottom
                         || dic.RenderedGeometry.Bounds.Bottom > top && dic.RenderedGeometry.Bounds.Bottom < bottom
                         || (dic.RenderedGeometry.Bounds.Top < top && dic.RenderedGeometry.Bounds.Bottom > top
                         && dic.RenderedGeometry.Bounds.Top < bottom && dic.RenderedGeometry.Bounds.Bottom > bottom)))
                     {
-                        if (!((DominoInCanvas)DominoProject.Children[i]).isSelected)
+                        if (e.ChangedButton == MouseButton.Left)
                         {
-                            ((DominoInCanvas)DominoProject.Children[i]).isSelected = true;
-                            selectedDominoes.Add(((DominoInCanvas)DominoProject.Children[i]));
+                            if (!((DominoInCanvas)DominoProject.Children[i]).isSelected)
+                            {
+                                ((DominoInCanvas)DominoProject.Children[i]).isSelected = true;
+                                selectedDominoes.Add(((DominoInCanvas)DominoProject.Children[i]));
+                            }
+                        }
+                        else if (e.ChangedButton == MouseButton.Right)
+                        {
+                            if (((DominoInCanvas)DominoProject.Children[i]).isSelected)
+                            {
+                                ((DominoInCanvas)DominoProject.Children[i]).isSelected = false;
+                                selectedDominoes.Remove(((DominoInCanvas)DominoProject.Children[i]));
+                            }
                         }
                     }
                 }
