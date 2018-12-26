@@ -123,7 +123,7 @@ namespace DominoPlanner.Usage
 
         public void DisposeStone()
         {
-            domino.ColorChanged -= Domino_ColorChanged; //jojoasdf - nurnoch auch wieder aufrufen eim abbauen :D
+            domino.ColorChanged -= Domino_ColorChanged;
         }
         
         private void refreshStroke()

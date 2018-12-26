@@ -129,6 +129,7 @@
       <DependentUpon>NewProject.xaml</DependentUpon>
     </Compile>
     <Compile Include="NewProjectVM.cs" />
+    <Compile Include="ProjectCanvas.cs" />
     <Compile Include="ProjectComposite.cs" />
     <Compile Include="ProjectListComposite.cs" />
     <Compile Include="ProtocolV.xaml.cs">

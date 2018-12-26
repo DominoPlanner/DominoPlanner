@@ -36,6 +36,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters;
         private DominoTransfer _dominoTransfer;
@@ -304,6 +305,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public System.Windows.Threading.Dispatcher dispatcher;
         private void refreshPlanPic()
         {
+            System.Diagnostics.Debug.WriteLine(progress.ToString());
             if (dispatcher == null)
             {
                 CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
@@ -313,17 +315,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 dispatcher.BeginInvoke((Action)(() =>
                 {
-                    CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                    CurrentPlan = newBitmap;
                     cursor = null;
                 }));
             }
         }
-
+        
         private async void refresh()
         {
             cursor = Cursors.Wait;
+            refrshCounter++;
             Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(progress));
-            dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(function);
+            DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
+            refrshCounter--;
+            if(refrshCounter == 0)
+            {   
+                dominoTransfer = dt;
+            }
         }
         #endregion
 
