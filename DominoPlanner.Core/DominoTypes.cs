@@ -88,8 +88,10 @@ namespace DominoPlanner.Core
     /// Stellt einen Dominostein beliebiger Form bereit, der durch Eckpunkte definiert wird.
     /// Implementiert IDominoShape.
     /// </summary>
+    [ProtoContract]
     public class PathDomino : IDominoShape
     {
+        [ProtoMember(1)]
         public Point[] points;
         public override bool Equals(IDominoShape other)
         {
@@ -169,6 +171,7 @@ namespace DominoPlanner.Core
             this.X = X;
             this.Y = Y;
         }
+        private Point() { }
 
         public static implicit operator System.Windows.Point(Point v)
         {

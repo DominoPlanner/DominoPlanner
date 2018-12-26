@@ -283,11 +283,6 @@ namespace DominoPlanner.Core
         {
             return (a - b) * (a - b);
         }
-
-        double IColorComparison.Distance(Lab lab1, Lab lab2)
-        {
-            throw new NotImplementedException();
-        }
     }
 
 }

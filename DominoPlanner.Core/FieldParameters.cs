@@ -281,23 +281,6 @@ namespace DominoPlanner.Core
         #endregion
         #region private helper methods
         /// <summary>
-        /// Verkleinert das Bild mit der spezifizierten Genauigkeit und auf die spezifizierte Größe.
-        /// </summary>
-        /// <param name="image">Das zu verkleinernde Bild.</param>
-        [ProtoAfterDeserialization]
-        
-        /// <summary>
-        /// Berechnet die Shapes mit den angegebenen Parametern.
-        /// </summary>
-        
-        public void restoreShapes()
-        {
-            //bool last_valid_temp = lastValid;
-            shapes = last.shapes;
-            ReadUsedColors();
-            //lastValid = last_valid_temp;
-        }
-        /// <summary>
         /// Berechnet aus dem Shape-Array die Farben.
         /// </summary>
         internal override void CalculateColors()

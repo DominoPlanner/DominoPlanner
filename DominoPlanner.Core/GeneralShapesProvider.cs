@@ -59,7 +59,7 @@ namespace DominoPlanner.Core
             set
             {
                 _allowStretch = value;
-                lastValid = false;
+                usedColorsValid = false;
             }
         }
         #endregion
@@ -258,6 +258,7 @@ namespace DominoPlanner.Core
             }
             usedColorsValid = true;
         }
+        
         #endregion
     }
 

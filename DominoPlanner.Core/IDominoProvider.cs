@@ -31,25 +31,6 @@ namespace DominoPlanner.Core
         /// </summary>
         [ProtoMember(3)]
         public bool hasProcotolDefinition { get; set; }
-        [ProtoMember(4, OverwriteList = true)]
-        private byte[] source_surrogate
-        {
-            get
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    source.Bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                    return memoryStream.GetBuffer();
-                }
-            }
-            set
-            {
-                using (MemoryStream memoryStream = new MemoryStream(value))
-                {
-                    source = new Image<Emgu.CV.Structure.Bgra, byte>(new System.Drawing.Bitmap(memoryStream)).Mat;
-                }
-            }
-        }
         /// <summary>
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
@@ -106,25 +87,6 @@ namespace DominoPlanner.Core
             }
         }
         public ColorRepository color_filtered { get; private set; }
-        [ProtoMember(8, OverwriteList = true)]
-        private byte[] image_filtered_surrogate
-        {
-            get
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    image_filtered.Bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                    return memoryStream.GetBuffer();
-                }
-            }
-            set
-            {
-                using (MemoryStream memoryStream = new MemoryStream(value))
-                {
-                    image_filtered = new Image<Emgu.CV.Structure.Bgra, byte>(new System.Drawing.Bitmap(memoryStream)).Mat;
-                }
-            }
-        }
         public Mat image_filtered { get; private set; }
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
@@ -260,7 +222,7 @@ namespace DominoPlanner.Core
         public bool sourceValid = false;
         [ProtoMember(1005)]
         public bool usedColorsValid = false;
-        [ProtoMember(1006)]
+        [ProtoMember(4)]
         public bool Editing { get; set; }
         [ProtoMember(2)]
         public DominoTransfer last;
@@ -576,12 +538,6 @@ namespace DominoPlanner.Core
             lastValid = false;
             colorsValid = true;
         }
-        [ProtoAfterDeserialization]
-        internal void ColorAfterDeserial()
-        {
-            // Beim Load werden Stück für Stück die Farbfilter angewendet, da die Liste mit den Events versehen wird 
-            // LastValid wird erst nach der Liste deserialisiert, das sollte also passen
-        }
         internal void ApplyImageFilters()
         {
             var image_filtered = source.ToImage<Emgu.CV.Structure.Bgra, byte>();
@@ -600,6 +556,15 @@ namespace DominoPlanner.Core
             {
                 Serializer.Serialize(stream, this);
             }
+        }
+        [ProtoAfterDeserialization]
+        public void restoreShapes()
+        {
+            UpdateSource();
+            ApplyImageFilters();
+            ApplyColorFilters();
+            GenerateShapes();
+            ReadUsedColors();
         }
         public abstract object Clone();
         #endregion
@@ -623,7 +588,7 @@ namespace DominoPlanner.Core
         [ProtoMember(1)]
         public int[] counts { get; set; }
 
-        [ProtoMember(1006)]
+        [ProtoMember(4)]
         public bool Editing { get; set; }
     }
 

@@ -43,10 +43,10 @@ namespace DominoPlanner.CoreTests
             }*/
             //CircleTest("gre.jpg");
             //for (int i = 0; i < 1; i++)
-            //SpiralTest("gre.jpg");
+            SpiralTest("gre.jpg");
             WallTest("gre.jpg");
             //ColorRepoSaveTest();
-            //FieldTest("bird.jpg");
+            FieldTest("bird.jpg");
             //
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -132,10 +132,10 @@ namespace DominoPlanner.CoreTests
                 ColorDetectionMode.Cie1976Comparison, new Dithering(), new NoColorRestriction());
             p.TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            //p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
+            p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
-            watch.Restart();
+            /*watch.Restart();
             p.ditherMode = new FloydSteinbergDithering();
             watch.Stop();
             Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
@@ -157,7 +157,7 @@ namespace DominoPlanner.CoreTests
             watch.Restart();
             p.Generate().GenerateImage().Save("tests/fieldtest_jjn.png");
             watch.Stop();
-            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);
+            Console.WriteLine("elapsed: " + watch.ElapsedMilliseconds);*/
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate()));
             // Filtertests für ein Logo oder ähnliches
             /*var erster = ((BlendFileFilter)p.ImageFilters[0]);
@@ -235,7 +235,7 @@ namespace DominoPlanner.CoreTests
 
             });*/
             //sw.Close();
-            /*p.Save("FieldTest.DObject");
+            p.Save("FieldTest.DObject");
             watch = Stopwatch.StartNew();
             int[] counts = Workspace.LoadColorList<FieldParameters>("FieldTest.DObject");
             watch.Stop();
@@ -244,6 +244,7 @@ namespace DominoPlanner.CoreTests
             
             watch = Stopwatch.StartNew();
             FieldParameters loaded = Workspace.Load<FieldParameters>("FieldTest.DObject");
+            loaded.Generate();
             watch.Stop();
             Console.WriteLine("Load Time: " + watch.ElapsedMilliseconds);
             //loaded.last.GenerateImage(Colors.Transparent).Save("tests/afterLoad.png");
@@ -260,7 +261,7 @@ namespace DominoPlanner.CoreTests
             //t = loaded.Generate();
             p.Generate().GenerateImage().Save("tests/fieldtest_after_load.png");
 
-            Console.WriteLine(String.Join(", ", loaded.counts));*/
+            Console.WriteLine(String.Join(", ", loaded.counts));
         }
         static void WBXTest()
         {
@@ -278,7 +279,7 @@ namespace DominoPlanner.CoreTests
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             SpiralParameters p = new SpiralParameters(path, 50, "colors.DColor", 
-                ColorDetectionMode.CieDe2000Comparison, new FloydSteinbergDithering(), AverageMode.Corner, new NoColorRestriction());
+                ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -321,9 +322,16 @@ namespace DominoPlanner.CoreTests
 
             //});
             sw.Close();
-            p.Save("spiral.DObject");
-            IDominoProvider c = Workspace.Load<IDominoProvider>("spiral.DObject");
-
+            p.Save("Spiral.DObject");
+            watch = Stopwatch.StartNew();
+            int[] counts = Workspace.LoadColorList<SpiralParameters>("Spiral.DObject");
+            watch.Stop();
+            Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
+            Console.WriteLine(String.Join(", ", counts));
+            
+            watch = Stopwatch.StartNew();
+            SpiralParameters loaded = Workspace.Load<SpiralParameters>("Spiral.DObject");
+            loaded.Generate().GenerateImage().Save("tests/spiral_after_load.png");
         }
         static void CircleTest(string path)
         {
@@ -436,6 +444,8 @@ namespace DominoPlanner.CoreTests
             //sw.Close();
             p.Save("structure.DObject");
             StructureParameters p2 = Workspace.Load<StructureParameters>("structure.DObject");
+            p2.Generate().GenerateImage().Save("tests/wall_after_load.png");
+            
         }
         static void HistoryTreeFieldTest(String path)
         {

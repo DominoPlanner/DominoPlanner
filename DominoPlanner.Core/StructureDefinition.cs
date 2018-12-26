@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -89,11 +90,16 @@ namespace DominoPlanner.Core
             return array;
         }
     }
+    [ProtoContract]
     public struct GenStructHelper
     {
+        [ProtoMember(1)]
         public double width;
+        [ProtoMember(2)]
         public double height;
+        [ProtoMember(3)]
         public IDominoShape[] dominoes;
+        [ProtoMember(4)]
         public bool HasProtocolDefinition;
     }
     public class CellDefinition
