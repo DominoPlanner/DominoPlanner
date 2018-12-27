@@ -36,7 +36,7 @@ namespace DominoPlanner.Core
 
         public PositionWrapper getPositionFromIndex(int index)
         {
-            return new PositionWrapper() { X = index % current_width, Y = index / current_width, CountInsideCell = 0 };
+            return getPositionFromIndex(index, current_width, current_height);
         }
 
         public int getIndexFromPosition(PositionWrapper wrapper)
@@ -116,5 +116,19 @@ namespace DominoPlanner.Core
             return column ? current_height : current_width;
         }
 
+        public (int startindex, int endindex) getIndicesOfCell(int row, int col, int target_width, int target_height)
+        {
+            if (row < target_height && col < target_width && row >= 0 && col >= 0)
+            {
+                int index = getIndexFromPosition(row, col, 0, target_width, target_height, false);
+                return (index, index);
+            }
+            return (0, -1);
+        }
+
+        public PositionWrapper getPositionFromIndex(int index, int new_width, int new_height)
+        {
+            return new PositionWrapper() { X = index % new_width, Y = index / new_width, CountInsideCell = 0 };
+        }
     }
 }

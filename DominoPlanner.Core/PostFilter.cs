@@ -77,6 +77,7 @@ namespace DominoPlanner.Core
         int current_height { get; set; }
 
         PositionWrapper getPositionFromIndex(int v);
+        PositionWrapper getPositionFromIndex(int v, int new_width, int new_height);
 
         int getIndexFromPosition(PositionWrapper wrapper);
 
@@ -91,6 +92,8 @@ namespace DominoPlanner.Core
         void ReinsertRowColumn(int[] rowcolumn, bool column, int index, IDominoShape[] target, int target_width, int target_height);
 
         int getLengthOfTypicalRowColumn(bool column);
+
+        (int startindex, int endindex) getIndicesOfCell(int row, int col, int target_width, int target_height);
     }
     public struct PositionWrapper
     {
@@ -101,7 +104,7 @@ namespace DominoPlanner.Core
     public class AddRows : PostFilter
     {
         IRowColumnAddableDeletable reference;
-        int[] added_indizes;
+        public int[] added_indizes;
         int position;
         int color;
         int count;
@@ -123,14 +126,14 @@ namespace DominoPlanner.Core
         public override void Undo()
         {
             ((IDominoProvider)reference).last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, false, added_indizes, out _, out _);
+                AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
         }
     }
     public class DeleteRows : PostFilter
     {
         IRowColumnAddableDeletable reference;
         int[] positions;
-        int[] remaining_positions;
+        PositionWrapper[] remaining_positions;
         int[][] oldShapes;
         public DeleteRows(IRowColumnAddableDeletable reference, int[] positions)
         {
@@ -140,7 +143,8 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             ((IDominoProvider)reference).last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, false, positions, out remaining_positions, out oldShapes);
+                AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, positions), 
+                out remaining_positions, out oldShapes);
         }
         public override void Undo()
         {
@@ -151,7 +155,7 @@ namespace DominoPlanner.Core
     public class AddColumns : PostFilter
     {
         IRowColumnAddableDeletable reference;
-        int[] added_indizes;
+        public int[] added_indizes;
         int position;
         int color;
         int count;
@@ -173,14 +177,14 @@ namespace DominoPlanner.Core
         public override void Undo()
         {
             ((IDominoProvider)reference).last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, true, added_indizes, out _, out _);
+                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
         }
     }
     public class DeleteColumns : PostFilter
     {
         IRowColumnAddableDeletable reference;
         int[] positions;
-        int[] remaining_positions;
+        PositionWrapper[] remaining_positions;
         int[][] oldShapes;
         public DeleteColumns(IRowColumnAddableDeletable reference, int[] position)
         {
@@ -191,7 +195,7 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             ((IDominoProvider)reference).last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, true, positions, out remaining_positions, out oldShapes);
+                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, positions), out remaining_positions, out oldShapes);
         }
         public override void Undo()
         {
@@ -201,30 +205,40 @@ namespace DominoPlanner.Core
     }
     public static class AddDeleteHelper
     {
-        
-        public static int[] getDistict(bool column, IRowColumnAddableDeletable reference, int[] positions)
+        public static PositionWrapper[] IndicesToPositions(IRowColumnAddableDeletable reference, int[] positions)
+        {
+            PositionWrapper[] wrapper = new PositionWrapper[positions.Length];
+            for (int i = 0; i < positions.Length; i++)
+            {
+                wrapper[i] = reference.getPositionFromIndex(positions[i]);
+            }
+            return wrapper;
+        }
+        public static int[] getDistinct(bool column, IRowColumnAddableDeletable reference, PositionWrapper[] positions)
         {
             int max_index = column ? reference.current_width : reference.current_height; 
             int[] counts = new int[max_index + 1];
             for (int i = 0; i < positions.Length; i++)
             {
-                var pos = reference.getPositionFromIndex(positions[i]);
-                var current = (column ? pos.X : pos.Y);
-                if (current < 0 || current > max_index) throw new InvalidOperationException("invalid position for insert");
+                var current = (column ? positions[i].X : positions[i].Y);
+                if (current < 0 || current > max_index) continue;
                 counts[current]++;
             }
             return counts;
         }
-        public static IDominoShape[] DeleteRowColumn(IRowColumnAddableDeletable reference, bool column, int[] positions, 
-            out int[] remaining_positions, out int[][] deleted_shapes)
+        public static IDominoShape[] DeleteRowColumn(IRowColumnAddableDeletable reference, bool column, PositionWrapper[] positions, 
+            out PositionWrapper[] remaining_positions, out int[][] deleted_shapes)
         {
-            int[] distinct = getDistict(column, reference, positions);
+            int[] distinct = getDistinct(column, reference, positions);
+            distinct[distinct.Length - 1] = 0;
             int total_deleted = distinct.Sum(x => x > 0 ? 1 : 0);
+            if (total_deleted == 0)
+                throw new InvalidOperationException("Nothing to delete. Borders can't be deleted.");
             int new_width = reference.current_width - (column ? total_deleted : 0);
             int new_height = reference.current_height - (!column ? total_deleted : 0);
             IDominoShape[] new_shapes = reference.getNewShapes(new_width, new_height);
             deleted_shapes = new int[total_deleted][];
-            remaining_positions = new int[total_deleted];
+            remaining_positions = new PositionWrapper[total_deleted];
             int deleted_counter = 0;
             int rowcollength = deleted_shapes.Length / total_deleted;
             for (int i = -1; i < distinct.Length; i++)
@@ -233,8 +247,10 @@ namespace DominoPlanner.Core
                 {
 
                     deleted_shapes[deleted_counter] = reference.ExtractRowColumn(column, i);
-                    int position = reference.getIndexFromPosition(i - deleted_counter, 0, 0, new_width, new_height, column);
-                    remaining_positions[deleted_counter] = position;
+                    remaining_positions[deleted_counter] = new PositionWrapper() {
+                    X = column ? (i - deleted_counter) : 0,
+                    Y = column ? 0 : (i - deleted_counter),
+                    CountInsideCell = 0};
                     deleted_counter++;
                 }
                 else
@@ -247,14 +263,17 @@ namespace DominoPlanner.Core
             reference.current_height = new_height;
             return new_shapes;
         }
-        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference, bool column, int[] positions, int[][] shapes, out int[] inserted_positions)
+        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference, bool column, 
+            PositionWrapper[] positions, int[][] shapes, out int[] inserted_positions)
         {
-            int[] distinct = getDistict(column, reference, positions);
-            int total_added = distinct.Sum();
+            int total_added = positions.Length;
             int new_width = reference.current_width + (column ? total_added : 0);
             int new_height = reference.current_height + (!column ? total_added : 0);
+            int[] distinct = getDistinct(column, reference, positions);
+            total_added = distinct.Sum();
             IDominoShape[] new_shapes = reference.getNewShapes(new_width, new_height);
-            inserted_positions = new int[total_added];
+            int typicallength = reference.getLengthOfTypicalRowColumn(column);
+            List<int> insertedPositions = new List<int>();
             int added_counter = 0;
             for (int i = -1; i < distinct.Length; i++)
             {
@@ -264,8 +283,7 @@ namespace DominoPlanner.Core
                     {
                         reference.ReinsertRowColumn(shapes[added_counter + i2], column, 
                             i + added_counter + i2, new_shapes, new_width, new_height);
-                        inserted_positions[added_counter+i2] =
-                            reference.getIndexFromPosition(i + i2 + added_counter, 0, 0, new_width, new_height, column);
+                        insertedPositions.AddRange(getAllIndicesInRowColumn(reference, i + i2 + added_counter, column, new_shapes.Length, new_width, new_height));
                     }
                     added_counter+=distinct[i];
                 }
@@ -274,9 +292,10 @@ namespace DominoPlanner.Core
             }
             reference.current_width = new_width;
             reference.current_height = new_height;
+            inserted_positions = insertedPositions.ToArray();
             return new_shapes;
         }
-        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference, 
+        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference,
             bool column, int position, bool southeast, int count, int color, out int[] inserted_positions)
         {
             int[][] shapes = new int[count][];
@@ -289,8 +308,13 @@ namespace DominoPlanner.Core
                 }
             }
             var pos = reference.getPositionFromIndex(position);
-            var index = southeast ? reference.getIndexFromPosition(pos.Y + (!column ? 1 : 0), pos.X + (column ? 1 : 0), pos.CountInsideCell) : position;
-            return AddRowColumn(reference, column, Enumerable.Repeat(index, count).ToArray(), shapes, out inserted_positions);
+            var res_y = southeast ? (pos.Y + (!column ? 1 : 0)) : pos.Y;
+            var res_x = southeast ? (pos.X + (column ? 1 : 0)) : pos.X;
+            if (res_y == -1 || res_y == reference.current_height + (column ? 0 : count)
+                || res_x == -1 || res_x == reference.current_width + (column ? count : 0))
+                throw new InvalidOperationException("Can't insert row/column here, borders must remain borders");
+            return AddRowColumn(reference, column, Enumerable.Repeat(new PositionWrapper() { X = res_x, Y = res_y, CountInsideCell = 0}, 
+                count).ToArray(), shapes, out inserted_positions);
         }
             public static void copyColors(IRowColumnAddableDeletable reference, IDominoShape[] target, 
             int startX, int endX, int startY, int endY, int shiftX, int shiftY, int target_width, int target_height, bool swapCoords = false)
@@ -310,6 +334,28 @@ namespace DominoPlanner.Core
                     reference.copyGroup(target, x, y, x + shiftX, y + shiftY, target_width, target_height);
                 }
             }
+        }
+        public static int[] getAllIndicesInRowColumn(IRowColumnAddableDeletable reference ,int rowColumn,  bool column, int maxindex, int current_width, int current_height)
+        {
+            int[] result = new int[reference.getLengthOfTypicalRowColumn(column)];
+            int position = 0;
+            for (int i = -1; i <= (column ? reference.current_height : reference.current_width); i++)
+            {
+                var (a, b) = reference.getIndicesOfCell(column ?  i : rowColumn, column ? rowColumn : i, current_width, current_height);
+                for (int j = a; j <= b; j++)
+                {
+                    if (j >= 0 && j < maxindex && position < result.Length )
+                    {
+                        result[position] = j;
+                        position++;
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            return result;
         }
     }
     public interface ICopyPasteable
