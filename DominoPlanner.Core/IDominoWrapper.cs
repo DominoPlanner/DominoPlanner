@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -132,6 +133,13 @@ namespace DominoPlanner.Core
                 if (_obj == null)
                     _obj = Workspace.Load<DominoAssembly>(relativePath);
                 return _obj;
+            }
+        }
+        public void Save()
+        {
+            using (FileStream stream = new FileStream(Workspace.Instance.MakePathAbsolute(relativePath), FileMode.Create))
+            {
+                Serializer.Serialize(stream, obj);
             }
         }
     }
