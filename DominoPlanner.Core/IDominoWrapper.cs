@@ -120,7 +120,7 @@ namespace DominoPlanner.Core
         // irgendwas, wo die Anzahlen vom Benutzer vorgegeben werden,
     }
     [ProtoContract]
-    public class AssemblyNode
+    public class AssemblyNode : IDominoWrapper
     {
         [ProtoMember(1)]
         public string relativePath;
