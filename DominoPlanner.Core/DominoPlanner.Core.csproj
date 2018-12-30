@@ -101,6 +101,7 @@
     <Compile Include="HistoryTree.cs" />
     <Compile Include="IDominoProvider.cs" />
     <Compile Include="IDominoShape.cs" />
+    <Compile Include="IDominoWrapper.cs" />
     <Compile Include="IFinalizable.cs" />
     <Compile Include="ImageFilter.cs" />
     <Compile Include="IterationInformation.cs" />
