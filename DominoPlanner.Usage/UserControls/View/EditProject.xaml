@@ -41,14 +41,14 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Name"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectName}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Rows"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Stones/Row"/>
-                    <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Amount"/>
-                    <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Name"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectName}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Rows"/>
+                    <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Stones/Row"/>
+                    <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount"/>
+                    <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
                 </Grid>
                 <Image Grid.Row="1" Source="{Binding ImageSource}">
                     <i:Interaction.Triggers>

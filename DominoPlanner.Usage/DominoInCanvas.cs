@@ -78,12 +78,11 @@ namespace DominoPlanner.Usage
         {
             colorRepository = colorlist;
             this.idx = idx;
-            this.ToolTip = idx.ToString();
             StoneColor = colorlist[domino.color].mediaColor;
             this.domino = domino;
             domino.ColorChanged += Domino_ColorChanged;
             Stroke = Brushes.Blue;
-            StrokeThickness = 2;
+            StrokeThickness = 1;
             DominoPath rectangle = domino.GetPath();
             canvasPoints[0] = new System.Windows.Point(rectangle.points[0].X, rectangle.points[0].Y);
             canvasPoints[1] = new System.Windows.Point(rectangle.points[1].X, rectangle.points[1].Y);

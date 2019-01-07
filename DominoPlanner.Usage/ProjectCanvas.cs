@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,11 +7,13 @@ namespace DominoPlanner.Usage
 {
     class ProjectCanvas : Canvas
     {
+        public List<DominoInCanvas> Stones = new List<DominoInCanvas>();
+
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
 
-            foreach (DominoInCanvas dic in Childrenn)
+            foreach (DominoInCanvas dic in Stones)
             {
                 Point point1 = dic.canvasPoints[0];
                 Point point2 = dic.canvasPoints[1];
@@ -49,7 +47,5 @@ namespace DominoPlanner.Usage
             }
 
         }
-
-        public List<DominoInCanvas> Childrenn = new List<DominoInCanvas>();
     }
 }
