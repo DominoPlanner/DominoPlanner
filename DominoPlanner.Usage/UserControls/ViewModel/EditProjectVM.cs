@@ -24,7 +24,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ImageSource = @"TestImages\mountain.jpg";
             string ColorSource = @"TestImages\colors.DColor";
             Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
-            ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 100000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+            ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 1000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
 
             /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
@@ -419,7 +419,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddRow(bool addBelow)
         {
-            if (selectedDominoes.Count == 1)
+            if (selectedDominoes.Count > 0)
             {
                 DominoInCanvas selDomino = selectedDominoes.First();
                 if (ProjectProperties is IRowColumnAddableDeletable)
@@ -429,13 +429,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     addRows.Apply();
                     clearCanvas();
                     RefreshCanvas();
+                    for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                    {
+                        DominoProject.Childrenn[addRows.added_indizes[i]].isSelected = true;
+                        selectedDominoes.Add(DominoProject.Childrenn[addRows.added_indizes[i]]);
+                    }
+                    DominoProject.InvalidateVisual();
                 }
             }
         }
 
         private void AddColumn(bool addRight)
         {
-            if (selectedDominoes.Count == 1)
+            if (selectedDominoes.Count > 0)
             {
                 DominoInCanvas selDomino = selectedDominoes.First();
                 if (ProjectProperties is IRowColumnAddableDeletable)
@@ -445,6 +451,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     addRows.Apply();
                     clearCanvas();
                     RefreshCanvas();
+                    for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                    {
+                        DominoProject.Childrenn[addRows.added_indizes[i]].isSelected = true;
+                        selectedDominoes.Add(DominoProject.Childrenn[addRows.added_indizes[i]]);
+                    }
+                    DominoProject.InvalidateVisual();
                 }
             }
         }
