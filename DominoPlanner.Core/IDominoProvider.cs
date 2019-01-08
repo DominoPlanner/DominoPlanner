@@ -13,6 +13,7 @@ using ProtoBuf;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using Emgu.CV.Structure;
+using System.Linq;
 
 namespace DominoPlanner.Core
 {
@@ -551,11 +552,7 @@ namespace DominoPlanner.Core
         }
         public void Save(string filepath)
         {
-            filepath = Workspace.Instance.MakePathAbsolute(filepath);
-            using (FileStream stream = new FileStream(filepath, FileMode.Create))
-            {
-                Serializer.Serialize(stream, this);
-            }
+            Workspace.Save(this, filepath);
         }
         [ProtoAfterDeserialization]
         public void restoreShapes()

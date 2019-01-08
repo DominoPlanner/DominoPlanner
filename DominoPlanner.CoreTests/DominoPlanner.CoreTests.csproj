@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="PostFilterTest.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TreeTests.cs" />
   </ItemGroup>
