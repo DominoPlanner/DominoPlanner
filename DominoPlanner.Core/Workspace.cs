@@ -57,6 +57,18 @@ namespace DominoPlanner.Core
             }
             return result;
         }
+        public static void Save(IWorkspaceLoadable obj, string filepath)
+        {
+            filepath = Workspace.Instance.MakePathAbsolute(filepath);
+            using (FileStream stream = new FileStream(filepath, FileMode.Create))
+            {
+                Serializer.Serialize(stream, obj);
+                if (Workspace.Instance.openedFiles.FindIndex(ob => ob.Item1 == filepath) == -1)
+                {
+                    Workspace.Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(filepath, obj));
+                }
+            }
+        }
         public static int[] LoadColorList<T>(string path) where T : IWorkspaceLoadColorList
         {
             path = Workspace.Instance.MakePathAbsolute(path);

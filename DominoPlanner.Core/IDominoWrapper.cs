@@ -31,8 +31,8 @@ namespace DominoPlanner.Core
     }
     public class DominoAssembly : IWorkspaceLoadable
     {
-        [ProtoMember(1)]
-        List<IDominoWrapper> children;
+        [ProtoMember(1, OverwriteList =true)]
+        public List<IDominoWrapper> children;
         [ProtoMember(2)]
         List<Constraint> constraints;
         private string _colorPath;
@@ -50,6 +50,20 @@ namespace DominoPlanner.Core
             }
         }
         public ColorRepository colors { get; private set; }
+        public DominoAssembly(string colorPath) : this()
+        {
+            this.colorPath = colorPath;
+        }
+        private DominoAssembly()
+        {
+            children = new List<IDominoWrapper>();
+        }
+
+        public void Save(string relativePath)
+        {
+            Workspace.Save(this, relativePath);
+        }
+
     }
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldNode))]
@@ -79,26 +93,43 @@ namespace DominoPlanner.Core
                 return obj.counts;
             }
         }
+        public DocumentNode(string relativePath)
+        {
+            this.relativePath = relativePath;
+        }
     }
     [ProtoContract]
     public class FieldNode : DocumentNode
     {
+        public FieldNode(string relativePath) : base(relativePath)
+        {
+
+        }
         // hier kommen mal so Sachen wie Feldanstoß rein
     }
     [ProtoContract]
     public class StructureNode : DocumentNode
     {
+        public StructureNode(string relativePath) : base(relativePath)
+        {
 
+        }
     }
     [ProtoContract]
     public class SpiralNode : DocumentNode
     {
-        
+        public SpiralNode(string relativePath) : base(relativePath)
+        {
+
+        }
     }
     [ProtoContract]
     public class CircleNode : DocumentNode
     {
+        public CircleNode(string relativePath) : base(relativePath)
+        {
 
+        }
     }
     [ProtoContract]
     public class LineNode : IDominoWrapper
@@ -135,12 +166,13 @@ namespace DominoPlanner.Core
                 return _obj;
             }
         }
-        public void Save()
+        public AssemblyNode(string relativePath)
         {
-            using (FileStream stream = new FileStream(Workspace.Instance.MakePathAbsolute(relativePath), FileMode.Create))
-            {
-                Serializer.Serialize(stream, obj);
-            }
+            this.relativePath = relativePath;
+        }
+        private AssemblyNode()
+        {
+
         }
     }
     [ProtoContract]
