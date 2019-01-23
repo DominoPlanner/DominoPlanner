@@ -14,7 +14,7 @@ namespace DominoPlanner.Core
         // threadsicheres Singleton
         private static readonly Lazy<Workspace> _mySingleton = new Lazy<Workspace>(() => new Workspace());
 
-        private static string FileInWork = "";
+        private string FileInWork = "";
         private Workspace() {
             openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
         }
@@ -36,7 +36,7 @@ namespace DominoPlanner.Core
             }
             else if (reference != null)
             {
-                string directoryofreference = Path.GetDirectoryName(FileInWork);
+                string directoryofreference = Path.GetDirectoryName(Instance.FileInWork);
                 relativePath = Path.GetFullPath(Path.Combine(directoryofreference, relativePath));
             }
             else if (new Uri(relativePath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
@@ -57,10 +57,10 @@ namespace DominoPlanner.Core
         public static T Load<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadable
         {
             var absPath = AbsolutePathFromReference(relativePath, reference);
-            string old_file_in_work = FileInWork;
+            string old_file_in_work = Instance.FileInWork;
             try
             {
-                FileInWork = absPath;
+                Instance.FileInWork = absPath;
                 var result = (T)Workspace.Instance.Find<T>(absPath);
                 Console.WriteLine("Datei " + absPath + " öffnen");
                 if (result == null)
@@ -76,7 +76,7 @@ namespace DominoPlanner.Core
             }
             finally
             {
-                FileInWork = old_file_in_work;
+                Instance.FileInWork = old_file_in_work;
             }
 
         }
