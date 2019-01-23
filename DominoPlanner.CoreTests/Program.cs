@@ -23,6 +23,7 @@ namespace DominoPlanner.CoreTests
 
         {
             ProjectTests.CreateProject();
+            ProjectTests.LoadProject();
             Thread.Sleep(500);
             PostFilterTests.PostFilterTest("bird.jpg");
             //TreeTests.TreeTest();
@@ -234,22 +235,22 @@ namespace DominoPlanner.CoreTests
 
             });*/
             //sw.Close();
-            p.Save("FieldTest.DObject");
+            p.Save();
             watch = Stopwatch.StartNew();
-            int[] counts = Workspace.LoadColorList<FieldParameters>("FieldTest.DObject");
+            int[] counts = Workspace.LoadColorList<FieldParameters>(Path.GetFullPath("tests/FieldTest.DObject"));
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
             
             watch = Stopwatch.StartNew();
-            FieldParameters loaded = Workspace.Load<FieldParameters>("FieldTest.DObject");
+            FieldParameters loaded = Workspace.Load<FieldParameters>(Path.GetFullPath("tests/FieldTest.DObject"));
             loaded.Generate();
             watch.Stop();
             Console.WriteLine("Load Time: " + watch.ElapsedMilliseconds);
             //loaded.last.GenerateImage(Colors.Transparent).Save("tests/afterLoad.png");
             Console.WriteLine(p.colors == loaded.colors);
             watch = Stopwatch.StartNew();
-            int[] counts2 = Workspace.LoadColorList<FieldParameters>("FieldTest.DObject");
+            int[] counts2 = Workspace.LoadColorList<FieldParameters>(Path.GetFullPath("tests/FieldTest.DObject"));
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts2));
@@ -323,13 +324,13 @@ namespace DominoPlanner.CoreTests
             sw.Close();
             p.Save();
             watch = Stopwatch.StartNew();
-            int[] counts = Workspace.LoadColorList<SpiralParameters>("Spiral.DObject");
+            int[] counts = Workspace.LoadColorList<SpiralParameters>(Path.GetFullPath("tests/Spiral.DObject"));
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
             
             watch = Stopwatch.StartNew();
-            SpiralParameters loaded = Workspace.Load<SpiralParameters>("Spiral.DObject");
+            SpiralParameters loaded = Workspace.Load<SpiralParameters>(Path.GetFullPath("tests/Spiral.DObject"));
             loaded.Generate().GenerateImage().Save("tests/spiral_after_load.png");
         }
         static void CircleTest(string path)
@@ -441,8 +442,8 @@ namespace DominoPlanner.CoreTests
 
             //});
             //sw.Close();
-            p.Save("structure.DObject");
-            StructureParameters p2 = Workspace.Load<StructureParameters>("structure.DObject");
+            p.Save();
+            StructureParameters p2 = Workspace.Load<StructureParameters>(Path.GetFullPath("tests/structure.DObject"));
             p2.Generate().GenerateImage().Save("tests/wall_after_load.png");
             
         }

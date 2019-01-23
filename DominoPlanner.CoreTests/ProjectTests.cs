@@ -47,14 +47,25 @@ namespace DominoPlanner.CoreTests
             {
                 node.obj.Save();
             }
-            
-            main.Save(mainnode.Path);
-            PrintProjectStructure(mainnode, "");
-            if (((FieldNode)sub.children[1]).obj == ((FieldNode)main.children[0]).obj)
+            if (field1 == ((FieldNode)sub.children[1]).obj)
             {
                 Console.WriteLine("references to field1 identical");
             }
+            main.Save(mainnode.Path);
+            PrintProjectStructure(mainnode, "");
+            
             return mainnode;
+        }
+        public static void LoadProject()
+        {
+            Workspace.Instance.openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+            string rootpath = Path.GetFullPath("tests/");
+            var mainnode = new AssemblyNode(Path.Combine(rootpath, "main.DProject"));
+            PrintProjectStructure(mainnode, "");
+            if (((FieldNode)mainnode.obj.children[0]).obj == ((FieldNode)((AssemblyNode)mainnode.obj.children[2]).obj.children[1]).obj)
+            {
+                Console.WriteLine("references to field1 identical");
+            }
         }
         public static void PrintProjectStructure(AssemblyNode project, string indentation)
         {

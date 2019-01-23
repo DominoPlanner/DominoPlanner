@@ -17,6 +17,7 @@ namespace DominoPlanner.Core
     [ProtoInclude(105, typeof(FreeObject))]
     public abstract class IDominoWrapper
     {
+        [ProtoMember(3, AsReference = true)]
         public DominoAssembly parent;
         public virtual int[] counts {get;}
         [ProtoMember(1)]

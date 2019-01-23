@@ -14,6 +14,7 @@ namespace DominoPlanner.Core
         // threadsicheres Singleton
         private static readonly Lazy<Workspace> _mySingleton = new Lazy<Workspace>(() => new Workspace());
 
+        private static string FileInWork = "";
         private Workspace() {
             openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
         }
@@ -33,10 +34,16 @@ namespace DominoPlanner.Core
                 string directoryofreference = Path.GetDirectoryName(referenceTuple.Item1);
                 relativePath = Path.GetFullPath(Path.Combine(directoryofreference, relativePath));
             }
+            else if (reference != null)
+            {
+                string directoryofreference = Path.GetDirectoryName(FileInWork);
+                relativePath = Path.GetFullPath(Path.Combine(directoryofreference, relativePath));
+            }
             else if (new Uri(relativePath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
             {
                 // Path passt schon
             }
+            
             else
             {
                 throw new IOException("When not providing a reference, the path must be absolute");
@@ -50,18 +57,28 @@ namespace DominoPlanner.Core
         public static T Load<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadable
         {
             var absPath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Workspace.Instance.Find<T>(absPath);
-            Console.WriteLine("Datei " + absPath + " öffnen");
-            if (result == null)
+            string old_file_in_work = FileInWork;
+            try
             {
-                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
-                using (var file = File.OpenRead(absPath))
+                FileInWork = absPath;
+                var result = (T)Workspace.Instance.Find<T>(absPath);
+                Console.WriteLine("Datei " + absPath + " öffnen");
+                if (result == null)
                 {
-                    result = Serializer.Deserialize<T>(file);
+                    Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                    using (var file = File.OpenRead(absPath))
+                    {
+                        result = Serializer.Deserialize<T>(file);
+                    }
+                    Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(absPath, result));
                 }
-                Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(absPath, result));
+                return result;
             }
-            return result;
+            finally
+            {
+                FileInWork = old_file_in_work;
+            }
+
         }
         public static void Save(IWorkspaceLoadable obj, string filepath = "")
         {
