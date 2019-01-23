@@ -75,9 +75,9 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected GeneralShapesProvider(string imagePath, string colors, IColorComparison comp, Dithering ditherMode,
+        protected GeneralShapesProvider(string filepath, string imagePath, string colors, IColorComparison comp, Dithering ditherMode,
             AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
-            : base(imagePath, comp, ditherMode, colors, iterationInformation)
+            : base(filepath, imagePath, comp, ditherMode, colors, iterationInformation)
         {
             this.allowStretch = allowStretch;
             average = averageMode;

@@ -145,9 +145,9 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public StructureParameters(string imagepath, XElement definition, int length, int height, string colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int length, int height, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
             this.length = length;
@@ -166,9 +166,9 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         /// <param name="targetSize">Die Zielgröße des Objekts.</param>
-        public StructureParameters(string imagepath, XElement definition, int targetSize, String colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int targetSize, String colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : this(imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
+            : this(filepath, imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             TargetCount = targetSize;
         }

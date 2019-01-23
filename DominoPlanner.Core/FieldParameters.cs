@@ -191,9 +191,9 @@ namespace DominoPlanner.Core
         /// <param name="iterationInformation">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
+        public FieldParameters(string filepath, string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
             Inter scalingMode,IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) 
-            : base(imagePath, colorMode, ditherMode, colors, iterationInformation)
+            : base(filepath, imagePath, colorMode, ditherMode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -228,9 +228,9 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
-        public FieldParameters(String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
+        public FieldParameters(string filepath, String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
             Inter scalingMode,  IColorComparison interpolationMode, Dithering ditherMode, IterationInformation iterationInformation) 
-            : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode,  interpolationMode, ditherMode, iterationInformation)
+            : this(filepath, imagePath, colors, a, b, c, d, 1, 1, scalingMode,  interpolationMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }

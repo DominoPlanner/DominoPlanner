@@ -22,9 +22,8 @@ namespace DominoPlanner.CoreTests
         static void Main(string[] args)
 
         {
+            ProjectTests.CreateProject();
             Thread.Sleep(500);
-            Workspace.Instance.root_path = Path.GetFullPath("tests");
-            Console.WriteLine($"Rootpfad des Workspaces: {Workspace.Instance.root_path}");
             PostFilterTests.PostFilterTest("bird.jpg");
             //TreeTests.TreeTest();
             //HistoryTreeFieldTest("tests/NewField.jpg");
@@ -128,7 +127,7 @@ namespace DominoPlanner.CoreTests
             //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             //Mat mat = CvInvoke.Imread(path, ImreadModes.Unchanged);
             
-            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
+            FieldParameters p = new FieldParameters(Path.GetFullPath("tests/FieldTest.DObject"), path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
                 ColorDetectionMode.Cie1976Comparison, new Dithering(), new NoColorRestriction());
             p.TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -278,7 +277,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            SpiralParameters p = new SpiralParameters(path, 50, "colors.DColor", 
+            SpiralParameters p = new SpiralParameters(Path.GetFullPath("tests/Spiral.DObject"), path, 50, "colors.DColor", 
                 ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
             p.ThetaMin = 0.3d * Math.PI;
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -322,7 +321,7 @@ namespace DominoPlanner.CoreTests
 
             //});
             sw.Close();
-            p.Save("Spiral.DObject");
+            p.Save();
             watch = Stopwatch.StartNew();
             int[] counts = Workspace.LoadColorList<SpiralParameters>("Spiral.DObject");
             watch.Stop();
@@ -339,7 +338,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
 
             //Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CircleParameters p = new CircleParameters(path, 150, "colors.DColor",
+            CircleParameters p = new CircleParameters(Path.GetFullPath("tests/Circle.DObject"), path, 150, "colors.DColor",
                 ColorDetectionMode.CieDe2000Comparison, new FloydSteinbergDithering(), AverageMode.Corner, new NoColorRestriction());
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
@@ -387,7 +386,7 @@ namespace DominoPlanner.CoreTests
 
             //});
             sw.Close();
-            p.Save("circle.DObject");
+            p.Save();
             IDominoProvider c = Workspace.Load<IDominoProvider>("circle.DObject");
         }
         static void WallTest(String path)
@@ -395,7 +394,7 @@ namespace DominoPlanner.CoreTests
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters p = new StructureParameters(path, xml.Elements().ElementAt(1), 30000, 
+            StructureParameters p = new StructureParameters(Path.GetFullPath("tests/WallTest.DObject"), path, xml.Elements().ElementAt(1), 30000, 
                 "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             var watch = System.Diagnostics.Stopwatch.StartNew();
@@ -446,20 +445,6 @@ namespace DominoPlanner.CoreTests
             StructureParameters p2 = Workspace.Load<StructureParameters>("structure.DObject");
             p2.Generate().GenerateImage().Save("tests/wall_after_load.png");
             
-        }
-        static void HistoryTreeFieldTest(String path)
-        {
-            //Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-
-            BitmapImage b = new BitmapImage(new Uri("./NewField.jpg", UriKind.RelativeOrAbsolute));
-            Mat mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            FieldParameters p = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 10000, Inter.Lanczos4,
-                ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
-            FieldParameters state = p.current.getState();
-            state.Generate().GenerateImage(2000, false).Save("Tests/before_resize");
-            //ChangeDimensionOperation<FieldParameters> dims = new ChangeDimensionOperation<FieldParameters>(p.current) {width= 10, length= 10};
-            //p.current = dims;
-            //p.current.getState().Generate().GenerateImage(2000, false).Save("Tests/after_resize");
         }
         public static async Task<long> OpenCVTest(string path, int threads)
         {

@@ -216,16 +216,7 @@ namespace DominoPlanner.Core
         }
         public void Save(string path)
         {
-            using (var file = new FileStream(path, FileMode.Create))
-            {
-                Serializer.Serialize<ColorRepository>(file, this);
-            }
-            return;
-            path = Workspace.Instance.MakePathAbsolute(path);
-            using (var file = new FileStream(path, FileMode.Create))
-            {
-                Serializer.Serialize<ColorRepository>(file, this);
-            }
+            Workspace.Save(this, path);
         }
     }
 }
