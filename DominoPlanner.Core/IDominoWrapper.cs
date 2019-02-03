@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
 {
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(100, typeof(DocumentNode))]
     [ProtoInclude(101, typeof(AssemblyNode))]
     [ProtoInclude(102, typeof(LineNode))]
@@ -17,18 +17,23 @@ namespace DominoPlanner.Core
     [ProtoInclude(105, typeof(FreeObject))]
     public abstract class IDominoWrapper
     {
+        [ProtoMember(3, AsReference = true)]
+        public DominoAssembly parent;
         public virtual int[] counts {get;}
         [ProtoMember(1)]
         List<DominoConnector> outnodes { get; set; }
         [ProtoMember(2)]
         DominoConnector innode { get; set; }
-
-        public IDominoWrapper()
+        public IDominoWrapper(DominoAssembly parent)
         {
             innode = new DominoConnector();
             innode.next = this;
+            this.parent = parent;
+            if (parent != null) // rootnode
+                parent.children.Add(this);
         }
     }
+    [ProtoContract]
     public class DominoAssembly : IWorkspaceLoadable
     {
         [ProtoMember(1, OverwriteList =true)]
@@ -46,26 +51,22 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(_colorPath);
+                colors = Workspace.Load<ColorRepository>(_colorPath, this);
             }
         }
         public ColorRepository colors { get; private set; }
-        public DominoAssembly(string colorPath) : this()
-        {
-            this.colorPath = colorPath;
-        }
-        private DominoAssembly()
+        public DominoAssembly()
         {
             children = new List<IDominoWrapper>();
         }
 
-        public void Save(string relativePath)
+        public void Save(string relativePath = "")
         {
             Workspace.Save(this, relativePath);
         }
 
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(100, typeof(FieldNode))]
     [ProtoInclude(101, typeof(StructureNode))]
     [ProtoInclude(102, typeof(CircleNode))]
@@ -80,7 +81,7 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<IDominoProvider>(relativePath);
+                    _obj = Workspace.Load<IDominoProvider>(relativePath, parent);
                 return _obj;
             }
         }
@@ -93,92 +94,102 @@ namespace DominoPlanner.Core
                 return obj.counts;
             }
         }
-        public DocumentNode(string relativePath)
+        public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
             this.relativePath = relativePath;
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class FieldNode : DocumentNode
     {
-        public FieldNode(string relativePath) : base(relativePath)
+        public FieldNode(string relativePath, DominoAssembly parent) : base (relativePath, parent)
         {
 
         }
         // hier kommen mal so Sachen wie Feldanstoß rein
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class StructureNode : DocumentNode
     {
-        public StructureNode(string relativePath) : base(relativePath)
+        public StructureNode(string relativePath, DominoAssembly parent) : base(relativePath, parent)
         {
 
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class SpiralNode : DocumentNode
     {
-        public SpiralNode(string relativePath) : base(relativePath)
+        public SpiralNode(string relativePath, DominoAssembly parent) : base(relativePath, parent)
         {
 
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class CircleNode : DocumentNode
     {
-        public CircleNode(string relativePath) : base(relativePath)
+        public CircleNode(string relativePath, DominoAssembly parent) : base(relativePath, parent)
         {
 
         }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class LineNode : IDominoWrapper
     {
+        public LineNode(DominoAssembly parent) : base(parent)
+        {
 
+        }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class LineBlockNode : IDominoWrapper
     {
+        public LineBlockNode(DominoAssembly parent) : base(parent)
+        {
 
+        }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class ArbitraryColorMatchedObject : IDominoWrapper
     {
         // so was wie Handsetting, bei dem aus einem Bild die Farben berechnet werden
+        public ArbitraryColorMatchedObject(DominoAssembly parent) : base(parent)
+        {
+
+        }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor = true)]
     public class FreeObject : IDominoWrapper
     {
-        // irgendwas, wo die Anzahlen vom Benutzer vorgegeben werden,
+        // irgendwas, wo die Anzahlen vom Benutzer vorgegeben werden
+        public FreeObject(DominoAssembly parent) : base(parent)
+        {
+
+        }
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     public class AssemblyNode : IDominoWrapper
     {
         [ProtoMember(1)]
-        public string relativePath;
+        public string Path;
         private DominoAssembly _obj;
         public DominoAssembly obj
         {
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<DominoAssembly>(relativePath);
+                    _obj = Workspace.Load<DominoAssembly>(Path, parent);
                 return _obj;
             }
         }
-        public AssemblyNode(string relativePath)
+        public AssemblyNode(string Path, DominoAssembly parent = null) : base(parent)
         {
-            this.relativePath = relativePath;
-        }
-        private AssemblyNode()
-        {
-
+            this.Path = Path;
         }
     }
     [ProtoContract]
     public class DominoConnector
     {
-        [ProtoMember(1)]
+        [ProtoMember(1, AsReference =true)]
         public IDominoWrapper next;
     }
     [ProtoContract]

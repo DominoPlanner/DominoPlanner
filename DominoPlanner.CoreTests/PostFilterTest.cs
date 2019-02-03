@@ -18,7 +18,7 @@ namespace DominoPlanner.CoreTests
         }
         public static void PostFilterFieldTest(string path)
         {
-            FieldParameters fp = new FieldParameters(path, "colors.DColor", 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4,
+            FieldParameters fp = new FieldParameters(Path.GetFullPath("tests/PostFilterTest.DObject"), path, "colors.DColor", 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4,
                 ColorDetectionMode.Cie94Comparison, new Dithering(), new NoColorRestriction());
 
             fp.Generate().GenerateImage().Save("tests/FilterTests/vorFilter.png");
@@ -32,7 +32,7 @@ namespace DominoPlanner.CoreTests
         {
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters s = new StructureParameters(path, xml.Elements().ElementAt(6), 3000,
+            StructureParameters s = new StructureParameters(Path.GetFullPath("tests/PostFilterTest.DObject"), path, xml.Elements().ElementAt(6), 3000,
                 "colors.DColor", ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             sr.Close();

@@ -90,9 +90,9 @@ namespace DominoPlanner.Core
                 shapesValid = false;
             }
         }
-        public CircularStructure(string bitmap, string colors,
+        public CircularStructure(string filepath, string bitmap, string colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : base(bitmap, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            : base(filepath, bitmap, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
 
         }
@@ -276,9 +276,9 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public SpiralParameters(string bitmap, int rotations, string colors, 
+        public SpiralParameters(string filepath, string bitmap, int rotations, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
+            base(filepath, bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             hasProcotolDefinition = false;
             init(rotations);

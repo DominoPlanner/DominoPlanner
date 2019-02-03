@@ -84,7 +84,7 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(value);
+                colors = Workspace.Load<ColorRepository>(value, this);
             }
         }
         public ColorRepository color_filtered { get; private set; }
@@ -139,6 +139,7 @@ namespace DominoPlanner.Core
         {
             get
             {
+                if (last == null) return null;
                 if (!shapesValid || !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
                 if (last != null)
@@ -241,22 +242,25 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(string bitmapPath, IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) 
+        protected IDominoProvider(string filepath, string bitmapPath, IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) 
             : this()
         {
-            //source = overlayImage(bitmap);
-            var BlendFileFilter = new BlendFileFilter() { FilePath = bitmapPath };
             
+            this.colorMode = comp;
+            this.IterationInformation = iterationInformation;
+            this.ditherMode = ditherMode;
+            this.Save(filepath);
+            this.ColorPath = colorpath;
+            //source = overlayImage(bitmap);
+            var BlendFileFilter = new BlendFileFilter() { FilePath = bitmapPath, parent = this };
+            BlendFileFilter.UpdateMat();
             ImageWidth = BlendFileFilter.GetSizeOfMat().Width;
             ImageHeight = BlendFileFilter.GetSizeOfMat().Height;
             BlendFileFilter.CenterX = ImageWidth / 2;
             BlendFileFilter.CenterY = ImageHeight / 2;
             UpdateSource();
             this.ImageFilters.Add(BlendFileFilter);
-            this.colorMode = comp;
-            this.ColorPath = colorpath;
-            this.IterationInformation = iterationInformation;
-            this.ditherMode = ditherMode;
+            
             
         }
         protected IDominoProvider()
@@ -557,13 +561,14 @@ namespace DominoPlanner.Core
             var image_filtered = source.ToImage<Emgu.CV.Structure.Bgra, byte>();
             foreach (ImageFilter filter in ImageFilters)
             {
+                filter.parent = this;
                 filter.Apply(image_filtered);
             }
             this.image_filtered = image_filtered.Mat;
             lastValid = false;
             imageValid = true;
         }
-        public void Save(string filepath)
+        public void Save(string filepath = "")
         {
             Workspace.Save(this, filepath);
         }

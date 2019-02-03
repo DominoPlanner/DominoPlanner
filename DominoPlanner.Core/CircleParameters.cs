@@ -87,10 +87,10 @@ namespace DominoPlanner.Core
         }
         private Random r;
 
-        public CircleParameters(string imagepath, int circles,
+        public CircleParameters(string filepath, string imagepath, int circles,
             string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
+            base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             init(circles);
         }

@@ -14,42 +14,62 @@ namespace DominoPlanner.CoreTests
     {
         public static AssemblyNode CreateProject()
         {
-            //Workspace.Instance.root_path = 
+            string rootpath = Path.GetFullPath("tests/");
             
-            DominoAssembly main = new DominoAssembly("colors.DColor");
-            main.Save("main.DProject");
-            var mainnode = new AssemblyNode("main.DProject");
-            main.children = new List<IDominoWrapper>();
-            FieldParameters field1 = new FieldParameters("mountain.jpg", main.colorPath, 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4, 
+            DominoAssembly main = new DominoAssembly();
+            main.Save(Path.Combine(rootpath, "main.DProject"));
+            main.colorPath = "colors.DColor";
+            var mainnode = new AssemblyNode(Path.Combine(rootpath, "main.DProject"));
+            FieldParameters field1 = new FieldParameters(Path.GetFullPath("tests/field1.DObject"), "mountain.jpg", main.colorPath, 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4, 
                 new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-            field1.Save("field1.DObject");
-            main.children.Add(new FieldNode("field1.DObject"));
+            field1.Save();
+            new FieldNode("field1.DObject", main);
             StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
-            StructureParameters structure = new StructureParameters("transparent.png", xml.Elements().ElementAt(1), 30000,
+            StructureParameters structure = new StructureParameters(Path.GetFullPath("tests/structure.DObject"), 
+                "transparent.png", xml.Elements().ElementAt(1), 30000,
                 main.colorPath, ColorDetectionMode.Cie1976Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
-            structure.Save("structure.DObject");
-            main.children.Add(new StructureNode("structure.DObject"));
-            DominoAssembly sub = new DominoAssembly("colors.DColor");
-            sub.Save("sub.DProject");
-            FieldParameters sub1 = new FieldParameters("transparent.png", main.colorPath, 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4,
+            structure.Save();
+            new StructureNode("structure.DObject", main);
+            DominoAssembly sub = new DominoAssembly();
+            sub.Save(Workspace.AbsolutePathFromReference("sub.DProject", main));
+            sub.colorPath = "colors.DColor";
+            new AssemblyNode("sub.DProject", main);
+            FieldParameters sub1 = new FieldParameters(Path.GetFullPath("tests/field2.DObject"), "transparent.png", main.colorPath, 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4,
                 new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-            field1.Save("field2.DObject");
-            sub.children.Add(new FieldNode("field2.DObject"));
-            sub.children.Add(new FieldNode("field.DObject"));
-            main.children.Add(new AssemblyNode("sub.DProject"));
+            field1.Save();
+            new FieldNode("field2.DObject", sub);
+            new FieldNode("field1.DObject", sub);
+            sub.Save();
+            
             foreach (AssemblyNode node in main.children.Where(child => child is AssemblyNode))
             {
-                node.obj.Save(node.relativePath);
+                node.obj.Save();
             }
-            main.Save(mainnode.relativePath);
+            if (field1 == ((FieldNode)sub.children[1]).obj)
+            {
+                Console.WriteLine("references to field1 identical");
+            }
+            main.Save(mainnode.Path);
             PrintProjectStructure(mainnode, "");
+            
             return mainnode;
+        }
+        public static void LoadProject()
+        {
+            Workspace.Instance.openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+            string rootpath = Path.GetFullPath("tests/");
+            var mainnode = new AssemblyNode(Path.Combine(rootpath, "main.DProject"));
+            PrintProjectStructure(mainnode, "");
+            if (((FieldNode)mainnode.obj.children[0]).obj == ((FieldNode)((AssemblyNode)mainnode.obj.children[2]).obj.children[1]).obj)
+            {
+                Console.WriteLine("references to field1 identical");
+            }
         }
         public static void PrintProjectStructure(AssemblyNode project, string indentation)
         {
-            Console.WriteLine(indentation + project.relativePath + ", id: " + RuntimeHelpers.GetHashCode(project));
+            Console.WriteLine(indentation + project.Path + ", id: " + RuntimeHelpers.GetHashCode(project));
 
             Console.WriteLine(indentation + "  "+ project.obj.colorPath + ", id: " + RuntimeHelpers.GetHashCode(project.obj.colors));
             foreach (IDominoWrapper obj in project.obj.children)
@@ -65,11 +85,11 @@ namespace DominoPlanner.CoreTests
                 }
             }
         }
-        public static void RenameObject(AssemblyNode project, string oldpath, string newpath)
+        /*public static void RenameObject(AssemblyNode project, string oldpath, string newpath)
         {
-            foreach (IDominoWrapper obj in project.obj.children)
+            foreach (IDominoWrapper obje in project.obj.children)
             {
-                switch (obj)
+                switch (obje)
                 {
                     case DocumentNode doc:
                         if (doc.relativePath == oldpath)
@@ -96,6 +116,6 @@ namespace DominoPlanner.CoreTests
                         new Tuple<string, IWorkspaceLoadable>(Workspace.Instance.MakePathAbsolute(oldpath), current.Item2);
                 }
             }
-        }
+        }*/
     }
 }
