@@ -223,8 +223,21 @@ namespace DominoPlanner.Core
         public bool sourceValid = false;
         [ProtoMember(1005)]
         public bool usedColorsValid = false;
+        private bool _Editing;
         [ProtoMember(4)]
-        public bool Editing { get; set; }
+        public bool Editing
+        {
+            get { return _Editing; }
+            set
+            {
+                if (_Editing != value)
+                {
+                    _Editing = value;
+                    EditingChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
         [ProtoMember(2)]
         public DominoTransfer last;
         #region const
@@ -565,7 +578,9 @@ namespace DominoPlanner.Core
         }
         public abstract object Clone();
         #endregion
-        
+        #region EVENTS
+        public event EventHandler EditingChanged;
+        #endregion
     }
 
     public interface IWorkspaceLoadColorList : IWorkspaceLoadable

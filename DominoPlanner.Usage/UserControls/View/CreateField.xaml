@@ -95,7 +95,7 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left">
+        <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding EditClick}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                 <Label Content="Edit" />

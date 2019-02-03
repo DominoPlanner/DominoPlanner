@@ -32,13 +32,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             refresh();
             UnsavedChanges = false;
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
+            EditClick = new RelayCommand(o => { fieldParameters.Editing = true; });
         }
         #endregion
 
         #region fields
         int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        FieldParameters fieldParameters;
+        FieldParameters fieldParameters
+        {
+            get { return CurrentProject as FieldParameters; }
+            set
+            {
+                if(CurrentProject != value)
+                {
+                    CurrentProject = value;
+                }
+            }
+        }
         private DominoTransfer _dominoTransfer;
 
         public DominoTransfer dominoTransfer
@@ -497,6 +508,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Commands
+		private ICommand _EditClick;
+        public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
+
         private ICommand _BuildtoolsClick;
         public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
         #endregion

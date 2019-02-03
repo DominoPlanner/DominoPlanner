@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DominoPlanner.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -25,6 +26,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
+        private IDominoProvider _CurrentProject;
+        public IDominoProvider CurrentProject
+        {
+            get { return _CurrentProject; }
+            set
+            {
+                if (_CurrentProject != value)
+                {
+                    _CurrentProject = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
         private bool _UnsavedChanges;
         public bool UnsavedChanges
         {

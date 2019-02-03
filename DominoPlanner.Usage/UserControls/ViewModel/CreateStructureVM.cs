@@ -55,21 +55,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Refresh();
             UnsavedChanges = false;
             ShowFieldPlan = new RelayCommand(o => { FieldPlan(); });
+            EditClick = new RelayCommand(o => { CurrentProject.Editing = false; });
         }
         #endregion
 
         #region fields
         public System.Windows.Threading.Dispatcher dispatcher;
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        private GeneralShapesProvider _structureParameters;
         private GeneralShapesProvider structureParameters
         {
-            get { return _structureParameters; }
+            get { return CurrentProject as GeneralShapesProvider; }
             set
             {
-                if (_structureParameters != value)
+                if (CurrentProject != value)
                 {
-                    _structureParameters = value;
+                    CurrentProject = value;
                     if (structureParameters != null)
                     {
                         if (structureParameters.hasProcotolDefinition)
@@ -562,6 +562,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Commands
+		private ICommand _EditClick;
+        public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
+
         private ICommand _ShowFieldPlan;
         public ICommand ShowFieldPlan { get { return _ShowFieldPlan; } set { if (value != _ShowFieldPlan) { _ShowFieldPlan = value; } } }
         #endregion

@@ -25,24 +25,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ImageSource = @"TestImages\mountain.jpg";
             string ColorSource = @"TestImages\colors.DColor";
             Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
-            ProjectProperties = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 1000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-
+            CurrentProject = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 1000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+            
             /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
             XElement xml = XElement.Parse(sr.ReadToEnd());
             ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(1), 10,
                  @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                 AverageMode.Corner, new NoColorRestriction(), true);
             sr.Close();*/
-
+            
             _DominoList = new ObservableCollection<ColorListEntry>();
 
             _DominoList.Clear();
-            ProjectProperties.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
+            CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
             
 
             SaveField = new RelayCommand(o => { Save(); });
-            RestoreBasicSettings = new RelayCommand(o => { MessageBox.Show("asdf"); });
+            RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
@@ -69,7 +69,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region fields
         private double visibleWidth = 0;
         private double visibleHeight = 0;
-        private IDominoProvider ProjectProperties;
         private double largestX = 0;
         private double largestY = 0;
         private List<DominoInCanvas> selectedDominoes;
@@ -278,15 +277,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void refreshList()
         {
             int counter = 0;
-            foreach (DominoColor domino in ProjectProperties.colors.RepresentionForCalculation.OfType<DominoColor>())
+            foreach (DominoColor domino in CurrentProject.colors.RepresentionForCalculation.OfType<DominoColor>())
             {
-                _DominoList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = ProjectProperties.colors.Anzeigeindizes[counter] });
+                _DominoList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = CurrentProject.colors.Anzeigeindizes[counter] });
                 counter++;
             }
 
-            if (ProjectProperties.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
+            if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
-                _DominoList.Add(new ColorListEntry() { DominoColor = ProjectProperties.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
+                _DominoList.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
             }
         }
         private void SelectAll()
@@ -338,7 +337,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedDominoes = new List<DominoInCanvas>();
             try
             {
-                int[] validPositions = ((ICopyPasteable)this.ProjectProperties).GetValidPastePositions(startindex);
+                int[] validPositions = ((ICopyPasteable)this.CurrentProject).GetValidPastePositions(startindex);
 
                 foreach (DominoInCanvas dic in DominoProject.Stones.OfType<DominoInCanvas>())
                 {
@@ -363,7 +362,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             int pasteindex = selectedDominoes.First().idx;
             selectedDominoes.First().isSelected = false;
             selectedDominoes.Clear();
-            PasteFilter paste = new PasteFilter(ProjectProperties as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
+            PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
             undoStack.Push(paste);
             paste.Apply();
 
@@ -440,7 +439,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 selectedIndices.Add(dic.idx);
                 dic.isSelected = false;
             }
-            SetColorOperation sco = new SetColorOperation(ProjectProperties, selectedIndices.ToArray(), ProjectProperties.colors.RepresentionForCalculation.ToList().IndexOf(SelectedColor.DominoColor));
+            SetColorOperation sco = new SetColorOperation(CurrentProject, selectedIndices.ToArray(), CurrentProject.colors.RepresentionForCalculation.ToList().IndexOf(SelectedColor.DominoColor));
             undoStack.Push(sco);
             sco.Apply();
 
@@ -454,9 +453,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (selectedDominoes.Count > 0)
             {
                 DominoInCanvas selDomino = selectedDominoes.First();
-                if (ProjectProperties is IRowColumnAddableDeletable)
+                if (CurrentProject is IRowColumnAddableDeletable)
                 {
-                    AddRows addRows = new AddRows((ProjectProperties as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
+                    AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
                     undoStack.Push(addRows);
                     addRows.Apply();
                     clearCanvas();
@@ -476,9 +475,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (selectedDominoes.Count > 0)
             {
                 DominoInCanvas selDomino = selectedDominoes.First();
-                if (ProjectProperties is IRowColumnAddableDeletable)
+                if (CurrentProject is IRowColumnAddableDeletable)
                 {
-                    AddColumns addRows = new AddColumns((ProjectProperties as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
+                    AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
                     undoStack.Push(addRows);
                     addRows.Apply();
                     clearCanvas();
@@ -502,7 +501,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     toRemove.Add(selDomino.idx);
                 }
-                DeleteRows deleteRows = new DeleteRows((ProjectProperties as IRowColumnAddableDeletable), toRemove.ToArray());
+                DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteRows);
                 deleteRows.Apply();
                 clearCanvas();
@@ -519,7 +518,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     toRemove.Add(selDomino.idx);
                 }
-                DeleteColumns deleteColumns = new DeleteColumns((ProjectProperties as IRowColumnAddableDeletable), toRemove.ToArray());
+                DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteColumns);
                 deleteColumns.Apply();
                 clearCanvas();
@@ -550,11 +549,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = Brushes.LightGray;
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-            dominoTransfer = ProjectProperties.Generate(progress);
+            dominoTransfer = CurrentProject.Generate(progress);
 
             for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
-                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i], ProjectProperties.colors);
+                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i], CurrentProject.colors);
                 dic.MouseDown += Dic_MouseDown;
                 System.Windows.Shapes.Path sd = new System.Windows.Shapes.Path();
 
@@ -607,7 +606,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                ProjectProperties.Save(this.FilePath);
+                CurrentProject.Save(this.FilePath);
                 return true;
             }
             catch (Exception) { return false; }
@@ -616,7 +615,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(ProjectProperties);
+            protocolV.DataContext = new ProtocolVM(CurrentProject);
             protocolV.ShowDialog();
         }
 

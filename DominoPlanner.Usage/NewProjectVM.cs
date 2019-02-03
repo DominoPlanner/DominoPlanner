@@ -1,6 +1,8 @@
-﻿using DominoPlanner.Usage.Serializer;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.Serializer;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -46,6 +48,14 @@ namespace DominoPlanner.Usage
                 Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName));
                 Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Source Image"));
                 Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Planner Files"));
+
+                Workspace.Instance.root_path = Path.Combine(SelectedPath, ProjectName);
+
+                DominoAssembly main = new DominoAssembly(sPath); 
+                main.Save(Path.Combine(SelectedPath, ProjectName, string.Format("{0}.DProject", ProjectName)));
+
+                main.children = new List<IDominoWrapper>();
+
                 bool create = ProjectSerializer.CreateProject(Path.Combine(SelectedPath, ProjectName), ProjectName);
                 if (create)
                 {

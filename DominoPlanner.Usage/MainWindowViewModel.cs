@@ -35,19 +35,26 @@ namespace DominoPlanner.Usage
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
 
             Tabs = new ObservableCollection<TabItem>();
-            /*Tabs.Add(new TabItem(50, 100, "Erstes Feld", @"\Icons\lock - Copy.ico", "", new CreateFieldVM(@"C:\Users\johan\Desktop\field.DObject")));
+            Tabs.Add(new TabItem(50, 100, "Erstes Feld", @"\Icons\lock - Copy.ico", "", new CreateFieldVM(@"C:\Users\johan\Desktop\field.DObject")));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-
+            Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
+            /*
             Tabs.Add(new TabItem(12, 100, "Erste Rechteckige Struktur", @"\Icons\lock - Copy.ico", "", new CreateStructureVM(@"C:\Users\johan\Desktop\colors.DObject", true)));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
 
             Tabs.Add(new TabItem(12, 100, "Erste Runde Struktur", @"\Icons\lock - copy.ico", "", new CreateStructureVM(@"C:\Users\johan\Desktop\round.DObject", false)));
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
             */
-            Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
-            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
+           // Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
+            //Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
             
             loadProjectList();
+        }
+
+        private void CurrentProject_EditingChanged(object sender, EventArgs e)
+        {
+            TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
+            tabItem.Content.Save();   
         }
         #endregion
 
@@ -159,6 +166,7 @@ namespace DominoPlanner.Usage
                 Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath));
 
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
+            Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
             SelectedTab = Tabs.Last<TabItem>();
         }
         /// <summary>
