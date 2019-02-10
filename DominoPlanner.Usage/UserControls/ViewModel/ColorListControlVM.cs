@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,14 +28,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             base.UnsavedChanges = false;
             
             ShowProjects = false;
-            DifColumns = new ObservableCollection<DataGridColumn>();
+        }
 
-            /*int[] counts2 = Workspace.LoadColorList<FieldParameters>(@"C:\Users\johan\Desktop\field.DObject");
-            for (int i = 0; i < counts2.Count(); i++)
+        public ColorListControlVM(DominoAssembly dominoAssembly) : this(dominoAssembly.colorPath)
+        {
+            DifColumns = new ObservableCollection<DataGridColumn>();
+            foreach (DocumentNode project in dominoAssembly.children)
             {
-                ColorList[i].ProjectCount.Add(counts2[i]);
+                int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
+                for (int i = 0; i < counts2.Count(); i++)
+                {
+                    ColorList[i].ProjectCount.Add(counts2[i]);
+                }
+                AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
             }
-            AddProjectCountsColumn();*/
         }
         #endregion
 
@@ -274,7 +281,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
 
-        private void AddProjectCountsColumn()
+        private void AddProjectCountsColumn(string projectName)
         {
             Binding amountBinding = new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString()));
             amountBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
@@ -283,7 +290,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             FrameworkElementFactory _textboxFactory = new FrameworkElementFactory(typeof(TextBlock));
 
             DataGridTemplateColumn c = new DataGridTemplateColumn();
-            c.Header = "hallo";
+            c.Header = projectName;
             FrameworkElementFactory textFactory = new FrameworkElementFactory(typeof(Label));
             textFactory.SetValue(Label.ContentProperty, amountBinding);
 

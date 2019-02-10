@@ -22,10 +22,10 @@ namespace DominoPlanner.Usage
             Init();
         }
 
-        public ProtocolVM(IDominoProvider fieldParameters)
+        public ProtocolVM(IDominoProvider dominoProvider)
         {
-            fParameters = fieldParameters;
-            dominoTransfer = fParameters.last;
+            DominoProvider = dominoProvider;
+            dominoTransfer = DominoProvider.last;
             Init();
         }
         #endregion
@@ -33,7 +33,7 @@ namespace DominoPlanner.Usage
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
-        IDominoProvider fParameters;
+        IDominoProvider DominoProvider;
         DominoTransfer dominoTransfer;
         #endregion
 
@@ -323,7 +323,7 @@ namespace DominoPlanner.Usage
             HideText = true;
             currentOPP.orientation = Core.Orientation.Horizontal;
 
-            CurrentProtocol = fParameters.GetHTMLProcotol(currentOPP);
+            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
             SaveHTML = new RelayCommand(o => { SaveHTMLFile(); });
@@ -333,12 +333,12 @@ namespace DominoPlanner.Usage
         }
         private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            CurrentProtocol = fParameters.GetHTMLProcotol(currentOPP);
+            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
         }
         private void ShowLiveHelper()
         {
             LiveBuildHelperV lbhv = new LiveBuildHelperV();
-            lbhv.DataContext = new LiveBuildHelperVM(fParameters, StonesPerBlock);
+            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock);
             lbhv.ShowDialog();
         }
 
@@ -353,7 +353,7 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    fParameters.SaveXLSFieldPlan(dlg.FileName, currentOPP);
+                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP);
                     MessageBox.Show("Save protocol in excel file.", "Save", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 }
                 catch (Exception ex) { MessageBox.Show("Fehler: " + ex.Message); }

@@ -12,23 +12,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class CreateStructureVM : TabBaseVM
     {
         #region CTOR
-        public CreateStructureVM(string filePath, bool rectangular) : base()
+        public CreateStructureVM(IDominoProvider dominoProvider, bool rectangular) : base()
         {
-            this.FilePath = filePath;
+            CurrentProject = dominoProvider;
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
             structureIsRectangular = rectangular;
+
             if (structureIsRectangular)
             {
                 CurrentViewModel = new RectangularSizeVM();
-                structureParameters = Workspace.Load<StructureParameters>(FilePath);
 
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
             }
             else
             {
-                CurrentViewModel = new RoundSizeVM();
-                structureParameters = Workspace.Load<SpiralParameters>(FilePath);
+                CurrentViewModel = new RoundSizeVM() { PossibleTypeChange = false };
                 if (structureParameters is SpiralParameters sp)
                 {
                     ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
@@ -55,7 +54,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Refresh();
             UnsavedChanges = false;
             ShowFieldPlan = new RelayCommand(o => { FieldPlan(); });
-            EditClick = new RelayCommand(o => { CurrentProject.Editing = false; });
+            EditClick = new RelayCommand(o => { CurrentProject.Editing = true; });
         }
         #endregion
 
@@ -456,10 +455,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                structureParameters.Save(FilePath);
+                structureParameters.Save();
+                UnsavedChanges = false;
                 return true;
             }
-            catch (Exception)
+            catch (Exception rd)
             {
                 return false;
             }
@@ -536,6 +536,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (!structureParameters.ImageFilters.Any(x => x is BlendFileFilter)) { return; }
                     string filepath = structureParameters.ImageFilters.OfType<BlendFileFilter>().First().FilePath;
+                    /*jojo
                     if (((RoundSizeVM)CurrentViewModel).TypeSelected.Equals("Spiral"))
                     {
                         structureParameters = new SpiralParameters(filepath, ((RoundSizeVM)CurrentViewModel).Amount / 4, structureParameters.ColorPath,
@@ -549,7 +550,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     structureParameters.colorMode, structureParameters.ditherMode, structureParameters.average, structureParameters.IterationInformation);
                         ((RoundSizeVM)CurrentViewModel).Amount = (int)((CircleParameters)structureParameters).Circles;
                     }
-
+                    */
                     ((RoundSizeVM)CurrentViewModel).dWidth = ((CircularStructure)structureParameters).DominoWidth;
                     ((RoundSizeVM)CurrentViewModel).dHeight = ((CircularStructure)structureParameters).DominoLength;
                     ((RoundSizeVM)CurrentViewModel).beLines = ((CircularStructure)structureParameters).NormalDistance;

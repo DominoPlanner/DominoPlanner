@@ -40,5 +40,10 @@ namespace DominoPlanner.Usage.UserControls.View
                 ((ViewModel.EditProjectVM)DataContext).SizeChanged(sender, e);
             }
         }
+
+        private void Grid_SizeChanged_1(object sender, SizeChangedEventArgs e)
+        {
+            ((Grid)sender).ColumnDefinitions[2].Width = new GridLength(e.NewSize.Width - 240);
+        }
     }
 }

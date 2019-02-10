@@ -7,16 +7,16 @@
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}">
+             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
     </UserControl.Resources>
-    <Grid>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="5"/>
@@ -104,13 +104,13 @@
                 </Grid>
             </Grid>
             <ScrollViewer Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
-                <ContentControl Content="{Binding DominoProject}"/>
+                <ContentControl Grid.Column="2" Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
             <Grid Grid.Column="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="150"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
                 <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
@@ -119,12 +119,12 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
+            <!--Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Save Field" />
                 </StackPanel>
-            </Button>
+            </-->
             <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding RestoreBasicSettings}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />

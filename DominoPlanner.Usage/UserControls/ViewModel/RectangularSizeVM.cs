@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Linq;
 using DominoPlanner.Core;
+using System.Reflection;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -106,11 +107,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                using (StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open)))
-                {
-                    XElement xElement = XElement.Parse(sr.ReadToEnd());
-                    structures = xElement.Elements();
-                }
+                XElement xElement = XElement.Parse(Properties.Resources.Structures);
+                structures = xElement.Elements();
 
                 foreach (var structure in structures)
                 {

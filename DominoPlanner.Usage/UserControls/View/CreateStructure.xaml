@@ -118,12 +118,12 @@
                 <Label Content="Edit" />
             </StackPanel>
         </Button>
-        <Button Grid.Row="2" Height="30" Margin="217,10,0,10" Width="120" HorizontalAlignment="Right" Grid.Column="2">
+        <!--Button Grid.Row="2" Height="30" Margin="217,10,0,10" Width="120" HorizontalAlignment="Right" Grid.Column="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                 <Label Content="Save Structure" />
             </StackPanel>
-        </Button>
+        </-->
         <Button Grid.Row="2" Height="30" Margin="135,9.6,0,10" Width="120" HorizontalAlignment="Left" Visibility="{Binding VisibleFieldplan}" Command="{Binding ShowFieldPlan}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />

@@ -31,7 +31,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             switch (structType)
             {
                 case StructureType.Round:
-                    CurrentViewModel = new RoundSizeVM();
+                    CurrentViewModel = new RoundSizeVM() { PossibleTypeChange = true } ;
                     break;
                 case StructureType.Rectangular:
                     CurrentViewModel = new RectangularSizeVM();

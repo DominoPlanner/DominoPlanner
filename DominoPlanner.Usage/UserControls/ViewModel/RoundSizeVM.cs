@@ -15,10 +15,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             list.Add("Spiral");
             list.Add("Circle Bomb");
             TypeSelected = "Spiral";
+            PossibleTypeChange = false;
         }
         #endregion
 
         #region Prop
+        private bool _PossibleTypeChange;
+        public bool PossibleTypeChange
+        {
+            get { return _PossibleTypeChange; }
+            set
+            {
+                if (_PossibleTypeChange != value)
+                {
+                    _PossibleTypeChange = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+
         private List<string> _list;
         public List<string> list
         {

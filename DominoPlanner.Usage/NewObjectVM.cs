@@ -2,19 +2,18 @@
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage
 {
     public class NewObjectVM : ModelBase
     {
         #region CTOR
-        public NewObjectVM(string folderpath)
+        public NewObjectVM(string folderpath, DominoAssembly parentProject)
         {
+            this.parentProject = parentProject;
             _ProjectPath = folderpath;
             CreateIt = new RelayCommand(o => { mCreateIt(); });
             selectedType = 7;
@@ -25,9 +24,15 @@ namespace DominoPlanner.Usage
         #region fields
         public string internPictureName { get; private set; }
         public int ObjectID { get; private set; }
+        private DominoAssembly parentProject;
         #endregion
 
         #region prop
+        private DocumentNode resultNode;
+        public DocumentNode ResultNode
+        {
+            get { return resultNode; }
+        }
         private string _ProjectPath;
         public string ProjectPath { get { return _ProjectPath; } }
         public string ObjectPath { get { return string.Format("{0}\\{1}{2}", _ProjectPath, _filename, _endung); } }
@@ -138,12 +143,20 @@ namespace DominoPlanner.Usage
         {
             try
             {
+                foreach (DocumentNode dc in parentProject.children)
+                {
+                    if (filename == Path.GetFileNameWithoutExtension(dc.relativePath))
+                    {
+                        MessageBox.Show("Please choose a name which is not in this project!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
                 if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
                 {
                     MessageBox.Show("You forget to choose a name.", "Missing Values", MessageBoxButton.OK);
                     return;
                 }
-                string colorlist = @"C:\Users\johan\Desktop\colors.DColor";
+                string colorlist = parentProject.colorPath;
                 switch (selectedType)
                 {
                     case 0: //Field with Picture
@@ -152,22 +165,30 @@ namespace DominoPlanner.Usage
                             MessageBox.Show("You forget to choose an image.", "Missing Values", MessageBoxButton.OK);
                             return;
                         }
-                        
+
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
                         File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
-                        FieldParameters p = new FieldParameters(((AddFieldVM)CurrentViewModel).pImage, colorlist, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
-                        p.Save(Path.Combine(this.ProjectPath, filename));
+                        FieldParameters p = new FieldParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddFieldVM)CurrentViewModel).pImage, colorlist, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
+                        p.Save();
+                        resultNode = new FieldNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
+                        parentProject.Save();
                         break;
-                    /*case 1: //Free Field
-                        internPictureName = "";
-                        break;*/
                     case 1: //Rectangular Structure
-
+                        if (string.IsNullOrEmpty(((AddStructureVM)CurrentViewModel).sPath) || string.IsNullOrWhiteSpace(((AddStructureVM)CurrentViewModel).sPath))
+                        {
+                            MessageBox.Show("You forget to choose an image.", "Missing Values", MessageBoxButton.OK);
+                            return;
+                        }
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
-                        File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
-                        
-                        StructureParameters sp = new StructureParameters(((AddStructureVM)CurrentViewModel).pImage, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).SelectedStructureElement, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                        sp.Save(Path.Combine(this.ProjectPath, filename));
+                        try
+                        {
+                            File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
+                        }
+                        catch (IOException es) { }
+                        StructureParameters sp = new StructureParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).SelectedStructureElement, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).sLength, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).sHeight, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        sp.Save();
+                        resultNode = new StructureNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
+                        parentProject.Save();
                         break;
                     case 2: //Round Structure
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
@@ -176,23 +197,24 @@ namespace DominoPlanner.Usage
                         CircularStructure circularStructure;
                         if (rsvm.TypeSelected.Equals("Spiral"))
                         {
-                            circularStructure = new SpiralParameters(((AddStructureVM)CurrentViewModel).pImage, rsvm.StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure = new SpiralParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure.Save();
+                            resultNode = new SpiralNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         }
                         else
                         {
-
-                            circularStructure = new CircleParameters(((AddStructureVM)CurrentViewModel).pImage, rsvm.StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure = new CircleParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure.Save();
+                            resultNode = new CircleNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         }
-                        circularStructure.Save(Path.Combine(this.ProjectPath, filename));
+                        parentProject.Save();
                         break;
                     default: break;
                 }
-                if(!string.IsNullOrEmpty(internPictureName))
-                     ObjectID = ProjectSerializer.AddProject(_ProjectPath, filename + endung, internPictureName);
 
                 Close = true;
             }
-            catch (Exception)
+            catch (Exception es)
             {
                 MessageBox.Show("Could not create a new Project!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }

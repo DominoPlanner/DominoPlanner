@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Usage.Serializer;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -30,31 +31,21 @@ namespace DominoPlanner.Usage
             Properties.Settings.Default.Save();
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(); });
+            AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
 
             Tabs = new ObservableCollection<TabItem>();
-            Tabs.Add(new TabItem(50, 100, "Erstes Feld", @"\Icons\lock - Copy.ico", "", new CreateFieldVM(@"C:\Users\johan\Desktop\field.DObject")));
-            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
-            /*
-            Tabs.Add(new TabItem(12, 100, "Erste Rechteckige Struktur", @"\Icons\lock - Copy.ico", "", new CreateStructureVM(@"C:\Users\johan\Desktop\colors.DObject", true)));
-            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
 
-            Tabs.Add(new TabItem(12, 100, "Erste Runde Struktur", @"\Icons\lock - copy.ico", "", new CreateStructureVM(@"C:\Users\johan\Desktop\round.DObject", false)));
-            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            */
-           // Tabs.Add(new TabItem(465, 100, "Nachbearbeiten", @"\Icons\lock - Copy.ico", "", new EditProjectVM()));
-            //Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            
             loadProjectList();
         }
 
         private void CurrentProject_EditingChanged(object sender, EventArgs e)
         {
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
-            tabItem.Content.Save();   
+            tabItem.Content.Save();
+            tabItem.ResetContent();
         }
         #endregion
 
@@ -102,7 +93,9 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Command
-
+	    private ICommand _AddExistingProject;
+        public ICommand AddExistingProject { get { return _AddExistingProject; } set { if (value != _AddExistingProject) { _AddExistingProject = value; } } }
+        
         private ICommand _NewProject;
         public ICommand NewProject { get { return _NewProject; } set { if (value != _NewProject) { _NewProject = value; } } }
 
@@ -161,12 +154,27 @@ namespace DominoPlanner.Usage
         {
             ProjectComposite clickedValue = (ProjectComposite)sender;
             if (clickedValue.ActType == NodeType.ColorListNode)
-                Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath, new ColorListControlVM(clickedValue.FilePath)));
-            else if (clickedValue.ActType == NodeType.FieldNode || clickedValue.ActType == NodeType.StructureNode || clickedValue.ActType == NodeType.FreeHandFieldNode)
-                Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath));
+            {
+                ProjectListComposite parent = null;
+                foreach (ProjectListComposite p in Projects.OfType<ProjectListComposite>())
+                {
+                    if (p.Children.Contains(clickedValue))
+                    {
+                        parent = p;
+                        break;
+                    }
+                }
+                if (parent != null) Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath, new ColorListControlVM(((AssemblyNode)parent.Project.documentNode).obj)));
+
+            }
+            else if (clickedValue.ActType == NodeType.ProjectNode)
+                Tabs.Add(new TabItem(clickedValue));
 
             Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
+            if (Tabs.Last<TabItem>().Content.CurrentProject != null)
+            {
+                Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
+            }
             SelectedTab = Tabs.Last<TabItem>();
         }
         /// <summary>
@@ -212,36 +220,88 @@ namespace DominoPlanner.Usage
 
         private void loadProject(OpenProject newProject)
         {
-            ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path);
-            actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
-            actPLC.conMenu.createMI.Click += CreateMI_Click;
-            actPLC.conMenu.removeMI.Click += RemoveMI_Click;
-            Projects.Add(actPLC);
-
-            foreach (ProjectTransfer currPT in ProjectSerializer.GetProjects(actPLC.FilePath))
+            if (Directory.Exists(newProject.path))
             {
-                try
+                AssemblyNode mainnode = new AssemblyNode(Path.Combine(newProject.path, string.Format("{0}.DProject", newProject.name)));
+
+                ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
+                actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
+                actPLC.conMenu.createMI.Click += CreateMI_Click;
+                actPLC.conMenu.removeMI.Click += RemoveMI_Click;
+                actPLC.Children.CollectionChanged += Children_CollectionChanged;
+                Projects.Add(actPLC);
+
+                foreach (ProjectElement currPT in getProjects(mainnode.obj))
                 {
-                    if (!Path.GetExtension(currPT.FilePath).Equals(".dpcol"))
+                    AddProjectToTree(actPLC, currPT);
+                }
+            }
+            else
+            {
+                MessageBox.Show(string.Format("Could not find: {0} ", newProject.name), "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach(ProjectComposite old in e.OldItems.OfType<ProjectComposite>())
+                {
+                    foreach(TabItem tabItem in Tabs.ToArray())
                     {
-                        while (!File.Exists(currPT.IcoPath))
+                        if(tabItem.ProjectComp == old)
                         {
-                            MessageBox.Show(String.Format("Could not find: {0} Please reload the image.", currPT.IcoPath), "Error!", MessageBoxButton.YesNo, MessageBoxImage.Error);
-                            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-                            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                            {
-                                if (File.Exists(openFileDialog.FileName))
-                                    File.Copy(openFileDialog.FileName, currPT.IcoPath);
-                            }
+                            Tabs.Remove(tabItem);
                         }
                     }
                 }
-                catch (Exception) { MessageBox.Show("Error loading openprojects!", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-                ProjectComposite newItem = actPLC.AddProject(new ProjectComposite(currPT.Id, newProject.id, Path.GetFileNameWithoutExtension(currPT.Name), currPT.IcoPath, currPT.FilePath, currPT.CurrType));
-                newItem.IsClicked += Item_IsClicked;
-                newItem.conMenu.removeMI.Click += actPLC.RemoveMI_Object_Click;
-                newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
             }
+        }
+
+        private List<ProjectElement> getProjects(DominoAssembly dominoAssembly)
+        {
+            List<ProjectElement> returnList = new List<ProjectElement>();
+
+            if (dominoAssembly != null)
+            {
+                ProjectElement color = new ProjectElement(dominoAssembly.colorPath, @".\Icons\colorLine.ico", null);
+                returnList.Add(color);
+            }
+
+            foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
+            {
+                ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent), @"C:\Users\johan\Pictures\Screenshots\Screenshot (1).png", dominoWrapper); //jojo bild austauschen
+                returnList.Add(project);
+            }
+
+            return returnList;
+        }
+
+        private void AddProjectToTree(ProjectListComposite parentProject, ProjectElement projectTransfer)
+        {
+            try
+            {
+                if (!Path.GetExtension(projectTransfer.FilePath).Equals(".DColor"))
+                {
+                    while (!File.Exists(projectTransfer.IcoPath))
+                    {
+                        MessageBox.Show(String.Format("Could not find: {0} Please reload the image.", projectTransfer.IcoPath), "Error!", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                        System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+                        if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            if (File.Exists(openFileDialog.FileName))
+                                File.Copy(openFileDialog.FileName, projectTransfer.IcoPath);
+                        }
+                        //jojo sonst einfach raus nehmen
+                    }
+                }
+            }
+            catch (Exception) { MessageBox.Show("Error loading openprojects!", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID)); 
+            newItem.IsClicked += Item_IsClicked;
+            newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
+            newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
         }
 
         /// <summary>
@@ -249,32 +309,31 @@ namespace DominoPlanner.Usage
         /// </summary>
         private void NewFieldStructure()
         {
-            if (SelectedProject == null || SelectedProject.GetType() != typeof(ProjectListComposite))
+            if (SelectedProject == null || !(SelectedProject is ProjectListComposite))
             {
                 MessageBox.Show("Please choose a project folder.");
                 return;
             }
-            NewObjectVM novm = new NewObjectVM(SelectedProject.FilePath);
+            NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
             new NewObject(novm).ShowDialog();
             if (!novm.Close) return;
-            ProjectComposite newProject = null;
-            switch (novm.selectedType)
+            AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
+            
+        }
+
+        private void AddProject_Exists()
+        {
+            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog.Filter = "project files (*.DProject)|*.DProject";
+            openFileDialog.RestoreDirectory = true;
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                case 0:
-                    newProject = ((ProjectListComposite)SelectedProject).AddProject(new ProjectComposite(novm.ObjectID, SelectedProject.OwnID, novm.filename, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ObjectPath, NodeType.FieldNode));
-                    break;
-                case 1:
-                    newProject = ((ProjectListComposite)SelectedProject).AddProject(new ProjectComposite(novm.ObjectID, SelectedProject.OwnID, novm.filename, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ObjectPath, NodeType.FreeHandFieldNode));
-                    break;
-                case 2:
-                    newProject = ((ProjectListComposite)SelectedProject).AddProject(new ProjectComposite(novm.ObjectID, SelectedProject.OwnID, novm.filename, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ObjectPath, NodeType.StructureNode));
-                    break;
-                case 3:
-                    newProject = ((ProjectListComposite)SelectedProject).AddProject(new ProjectComposite(novm.ObjectID, SelectedProject.OwnID, novm.filename, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ObjectPath, NodeType.StructureNode));
-                    break;
-                default: break;
+                if (File.Exists(openFileDialog.FileName))
+                {
+                    OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(openFileDialog.FileName), Path.GetDirectoryName(openFileDialog.FileName));
+                    loadProject(openProject);
+                }
             }
-            newProject.SelectedEvent += MainWindowViewModel_SelectedEvent;
         }
 
         private void CreateNewProject()
@@ -330,10 +389,50 @@ namespace DominoPlanner.Usage
         public TabItem(int projectID, string path)
         {
             Path = path;
-            //hier muss die DAtei unter path ausgelesen werden und dann mus Content und das Icon geladen werden
-            //this.picture = new WriteableBitmap(new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute)));
             Close = new RelayCommand(o => CloseThis());
             zusatz = "";
+        }
+
+        public TabItem(ProjectComposite project) : this(project.OwnID, project.ParentProjectID, project.Name, project.PicturePath, project.FilePath)
+        {
+            ProjectComp = project;
+            ResetContent();
+        }
+
+        internal void ResetContent()
+        {
+            if(Content is EditProjectVM editProject)
+            {
+                editProject.ClearCanvas();
+            }
+            if (ProjectComp.Project.documentNode is DocumentNode documentNode)
+            {
+                if (documentNode.obj != null)
+                {
+                    if (documentNode.obj.Editing)
+                    {
+                        Content = new EditProjectVM(documentNode.obj);
+                    }
+                    else
+                    {
+                        switch (documentNode)
+                        {
+                            case FieldNode fieldNode:
+                                Content = new CreateFieldVM(fieldNode.obj);
+                                break;
+                            case StructureNode structureNode:
+                                Content = new CreateStructureVM(structureNode.obj, true);
+                                break;
+                            case SpiralNode spiralNode:
+                            case CircleNode circleNode:
+                                Content = new CreateStructureVM(documentNode.obj, false);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         public TabItem(int ownID, int projectID, string Header, string picturePath, string path) : this(projectID, path)
@@ -355,6 +454,20 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region prope
+        private ProjectComposite _ProjectComp;
+        public ProjectComposite ProjectComp
+        {
+            get { return _ProjectComp; }
+            set
+            {
+                if (_ProjectComp != value)
+                {
+                    _ProjectComp = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         //public WriteableBitmap picture { get; set; }
 
         public string picture { get; set; }

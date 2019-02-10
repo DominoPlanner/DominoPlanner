@@ -12,15 +12,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class CreateFieldVM : TabBaseVM
     {
         #region CTOR
-        public CreateFieldVM(string filePath) : base()
+        public CreateFieldVM(IDominoProvider dominoProvider) : base()
         {
-            this.FilePath = filePath;
+            CurrentProject = dominoProvider;
+            
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
-            
-            fieldParameters = new FieldParameters(@"C:\Users\johan\Pictures\Screenshots\Screenshot (5).png", @"C:\Users\johan\Desktop\colors.DColor", 8, 8, 24, 8, 1500, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-            
-            //fieldParameters =  Workspace.Load<FieldParameters>(FilePath);
 
             iResizeMode = (int)fieldParameters.resizeMode;
             iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;
@@ -362,7 +359,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                fieldParameters.Save(FilePath);
+                fieldParameters.Save();
+                UnsavedChanges = false;
                 return true;
             }
             catch (Exception)

@@ -45,36 +45,25 @@ namespace DominoPlanner.Usage
                     return;
                 }
 
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName));
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Source Image"));
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Planner Files"));
+                string projectpath = Path.Combine(SelectedPath, ProjectName);
+                Directory.CreateDirectory(projectpath);
+                Directory.CreateDirectory(Path.Combine(projectpath, "Source Image"));
+                Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
-                Workspace.Instance.root_path = Path.Combine(SelectedPath, ProjectName);
+                DominoAssembly main = new DominoAssembly();
+                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
 
-                DominoAssembly main = new DominoAssembly(sPath); 
-                main.Save(Path.Combine(SelectedPath, ProjectName, string.Format("{0}.DProject", ProjectName)));
-
-                main.children = new List<IDominoWrapper>();
-
-                bool create = ProjectSerializer.CreateProject(Path.Combine(SelectedPath, ProjectName), ProjectName);
-                if (create)
-                {
-                    if(ProjectSerializer.AddProject(Path.Combine(SelectedPath, ProjectName), "colors.dpcol", @".\Icons\colorLine.ico") == -1)
-                    {
-                        create = false;
-                    }
-                }
                 if (File.Exists(sPath))
-                    File.Copy(sPath, Path.Combine(SelectedPath, ProjectName, "Planner Files", "colors.dpcol"));
-                if (create)
                 {
-                    MessageBox.Show("Create new project", "Created", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                    Close = true;
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", "colors.DColor");
+                    File.Copy(sPath, colorPath);
+                    main.colorPath = colorPath;
                 }
-                else
-                {
-                    MessageBox.Show("Could not create the new project.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+
+                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
+
+                MessageBox.Show("Create new project", "Created", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                Close = true;
             }
             catch (Exception e)
             {

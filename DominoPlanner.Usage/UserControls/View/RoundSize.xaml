@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="201*" />
             </Grid.ColumnDefinitions>
             <Label Content="Type" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
-            <ComboBox ItemsSource="{Binding list}" SelectedValue="{Binding TypeSelected}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1"/>
+            <ComboBox ItemsSource="{Binding list}" SelectedValue="{Binding TypeSelected}" IsEnabled="{Binding PossibleTypeChange}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1"/>
             <Label Content="{Binding lType}" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="2" Visibility="Visible"/>
             <xctk:IntegerUpDown Minimum="0" Value="{Binding Amount}" Grid.Column="1" Grid.Row="2" Visibility="Visible"/>
         </Grid>

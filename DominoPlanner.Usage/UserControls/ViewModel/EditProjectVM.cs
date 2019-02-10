@@ -16,23 +16,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class EditProjectVM : TabBaseVM
     {
         #region CTOR
-        public EditProjectVM() : base()
+        public EditProjectVM(IDominoProvider dominoProvider) : base()
         {
             ProjectName = "Projektname";
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
-            ImageSource = @"TestImages\mountain.jpg";
-            string ColorSource = @"TestImages\colors.DColor";
-            Workspace.Instance.root_path = Path.GetFullPath("..\\..\\..\\");
-            CurrentProject = new FieldParameters(ImageSource, ColorSource, 8, 8, 24, 8, 1000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
-            
-            /*StreamReader sr = new StreamReader(new FileStream(@"C:\Users\johan\Dropbox\JoJoJo\Structures.xml", FileMode.Open));
-            XElement xml = XElement.Parse(sr.ReadToEnd());
-            ProjectProperties = new StructureParameters(ImageSource, xml.Elements().ElementAt(1), 10,
-                 @"C:\Users\johan\Desktop\colors.DColor", ColorDetectionMode.CieDe2000Comparison, new Dithering(),
-                AverageMode.Corner, new NoColorRestriction(), true);
-            sr.Close();*/
+            CurrentProject = dominoProvider;
             
             _DominoList = new ObservableCollection<ColorListEntry>();
 
@@ -63,6 +53,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseOutPicture = new RelayCommand(o => { UICursor = null; });
             SelectAllCom = new RelayCommand(o => { SelectAll(); });
             RefreshCanvas();
+            UnsavedChanges = false;
         }
         #endregion
 
@@ -248,13 +239,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal override void Close()
         {
             base.Close();
-            clearCanvas();
+            ClearCanvas();
         }
 
-        private void clearCanvas()
+        internal void ClearCanvas()
         {
             clearPossibleToPaste();
             ClearFullSelection();
+            RemoveStones();
+        }
+
+        private void RemoveStones()
+        {
             while (DominoProject.Stones.Count > 0)
             {
                 if (DominoProject.Stones[0] is DominoInCanvas dic)
@@ -262,6 +258,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoProject.Stones.RemoveAt(0);
             }
         }
+
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -389,7 +386,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             redoStack.Push(undoFilter);
             undoFilter.Undo();
 
-            clearCanvas();
+            ClearCanvas();
             RefreshCanvas();
         }
         public override void Redo()
@@ -401,7 +398,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             //if (!(redoFilter is SetColorOperation || redoFilter is PasteFilter))
             {
-                clearCanvas();
+                ClearCanvas();
                 RefreshCanvas();
             }
         }
@@ -458,7 +455,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
                     undoStack.Push(addRows);
                     addRows.Apply();
-                    clearCanvas();
+                    ClearCanvas();
                     RefreshCanvas();
                     for (int i = 0; i < addRows.added_indizes.Count(); i++)
                     {
@@ -480,7 +477,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
                     undoStack.Push(addRows);
                     addRows.Apply();
-                    clearCanvas();
+                    ClearCanvas();
                     RefreshCanvas();
                     for (int i = 0; i < addRows.added_indizes.Count(); i++)
                     {
@@ -504,7 +501,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteRows);
                 deleteRows.Apply();
-                clearCanvas();
+                ClearCanvas();
                 RefreshCanvas();
             }
         }
@@ -521,7 +518,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
                 undoStack.Push(deleteColumns);
                 deleteColumns.Apply();
-                clearCanvas();
+                ClearCanvas();
                 RefreshCanvas();
             }
         }
@@ -533,10 +530,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedDominoes.Clear();
             RefreshCanvas();
         }
-        private void RefreshCanvas()
+
+        internal void RefreshCanvas()
         {
             if (DominoProject != null)
             {
+                RemoveStones();
                 DominoProject.MouseDown -= Canvas_MouseDown;
                 DominoProject.MouseMove -= Canvas_MouseMove;
                 DominoProject.MouseUp -= Canvas_MouseUp;
@@ -547,7 +546,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
             DominoProject.MouseUp += Canvas_MouseUp;
-            DominoProject.Background = Brushes.LightGray;
+            DominoProject.Background = new SolidColorBrush(Color.FromArgb(1,0,0,0));
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             dominoTransfer = CurrentProject.Generate(progress);
 
@@ -606,7 +605,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                CurrentProject.Save(this.FilePath);
+                CurrentProject.Save();
+                UnsavedChanges = false;
                 return true;
             }
             catch (Exception) { return false; }
