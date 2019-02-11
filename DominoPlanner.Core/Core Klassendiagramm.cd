@@ -7,20 +7,20 @@
     </Compartments>
     <AssociationLine Name="color_filtered" Type="DominoPlanner.Core.ColorRepository" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="7.463" />
-        <Point X="15" Y="7.463" />
+        <Point X="13.5" Y="7.533" />
+        <Point X="15" Y="7.533" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="ImageFilters" Type="DominoPlanner.Core.ImageFilter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="10.75" Y="6.231" />
-        <Point X="10.375" Y="6.231" />
+        <Point X="10.75" Y="6.242" />
+        <Point X="10.375" Y="6.242" />
         <Point X="10.375" Y="1.812" />
         <Point X="7.25" Y="1.812" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>gAiAAIAACAEBBMMgBCSAMIhMBREA4gCUQAgAHXAAIrQ=</HashCode>
+      <HashCode>ggiAAIAACAEBBMMgBCSAMJhMBZEA4gCUUAgAHXAAIrQ=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -192,7 +192,7 @@
   <Class Name="DominoPlanner.Core.ImageFilter">
     <Position X="5.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAgAABAAAEAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAgAABAAAEBAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DominoFilter.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -307,7 +307,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAgBAQAAAAABAAAAAAAAAAAAAIAgAQQAAAAgAAAAA=</HashCode>
+      <HashCode>AAAAgJARAAAAAAAAABAAAAAAAAAIAAAQQAAAAgAAAAA=</HashCode>
       <FileName>Workspace.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -415,14 +415,6 @@
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
-    <InheritanceLine Type="DominoPlanner.Core.IDominoProvider" FixedToPoint="true">
-      <Path>
-        <Point X="12.125" Y="13.584" />
-        <Point X="12.125" Y="14.125" />
-        <Point X="15.062" Y="14.125" />
-        <Point X="15.062" Y="14.5" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAABAMAAAAAAAAAAAAACgAAAAAABAAAgBAA=</HashCode>
       <FileName>GeneralShapesProvider.cs</FileName>
@@ -483,7 +475,7 @@
   <Class Name="DominoPlanner.Core.IDominoWrapper">
     <Position X="10" Y="25.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAADAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAABADAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>IDominoWrapper.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -496,7 +488,7 @@
   <Class Name="DominoPlanner.Core.DominoAssembly" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="20.25" Y="29.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAEAAAAAACAAAAQEAAAAAA=</HashCode>
+      <HashCode>AAAAAIAAAAAAAAQAAAAAAAAEAAAAAACAAAAQEAAAAAA=</HashCode>
       <FileName>IDominoWrapper.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -570,7 +562,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>BAAAAAAAAAAAIAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BAAAAAAAAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IDominoWrapper.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -600,10 +592,6 @@
       <Path>
         <Point X="18.125" Y="14.75" />
         <Point X="18.125" Y="14.25" />
-        <Point X="15.146" Y="14.25" Type="JumpStart" />
-        <Point X="14.979" Y="14.25" Type="JumpEnd" />
-        <Point X="12.208" Y="14.25" Type="JumpStart" />
-        <Point X="12.042" Y="14.25" Type="JumpEnd" />
         <Point X="10.25" Y="14.25" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
@@ -647,7 +635,7 @@
   <Interface Name="DominoPlanner.Core.IWorkspaceLoadColorList" Collapsed="true">
     <Position X="13.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
   </Interface>

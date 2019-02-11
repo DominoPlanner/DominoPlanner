@@ -140,7 +140,7 @@ namespace DominoPlanner.Core
             get
             {
                 if (last == null) return null;
-                if (!shapesValid || !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
+                if (!Editing && (!shapesValid || !lastValid)) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
                 if (last != null)
                 {
@@ -213,9 +213,13 @@ namespace DominoPlanner.Core
         #endregion
         // müssen nach den Unterklassen deserialisiert werden
         [ProtoMember(1000)]
-        protected bool shapesValid = false;
+        private bool _shapesValid = false;
+        protected bool shapesValid { get => _shapesValid;
+            set => _shapesValid = value; }
         [ProtoMember(1001)]
-        public bool lastValid = false;
+        private bool _lastValid = false;
+        public bool lastValid { get => _lastValid;
+            set => _lastValid = value; }
         [ProtoMember(1002)]
         public bool colorsValid = false;
         [ProtoMember(1003)]
@@ -575,11 +579,14 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         public void restoreShapes()
         {
-            UpdateSource();
-            ApplyImageFilters();
-            ApplyColorFilters();
-            GenerateShapes();
-            ReadUsedColors();
+            if (!Editing)
+            {
+                UpdateSource();
+                ApplyImageFilters();
+                ApplyColorFilters();
+                GenerateShapes();
+                ReadUsedColors();
+            }
         }
         public abstract object Clone();
         #endregion
@@ -607,8 +614,14 @@ namespace DominoPlanner.Core
 
         [ProtoMember(4)]
         public bool Editing { get; set; }
-    }
 
+    }
+    [ProtoContract]
+    public class IDominoProviderImageFilter
+    {
+        [ProtoMember(13)]
+        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
+    }
     public interface ICountTargetable
     {
         int TargetCount { set; }

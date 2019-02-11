@@ -137,6 +137,7 @@ namespace DominoPlanner.Core
                     if (target_rowtyp != source_rowtyp || target_coltyp != source_coltyp) throw new InvalidOperationException("type mismatch");
                     for (int i=0; i < cells[target_rowtyp, target_coltyp].Count; i++)
                     {
+                        if (targetindex + i >= target.Length) break;
                         target[targetindex + i].color = last.shapes[sourceindex + i].color;
                     }
                 }
