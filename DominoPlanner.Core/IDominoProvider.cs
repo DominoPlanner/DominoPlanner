@@ -579,14 +579,14 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         public void restoreShapes()
         {
-            if (!Editing)
-            {
+            //if (!Editing)
+            //{
                 UpdateSource();
                 ApplyImageFilters();
                 ApplyColorFilters();
                 GenerateShapes();
                 ReadUsedColors();
-            }
+            //}
         }
         public abstract object Clone();
         #endregion
