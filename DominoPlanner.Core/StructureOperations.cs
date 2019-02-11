@@ -135,7 +135,7 @@ namespace DominoPlanner.Core
                     var (targetindex, target_rowtyp, target_coltyp) = getIndexUndTyp(target_y, target_x, 0, target_width, target_height, false);
                     var (sourceindex, source_rowtyp, source_coltyp) = getIndexUndTyp(source_y, source_x, 0, current_width, current_height, false);
                     if (target_rowtyp != source_rowtyp || target_coltyp != source_coltyp) throw new InvalidOperationException("type mismatch");
-                    for (int i=0; i < cells[target_rowtyp, target_coltyp].Count; i++)
+                    for (int i=0; i < cells[target_coltyp, target_rowtyp].Count; i++)
                     {
                         if (targetindex + i >= target.Length) break;
                         target[targetindex + i].color = last.shapes[sourceindex + i].color;
@@ -223,7 +223,7 @@ namespace DominoPlanner.Core
             if (row >= -1 && col >= -1 && row <= target_height && col <= target_width)
             {
                 var (targetindex, target_rowtyp, target_coltyp) = getIndexUndTyp(row, col, 0, target_width, target_height, false);
-                return (targetindex, targetindex + cells[target_rowtyp, target_coltyp].Count - 1);
+                return (targetindex, targetindex + cells[target_coltyp, target_rowtyp].Count - 1);
             }
             return (0, -1);
         }

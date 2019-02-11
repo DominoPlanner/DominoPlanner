@@ -310,8 +310,8 @@ namespace DominoPlanner.Core
             var pos = reference.getPositionFromIndex(position);
             var res_y = southeast ? (pos.Y + (!column ? 1 : 0)) : pos.Y;
             var res_x = southeast ? (pos.X + (column ? 1 : 0)) : pos.X;
-            if (res_y == -1 || res_y == reference.current_height + (column ? 0 : count)
-                || res_x == -1 || res_x == reference.current_width + (column ? count : 0))
+            if (!column && (res_y == -1 || res_y == reference.current_height + (column ? 0 : count))
+                || column && (res_x == -1 || res_x == reference.current_width + (column ? count : 0)))
                 throw new InvalidOperationException("Can't insert row/column here, borders must remain borders");
             return AddRowColumn(reference, column, Enumerable.Repeat(new PositionWrapper() { X = res_x, Y = res_y, CountInsideCell = 0}, 
                 count).ToArray(), shapes, out inserted_positions);
