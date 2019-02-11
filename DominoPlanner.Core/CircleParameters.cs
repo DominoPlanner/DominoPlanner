@@ -32,7 +32,7 @@ namespace DominoPlanner.Core
 
             }
         }
-        int _start_diameter = 0;
+        int _start_diameter = 20;
         [ProtoMember(2)]
         public int StartDiameter
         {
@@ -104,7 +104,7 @@ namespace DominoPlanner.Core
         }
         private void init(int circles)
         {
-            this.StartDiameter = 4 * DominoLength;
+            
             Circles = circles;
             hasProcotolDefinition = true;
             r = new Random();
@@ -112,6 +112,7 @@ namespace DominoPlanner.Core
             DominoLength = 24;
             NormalDistance = 8;
             TangentialDistance = 8;
+            this.StartDiameter = 4 * DominoLength;
         }
         private CircleParameters() : base() { r = new Random(); }
         internal override void GenerateShapes()
