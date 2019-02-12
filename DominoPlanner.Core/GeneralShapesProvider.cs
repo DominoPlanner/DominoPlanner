@@ -41,7 +41,7 @@ namespace DominoPlanner.Core
             set
             {
                 _average = value;
-                lastValid = false;
+                usedColorsValid = false;
             }
         }
         private bool _allowStretch;
@@ -234,12 +234,12 @@ namespace DominoPlanner.Core
                         {
                             for (int y_iterator = container.y1; y_iterator <= container.y2; y_iterator++)
                             {
-                                if (shapes.dominoes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY))
+                                if (shapes.dominoes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY) )
                                 {
-                                    R += img.Data[container.y1, container.x1, 2];
-                                    G += img.Data[container.y1, container.x1, 1];
-                                    B += img.Data[container.y1, container.x1, 0];
-                                    A += img.Data[container.y1, container.x1, 3];
+                                    R += img.Data[y_iterator, x_iterator, 2];
+                                    G += img.Data[y_iterator, x_iterator, 1];
+                                    B += img.Data[y_iterator, x_iterator, 0];
+                                    A += img.Data[y_iterator, x_iterator, 3];
                                     counter++;
                                 }
                             }

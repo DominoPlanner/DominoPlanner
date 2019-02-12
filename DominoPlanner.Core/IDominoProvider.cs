@@ -372,7 +372,7 @@ namespace DominoPlanner.Core
         public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool reverse = false)
         {
             int[,] dominoes = GetBaseField(o);
-            int[,] tempdominoes = new int[dominoes.GetLength(0), dominoes.GetLength(1)];
+            int[,] tempdominoes;
             if (reverse == true)
             {
                 // if reversed building direction
@@ -381,9 +381,10 @@ namespace DominoPlanner.Core
                 {
                     for (int j = 0; j < dominoes.GetLength(1); j++)
                     {
-                        dominoes[i, j] = tempdominoes[dominoes.GetLength(0) - i - 1, dominoes.GetLength(1) - j - 1];
+                        tempdominoes[i, j] = dominoes[dominoes.GetLength(0) - i - 1, dominoes.GetLength(1) - j - 1];
                     }
                 }
+                dominoes = tempdominoes;
             }
             ProtocolTransfer d = new ProtocolTransfer();
             d.dominoes = new List<List<Tuple<int, int>>>[dominoes.GetLength(1)];
