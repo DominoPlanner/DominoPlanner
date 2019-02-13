@@ -35,6 +35,7 @@ namespace DominoPlanner.Core
             return res;
         }
     }
+    [ProtoContract(SkipConstructor = true)]
     public class NoColorRestriction : IterationInformation
     {
         public NoColorRestriction()
@@ -45,11 +46,12 @@ namespace DominoPlanner.Core
         public override int maxNumberOfIterations { get => 1; set => base.maxNumberOfIterations = 1; }
 
     }
+    [ProtoContract(SkipConstructor =true)]
     public class IterativeColorRestriction : IterationInformation
     {
-
+        
         private int _maxnumberofiterations;
-
+        [ProtoMember(2)]
         public override int maxNumberOfIterations
         {
             get
