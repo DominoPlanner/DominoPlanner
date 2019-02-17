@@ -105,12 +105,13 @@ namespace DominoPlanner.Core
         }
         public DominoColor(XElement source)
         {
+            var color = source.Element("rgb");
             mediaColor = Color.FromRgb(
-                byte.Parse(source.Element("R").Value),
-            byte.Parse(source.Element("G").Value),
-            byte.Parse(source.Element("B").Value));
-            count = int.Parse(source.Element("Count").Value);
-            name = source.Element("Name").Value;
+                byte.Parse(color.Element("R").Value),
+            byte.Parse(color.Element("G").Value),
+            byte.Parse(color.Element("B").Value));
+            count = int.Parse(source.Element("count").Value);
+            name = source.Element("name").Value;
             labColor = mediaColor.ToLab();
         }
         public DominoColor(Color c, int count, string name)
@@ -217,6 +218,14 @@ namespace DominoPlanner.Core
         public void Save(string path)
         {
             Workspace.Save(this, path);
+        }
+        public ColorRepository(string absolutePath) : this()
+        {
+            var doc = XDocument.Load(absolutePath);
+            foreach (XElement x in doc.Descendants("DominoColor"))
+            {
+                this.Add(new DominoColor(x));
+            }
         }
     }
 }
