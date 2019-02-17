@@ -106,8 +106,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _colorMode = value;
-                lastValid = false;
+                if (value.GetType() != _colorMode.GetType())
+                {
+                    _colorMode = value;
+                    lastValid = false;
+                }
             }
         }
         [ProtoMember(11)]
@@ -194,8 +197,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _ditherMode = value;
-                lastValid = false;
+                if (value.GetType() != _ditherMode.GetType())
+                {
+                    _ditherMode = value;
+                    lastValid = false;
+                }
             }
         }
         [ProtoMember(18)]
@@ -299,6 +305,7 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            Console.WriteLine("Regenerate");
             if (Editing) return last;
             if (!sourceValid)
             {
@@ -580,6 +587,7 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         public void restoreShapes()
         {
+            bool lastValidTemp = lastValid;
             //if (!Editing)
             //{
                 UpdateSource();
@@ -588,6 +596,7 @@ namespace DominoPlanner.Core
                 GenerateShapes();
                 ReadUsedColors();
             //}
+            lastValid = lastValidTemp;
         }
         public abstract object Clone();
         #endregion
