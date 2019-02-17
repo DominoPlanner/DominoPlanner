@@ -70,6 +70,12 @@ namespace DominoPlanner.CoreTests
             var repo = new ColorRepository(path);
 
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"\n{x.name} {x.count}").ToArray()));
+
+            var path2 = "tests/Dominosteine.farbe";
+            var repo2 = new ColorRepository(path2);
+
+
+            Console.WriteLine(String.Join(", ", repo2.SortedRepresentation.Select(x => $"\n{x.name} {x.count}").ToArray()));
         }
         private static void ColorRepoSaveTest()
         {
