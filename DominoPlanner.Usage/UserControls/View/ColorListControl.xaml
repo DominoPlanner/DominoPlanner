@@ -101,7 +101,7 @@
             <Button Grid.Column="2" Height="30" Margin="5,0,5,5" VerticalAlignment="Top" Command="{Binding BtnExportXLSX}" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
                     <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/document_save.ico" Height="20" />
-                    <Label Content="Save Colors" />
+                    <Label Content="Export to Excel" />
                 </StackPanel>
             </Button>
         </Grid>

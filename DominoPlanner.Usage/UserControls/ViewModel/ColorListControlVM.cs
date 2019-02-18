@@ -38,10 +38,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-
                 for (int i = 0; i < counts2.Count(); i++)
                 {
-                    ColorList[i].ProjectCount.Add(counts2[i]);
+                    _ColorList[i].ProjectCount.Add(counts2[i]);
                 }
                 AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
             }
@@ -73,17 +72,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void refreshList()
         {
             int counter = 0;
-            foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
-            {
-                colorRepository = Workspace.Load<ColorRepository>(FilePath);
-                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
-                counter++;
-            }
-
             if (colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
             }
+            foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
+            {
+                //colorRepository = Workspace.Load<ColorRepository>(FilePath);
+                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
+                counter++;
+            }
+
+            
         }
         private void ExportXLSX()
         {
