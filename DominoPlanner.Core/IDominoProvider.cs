@@ -496,7 +496,7 @@ namespace DominoPlanner.Core
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
             if (!hasProcotolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
-            if (!lastValid || !shapesValid) throw new InvalidOperationException("This object has unreflected changes.");
+            if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
             int[,] basefield = new int[last.dominoLength, last.dominoHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)
             {
