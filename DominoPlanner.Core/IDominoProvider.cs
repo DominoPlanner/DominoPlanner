@@ -233,7 +233,10 @@ namespace DominoPlanner.Core
         [ProtoMember(1004)]
         public bool sourceValid = false;
         [ProtoMember(1005)]
-        public bool usedColorsValid = false;
+        private bool _usedColorsValid = false;
+        public bool usedColorsValid { get => _usedColorsValid;
+            set => _usedColorsValid = value;
+        }
         private bool _Editing;
         [ProtoMember(4)]
         public bool Editing
