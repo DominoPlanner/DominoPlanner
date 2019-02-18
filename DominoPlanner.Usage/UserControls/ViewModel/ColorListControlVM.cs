@@ -38,9 +38,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                for (int i = 0; i < counts2.Count(); i++)
+                for (int i = 0; i < counts2.Length; i++)
                 {
                     _ColorList[i].ProjectCount.Add(counts2[i]);
+                }
+                for (int i = counts2.Length; i < _ColorList.Count; i++)
+                {
+                    _ColorList[i].ProjectCount.Add(0);
                 }
                 AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
             }
@@ -212,7 +216,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void AddNewColor()
         {
             colorRepository.Add(new DominoColor(System.Windows.Media.Colors.IndianRed, 0, "New Color"));
-            _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last() });
+            _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last(),
+             ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))});
+
             UnsavedChanges = true;
         }
 
