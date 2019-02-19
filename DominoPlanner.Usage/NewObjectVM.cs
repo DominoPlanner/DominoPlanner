@@ -216,7 +216,7 @@ namespace DominoPlanner.Usage
             }
             catch (Exception es)
             {
-                MessageBox.Show("Could not create a new Project!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         #endregion

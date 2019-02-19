@@ -106,7 +106,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (value.GetType() != _colorMode.GetType())
+                if (value.GetType() != _colorMode?.GetType())
                 {
                     _colorMode = value;
                     lastValid = false;
@@ -197,7 +197,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (value.GetType() != _ditherMode.GetType())
+                if (value.GetType() != _ditherMode?.GetType())
                 {
                     _ditherMode = value;
                     lastValid = false;
