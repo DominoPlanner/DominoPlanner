@@ -85,8 +85,16 @@ namespace DominoPlanner.Core
                if (shapes[i] is RectangleDomino)
                {
                    DominoRectangle rect = shapes[i].GetContainer(scalingFactor);
-                   CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle() { X = (int)rect.x, Y = (int)rect.y,
-                       Width = (int)rect.width, Height = (int)rect.height }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, c.A), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
+                   if (c.A != 0)
+                   {
+                       CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
+                       {
+                           X = (int)rect.x,
+                           Y = (int)rect.y,
+                           Width = (int)rect.width,
+                           Height = (int)rect.height
+                       }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, c.A), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
+                   }
                    if (borders)
                    {
                        CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
@@ -102,8 +110,11 @@ namespace DominoPlanner.Core
                else
                {
                    DominoPath shape = shapes[i].GetPath(scalingFactor);
-                   bitmap.FillConvexPoly(shape.getSDPath(),
-                       new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
+                   if (c.A != 0)
+                   {
+                       bitmap.FillConvexPoly(shape.getSDPath(),
+                           new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
+                   }
                    if (borders)
                    {
                        bitmap.DrawPolyline(shape.getSDPath(), true, 
