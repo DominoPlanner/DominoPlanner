@@ -68,7 +68,7 @@ namespace DominoPlanner.CoreTests
         {
             var path = "tests/dominoes.clr";
             var repo = new ColorRepository(path);
-
+            repo.Save("C:/Users/jonat/Desktop/lamping.DColor");
             Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"\n{x.name} {x.count}").ToArray()));
 
             var path2 = "tests/Dominosteine.farbe";

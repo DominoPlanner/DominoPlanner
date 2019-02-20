@@ -156,15 +156,20 @@ namespace DominoPlanner.Core
             }
             private set { }
         }
-        private int _imagewidth;
+
+
         [ProtoMember(15)]
+        private int _imagewidth;
         public int ImageWidth
         {
             get { return _imagewidth; }
-            set { _imagewidth = value; sourceValid = false; }
+            set
+            {
+                _imagewidth = value; sourceValid = false;
+            }
         }
-        private int _imageheigth;
         [ProtoMember(16)]
+        private int _imageheigth;
         public int ImageHeight
         {
             get => _imageheigth;
