@@ -112,7 +112,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         = "SUM(" + ws.Cells[4, 3].Address + ":" + ws.Cells[3 + ColorList.Count, 3].Address + ")";
                 ws.Cells[ColorList.Count + 4, 4 + DifColumns.Count].Formula =
                      "SUM(" + ws.Cells[4, 4 + DifColumns.Count].Address + ":" + ws.Cells[3 + ColorList.Count, 4 + DifColumns.Count].Address + ")";
-                ws.Cells[3, 4 + DifColumns.Count].Value = "Sum";
+                if (DifColumns.Count != 0)  ws.Cells[3, 4 + DifColumns.Count].Value = "Sum";
                 ws.Cells[4 + ColorList.Count, 2].Value = "Sum";
                 // fill color counts
                 for (int i = 0; i < ColorList.Count; i++)
@@ -126,10 +126,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         ws.Cells[4 + i, 4 + j].Value = ColorList[i].ProjectCount[j];
                     }
-
-                    ws.Cells[4 + i, 4 + DifColumns.Count].Formula
-                        = "SUM(" + ws.Cells[4 + i, 4].Address + ":" 
-                        + ws.Cells[4 + i, 3 + DifColumns.Count].Address + ")";
+                    if (DifColumns.Count != 0)
+                    {
+                        ws.Cells[4 + i, 4 + DifColumns.Count].Formula
+                            = "SUM(" + ws.Cells[4 + i, 4].Address + ":"
+                            + ws.Cells[4 + i, 3 + DifColumns.Count].Address + ")";
+                    }
                 }
                 
                 ws.Cells["C4"].Value = ""; // Count of empty domino
@@ -144,10 +146,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
                 ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Font.Bold = true;
                 ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-                ws.Cells[3, 4, 4 + ColorList.Count, 3 + DifColumns.Count].Style.Border.Right.Style
-                    = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                ws.Cells[4, 2, 3 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Bottom.Style 
-                    = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                if (DifColumns.Count != 0)
+                {
+                    ws.Cells[3, 4, 4 + ColorList.Count, 3 + DifColumns.Count].Style.Border.Right.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    ws.Cells[4, 2, 3 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Bottom.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                }
 
                 ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Top.Style 
                     = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
