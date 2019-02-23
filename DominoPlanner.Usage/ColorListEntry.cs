@@ -8,7 +8,7 @@ namespace DominoPlanner.Usage
     {
         public ColorListEntry()
         {
-            _ProjectCount = new ObservableCollection<int>();
+            ProjectCount = new ObservableCollection<int>();
             SumAll = 0;
         }
 
@@ -59,8 +59,7 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
-
+        
         private ObservableCollection<int> _ProjectCount;
         public ObservableCollection<int> ProjectCount
         {
@@ -78,7 +77,6 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
         #endregion
     }
 }

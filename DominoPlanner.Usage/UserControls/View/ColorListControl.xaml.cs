@@ -26,11 +26,35 @@ namespace DominoPlanner.Usage.UserControls.View
         public ColorListControl()
         {
             InitializeComponent();
+            DataContextChanged += ColorListControl_DataContextChanged;
         }
-        public ColorListControl(ColorListControlVM clcvm)
+
+        private void ColorListControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(DataContext is ColorListControlVM vm)
+            {
+                vm.ShowProjectsChanged += Vm_ShowProjectsChanged;
+                RefreshSumVisibility();
+            }
+        }
+
+        private void Vm_ShowProjectsChanged(object sender, EventArgs e)
+        {
+            RefreshSumVisibility();
+        }
+
+        public ColorListControl(ColorListControlVM clcvm) : this()
         {
             DataContext = clcvm;
-            
+            RefreshSumVisibility();
+        }
+
+        private void RefreshSumVisibility()
+        {
+            if (DataContext is ColorListControlVM vm)
+            {
+                sumtemplate.Visibility = vm.ShowProjects ? Visibility.Visible : Visibility.Hidden;
+            }
         }
 
         private void Color_Delete(object sender, RoutedEventArgs e)

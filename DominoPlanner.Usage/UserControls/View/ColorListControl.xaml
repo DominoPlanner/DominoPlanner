@@ -47,15 +47,14 @@
                 <DataGridTemplateColumn CanUserSort="False" Header="Count" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,#}" />
+                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,0}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!--DataGridTemplateColumn x:Name="SumColumn" Header="Sum all Projects" Width="100" Visibility="{Binding ShowProjects, Converter={StaticResource BoolVisibilityConverter}}"-->
-                <DataGridTemplateColumn Header="Sum all Projects" Width="100" Visibility="{Binding .Data, Converter={StaticResource BoolToVisibilityConverter}, Source={StaticResource FirstColumnCheckedProxy}}">
-                    <DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn x:Name="sumtemplate" Header="Sum" Width="50" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding SumAll}"/>
+                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

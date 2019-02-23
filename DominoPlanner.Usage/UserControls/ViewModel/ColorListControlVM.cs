@@ -357,6 +357,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        internal event EventHandler ShowProjectsChanged;
+
         private bool _ShowProjects;
         public bool ShowProjects
         {
@@ -366,6 +368,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_ShowProjects != value)
                 {
                     _ShowProjects = value;
+                    ShowProjectsChanged?.Invoke(this, EventArgs.Empty);
                     RaisePropertyChanged();
                 }
             }
@@ -373,6 +376,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         internal override void ResetContent()
         {
+            ShowProjects = true;
             DifColumns = new ObservableCollection<DataGridColumn>();
             foreach(ColorListEntry cle in _ColorList)
             {
