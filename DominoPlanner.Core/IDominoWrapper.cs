@@ -32,6 +32,27 @@ namespace DominoPlanner.Core
             if (parent != null) // rootnode
                 parent.children.Add(this);
         }
+        public IDominoWrapper CreateNodeFromPath(DominoAssembly futureParent, string path)
+        {
+            var parentPath = Workspace.Instance.openedFiles.Find(x => x.Item2 == futureParent).Item1;
+            var relPath = Workspace.MakeRelativePath(parentPath, path);
+            var deserialized = Workspace.Load<IWorkspaceLoadable>(path);
+            switch (deserialized)
+            {
+                case FieldParameters p:
+                    return new FieldNode(relPath, futureParent);
+                case StructureParameters p:
+                    return new StructureNode(relPath, futureParent);
+                case SpiralParameters p:
+                    return new SpiralNode(relPath, futureParent);
+                case CircleParameters p:
+                    return new CircleNode(relPath, futureParent);
+                case DominoAssembly p:
+                    return new AssemblyNode(relPath, futureParent);
+                default:
+                    throw new ArgumentException("Path is not loadable");
+            }
+        }
     }
     [ProtoContract]
     public class DominoAssembly : IWorkspaceLoadable
@@ -98,6 +119,7 @@ namespace DominoPlanner.Core
         {
             this.relativePath = relativePath;
         }
+        
     }
     [ProtoContract(SkipConstructor = true)]
     public class FieldNode : DocumentNode
