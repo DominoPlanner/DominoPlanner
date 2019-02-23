@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -152,6 +153,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     try
                     {
                         p.SaveAs(new FileInfo(dlg.FileName));
+                        Process.Start(dlg.FileName);
                     }
                     catch
                     {
