@@ -21,7 +21,7 @@
         <Border BorderThickness="1" BorderBrush="Black" Margin="5,25,5,0" Height="93" VerticalAlignment="Top">
             <Image Source="{Binding pImage}" Margin="-1,0">
                 <intr:Interaction.Triggers>
-                    <intr:EventTrigger EventName="MouseUp">
+                    <intr:EventTrigger EventName="MouseDown">
                         <intr:InvokeCommandAction Command="{Binding LoadNewImage}"/>
                     </intr:EventTrigger>
                 </intr:Interaction.Triggers>

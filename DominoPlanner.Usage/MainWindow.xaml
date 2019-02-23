@@ -63,6 +63,11 @@
                     <Image Source="Icons/add.ico"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem Header="Add Existing Item" Command="{Binding AddExistingItem}">
+                <MenuItem.Icon>
+                    <Image Source="Icons/add.ico"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem Header="Save">
                 <MenuItem.Icon>
                     <Image Source="Icons/Save.ico"/>

@@ -78,12 +78,14 @@ namespace DominoPlanner.Usage
                         case 1:
                             endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
-                            ((AddStructureVM)CurrentViewModel).sPath = picturePath;
+                            if(picturePath != null)
+                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         case 2:
                             endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Round);
-                            ((AddStructureVM)CurrentViewModel).sPath = picturePath;
+                            if(picturePath != null)
+                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         default: break;
                     }

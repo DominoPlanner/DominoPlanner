@@ -32,6 +32,7 @@ namespace DominoPlanner.Usage
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
+            AddExistingItem = new RelayCommand(o => { AddItem_Exists(); });
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
@@ -96,6 +97,9 @@ namespace DominoPlanner.Usage
 	    private ICommand _AddExistingProject;
         public ICommand AddExistingProject { get { return _AddExistingProject; } set { if (value != _AddExistingProject) { _AddExistingProject = value; } } }
         
+        private ICommand _AddExistingItem;
+        public ICommand AddExistingItem { get { return _AddExistingItem; } set { if (value != _AddExistingItem) { _AddExistingItem = value; } } }
+
         private ICommand _NewProject;
         public ICommand NewProject { get { return _NewProject; } set { if (value != _NewProject) { _NewProject = value; } } }
 
@@ -291,6 +295,7 @@ namespace DominoPlanner.Usage
 
             foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
             {
+                //Workspace.Load<IDominoProviderImageFilter>(dominoWrapper.relativePath, dominoWrapper.parent);
                 ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
                     @"./Icons/colorLine.ico", dominoWrapper); //jojo bild austauschen
                 returnList.Add(project);
@@ -354,6 +359,37 @@ namespace DominoPlanner.Usage
                 {
                     OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(openFileDialog.FileName), Path.GetDirectoryName(openFileDialog.FileName));
                     loadProject(openProject);
+                }
+            }
+        }
+
+        private void AddItem_Exists()
+        {
+            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog.Filter = "project files (*.DObject)|*.DObject";
+            openFileDialog.RestoreDirectory = true;
+            if(openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (File.Exists(openFileDialog.FileName))
+                {
+                    IDominoProvider c = Workspace.Load<IDominoProvider>(openFileDialog.FileName);
+                    DocumentNode node = null;
+                    switch (c)
+                    {
+                        case SpiralParameters spiralParameters:
+                            node = new SpiralNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
+                            break;
+                        case CircleParameters circleParameters:
+                            node = new CircleNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
+                            break;
+                        case FieldParameters fieldParameters:
+                            node = new FieldNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
+                            break;
+                        default:
+                            break;
+                    }
+                    ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(openFileDialog.FileName, Path.Combine(SelectedProject.FilePath, "Source Image", @"./Icons/colorLine.ico"), node)); //jojowarten
+                    OpenItem(compo);
                 }
             }
         }
