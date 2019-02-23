@@ -18,7 +18,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="234"/>
         </Grid.RowDefinitions>
-        <DataGrid x:Name="dGrid" GridLinesVisibility="None" RowHeaderWidth="0" local:ColorListControl.BindableColumns="{Binding DifColumns}" Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding ColorList}" SelectedItem="{Binding SelectedStone}" Margin="5,5,5,5" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" SelectionMode="Single" CanUserResizeRows="False" BorderBrush="{x:Null}" RowHeight="30" Background="{x:Null}" CanUserDeleteRows="False" HeadersVisibility="Column" CanUserSortColumns="False">
+        <DataGrid SelectedIndex="{Binding selindex}" x:Name="dGrid" GridLinesVisibility="None" RowHeaderWidth="0" local:ColorListControl.BindableColumns="{Binding DifColumns}" Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding ColorList}" SelectedItem="{Binding SelectedStone}" Margin="5,5,5,5" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" SelectionMode="Single" CanUserResizeRows="False" BorderBrush="{x:Null}" RowHeight="30" Background="{x:Null}" CanUserDeleteRows="False" HeadersVisibility="Column" CanUserSortColumns="False">
             <DataGrid.Resources>
                 <parent:BindingProxy x:Key="FirstColumnCheckedProxy" Data="{Binding ShowProjects}"   />
             </DataGrid.Resources>

@@ -304,15 +304,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _SelectedStone; }
             set
             {
-                if (_SelectedStone != value)
+                if (value != null && !(value.DominoColor is EmptyDomino))
                 {
-                    if (_SelectedStone != null)
-                        _SelectedStone.DominoColor.PropertyChanged -= DominoColor_PropertyChanged;
-                    _SelectedStone = value;
-                    if (_SelectedStone != null)
-                        _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
-                    RaisePropertyChanged();
+                    if (_SelectedStone != value)
+                    {
+                        if (_SelectedStone != null)
+                            _SelectedStone.DominoColor.PropertyChanged -= DominoColor_PropertyChanged;
+                        _SelectedStone = value;
+                        if (_SelectedStone != null)
+                            _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
+                    }
                 }
+                RaisePropertyChanged();
             }
         }
         public override TabItemType tabType
