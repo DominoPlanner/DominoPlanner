@@ -295,7 +295,7 @@ namespace DominoPlanner.Usage
 
             foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
             {
-                //Workspace.Load<IDominoProviderImageFilter>(dominoWrapper.relativePath, dominoWrapper.parent);
+                //jovar filter = Workspace.LoadImageFilters<IWorkspaceLoadImageFilter>(dominoWrapper.relativePath, dominoWrapper.parent);
                 ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
                     @"./Icons/colorLine.ico", dominoWrapper); //jojo bild austauschen
                 returnList.Add(project);
@@ -372,24 +372,10 @@ namespace DominoPlanner.Usage
             {
                 if (File.Exists(openFileDialog.FileName))
                 {
-                    IDominoProvider c = Workspace.Load<IDominoProvider>(openFileDialog.FileName);
-                    DocumentNode node = null;
-                    switch (c)
-                    {
-                        case SpiralParameters spiralParameters:
-                            node = new SpiralNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
-                            break;
-                        case CircleParameters circleParameters:
-                            node = new CircleNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
-                            break;
-                        case FieldParameters fieldParameters:
-                            node = new FieldNode(openFileDialog.FileName, SelectedProject.Project.documentNode.parent);
-                            break;
-                        default:
-                            break;
-                    }
+                    DocumentNode node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(((AssemblyNode)SelectedProject.Project.documentNode).obj, openFileDialog.FileName);
+                    //var filter = Workspace.LoadImageFilters<IWorkspaceLoadImageFilter>(openFileDialog.FileName);
                     ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(openFileDialog.FileName, Path.Combine(SelectedProject.FilePath, "Source Image", @"./Icons/colorLine.ico"), node)); //jojowarten
-                    OpenItem(compo);
+                    OpenItem(compo); //jojowarten
                 }
             }
         }

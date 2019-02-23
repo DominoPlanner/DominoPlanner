@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using ProtoBuf;
 using System.IO;
+using System.ComponentModel;
 
 namespace DominoPlanner.Core
 {
@@ -28,13 +29,21 @@ namespace DominoPlanner.Core
         internal Emgu.CV.Structure.Lab labColor;
         public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
         private Color _mediacolor;
+        [DisplayName ("Color")]
         public Color mediaColor
         {
             get { return _mediacolor; }
-            set { _mediacolor = value; labColor = value.ToLab(); PropertyChanged?.Invoke(this, "mediaColor"); }
+            set { _mediacolor = value; labColor = value.ToLab(); MediaColorChanged(); }
         }
+
+        internal virtual void MediaColorChanged()
+        {
+            PropertyChanged?.Invoke(this, "mediaColor");
+        }
+
         private int _count;
         [ProtoMember(2)]
+        [DisplayName("Count")]
         public virtual int count
         {
             get { return _count; }
@@ -50,6 +59,7 @@ namespace DominoPlanner.Core
 
         private string _name;
         [ProtoMember(1)]
+        [DisplayName("Name")]
         public string name
         {
             get { return _name; }
@@ -62,6 +72,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        [Browsable(false)]
         public virtual bool show { get { return count != 0; } }
         public abstract XElement Save();
 
@@ -127,6 +138,14 @@ namespace DominoPlanner.Core
                 labColor = mediaColor.ToLab();
             }
             else throw new ArgumentException("Version of old color list must be 1 or 2");
+        }
+        internal override void MediaColorChanged()
+        {
+            base.MediaColorChanged();
+            if(mediaColor.A != 255)
+            {
+                mediaColor = Color.FromRgb(mediaColor.R, mediaColor.G, mediaColor.B);
+            }
         }
         public DominoColor(Color c, int count, string name)
         {

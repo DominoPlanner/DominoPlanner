@@ -644,7 +644,7 @@ namespace DominoPlanner.Core
     public class IDominoProviderImageFilter : IWorkspaceLoadImageFilter
     {
         [ProtoMember(13)]
-        public ObservableCollection<ImageFilter> ImageFilters { get; }
+        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
     }
     public interface ICountTargetable
     {
