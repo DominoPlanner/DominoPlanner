@@ -51,6 +51,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_Path != value)
                 {
                     _Path = value;
+                    pImage = _Path;
                     RaisePropertyChanged();
                 }
             }

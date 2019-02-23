@@ -64,7 +64,7 @@ namespace DominoPlanner.Usage
                 ProtocolV protocolV = new ProtocolV();
                 if (documentNode.obj.last == null)
                     documentNode.obj.Generate();
-                protocolV.DataContext = new ProtocolVM(documentNode.obj);
+                protocolV.DataContext = new ProtocolVM(documentNode.obj, Path.GetFileNameWithoutExtension(documentNode.relativePath));
                 protocolV.ShowDialog();
             }
         }

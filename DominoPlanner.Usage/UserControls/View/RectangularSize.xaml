@@ -9,7 +9,7 @@
     <Grid Margin="5" Width="300">
         <Label Content="Structure Size:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
         <Label Content="Dominoes" HorizontalAlignment="Left" Margin="223,5,0,0" VerticalAlignment="Top"/>
-        <xctk:IntegerUpDown IsEnabled="False" Minimum="0" Value="{Binding StrucSize}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
+        <xctk:IntegerUpDown Minimum="1" Value="{Binding StrucSize, Delay=200}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
         <ComboBox ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,35,10,0"></ComboBox>
         <Grid Margin="34,65,34,0" Width="230">
             <Grid.ColumnDefinitions>
@@ -61,8 +61,8 @@
                                    Margin="1" Source="{Binding Path=description_imgs[8]}"/>
             </Border>
 
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sLength, Delay=200}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="20" Width="50"/>
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Grid.Row="1" Grid.Column="3" Height="20" Margin="0,16,10,16"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding sLength, Delay=200}" Visibility="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="20" Width="50"/>
+            <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Visibility="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="3" Height="20" Margin="0,16,10,16"/>
         </Grid>
     </Grid>
 </UserControl>

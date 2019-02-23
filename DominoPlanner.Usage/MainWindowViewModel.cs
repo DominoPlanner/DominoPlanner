@@ -152,30 +152,50 @@ namespace DominoPlanner.Usage
         /// <param name="e"></param>
         private void Item_IsClicked(object sender, EventArgs e)
         {
-            ProjectComposite clickedValue = (ProjectComposite)sender;
-            if (clickedValue.ActType == NodeType.ColorListNode)
+            OpenItem((ProjectComposite)sender);
+        }
+
+        private void OpenItem(ProjectComposite toOpen)
+        {
+            TabItem selTab = null;
+            if (toOpen.ActType == NodeType.ColorListNode)
             {
                 ProjectListComposite parent = null;
                 foreach (ProjectListComposite p in Projects.OfType<ProjectListComposite>())
                 {
-                    if (p.Children.Contains(clickedValue))
+                    if (p.Children.Contains(toOpen))
                     {
                         parent = p;
                         break;
                     }
                 }
-                if (parent != null) Tabs.Add(new TabItem(clickedValue.OwnID, clickedValue.ParentProjectID, clickedValue.Name, clickedValue.PicturePath, clickedValue.FilePath, new ColorListControlVM(((AssemblyNode)parent.Project.documentNode).obj)));
-
+                if (parent != null)
+                {
+                    selTab = Tabs.FirstOrDefault(x => x.Content is ColorListControlVM && ((ColorListControlVM)x.Content).DominoAssembly == ((AssemblyNode)parent.Project.documentNode).obj);
+                    if (selTab == null)
+                    {
+                        selTab = new TabItem(toOpen.OwnID, toOpen.ParentProjectID, toOpen.Name, toOpen.PicturePath, toOpen.FilePath, new ColorListControlVM(((AssemblyNode)parent.Project.documentNode).obj));
+                        Tabs.Add(selTab);
+                    }
+                }
             }
-            else if (clickedValue.ActType == NodeType.ProjectNode)
-                Tabs.Add(new TabItem(clickedValue));
-
-            Tabs.Last<TabItem>().CloseIt += MainWindowViewModel_CloseIt;
-            if (Tabs.Last<TabItem>().Content.CurrentProject != null)
+            else if (toOpen.ActType == NodeType.ProjectNode)
             {
-                Tabs.Last<TabItem>().Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
+                selTab = Tabs.FirstOrDefault(x => x.ProjectComp == toOpen);
+                if (selTab == null)
+                {
+                    selTab = new TabItem(toOpen);
+                    Tabs.Add(selTab);
+                }
             }
-            SelectedTab = Tabs.Last<TabItem>();
+
+            selTab.CloseIt += MainWindowViewModel_CloseIt;
+            if (selTab.Content.CurrentProject != null)
+            {
+                selTab.Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
+            }
+
+            SelectedTab = selTab;
         }
         /// <summary>
         /// Selection Changed in der Baumstruktur (damit das akteuelle Item refreshed werden kann)
@@ -278,7 +298,7 @@ namespace DominoPlanner.Usage
             return returnList;
         }
 
-        private void AddProjectToTree(ProjectListComposite parentProject, ProjectElement projectTransfer)
+        private ProjectComposite AddProjectToTree(ProjectListComposite parentProject, ProjectElement projectTransfer)
         {
             try
             {
@@ -302,6 +322,7 @@ namespace DominoPlanner.Usage
             newItem.IsClicked += Item_IsClicked;
             newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
             newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
+            return newItem;
         }
 
         /// <summary>
@@ -317,8 +338,8 @@ namespace DominoPlanner.Usage
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
             new NewObject(novm).ShowDialog();
             if (!novm.Close) return;
-            AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
-            
+            ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
+            OpenItem(compo);
         }
 
         private void AddProject_Exists()
@@ -411,14 +432,14 @@ namespace DominoPlanner.Usage
                 {
                     if (documentNode.obj.Editing)
                     {
-                        Content = new EditProjectVM(documentNode.obj);
+                        Content = new EditProjectVM(documentNode);
                     }
                     else
                     {
                         switch (documentNode)
                         {
                             case FieldNode fieldNode:
-                                Content = new CreateFieldVM(fieldNode.obj);
+                                Content = new CreateFieldVM(fieldNode);
                                 break;
                             case StructureNode structureNode:
                                 Content = new CreateStructureVM(structureNode.obj, true);
@@ -433,6 +454,7 @@ namespace DominoPlanner.Usage
                     }
                 }
             }
+            Content.UnsavedChanges = false;
         }
 
         public TabItem(int ownID, int projectID, string Header, string picturePath, string path) : this(projectID, path)

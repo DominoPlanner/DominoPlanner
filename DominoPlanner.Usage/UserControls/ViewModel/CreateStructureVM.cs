@@ -1,6 +1,7 @@
 ﻿using DominoPlanner.Core;
 using DominoPlanner.Usage.HelperClass;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -468,7 +469,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProtocolV protocolV = new ProtocolV
             {
-                DataContext = new ProtocolVM(structureParameters)
+                DataContext = new ProtocolVM(structureParameters, Path.GetFileNameWithoutExtension(this.FilePath))
             };
             protocolV.ShowDialog();
         }
@@ -499,6 +500,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             VisibleFieldplan = Visibility.Hidden;
                     }
 
+                    changed = true;
+                }
+                else if (e.PropertyName.Equals("StrucSize"))
+                {
+                    ((StructureParameters)structureParameters).TargetCount = ((RectangularSizeVM)CurrentViewModel).StrucSize;
                     changed = true;
                 }
             }

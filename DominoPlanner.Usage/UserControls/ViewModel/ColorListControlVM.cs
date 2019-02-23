@@ -32,6 +32,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public ColorListControlVM(DominoAssembly dominoAssembly) : this(dominoAssembly.colorPath)
         {
+            this.dominoAssembly = dominoAssembly;
             DifColumns = new ObservableCollection<DataGridColumn>();
             foreach (DocumentNode project in dominoAssembly.children)
             {
@@ -193,6 +194,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prop
+        private DominoAssembly dominoAssembly;
+        public DominoAssembly DominoAssembly
+        {
+            get { return dominoAssembly; }
+        }
         private ColorListEntry _SelectedStone;
         public ColorListEntry SelectedStone
         {

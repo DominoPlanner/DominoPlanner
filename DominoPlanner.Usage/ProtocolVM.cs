@@ -19,13 +19,15 @@ namespace DominoPlanner.Usage
         #region CTOR
         public ProtocolVM(string filePath)
         {
+            Titel = Path.GetFileNameWithoutExtension(filePath);
             Init();
         }
 
-        public ProtocolVM(IDominoProvider dominoProvider)
+        public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
         {
             DominoProvider = dominoProvider;
             dominoTransfer = DominoProvider.last;
+            Titel = fieldName;
             Init();
         }
         #endregion
@@ -257,7 +259,7 @@ namespace DominoPlanner.Usage
                 if (_UseBlocks != value)
                 {
                     _UseBlocks = value;
-
+                    currentOPP.templateLength = _UseBlocks ? StonesPerBlock : int.MaxValue;
                     RaisePropertyChanged();
                 }
             }
@@ -312,8 +314,8 @@ namespace DominoPlanner.Usage
         #region Methods
         private void Init()
         {
-            Titel = "Field";
-            StonesPerBlock = 20;
+            StonesPerBlock = 50;
+            UseBlocks = true;
             BuildReverse = false;
             currentOPP.reverse = false;
             HasShortProperties = true;
@@ -344,10 +346,12 @@ namespace DominoPlanner.Usage
 
         public void SaveExcelFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.DefaultExt = ".xlsx";
-            dlg.Filter = "Excel Document (.xlsx)|*.xlsx";
-            dlg.FileName = Titel;
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                DefaultExt = ".xlsx",
+                Filter = "Excel Document (.xlsx)|*.xlsx",
+                FileName = Titel
+            };
 
             if (dlg.ShowDialog() == true)
             {

@@ -37,6 +37,8 @@ namespace DominoPlanner.Usage
         public string ProjectPath { get { return _ProjectPath; } }
         public string ObjectPath { get { return string.Format("{0}\\{1}{2}", _ProjectPath, _filename, _endung); } }
 
+        string picturePath;
+
         private int _selectedType;
         public int selectedType
         {
@@ -45,12 +47,29 @@ namespace DominoPlanner.Usage
             {
                 if (_selectedType != value)
                 {
+                    switch (_selectedType)
+                    {
+                        case 0:
+                            if(CurrentViewModel is AddFieldVM addField)
+                            {
+                                picturePath = addField.sPath;
+                            }
+                            break;
+                        case 1:
+                        case 2:
+                            if(CurrentViewModel is AddStructureVM addStructureVM)
+                            {
+                                picturePath = addStructureVM.sPath;
+                            }
+                            break;
+                    }
                     _selectedType = value;
                     switch (value)
                     {
                         case 0:
                             endung = ".dobject";
                             CurrentViewModel = new AddFieldVM();
+                            ((AddFieldVM)CurrentViewModel).sPath = picturePath;
                             break;
                         /*case 1:
                             endung = ".dobject";
@@ -59,10 +78,12 @@ namespace DominoPlanner.Usage
                         case 1:
                             endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
+                            ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         case 2:
                             endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Round);
+                            ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         default: break;
                     }
@@ -157,6 +178,7 @@ namespace DominoPlanner.Usage
                     return;
                 }
                 string colorlist = parentProject.colorPath;
+                string picturepath;
                 switch (selectedType)
                 {
                     case 0: //Field with Picture
@@ -167,8 +189,10 @@ namespace DominoPlanner.Usage
                         }
 
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
-                        File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
-                        FieldParameters p = new FieldParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddFieldVM)CurrentViewModel).pImage, colorlist, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
+                        picturepath = string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
+                        File.Copy(((AddFieldVM)CurrentViewModel).sPath, picturepath);
+                        FieldParameters p = new FieldParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), picturepath, colorlist, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4, ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
+                        p.Generate();
                         p.Save();
                         resultNode = new FieldNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         parentProject.Save();
@@ -180,30 +204,35 @@ namespace DominoPlanner.Usage
                             return;
                         }
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
+                        picturepath = string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
                         try
                         {
-                            File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
+                            File.Copy(((AddStructureVM)CurrentViewModel).sPath, picturepath);
                         }
                         catch (IOException es) { }
-                        StructureParameters sp = new StructureParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).SelectedStructureElement, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).sLength, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).sHeight, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        StructureParameters sp = new StructureParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), picturepath, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).SelectedStructureElement, ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).StrucSize, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                        sp.Generate();
                         sp.Save();
                         resultNode = new StructureNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         parentProject.Save();
                         break;
                     case 2: //Round Structure
                         internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
-                        File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
+                        picturepath = string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
+                        File.Copy(((AddStructureVM)CurrentViewModel).sPath, picturepath);
                         RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
                         CircularStructure circularStructure;
                         if (rsvm.TypeSelected.Equals("Spiral"))
                         {
-                            circularStructure = new SpiralParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure = new SpiralParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), picturepath, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure.Generate();
                             circularStructure.Save();
                             resultNode = new SpiralNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         }
                         else
                         {
-                            circularStructure = new CircleParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), ((AddStructureVM)CurrentViewModel).pImage, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure = new CircleParameters(Path.Combine(ProjectPath, "Planner Files", string.Format("{0}.DObject", filename)), picturepath, rsvm.Amount, colorlist, ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                            circularStructure.Generate();
                             circularStructure.Save();
                             resultNode = new CircleNode(Path.Combine("Planner Files", string.Format("{0}.DObject", filename)), parentProject);
                         }

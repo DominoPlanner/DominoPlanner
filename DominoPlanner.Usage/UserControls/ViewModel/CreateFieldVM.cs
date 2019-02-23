@@ -2,6 +2,7 @@
 using DominoPlanner.Usage.HelperClass;
 using Emgu.CV.CvEnum;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -12,9 +13,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class CreateFieldVM : TabBaseVM
     {
         #region CTOR
-        public CreateFieldVM(IDominoProvider dominoProvider) : base()
+        public CreateFieldVM(FieldNode dominoProvider) : base()
         {
-            CurrentProject = dominoProvider;
+            name = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
+            CurrentProject = dominoProvider.obj;
             
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
@@ -34,6 +36,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        string name;
         int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters
@@ -500,7 +503,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(fieldParameters);
+            protocolV.DataContext = new ProtocolVM(fieldParameters, name);
             protocolV.ShowDialog();
         }
         #endregion

@@ -16,13 +16,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class EditProjectVM : TabBaseVM
     {
         #region CTOR
-        public EditProjectVM(IDominoProvider dominoProvider) : base()
+        public EditProjectVM(DocumentNode dominoProvider) : base()
         {
-            ProjectName = "Projektname";
+            ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
-            CurrentProject = dominoProvider;
+            CurrentProject = dominoProvider.obj;
             
             _DominoList = new ObservableCollection<ColorListEntry>();
 
@@ -615,7 +615,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject);
+            protocolV.DataContext = new ProtocolVM(CurrentProject, ProjectName);
             protocolV.ShowDialog();
         }
 

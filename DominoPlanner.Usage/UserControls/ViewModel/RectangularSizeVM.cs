@@ -12,11 +12,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class RectangularSizeVM : StructureViewModel
     {
         #region CTOR
-        public RectangularSizeVM()
+        public RectangularSizeVM() : base()
         {
             list = new List<string>();
             StuctureTypes();
             structure_index = 0;
+
+            sHeight = 1;
+            sLength = 1;
         }
         #endregion
 

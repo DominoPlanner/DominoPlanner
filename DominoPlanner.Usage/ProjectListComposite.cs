@@ -66,23 +66,6 @@ namespace DominoPlanner.Usage
                     dn.parent.children.Remove(dn);
                     dn.parent.Save();
                     this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
-
-                    string picturepath = ((ProjectComposite)((MenuItem)sender).DataContext).Project.IcoPath;
-                    string objectpath = ((ProjectComposite)((MenuItem)sender).DataContext).Project.FilePath;
-                    
-                    MessageBoxResult mbrRemoveAll = MessageBox.Show("Delete all files?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (mbrRemoveAll == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            //File.Delete(picturepath); jojo wenn das bild richtig ist
-                            File.Delete(objectpath);
-                        }
-                        catch (Exception)
-                        {
-                            MessageBox.Show("Error removing projectfiles!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
                 }
                 MessageBox.Show(string.Format("{0} is remove!", removeName), "Removed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             }

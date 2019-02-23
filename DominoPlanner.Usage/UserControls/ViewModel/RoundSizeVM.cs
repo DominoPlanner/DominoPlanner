@@ -9,13 +9,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class RoundSizeVM : StructureViewModel
     {
         #region CTOR
-        public RoundSizeVM()
+        public RoundSizeVM() : base()
         {
             list = new List<String>();
             list.Add("Spiral");
             list.Add("Circle Bomb");
             TypeSelected = "Spiral";
             PossibleTypeChange = false;
+            Amount = 10;
         }
         #endregion
 
