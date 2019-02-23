@@ -61,6 +61,8 @@ namespace DominoPlanner.Usage
                 if (_SelectedTab != value)
                 {
                     _SelectedTab = value;
+                    if(SelectedTab != null)
+                        _SelectedTab.Content.ResetContent();
                     RaisePropertyChanged();
                 }
             }

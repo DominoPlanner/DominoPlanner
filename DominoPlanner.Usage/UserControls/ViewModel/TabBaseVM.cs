@@ -20,6 +20,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
+        internal virtual void ResetContent() { }
         public abstract void Undo();
         public abstract void Redo();
         public abstract bool Save();

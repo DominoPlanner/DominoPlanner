@@ -35,20 +35,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly))
         {
             this.dominoAssembly = dominoAssembly;
-            DifColumns = new ObservableCollection<DataGridColumn>();
-            foreach (DocumentNode project in dominoAssembly.children)
-            {
-                int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                for (int i = 0; i < counts2.Length; i++)
-                {
-                    _ColorList[i].ProjectCount.Add(counts2[i]);
-                }
-                for (int i = counts2.Length; i < _ColorList.Count; i++)
-                {
-                    _ColorList[i].ProjectCount.Add(0);
-                }
-                AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
-            }
         }
         #endregion
 
@@ -70,7 +56,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (colorRepository != null) colorRepository.Anzeigeindizes.CollectionChanged -= Anzeigeindizes_CollectionChanged;
             colorRepository = Workspace.Load<ColorRepository>(FilePath);
             colorRepository.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
-
             refreshList();
         }
 
@@ -87,8 +72,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
                 counter++;
             }
-
-            
         }
         private void ExportXLSX()
         {
@@ -388,6 +371,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        internal override void ResetContent()
+        {
+            DifColumns = new ObservableCollection<DataGridColumn>();
+            foreach(ColorListEntry cle in _ColorList)
+            {
+                cle.ProjectCount.Clear();
+            }
+            foreach (DocumentNode project in dominoAssembly.children)
+            {
+                int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
+                for (int i = 0; i < counts2.Length; i++)
+                {
+                    _ColorList[i].ProjectCount.Add(counts2[i]);
+                }
+                for (int i = counts2.Length; i < _ColorList.Count; i++)
+                {
+                    _ColorList[i].ProjectCount.Add(0);
+                }
+                AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
+            }
+        }
 
         private void AddProjectCountsColumn(string projectName)
         {
