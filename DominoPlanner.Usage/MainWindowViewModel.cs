@@ -338,7 +338,7 @@ namespace DominoPlanner.Usage
             }
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
             new NewObject(novm).ShowDialog();
-            if (!novm.Close) return;
+            if (!novm.Close || novm.ResultNode == null) return;
             ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
             OpenItem(compo);
         }

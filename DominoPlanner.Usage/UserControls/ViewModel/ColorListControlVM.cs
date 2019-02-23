@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ShowProjects = false;
         }
 
-        public ColorListControlVM(DominoAssembly dominoAssembly) : this(dominoAssembly.colorPath)
+        public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly))
         {
             this.dominoAssembly = dominoAssembly;
             DifColumns = new ObservableCollection<DataGridColumn>();
