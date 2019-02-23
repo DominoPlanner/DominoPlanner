@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -112,6 +113,25 @@ namespace DominoPlanner.Core
                     Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(filepath, obj));
                 }
             }
+        }
+        public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string absolutePath) where T : IWorkspaceLoadImageFilter
+        {
+            return LoadImageFilters<T>(absolutePath, null);
+        }
+        public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
+        {
+            relativePath = AbsolutePathFromReference(relativePath, reference);
+            var result = (T)Workspace.Instance.Find<T>(relativePath);
+            Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für ImageFilter");
+            if (result == null)
+            {
+                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                using (var file = File.OpenRead(relativePath))
+                {
+                    return Serializer.Deserialize<IDominoProviderImageFilter>(file).ImageFilters;
+                }
+            }
+            return result.ImageFilters;
         }
         public static int[] LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
