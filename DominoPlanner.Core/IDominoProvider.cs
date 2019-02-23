@@ -23,7 +23,7 @@ namespace DominoPlanner.Core
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
     [ProtoInclude(101, typeof(GeneralShapesProvider))]
-    public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList
+    public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
     {
         #region public properties
         /// <summary>
@@ -618,6 +618,12 @@ namespace DominoPlanner.Core
         int[] counts { get; }
 
         bool Editing { get; set; }
+
+
+    }
+    public interface IWorkspaceLoadImageFilter
+    {
+        ObservableCollection<ImageFilter> ImageFilters { get;}
     }
     public interface IWorkspaceLoadable
     {
@@ -635,10 +641,10 @@ namespace DominoPlanner.Core
 
     }
     [ProtoContract]
-    public class IDominoProviderImageFilter
+    public class IDominoProviderImageFilter : IWorkspaceLoadImageFilter
     {
         [ProtoMember(13)]
-        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
+        public ObservableCollection<ImageFilter> ImageFilters { get; }
     }
     public interface ICountTargetable
     {

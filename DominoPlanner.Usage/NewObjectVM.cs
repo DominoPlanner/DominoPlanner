@@ -223,7 +223,7 @@ namespace DominoPlanner.Usage
                             case 1: //Rectangular Structure
                                 var structureVM = ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel);
                                 StructureParameters sp = new StructureParameters(resultPath, relPicturePath,
-                                    structureVM.SelectedStructureElement, structureVM.sLength, structureVM.sHeight, relColorList,
+                                    structureVM.SelectedStructureElement, structureVM.StrucSize, relColorList,
                                     ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
                                 sp.Generate();
                                 sp.Save();

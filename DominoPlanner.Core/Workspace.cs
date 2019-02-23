@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -113,6 +114,25 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string absolutePath) where T : IWorkspaceLoadImageFilter
+        {
+            return LoadImageFilters<T>(absolutePath, null);
+        }
+        public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
+        {
+            relativePath = AbsolutePathFromReference(relativePath, reference);
+            var result = (T)Workspace.Instance.Find<T>(relativePath);
+            Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für ImageFilter");
+            if (result == null)
+            {
+                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
+                using (var file = File.OpenRead(relativePath))
+                {
+                    return Serializer.Deserialize<IDominoProviderImageFilter>(file).ImageFilters;
+                }
+            }
+            return result.ImageFilters;
+        }
         public static int[] LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
             return LoadColorList<T>(absolutePath, null);
@@ -156,6 +176,26 @@ namespace DominoPlanner.Core
             var result = openedFiles.Where(x => x.Item1 == AbsolutePath && x.Item2 is T);
             if (result.Count() == 0) return null;
             return result.First().Item2;
+        }
+        public static String MakeRelativePath(String fromPath, String toPath)
+        {
+            if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
+            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
+
+            Uri fromUri = new Uri(fromPath);
+            Uri toUri = new Uri(toPath);
+
+            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
+
+            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
+            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+            {
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            return relativePath;
         }
     }
 }
