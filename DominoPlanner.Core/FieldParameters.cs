@@ -124,8 +124,12 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _resizeMode = value;
-                usedColorsValid = false;
+
+                if (_resizeMode != value)
+                {
+                    _resizeMode = value;
+                    usedColorsValid = false;
+                }
             }
         }
         
@@ -264,13 +268,14 @@ namespace DominoPlanner.Core
                 {
                     for (int yi = 0; yi < height; yi++)
                     {
-                        usedColorsValid = true;
+                        
                         if (shapes == null) restoreShapes();
                         shapes[length * yi + xi].originalColor = image[yi, xi];
                     }
                 });
             }
-            
+            usedColorsValid = true;
+
         }
         internal override void GenerateShapes()
         {

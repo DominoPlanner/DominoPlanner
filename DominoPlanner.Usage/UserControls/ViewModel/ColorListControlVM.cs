@@ -1,5 +1,6 @@
 ﻿using DominoPlanner.Core;
 using Microsoft.Win32;
+using OfficeOpenXml;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -25,6 +26,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             BtnRemove = new RelayCommand(o => { RemoveSelected(); });
             BtnMoveDown = new RelayCommand(o => { MoveDown(); });
             BtnMoveUp = new RelayCommand(o => { MoveUp(); });
+            BtnExportXLSX = new RelayCommand(o => { ExportXLSX(); });
             base.UnsavedChanges = false;
             
             ShowProjects = false;
@@ -37,9 +39,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                for (int i = 0; i < counts2.Count(); i++)
+                for (int i = 0; i < counts2.Length; i++)
                 {
-                    ColorList[i].ProjectCount.Add(counts2[i]);
+                    _ColorList[i].ProjectCount.Add(counts2[i]);
+                }
+                for (int i = counts2.Length; i < _ColorList.Count; i++)
+                {
+                    _ColorList[i].ProjectCount.Add(0);
                 }
                 AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
             }
@@ -71,19 +77,107 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void refreshList()
         {
             int counter = 0;
-            foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
-            {
-                colorRepository = Workspace.Load<ColorRepository>(FilePath);
-                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
-                counter++;
-            }
-
             if (colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
             }
-        }
+            foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
+            {
+                //colorRepository = Workspace.Load<ColorRepository>(FilePath);
+                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
+                counter++;
+            }
 
+            
+        }
+        private void ExportXLSX()
+        {
+            using (var p = new ExcelPackage())
+            {
+                // content
+                var ws = p.Workbook.Worksheets.Add("Overview");
+                ws.Cells["A1"].Value = "Color Usage Overview";
+                ws.Cells["A1"].Style.Font.Size = 15;
+                ws.Cells["B3"].Value = "Color";
+                ws.Cells["C3"].Value = "Available";
+                
+                // Write project titles
+                for (int i = 0; i < DifColumns.Count; i++)
+                { 
+                    ws.Cells[3, 4 + i].Value = DifColumns[i].Header;
+                    
+                    ws.Cells[4 + ColorList.Count, 4+i].Formula
+                        = "SUM(" + ws.Cells[4, 4+i].Address + ":" + ws.Cells[3 + ColorList.Count, 4+i].Address + ")";
+                }
+                ws.Cells[4 + ColorList.Count, 3].Formula
+                        = "SUM(" + ws.Cells[4, 3].Address + ":" + ws.Cells[3 + ColorList.Count, 3].Address + ")";
+                ws.Cells[ColorList.Count + 4, 4 + DifColumns.Count].Formula =
+                     "SUM(" + ws.Cells[4, 4 + DifColumns.Count].Address + ":" + ws.Cells[3 + ColorList.Count, 4 + DifColumns.Count].Address + ")";
+                if (DifColumns.Count != 0)  ws.Cells[3, 4 + DifColumns.Count].Value = "Sum";
+                ws.Cells[4 + ColorList.Count, 2].Value = "Sum";
+                // fill color counts
+                for (int i = 0; i < ColorList.Count; i++)
+                {
+
+                    ws.Cells[i + 4, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[i + 4, 1].Style.Fill.BackgroundColor.SetColor(ColorList[i].DominoColor.mediaColor.ToSD());
+                    ws.Cells[i + 4, 2].Value = ColorList[i].DominoColor.name;
+                    ws.Cells[i + 4, 3].Value = ColorList[i].DominoColor.count;
+                    for (int j = 0; j < ColorList[i].ProjectCount.Count; j++)
+                    {
+                        ws.Cells[4 + i, 4 + j].Value = ColorList[i].ProjectCount[j];
+                    }
+                    if (DifColumns.Count != 0)
+                    {
+                        ws.Cells[4 + i, 4 + DifColumns.Count].Formula
+                            = "SUM(" + ws.Cells[4 + i, 4].Address + ":"
+                            + ws.Cells[4 + i, 3 + DifColumns.Count].Address + ")";
+                    }
+                }
+                
+                ws.Cells["C4"].Value = ""; // Count of empty domino
+                ws.Calculate();
+
+                //styling 
+                
+                ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
+                ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
+
+                ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Font.Bold = true;
+                ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Font.Bold = true;
+                ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                if (DifColumns.Count != 0)
+                {
+                    ws.Cells[3, 4, 4 + ColorList.Count, 3 + DifColumns.Count].Style.Border.Right.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    ws.Cells[4, 2, 3 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Bottom.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                }
+
+                ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Top.Style 
+                    = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Left.Style
+                    = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = "ColorList";
+                dlg.DefaultExt = ".xlsx";
+                dlg.Filter = "Excel files (.xlsx)|*.xlsx|All Files (*.*)|*";
+                if (dlg.ShowDialog() == true)
+                {
+                    try
+                    {
+                        p.SaveAs(new FileInfo(dlg.FileName));
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Save failed");
+                    }
+                }
+                    
+            }
+        }
         public override void Undo()
         {
             throw new NotImplementedException();
@@ -128,7 +222,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void AddNewColor()
         {
             colorRepository.Add(new DominoColor(System.Windows.Media.Colors.IndianRed, 0, "New Color"));
-            _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last() });
+            _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last(),
+             ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))});
+
             UnsavedChanges = true;
         }
 
@@ -174,6 +270,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region COMMANDS
+        private ICommand _BtnExportXLSX;
+        public ICommand BtnExportXLSX { get { return _BtnExportXLSX; } set { if (value != _BtnExportXLSX) { _BtnExportXLSX = value; } } }
+
         private ICommand _BtnSendMail;
         public ICommand BtnSendMail { get { return _BtnSendMail; } set { if (value != _BtnSendMail) { _BtnSendMail = value; } } }
 

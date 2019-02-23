@@ -22,10 +22,10 @@ namespace DominoPlanner.CoreTests
         static void Main(string[] args)
 
         {
-            ProjectTests.CreateProject();
-            ProjectTests.LoadProject();
+            //ProjectTests.CreateProject();
+            //ProjectTests.LoadProject();
             Thread.Sleep(500);
-            PostFilterTests.PostFilterTest("bird.jpg");
+           // PostFilterTests.PostFilterTest("bird.jpg");
             //TreeTests.TreeTest();
             //HistoryTreeFieldTest("tests/NewField.jpg");
             /*try
@@ -43,10 +43,10 @@ namespace DominoPlanner.CoreTests
             }*/
             //CircleTest("gre.jpg");
             //for (int i = 0; i < 1; i++)
-            SpiralTest("gre.jpg");
-            WallTest("gre.jpg");
+            //SpiralTest("gre.jpg");
+            //WallTest("gre.jpg");
             //ColorRepoSaveTest();
-            FieldTest("bird.jpg");
+            ///FieldTest("bird.jpg");
             //
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -60,11 +60,23 @@ namespace DominoPlanner.CoreTests
             //FieldTest("tests/bird.jpg");
 
             //Console.WriteLine(Test());
-
+            OldColorRepoLoadTest();
             Console.ReadLine();
             
         }
+        private static void OldColorRepoLoadTest()
+        {
+            var path = "tests/dominoes.clr";
+            var repo = new ColorRepository(path);
+            repo.Save("C:/Users/jonat/Desktop/lamping.DColor");
+            Console.WriteLine(String.Join(", ", repo.SortedRepresentation.Select(x => $"\n{x.name} {x.count}").ToArray()));
 
+            var path2 = "tests/Dominosteine.farbe";
+            var repo2 = new ColorRepository(path2);
+
+
+            Console.WriteLine(String.Join(", ", repo2.SortedRepresentation.Select(x => $"\n{x.name} {x.count}").ToArray()));
+        }
         private static void ColorRepoSaveTest()
         {
             var repo = new ColorRepository();

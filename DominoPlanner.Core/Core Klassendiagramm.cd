@@ -7,20 +7,20 @@
     </Compartments>
     <AssociationLine Name="color_filtered" Type="DominoPlanner.Core.ColorRepository" FixedFromPoint="true">
       <Path>
-        <Point X="13.5" Y="7.533" />
-        <Point X="15" Y="7.533" />
+        <Point X="13.5" Y="7.568" />
+        <Point X="15" Y="7.568" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="ImageFilters" Type="DominoPlanner.Core.ImageFilter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="10.75" Y="6.242" />
-        <Point X="10.375" Y="6.242" />
+        <Point X="10.75" Y="6.248" />
+        <Point X="10.375" Y="6.248" />
         <Point X="10.375" Y="1.812" />
         <Point X="7.25" Y="1.812" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ggiAAIAACAEBBMMgBCSAMJhMBZEA4gCUUAgAHXAAIrQ=</HashCode>
+      <HashCode>ggiAAIAACAEBBMMgBCSAMJhMBZEA4gCUUAhAHXAAIrQ=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -108,7 +108,7 @@
   <Class Name="DominoPlanner.Core.ObjectProtocolParameters">
     <Position X="18.5" Y="8" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAABAAAAQAQAgAACAIAiAAAIAAAAAEIAiIAADAEQAAA=</HashCode>
+      <HashCode>AAABAAAAQAQAgAACAIAiAAIIAAAAAEIAiIAADAEQAAA=</HashCode>
       <FileName>ObjectProtocolParameters.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -635,7 +635,7 @@
   <Interface Name="DominoPlanner.Core.IWorkspaceLoadColorList" Collapsed="true">
     <Position X="13.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
   </Interface>

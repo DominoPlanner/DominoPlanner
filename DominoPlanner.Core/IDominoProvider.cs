@@ -106,8 +106,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _colorMode = value;
-                lastValid = false;
+                if (value.GetType() != _colorMode?.GetType())
+                {
+                    _colorMode = value;
+                    lastValid = false;
+                }
             }
         }
         [ProtoMember(11)]
@@ -153,15 +156,20 @@ namespace DominoPlanner.Core
             }
             private set { }
         }
-        private int _imagewidth;
+
+
         [ProtoMember(15)]
+        private int _imagewidth;
         public int ImageWidth
         {
             get { return _imagewidth; }
-            set { _imagewidth = value; sourceValid = false; }
+            set
+            {
+                _imagewidth = value; sourceValid = false;
+            }
         }
-        private int _imageheigth;
         [ProtoMember(16)]
+        private int _imageheigth;
         public int ImageHeight
         {
             get => _imageheigth;
@@ -194,8 +202,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _ditherMode = value;
-                lastValid = false;
+                if (value.GetType() != _ditherMode?.GetType())
+                {
+                    _ditherMode = value;
+                    lastValid = false;
+                }
             }
         }
         [ProtoMember(18)]
@@ -227,7 +238,10 @@ namespace DominoPlanner.Core
         [ProtoMember(1004)]
         public bool sourceValid = false;
         [ProtoMember(1005)]
-        public bool usedColorsValid = false;
+        private bool _usedColorsValid = false;
+        public bool usedColorsValid { get => _usedColorsValid;
+            set => _usedColorsValid = value;
+        }
         private bool _Editing;
         [ProtoMember(4)]
         public bool Editing
@@ -299,6 +313,7 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
         {
+            Console.WriteLine("Regenerate");
             if (Editing) return last;
             if (!sourceValid)
             {
@@ -489,7 +504,7 @@ namespace DominoPlanner.Core
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
             if (!hasProcotolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
-            if (!lastValid || !shapesValid) throw new InvalidOperationException("This object has unreflected changes.");
+            if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
             int[,] basefield = new int[last.dominoLength, last.dominoHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)
             {
@@ -580,6 +595,7 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         public void restoreShapes()
         {
+            bool lastValidTemp = lastValid;
             //if (!Editing)
             //{
                 UpdateSource();
@@ -588,6 +604,7 @@ namespace DominoPlanner.Core
                 GenerateShapes();
                 ReadUsedColors();
             //}
+            lastValid = lastValidTemp;
         }
         public abstract object Clone();
         #endregion

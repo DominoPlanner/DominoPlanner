@@ -103,15 +103,30 @@ namespace DominoPlanner.Core
                 return Int32.MaxValue;
             return comp.Distance(color.ToLab(), labColor);
         }
-        public DominoColor(XElement source)
+        public DominoColor(XElement source, int old_version)
         {
-            mediaColor = Color.FromRgb(
-                byte.Parse(source.Element("R").Value),
-            byte.Parse(source.Element("G").Value),
-            byte.Parse(source.Element("B").Value));
-            count = int.Parse(source.Element("Count").Value);
-            name = source.Element("Name").Value;
-            labColor = mediaColor.ToLab();
+            if (old_version == 1)
+            {
+                mediaColor = Color.FromRgb(
+                    byte.Parse(source.Element("r").Value),
+                byte.Parse(source.Element("g").Value),
+                byte.Parse(source.Element("b").Value));
+                count = int.Parse(source.Element("Anzahl").Value);
+                name = source.Element("Farbname").Value;
+                labColor = mediaColor.ToLab();
+            }
+            else if (old_version == 2)
+            {
+                var color = source.Element("rgb");
+                mediaColor = Color.FromRgb(
+                    byte.Parse(color.Element("R").Value),
+                byte.Parse(color.Element("G").Value),
+                byte.Parse(color.Element("B").Value));
+                count = int.Parse(source.Element("count").Value);
+                name = source.Element("name").Value;
+                labColor = mediaColor.ToLab();
+            }
+            else throw new ArgumentException("Version of old color list must be 1 or 2");
         }
         public DominoColor(Color c, int count, string name)
         {
@@ -217,6 +232,25 @@ namespace DominoPlanner.Core
         public void Save(string path)
         {
             Workspace.Save(this, path);
+        }
+        public ColorRepository(string absolutePath) : this()
+        {
+            var doc = XDocument.Load(absolutePath);
+            if (doc.Element("ColorArrayDocument") != null)
+            {
+                foreach (XElement x in doc.Descendants("DominoColor"))
+                {
+                    this.Add(new DominoColor(x, 2));
+                }
+            }
+            else if (doc.Element("Farbenarray") != null)
+            {
+                foreach (XElement x in doc.Descendants("Farbe"))
+                {
+                    this.Add(new DominoColor(x, 1));
+                }
+            }
+            else throw new ArgumentException("Format of color repository unknown");
         }
     }
 }

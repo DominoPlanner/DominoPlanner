@@ -291,7 +291,8 @@ namespace DominoPlanner.Usage
 
             foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
             {
-                ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent), @"C:\Users\johan\Pictures\Screenshots\Screenshot (1).png", dominoWrapper); //jojo bild austauschen
+                ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
+                    @"./Icons/colorLine.ico", dominoWrapper); //jojo bild austauschen
                 returnList.Add(project);
             }
 
@@ -302,7 +303,7 @@ namespace DominoPlanner.Usage
         {
             try
             {
-                if (!Path.GetExtension(projectTransfer.FilePath).Equals(".DColor"))
+                /*if (!Path.GetExtension(projectTransfer.FilePath).Equals(".DColor"))
                 {
                     while (!File.Exists(projectTransfer.IcoPath))
                     {
@@ -315,7 +316,7 @@ namespace DominoPlanner.Usage
                         }
                         //jojo sonst einfach raus nehmen
                     }
-                }
+                }*/
             }
             catch (Exception) { MessageBox.Show("Error loading openprojects!", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
             ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID)); 
