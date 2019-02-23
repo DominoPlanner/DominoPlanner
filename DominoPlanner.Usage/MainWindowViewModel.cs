@@ -377,6 +377,7 @@ namespace DominoPlanner.Usage
                     DocumentNode node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(((AssemblyNode)SelectedProject.Project.documentNode).obj, openFileDialog.FileName);
                     //var filter = Workspace.LoadImageFilters<IWorkspaceLoadImageFilter>(openFileDialog.FileName);
                     ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(openFileDialog.FileName, Path.Combine(SelectedProject.FilePath, "Source Image", @"./Icons/colorLine.ico"), node)); //jojowarten
+                    ((AssemblyNode)SelectedProject.Project.documentNode).obj.Save();
                     OpenItem(compo); //jojowarten
                 }
             }
