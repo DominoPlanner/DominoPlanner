@@ -31,7 +31,7 @@ namespace DominoPlanner.Usage.UserControls.View
 
         private void ColorListControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if(DataContext is ColorListControlVM vm)
+            if (DataContext is ColorListControlVM vm)
             {
                 vm.ShowProjectsChanged += Vm_ShowProjectsChanged;
                 RefreshSumVisibility();
@@ -61,7 +61,7 @@ namespace DominoPlanner.Usage.UserControls.View
         {
             System.Diagnostics.Debug.WriteLine("Delete!");
         }
-
+        
         public static readonly DependencyProperty BindableColumnsProperty = DependencyProperty.RegisterAttached("BindableColumns", typeof(ObservableCollection<DataGridColumn>), typeof(ColorListControl), new UIPropertyMetadata(null, BindableColumnsPropertyChanged));
 
         private static void BindableColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -74,7 +74,8 @@ namespace DominoPlanner.Usage.UserControls.View
                 try
                 {
                     dataGrid.Columns.Add(column);
-                }catch(ArgumentException ex)
+                }
+                catch (ArgumentException ex)
                 {
 
                 }
@@ -115,13 +116,13 @@ namespace DominoPlanner.Usage.UserControls.View
             };
         }
 
-            
+
         public static void SetBindableColumns(DependencyObject element, ObservableCollection<DataGridColumn> value)
         {
             element.SetValue(BindableColumnsProperty, value);
         }
 
-        public static ObservableCollection<DataGridColumn> GetBindableColumns(DependencyObject element)
+        public ObservableCollection<DataGridColumn> GetBindableColumns(DependencyObject element)
         {
             return (ObservableCollection<DataGridColumn>)element.GetValue(BindableColumnsProperty);
         }

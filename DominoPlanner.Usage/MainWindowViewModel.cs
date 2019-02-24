@@ -66,6 +66,14 @@ namespace DominoPlanner.Usage
             {
                 if (_SelectedTab != value)
                 {
+                    if(_SelectedTab != null)
+                    {
+                        if(_SelectedTab.Content is ColorListControlVM colorList)
+                        {
+                            //hässlich aber tut... :D
+                            colorList.DifColumns.Clear();
+                        }
+                    }
                     _SelectedTab = value;
                     if(SelectedTab != null)
                         _SelectedTab.Content.ResetContent();
