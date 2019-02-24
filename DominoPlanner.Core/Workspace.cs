@@ -133,24 +133,35 @@ namespace DominoPlanner.Core
             }
             return result.ImageFilters;
         }
-        public static int[] LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
+        public static Tuple<string, int[]> LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
             return LoadColorList<T>(absolutePath, null);
         }
-        public static int[] LoadColorList<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
+        public static Tuple<string, int[]> LoadColorList<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
             relativePath = AbsolutePathFromReference(relativePath, reference);
             var result = (T)Workspace.Instance.Find<T>(relativePath);
             Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für Farbenliste");
+            int[] counts;
+            string absolute_path;
             if (result == null)
             {
                 Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
                 using (var file = File.OpenRead(relativePath))
                 {
-                    return Serializer.Deserialize<IDominoProviderPreview>(file).counts;
+                    var deser = Serializer.Deserialize<IDominoProviderPreview>(file);
+                    counts = deser.counts;
+                    absolute_path = deser.ColorPath;
                 }
             }
-            return result.counts;
+            else
+            {
+                counts = result.counts;
+                absolute_path = result.ColorPath;
+            }
+            string directoryofreference = Path.GetDirectoryName(relativePath);
+            absolute_path = Path.GetFullPath(Path.Combine(directoryofreference, absolute_path));
+            return new Tuple<string, int[]>(absolute_path, counts);
         }
         public static bool LoadEditingState<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {

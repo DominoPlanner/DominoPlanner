@@ -384,14 +384,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cle.ProjectCount.Clear();
             }
+            string thispath = Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly);
             foreach (DocumentNode project in dominoAssembly.children)
             {
-                int[] counts2 = Workspace.LoadColorList<FieldParameters>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                for (int i = 0; i < counts2.Length; i++)
+                var counts2 = Workspace.LoadColorList<IDominoProvider>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
+                if (counts2.Item1 != thispath) continue;
+                // Jojo: Warnmeldung anzeigen, dass diese Datei nicht in der Liste enthalten ist
+                for (int i = 0; i < counts2.Item2.Length; i++)
                 {
-                    _ColorList[i].ProjectCount.Add(counts2[i]);
+                    _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
                 }
-                for (int i = counts2.Length; i < _ColorList.Count; i++)
+                for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
                 {
                     _ColorList[i].ProjectCount.Add(0);
                 }
