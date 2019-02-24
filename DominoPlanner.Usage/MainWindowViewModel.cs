@@ -297,9 +297,10 @@ namespace DominoPlanner.Usage
 
             foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
             {
-                //jovar filter = Workspace.LoadImageFilters<IWorkspaceLoadImageFilter>(dominoWrapper.relativePath, dominoWrapper.parent);
+                string filepath = Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent);
+                string picturepath = ImageHelper.GetImageOfFile(filepath);
                 ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
-                    @"./Icons/colorLine.ico", dominoWrapper); //jojo bild austauschen
+                    picturepath, dominoWrapper); 
                 returnList.Add(project);
             }
 
@@ -375,10 +376,10 @@ namespace DominoPlanner.Usage
                 if (File.Exists(openFileDialog.FileName))
                 {
                     DocumentNode node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(((AssemblyNode)SelectedProject.Project.documentNode).obj, openFileDialog.FileName);
-                    //var filter = Workspace.LoadImageFilters<IWorkspaceLoadImageFilter>(openFileDialog.FileName);
-                    ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(openFileDialog.FileName, Path.Combine(SelectedProject.FilePath, "Source Image", @"./Icons/colorLine.ico"), node)); //jojowarten
+                    string picturepath = ImageHelper.GetImageOfFile(openFileDialog.FileName);
+                    ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(openFileDialog.FileName, Path.Combine(SelectedProject.FilePath, "Source Image", picturepath), node));
                     ((AssemblyNode)SelectedProject.Project.documentNode).obj.Save();
-                    OpenItem(compo); //jojowarten
+                    OpenItem(compo);
                 }
             }
         }

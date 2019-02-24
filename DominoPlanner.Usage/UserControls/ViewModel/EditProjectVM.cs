@@ -19,17 +19,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public EditProjectVM(DocumentNode dominoProvider) : base()
         {
             ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
+
+            string filepath = Workspace.AbsolutePathFromReference(dominoProvider.relativePath, dominoProvider.parent);
+            ImageSource = ImageHelper.GetImageOfFile(filepath);
+
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
             CurrentProject = dominoProvider.obj;
-            
+
             _DominoList = new ObservableCollection<ColorListEntry>();
 
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
-            
+
 
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
@@ -546,7 +550,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
             DominoProject.MouseUp += Canvas_MouseUp;
-            DominoProject.Background = new SolidColorBrush(Color.FromArgb(1,0,0,0));
+            DominoProject.Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             dominoTransfer = CurrentProject.Generate(progress);
 
