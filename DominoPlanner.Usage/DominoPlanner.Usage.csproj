@@ -298,6 +298,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Resources\Lamping %28en%29.DColor" />
     <None Include="Resources\lamping.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
