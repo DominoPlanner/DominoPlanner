@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_23A2FF11137D4C5092D488274B6AD2C1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_261A4FA2252B2FA82ADD8BC0DE3F4AD1"
         "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
         "MsmSig" = "8:_UNDEFINED"
@@ -322,13 +328,13 @@
         "Entry"
         {
         "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
-        "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
-        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
+        "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -555,6 +561,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E9066AC4443C49F3ABA2CAEA51BE2AA0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F096680D4F225C9448B286D5C44031ED"
         "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
         "MsmSig" = "8:_UNDEFINED"
@@ -587,12 +599,6 @@
         {
         "MsmKey" = "8:_FEC6A877A08D44818236D43A6E661569"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BD9F1A48AF1D20F956243A79E1341527"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -652,12 +658,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_ACCFECA8A12D1D40637E920A5D5C4981"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -677,6 +677,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1009,6 +1015,12 @@
         "OwnerKey" = "8:_95DA2397B7DFBEE41C314E1C88E852C2"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_BD9F1A48AF1D20F956243A79E1341527"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -1027,6 +1039,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -1043,6 +1071,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -1338,6 +1374,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_23A2FF11137D4C5092D488274B6AD2C1"
+            {
+            "SourcePath" = "8:..\\DominoPlanner.Usage\\Resources\\lamping.DColor"
+            "TargetName" = "8:lamping.DColor"
+            "Tag" = "8:"
+            "Folder" = "8:_B49C3184D6D348DFB2C63F28562F1B95"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_261A4FA2252B2FA82ADD8BC0DE3F4AD1"
@@ -3298,6 +3354,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E9066AC4443C49F3ABA2CAEA51BE2AA0"
+            {
+            "SourcePath" = "8:..\\DominoPlanner.Usage\\Resources\\Structures.xml"
+            "TargetName" = "8:Structures.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_B49C3184D6D348DFB2C63F28562F1B95"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F096680D4F225C9448B286D5C44031ED"
             {
             "AssemblyRegister" = "3:1"
@@ -3500,6 +3576,17 @@
                         {
                         }
                     }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_B49C3184D6D348DFB2C63F28562F1B95"
+                    {
+                    "Name" = "8:Resources"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_F0BB8F3E07C842D98C8A795321DB68E2"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_8252C32EF5DC4338A6C92181FBAC4505"
@@ -3540,15 +3627,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DominoPlanner"
-        "ProductCode" = "8:{F9F4052F-3262-429D-A4CF-067010DD4CA2}"
-        "PackageCode" = "8:{287AB81F-958E-45B0-8387-355A84BB9C56}"
+        "ProductCode" = "8:{AB5DCFB5-23B5-434C-A47C-518252658724}"
+        "PackageCode" = "8:{CA445FE2-ED75-4DF5-AF5F-F5CA3ADDAB18}"
         "UpgradeCode" = "8:{A5203434-2746-4DF1-82A6-821CBC4C4A63}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.0.5"
+        "ProductVersion" = "8:3.0.2"
         "Manufacturer" = "8:DominoPlanner"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
