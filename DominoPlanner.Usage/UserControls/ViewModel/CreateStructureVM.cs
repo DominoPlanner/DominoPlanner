@@ -441,6 +441,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private async void Refresh()
         {
+            CurrentViewModel.PropertyChanged -= CurrentViewModel_PropertyChanged;
             try
             {
                 cursor = Cursors.Wait;
@@ -459,6 +460,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cursor = null;
             }
+            CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
         }
         public override bool Save()
         {

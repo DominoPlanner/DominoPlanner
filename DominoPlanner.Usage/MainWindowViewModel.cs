@@ -274,17 +274,19 @@ namespace DominoPlanner.Usage
             if (Directory.Exists(newProject.path))
             {
                 AssemblyNode mainnode = new AssemblyNode(Path.Combine(newProject.path, string.Format("{0}.DProject", newProject.name)));
-
-                ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
-                actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
-                actPLC.conMenu.createMI.Click += CreateMI_Click;
-                actPLC.conMenu.removeMI.Click += RemoveMI_Click;
-                actPLC.Children.CollectionChanged += Children_CollectionChanged;
-                Projects.Add(actPLC);
-
-                foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                if (mainnode.obj.colorPath != null)
                 {
-                    AddProjectToTree(actPLC, currPT);
+                    ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
+                    actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
+                    actPLC.conMenu.createMI.Click += CreateMI_Click;
+                    actPLC.conMenu.removeMI.Click += RemoveMI_Click;
+                    actPLC.Children.CollectionChanged += Children_CollectionChanged;
+                    Projects.Add(actPLC);
+
+                    foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                    {
+                        AddProjectToTree(actPLC, currPT);
+                    }
                 }
             }
             else
