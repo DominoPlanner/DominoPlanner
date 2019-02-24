@@ -16,8 +16,7 @@ namespace DominoPlanner.Usage
     {
         #region CTOR
         public MainWindowViewModel()
-        {
-            Properties.Settings.Default.Upgrade();
+        {Properties.Settings.Default.Upgrade();
             Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
             if (Properties.Settings.Default.FirstStartup)
             {
@@ -29,6 +28,13 @@ namespace DominoPlanner.Usage
                 Properties.Settings.Default.FirstStartup = false;
             }
             Properties.Settings.Default.Save();
+
+            while(!File.Exists(Properties.Settings.Default.StandardColorArray))
+            {
+                MessageBox.Show("Please create a defaultcolortable.");
+                new SetStandardV().ShowDialog();
+            }
+            
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });

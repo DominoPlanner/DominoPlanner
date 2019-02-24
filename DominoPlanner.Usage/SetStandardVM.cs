@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Usage.UserControls.ViewModel;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.UserControls.ViewModel;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,16 @@ namespace DominoPlanner.Usage
             SaveStandardPath = new RelayCommand(o => { SaveStandard(); });
             ClearList = new RelayCommand(o => { ClearListMet(); });
             standardpath = Properties.Settings.Default.StandardProjectPath;
+
+            if (!File.Exists(Properties.Settings.Default.StandardColorArray))
+            {
+                try
+                {
+                    File.Copy(@".\Resources\lamping.DColor", Properties.Settings.Default.StandardColorArray);
+                }
+                catch (Exception ex) { }
+            }
+
             ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);
         }
 
@@ -81,7 +92,17 @@ namespace DominoPlanner.Usage
             
             if (openFileDialog.ShowDialog() == true)
             {
-                ColorVM.Reload(openFileDialog.FileName);
+                if (File.Exists(openFileDialog.FileName))
+                {
+                    File.Delete(Properties.Settings.Default.StandardColorArray);
+                    File.Copy(openFileDialog.FileName, Properties.Settings.Default.StandardColorArray);
+                }
+                var item = Workspace.Instance.openedFiles.Find(x => x.Item1.Equals(Properties.Settings.Default.StandardColorArray));
+                if(item != null)
+                {
+                    Workspace.Instance.openedFiles.Remove(item);
+                }
+                ColorVM.Reload(Properties.Settings.Default.StandardColorArray);
             }
         }
 
@@ -94,14 +115,14 @@ namespace DominoPlanner.Usage
         #region Command
         private ICommand _SetStandardColor;
         public ICommand SetStandardColor { get { return _SetStandardColor; } set { if (value != _SetStandardColor) { _SetStandardColor = value; } } }
-        
-		private ICommand _SetStandardPath;
+
+        private ICommand _SetStandardPath;
         public ICommand SetStandardPath { get { return _SetStandardPath; } set { if (value != _SetStandardPath) { _SetStandardPath = value; } } }
-                
+
         private ICommand _SaveStandardPath;
         public ICommand SaveStandardPath { get { return _SaveStandardPath; } set { if (value != _SaveStandardPath) { _SaveStandardPath = value; } } }
-        
-		private ICommand _ClearList;
+
+        private ICommand _ClearList;
         public ICommand ClearList { get { return _ClearList; } set { if (value != _ClearList) { _ClearList = value; } } }
 
         #endregion
