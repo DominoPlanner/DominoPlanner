@@ -282,14 +282,16 @@ namespace DominoPlanner.Usage
                 actPLC.Children.CollectionChanged += Children_CollectionChanged;
                 Projects.Add(actPLC);
 
-                foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                foreach (ProjectElement currPT in getProjects(mainnode))
                 {
+
                     AddProjectToTree(actPLC, currPT);
                 }
             }
             else
             {
                 MessageBox.Show(string.Format("Could not find: {0} ", newProject.name), "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Jojo: Remove Project from List
             }
         }
 
@@ -310,23 +312,33 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private List<ProjectElement> getProjects(DominoAssembly dominoAssembly)
+        private List<ProjectElement> getProjects(AssemblyNode dominoAssembly)
         {
             List<ProjectElement> returnList = new List<ProjectElement>();
 
-            if (dominoAssembly != null)
+            if (dominoAssembly.obj != null)
             {
-                ProjectElement color = new ProjectElement(dominoAssembly.colorPath, @".\Icons\colorLine.ico", null);
+                ProjectElement color = new ProjectElement(dominoAssembly.obj.colorPath, @".\Icons\colorLine.ico", null);
                 returnList.Add(color);
             }
 
-            foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
+            foreach (DocumentNode dominoWrapper in dominoAssembly.obj.children.OfType<DocumentNode>().ToList())
             {
                 string filepath = Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent);
-                string picturepath = ImageHelper.GetImageOfFile(filepath);
-                ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
-                    picturepath, dominoWrapper); 
-                returnList.Add(project);
+                if (!File.Exists(filepath))
+                {
+                    // Remove file from Project
+                    dominoAssembly.obj.children.Remove(dominoWrapper);
+                    MessageBox.Show($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project {dominoAssembly.Path}.");
+                    dominoAssembly.Save();
+                }
+                else
+                {
+                    string picturepath = ImageHelper.GetImageOfFile(filepath);
+                    ProjectElement project = new ProjectElement(filepath,
+                        picturepath, dominoWrapper);
+                    returnList.Add(project);
+                }
             }
 
             return returnList;
