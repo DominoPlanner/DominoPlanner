@@ -446,6 +446,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 cursor = Cursors.Wait;
                 Func<DominoTransfer> function = new Func<DominoTransfer>(() => structureParameters.Generate(progress));
                 dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(function);
+                if (structureParameters is StructureParameters sp)
+                {
+                    if (CurrentViewModel is RectangularSizeVM rs)
+                    {
+                        rs.sHeight = sp.height;
+                        rs.sLength = sp.length;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -491,7 +499,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 else if (e.PropertyName.Equals("structure_index"))
                 {
                     ((StructureParameters)structureParameters).structureDefinitionXML = ((RectangularSizeVM)CurrentViewModel).SelectedStructureElement;
-                    
+
                     if (structureParameters != null)
                     {
                         if (structureParameters.hasProcotolDefinition)
@@ -569,7 +577,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Commands
-		private ICommand _EditClick;
+        private ICommand _EditClick;
         public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
 
         private ICommand _ShowFieldPlan;
