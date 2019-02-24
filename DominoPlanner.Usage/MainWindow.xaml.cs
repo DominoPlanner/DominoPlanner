@@ -12,5 +12,13 @@ namespace DominoPlanner.Usage
             InitializeComponent();
             DataContext = new MainWindowViewModel();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(DataContext is MainWindowViewModel mwvm)
+            {
+                mwvm.CloseAllTabs();
+            }
+        }
     }
 }

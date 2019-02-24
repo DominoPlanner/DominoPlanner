@@ -574,7 +574,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
             if (changed)
+            {
                 Refresh();
+                UnsavedChanges = true;
+            }
         }
         #endregion
 

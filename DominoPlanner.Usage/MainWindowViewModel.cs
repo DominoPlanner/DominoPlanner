@@ -48,6 +48,14 @@ namespace DominoPlanner.Usage
             loadProjectList();
         }
 
+        internal void CloseAllTabs()
+        {
+            while(Tabs.Count > 0)
+            {
+                RemoveItem(Tabs.First());
+            }
+        }
+
         private void CurrentProject_EditingChanged(object sender, EventArgs e)
         {
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
@@ -236,17 +244,23 @@ namespace DominoPlanner.Usage
         {
             if (sender is TabItem tabItem)
             {
-                if (tabItem.Content.UnsavedChanges)
-                {
-                    System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save unsaved changes?", "Warning", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Warning);
-                    if (result == System.Windows.Forms.DialogResult.Yes)
-                    {
-                        tabItem.Content.Save();
-                    }
-                }
-                Tabs.Remove(tabItem);
+                RemoveItem(tabItem);
             }
         }
+
+        private void RemoveItem(TabItem tabItem)
+        {
+            if (tabItem.Content.UnsavedChanges)
+            {
+                System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show($"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?", "Warning", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Warning);
+                if (result == System.Windows.Forms.DialogResult.Yes)
+                {
+                    tabItem.Content.Save();
+                }
+            }
+            Tabs.Remove(tabItem);
+        }
+
         #endregion
         /// <summary>
         /// Projektliste laden

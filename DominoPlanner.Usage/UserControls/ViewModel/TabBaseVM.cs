@@ -50,8 +50,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_UnsavedChanges != value)
                 {
                     _UnsavedChanges = value;
-                    if (Changes != null)
-                        Changes(this, value);
+                    Changes?.Invoke(this, value);
                 }
             }
         }

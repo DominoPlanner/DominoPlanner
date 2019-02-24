@@ -498,6 +498,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
 
             this.fsvm.PropertyChanged += CreateFieldVM_PropertyChanged;
+            UnsavedChanges = true;
         }
 
         private void OpenBuildTools()
