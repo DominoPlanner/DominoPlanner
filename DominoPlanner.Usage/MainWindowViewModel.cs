@@ -234,7 +234,18 @@ namespace DominoPlanner.Usage
         /// <param name="e"></param>
         private void MainWindowViewModel_CloseIt(object sender, EventArgs e)
         {
-            Tabs.Remove((TabItem)sender);
+            if (sender is TabItem tabItem)
+            {
+                if (tabItem.Content.UnsavedChanges)
+                {
+                    System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save unsaved changes?", "Warning", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Warning);
+                    if (result == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        tabItem.Content.Save();
+                    }
+                }
+                Tabs.Remove(tabItem);
+            }
         }
         #endregion
         /// <summary>
