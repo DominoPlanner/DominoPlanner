@@ -25,6 +25,21 @@ namespace DominoPlanner.Usage.UserControls.View
         {
             InitializeComponent();
             this.KeyDown += LiveBuildHelperV_KeyDown;
+            DataContextChanged += EditProject_DataContextChanged;
+        }
+
+        private void EditProject_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(DataContext != null && DataContext is EditProjectVM editProjectVM)
+            {
+                editProjectVM.RefreshSize += EditProjectVM_RefreshSize;
+                editProjectVM.SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
+            }
+        }
+
+        private void EditProjectVM_RefreshSize(object sender, EventArgs e)
+        {
+            (sender as EditProjectVM).SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
         }
 
         private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
@@ -37,13 +52,18 @@ namespace DominoPlanner.Usage.UserControls.View
         {
             if(DataContext != null && DataContext.GetType() == typeof(ViewModel.EditProjectVM))
             {
-                ((ViewModel.EditProjectVM)DataContext).SizeChanged(sender, e);
+                ((ViewModel.EditProjectVM)DataContext).SizeChanged(e.NewSize.Width, e.NewSize.Height);
             }
         }
 
         private void Grid_SizeChanged_1(object sender, SizeChangedEventArgs e)
         {
             ((Grid)sender).ColumnDefinitions[2].Width = new GridLength(e.NewSize.Width - 240);
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            CanGrid.ColumnDefinitions[2].Width = new GridLength(10);
         }
     }
 }

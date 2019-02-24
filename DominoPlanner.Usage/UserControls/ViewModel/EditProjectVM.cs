@@ -33,8 +33,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
-
-
+            
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
@@ -76,6 +75,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private Stack<PostFilter> undoStack = new Stack<PostFilter>();
         private Stack<PostFilter> redoStack = new Stack<PostFilter>();
+        #endregion
+
+        #region events
+        internal event EventHandler RefreshSize;
         #endregion
 
         #region prope
@@ -407,17 +410,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        internal void SizeChanged(object sender, SizeChangedEventArgs e)
+        internal void SizeChanged(double width, double height)
         {
-            visibleWidth = e.NewSize.Width;
-            visibleHeight = e.NewSize.Height;
-            _DominoProject_SizeChanged(sender, e);
+            visibleWidth = width;
+            visibleHeight = height;
+            RefreshTransformation();
         }
+
         internal void PressedKey(Key key)
         {
             ClearFullSelection();
         }
+        internal override void ResetContent()
+        {
+            base.ResetContent();
+            RefreshSize?.Invoke(this, EventArgs.Empty);
+        }
         private void _DominoProject_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RefreshTransformation();
+        }
+
+        internal void RefreshTransformation()
         {
             double ScaleX, ScaleY;
 

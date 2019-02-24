@@ -7,7 +7,7 @@
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" SizeChanged="UserControl_SizeChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
     </UserControl.Resources>
@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
+        <Grid x:Name="CanGrid" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="5"/>
@@ -103,7 +103,7 @@
                     </ListView>
                 </Grid>
             </Grid>
-            <ScrollViewer Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+            <ScrollViewer x:Name="ScrollViewer" Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                 <ContentControl Grid.Column="2" Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
             <Grid Grid.Column="4">
