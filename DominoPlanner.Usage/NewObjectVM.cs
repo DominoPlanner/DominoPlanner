@@ -202,7 +202,7 @@ namespace DominoPlanner.Usage
                         break;
                 }
 
-                if (selectedType >= 0 && selectWedType <= 2)
+                if (selectedType >= 0 && selectedType <= 2)
                 {
                     // project with image
                     string originalImagePath = picturePath;
