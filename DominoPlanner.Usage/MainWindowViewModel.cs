@@ -209,11 +209,22 @@ namespace DominoPlanner.Usage
             }
             else if (toOpen.ActType == NodeType.ProjectNode)
             {
+                
                 selTab = Tabs.FirstOrDefault(x => x.ProjectComp == toOpen);
                 if (selTab == null)
                 {
-                    selTab = new TabItem(toOpen);
-                    Tabs.Add(selTab);
+                    try
+                    {
+                        selTab = new TabItem(toOpen);
+                        Tabs.Add(selTab);
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        var ext = Path.GetExtension(ex.FileName);
+                        // Jojo aus Projekt rauslöschen
+                        MessageBox.Show($"The object {toOpen.Project.FilePath} contains a reference to the file ${ex.FileName}," +
+                            $"which could not be located. The object has been removed from the project.");
+                    }
                 }
             }
 
@@ -285,27 +296,69 @@ namespace DominoPlanner.Usage
 
         private void loadProject(OpenProject newProject)
         {
+            bool remove = false;
             if (Directory.Exists(newProject.path))
             {
-                AssemblyNode mainnode = new AssemblyNode(Path.Combine(newProject.path, string.Format("{0}.DProject", newProject.name)));
-                if (mainnode.obj.colorPath != null)
-                {
-                    ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
-                    actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
-                    actPLC.conMenu.createMI.Click += CreateMI_Click;
-                    actPLC.conMenu.removeMI.Click += RemoveMI_Click;
-                    actPLC.Children.CollectionChanged += Children_CollectionChanged;
-                    Projects.Add(actPLC);
+                string projectpath = Path.Combine(newProject.path, string.Format("{0}.DProject", newProject.name));
 
-                    foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                AssemblyNode mainnode = new AssemblyNode(projectpath);
+                //if (mainnode.obj.colorPath != null && File.Exists(Workspace.AbsolutePathFromReference(mainnode.obj.colorPath, mainnode.obj)))
+                // {
+                try
+                {
+                    // check if the file can be deserialized properly
+                    DominoAssembly assembly = mainnode.obj;
+                    bool colorpathExists = File.Exists(Workspace.AbsolutePathFromReference(mainnode.obj.colorPath, mainnode.obj));
+                }
+                catch (Exception ex)
+                {
+                    string colorpath = Path.Combine(newProject.path, "Planner Files", "colors.DColor");
+                    // restore project if colorfile exists
+                    if (File.Exists(colorpath))
                     {
-                        AddProjectToTree(actPLC, currPT);
+                        DominoAssembly newMainNode = new DominoAssembly();
+                        newMainNode.Save(projectpath);
+                        newMainNode.colorPath = Path.Combine("Planner Files", "colors.DColor");
+                        foreach (string path in Directory.EnumerateFiles(Path.Combine(newProject.path, "Planner Files"), "*.DObject"))
+                        {
+                            var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
+                        }
+                        newMainNode.Save();
+
+                        Workspace.Instance.openedFiles.RemoveAll(x => x.Item1 == projectpath);
+                        mainnode = new AssemblyNode(projectpath);
+                        MessageBox.Show($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.");
+                    }
+                    else
+                    {
+                        remove = true;
                     }
                 }
+                ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
+                actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
+                actPLC.conMenu.createMI.Click += CreateMI_Click;
+                actPLC.conMenu.removeMI.Click += RemoveMI_Click;
+                actPLC.Children.CollectionChanged += Children_CollectionChanged;
+                Projects.Add(actPLC);
+
+                foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                {
+
+                    AddProjectToTree(actPLC, currPT);
+                }
+                // }
+                //else remove = true;
             }
             else
             {
-                MessageBox.Show(string.Format("Could not find: {0} ", newProject.name), "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                remove = true;
+            }
+            if (remove)
+            {
+                MessageBox.Show($"Unable to load project {newProject.name}. It might have been moved. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                OpenProjectSerializer.RemoveOpenProject(newProject.id);
+
             }
         }
 
@@ -336,13 +389,23 @@ namespace DominoPlanner.Usage
                 returnList.Add(color);
             }
 
-            foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>())
+            foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>().ToList())
             {
                 string filepath = Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent);
-                string picturepath = ImageHelper.GetImageOfFile(filepath);
-                ProjectElement project = new ProjectElement(Workspace.AbsolutePathFromReference(dominoWrapper.relativePath, dominoWrapper.parent),
-                    picturepath, dominoWrapper); 
-                returnList.Add(project);
+                if (!File.Exists(filepath))
+                {
+                    // Remove file from Project
+                    dominoAssembly.children.Remove(dominoWrapper);
+                    MessageBox.Show($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project.");
+                    dominoAssembly.Save();
+                }
+                else
+                {
+                    string picturepath = ImageHelper.GetImageOfFile(filepath);
+                    ProjectElement project = new ProjectElement(filepath,
+                        picturepath, dominoWrapper);
+                    returnList.Add(project);
+                }
             }
 
             return returnList;

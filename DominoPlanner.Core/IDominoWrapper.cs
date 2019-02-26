@@ -205,6 +205,10 @@ namespace DominoPlanner.Core
         {
             this.Path = Path;
         }
+        public void Save()
+        {
+            Workspace.Save(obj);
+        }
     }
     [ProtoContract]
     public class DominoConnector
