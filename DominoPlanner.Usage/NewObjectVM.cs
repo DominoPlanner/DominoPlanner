@@ -185,7 +185,24 @@ namespace DominoPlanner.Usage
                 string relColorList = $@"..\{colorlist}";
                 string resultPath = Path.Combine(ProjectPath, relResultPath);
 
-                if (selectedType >= 0 && selectedType <= 2)
+                switch (_selectedType)
+                {
+                    case 0:
+                        if (CurrentViewModel is AddFieldVM addField)
+                        {
+                            picturePath = addField.sPath;
+                        }
+                        break;
+                    case 1:
+                    case 2:
+                        if (CurrentViewModel is AddStructureVM addStructureVM)
+                        {
+                            picturePath = addStructureVM.sPath;
+                        }
+                        break;
+                }
+
+                if (selectedType >= 0 && selectWedType <= 2)
                 {
                     // project with image
                     string originalImagePath = picturePath;
