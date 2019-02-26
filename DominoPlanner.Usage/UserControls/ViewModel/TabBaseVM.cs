@@ -81,7 +81,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.RaisePropertyChanged(propertyName);
-            if(!propertyName.Equals("SelectedStone") && !propertyName.Equals("DestinationImage") && !propertyName.Equals("cursor") && !propertyName.Equals("CurrentPlan"))
+            if(!propertyName.Equals("SelectedStone") && !propertyName.Equals("DestinationImage") && !propertyName.Equals("cursor") && !propertyName.Equals("CurrentPlan") && !propertyName.Equals("ShowProjects"))
                 UnsavedChanges = true;
         }
 

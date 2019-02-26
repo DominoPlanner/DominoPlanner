@@ -49,6 +49,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorRepository.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             _ColorList.Clear();
             refreshList();
+            UnsavedChanges = false;
         }
 
         internal void Reload(string fileName)
@@ -59,6 +60,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorRepository = Workspace.Load<ColorRepository>(FilePath);
             colorRepository.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
+            UnsavedChanges = false;
         }
 
         private void refreshList()
