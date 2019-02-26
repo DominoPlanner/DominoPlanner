@@ -105,9 +105,9 @@ namespace DominoPlanner.Usage.UserControls.View
                         }
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        while (dataGrid.Columns.Count > 3)
+                        while (dataGrid.Columns.Count > 5)
                         {
-                            dataGrid.Columns.RemoveAt(3);
+                            dataGrid.Columns.RemoveAt(5);
                         }
                         break;
                     default:
@@ -122,7 +122,7 @@ namespace DominoPlanner.Usage.UserControls.View
             element.SetValue(BindableColumnsProperty, value);
         }
 
-        public ObservableCollection<DataGridColumn> GetBindableColumns(DependencyObject element)
+        public static ObservableCollection<DataGridColumn> GetBindableColumns(DependencyObject element)
         {
             return (ObservableCollection<DataGridColumn>)element.GetValue(BindableColumnsProperty);
         }
