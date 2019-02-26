@@ -67,7 +67,7 @@ namespace DominoPlanner.Usage
                     dn.parent.Save();
                     this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
                 }
-                MessageBox.Show(string.Format("{0} is remove!", removeName), "Removed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                MessageBox.Show(string.Format("{0} has been removed!", removeName), "Removed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             }
             catch (Exception)
             {

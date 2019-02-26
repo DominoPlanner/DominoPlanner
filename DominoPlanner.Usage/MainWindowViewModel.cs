@@ -201,11 +201,22 @@ namespace DominoPlanner.Usage
             }
             else if (toOpen.ActType == NodeType.ProjectNode)
             {
+                
                 selTab = Tabs.FirstOrDefault(x => x.ProjectComp == toOpen);
                 if (selTab == null)
                 {
-                    selTab = new TabItem(toOpen);
-                    Tabs.Add(selTab);
+                    try
+                    {
+                        selTab = new TabItem(toOpen);
+                        Tabs.Add(selTab);
+                    }
+                    catch (FileNotFoundException ex)
+                    {
+                        var ext = Path.GetExtension(ex.FileName);
+                        // Jojo aus Projekt rauslöschen
+                        MessageBox.Show($"The object {toOpen.Project.FilePath} contains a reference to the file ${ex.FileName}," +
+                            $"which could not be located. The object has been removed from the project.");
+                    }
                 }
             }
 
