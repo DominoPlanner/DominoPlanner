@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using Microsoft.Win32;
 using System;
@@ -41,7 +42,7 @@ namespace DominoPlanner.Usage
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    MessageBox.Show("This Folder already exists. Please choose another Project-Name.", "Existing Folder", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Errorhandler.RaiseMessage("This Folder already exists. Please choose another Project-Name.", "Existing Folder", Errorhandler.MessageType.Error);
                     return;
                 }
 
@@ -62,7 +63,7 @@ namespace DominoPlanner.Usage
 
                 main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
 
-                MessageBox.Show("Create new project", "Created", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                Errorhandler.RaiseMessage("Create new project", "Created", Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)

@@ -123,6 +123,7 @@
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="DominoInCanvas.cs" />
     <Compile Include="DominoStone.cs" />
+    <Compile Include="HelperClass\Errorhandler.cs" />
     <Compile Include="HelperClass\ImageConvert.cs" />
     <Compile Include="ImageHelper.cs" />
     <Compile Include="LiveBuildHelperV.xaml.cs">

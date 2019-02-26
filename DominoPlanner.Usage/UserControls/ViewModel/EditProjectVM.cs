@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -323,7 +324,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             clearPossibleToPaste();
             if (selectedDominoes.Count < 0)
             {
-                MessageBox.Show("gibt nichts");
+                Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
                 return;
             }
             copyedDominoes = new DominoInCanvas[selectedDominoes.Count];
@@ -376,7 +377,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
@@ -493,7 +494,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
@@ -522,7 +523,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
@@ -546,7 +547,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
@@ -570,7 +571,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
@@ -628,7 +629,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void RefreshSizeLabels()
         {
             ProjectHeight = dominoTransfer.dominoHeight.ToString();
-            //ProjectHeight = ((DominoPlanner.Core.StructureParameters)ProjectProperties).last.shapes.
             ProjectWidth = dominoTransfer.dominoLength.ToString();
             ProjectAmount = dominoTransfer.shapes.Count().ToString();
         }

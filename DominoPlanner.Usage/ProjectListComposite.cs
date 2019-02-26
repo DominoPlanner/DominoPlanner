@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
@@ -67,11 +68,11 @@ namespace DominoPlanner.Usage
                     dn.parent.Save();
                     this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
                 }
-                MessageBox.Show(string.Format("{0} has been removed!", removeName), "Removed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                Errorhandler.RaiseMessage(string.Format("{0} has been removed!", removeName), "Removed", Errorhandler.MessageType.Error);
             }
             catch (Exception)
             {
-                MessageBox.Show("Could not remove the project!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
         }
         #endregion

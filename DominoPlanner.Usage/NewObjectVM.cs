@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
@@ -170,13 +171,13 @@ namespace DominoPlanner.Usage
                 {
                     if (filename == Path.GetFileNameWithoutExtension(dc.relativePath))
                     {
-                        MessageBox.Show("This name is already in use in this project.\n Please choose different Name.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose different Name.", "Error!", Errorhandler.MessageType.Error);
                         return;
                     }
                 }
                 if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
                 {
-                    MessageBox.Show("You forgot to choose a name.", "Missing Values", MessageBoxButton.OK);
+                    Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
                     return;
                 }
                 string colorlist = parentProject.colorPath;
@@ -191,7 +192,7 @@ namespace DominoPlanner.Usage
                     
                     if (string.IsNullOrEmpty(originalImagePath) || string.IsNullOrWhiteSpace(originalImagePath))
                     {
-                        MessageBox.Show("Please choose an image", "Missing Values", MessageBoxButton.OK);
+                        Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error);
                         return;
                     }
 
@@ -202,7 +203,7 @@ namespace DominoPlanner.Usage
                     }
                     catch (IOException es)
                     {
-                        MessageBox.Show("Copying the image into the project folder failed.\nPlease check the permissions to this file.");
+                        Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning);
                         return;
                     }
                     string relPicturePath = $@"..\Source Image\{internPictureName}";
@@ -258,7 +259,7 @@ namespace DominoPlanner.Usage
                         File.Delete(Workspace.AbsolutePathFromReference(relResultPath, parentProject));
                         File.Delete(Path.Combine(_ProjectPath, "Source Image", internPictureName));
                         resultNode = null;
-                        MessageBox.Show("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted");
+                        Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
                     }
                     parentProject.Save();
                 }
@@ -268,7 +269,7 @@ namespace DominoPlanner.Usage
             }
             catch (Exception es)
             {
-                MessageBox.Show("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error);
             }
         }
         #endregion

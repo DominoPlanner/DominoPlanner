@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace DominoPlanner.Usage
             {
                 if (!documentNode.obj.hasProcotolDefinition)
                 {
-                    MessageBox.Show("Could not generate a protocol!", "No Protocol", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Errorhandler.RaiseMessage("Could not generate a protocol!", "No Protocol", Errorhandler.MessageType.Warning);
                     return;
                 }
                 ProtocolV protocolV = new ProtocolV();

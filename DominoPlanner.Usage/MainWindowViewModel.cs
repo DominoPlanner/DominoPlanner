@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
@@ -31,7 +32,7 @@ namespace DominoPlanner.Usage
 
             while(!File.Exists(Properties.Settings.Default.StandardColorArray))
             {
-                MessageBox.Show("Please create a defaultcolortable.");
+                Errorhandler.RaiseMessage("Please create a defaultcolortable.", "Missing Color Table", Errorhandler.MessageType.Info);
                 new SetStandardV().ShowDialog();
             }
             
@@ -170,7 +171,7 @@ namespace DominoPlanner.Usage
             }
             else
             {
-                MessageBox.Show("Could not remove the project!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
         }
         /// <summary>
@@ -221,9 +222,8 @@ namespace DominoPlanner.Usage
                     catch (FileNotFoundException ex)
                     {
                         var ext = Path.GetExtension(ex.FileName);
-                        // Jojo aus Projekt rauslöschen
-                        MessageBox.Show($"The object {toOpen.Project.FilePath} contains a reference to the file ${ex.FileName}," +
-                            $"which could not be located. The object has been removed from the project.");
+                        Errorhandler.RaiseMessage($"The object {toOpen.Project.FilePath} contains a reference to the file ${ex.FileName}," +
+                            $"which could not be located. The object has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
                     }
                 }
             }
@@ -289,7 +289,7 @@ namespace DominoPlanner.Usage
             }
             else
             {
-                MessageBox.Show("Error loading opened projects!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Error loading opened projects!", "Error", Errorhandler.MessageType.Error);
                 OpenProjectSerializer.Create();
             }
         }
@@ -327,7 +327,7 @@ namespace DominoPlanner.Usage
 
                         Workspace.Instance.openedFiles.RemoveAll(x => x.Item1 == projectpath);
                         mainnode = new AssemblyNode(projectpath);
-                        MessageBox.Show($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.");
+                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Demaged File", Errorhandler.MessageType.Info);
                     }
                     else
                     {
@@ -355,7 +355,7 @@ namespace DominoPlanner.Usage
             }
             if (remove)
             {
-                MessageBox.Show($"Unable to load project {newProject.name}. It might have been moved. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects.", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage($"Unable to load project {newProject.name}. It might have been moved. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects.", "Error!", Errorhandler.MessageType.Error);
 
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
 
@@ -396,7 +396,7 @@ namespace DominoPlanner.Usage
                 {
                     // Remove file from Project
                     dominoAssembly.children.Remove(dominoWrapper);
-                    MessageBox.Show($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project.");
+                    Errorhandler.RaiseMessage($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
                     dominoAssembly.Save();
                 }
                 else
@@ -445,7 +445,7 @@ namespace DominoPlanner.Usage
         {
             if (SelectedProject == null || !(SelectedProject is ProjectListComposite))
             {
-                MessageBox.Show("Please choose a project folder.");
+                Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
                 return;
             }
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
@@ -497,7 +497,7 @@ namespace DominoPlanner.Usage
                 OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}\{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
                 if (newProj == null)
                 {
-                    MessageBox.Show("Could not create new Project!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Errorhandler.RaiseMessage("Could not create new Project!", "Error!", Errorhandler.MessageType.Error);
                     return;
                 }
                 loadProject(newProj);
@@ -515,12 +515,12 @@ namespace DominoPlanner.Usage
                 {
                     if (!curTI.Content.Save())
                     {
-                        MessageBox.Show("Error Saving files!", string.Format("Stop saving, because could not save {0}", curTI.Header), MessageBoxButton.OK, MessageBoxImage.Error);
+                        Errorhandler.RaiseMessage("Error Saving files!", string.Format("Stop saving, because could not save {0}", curTI.Header), Errorhandler.MessageType.Error);
                         return;
                     }
                 }
             }
-            MessageBox.Show("Save all files", "Saves all files!", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            Errorhandler.RaiseMessage("Save all files", "Saves all files!", Errorhandler.MessageType.Info);
         }
         /// <summary>
         /// Save current project
@@ -528,9 +528,9 @@ namespace DominoPlanner.Usage
         private void SaveCurrentOpenProject()
         {
             if (SelectedTab.Content.Save())
-                MessageBox.Show("Save all changes!", "Save all changes", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                Errorhandler.RaiseMessage("Save all changes!", "Save all changes", Errorhandler.MessageType.Info);
             else
-                MessageBox.Show("Error!", "Error saving changes!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Error!", "Error saving changes!", Errorhandler.MessageType.Error);
         }
         #endregion
     }

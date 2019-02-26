@@ -552,21 +552,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (!structureParameters.ImageFilters.Any(x => x is BlendFileFilter)) { return; }
                     string filepath = structureParameters.ImageFilters.OfType<BlendFileFilter>().First().FilePath;
-                    /*jojo
-                    if (((RoundSizeVM)CurrentViewModel).TypeSelected.Equals("Spiral"))
-                    {
-                        structureParameters = new SpiralParameters(filepath, ((RoundSizeVM)CurrentViewModel).Amount / 4, structureParameters.ColorPath,
-                    structureParameters.colorMode, structureParameters.ditherMode, structureParameters.average, structureParameters.IterationInformation);
-
-                        ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
-                    }
-                    else
-                    {
-                        structureParameters = new CircleParameters(filepath, ((RoundSizeVM)CurrentViewModel).Amount * 4, structureParameters.ColorPath,
-                    structureParameters.colorMode, structureParameters.ditherMode, structureParameters.average, structureParameters.IterationInformation);
-                        ((RoundSizeVM)CurrentViewModel).Amount = (int)((CircleParameters)structureParameters).Circles;
-                    }
-                    */
                     ((RoundSizeVM)CurrentViewModel).dWidth = ((CircularStructure)structureParameters).DominoWidth;
                     ((RoundSizeVM)CurrentViewModel).dHeight = ((CircularStructure)structureParameters).DominoLength;
                     ((RoundSizeVM)CurrentViewModel).beLines = ((CircularStructure)structureParameters).NormalDistance;

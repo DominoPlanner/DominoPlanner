@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
@@ -157,7 +158,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch
                     {
-                        MessageBox.Show("Save failed");
+                        Errorhandler.RaiseMessage("Save failed", "Fail", Errorhandler.MessageType.Error);
                     }
                 }
                     
@@ -388,8 +389,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 var counts2 = Workspace.LoadColorList<IDominoProvider>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                if (counts2.Item1 != thispath) continue;
-                // Jojo: Warnmeldung anzeigen, dass diese Datei nicht in der Liste enthalten ist
+                if (counts2.Item1 != thispath)
+                {
+                    Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} used a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                    continue;
+                }
                 for (int i = 0; i < counts2.Item2.Length; i++)
                 {
                     _ColorList[i].ProjectCount.Add(counts2.Item2[i]);

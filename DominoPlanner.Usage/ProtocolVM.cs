@@ -1,8 +1,10 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -358,9 +360,9 @@ namespace DominoPlanner.Usage
                 try
                 {
                     DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP);
-                    MessageBox.Show("Save protocol in excel file.", "Save", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    Process.Start(dlg.FileName);
                 }
-                catch (Exception ex) { MessageBox.Show("Fehler: " + ex.Message); }
+                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
 
@@ -379,9 +381,9 @@ namespace DominoPlanner.Usage
                     StreamWriter sw = new StreamWriter(fs);
                     sw.Write(CurrentProtocol);
                     fs.Close();
-                    MessageBox.Show("Save protocol in .html file!", "Save", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    Process.Start(filename);
                 }
-                catch (Exception ex) { MessageBox.Show("Fehler: " + ex.Message); }
+                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
         #endregion
