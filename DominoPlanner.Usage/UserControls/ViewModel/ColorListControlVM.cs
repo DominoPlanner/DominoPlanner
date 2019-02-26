@@ -72,7 +72,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
             {
-                //colorRepository = Workspace.Load<ColorRepository>(FilePath);
                 _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
                 counter++;
             }

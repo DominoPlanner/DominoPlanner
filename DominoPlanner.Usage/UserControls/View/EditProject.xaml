@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
         <Grid x:Name="CanGrid" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -94,7 +94,14 @@
                                 <GridViewColumn Header="Count" Width="80">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,#}" />
+                                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,0}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Sum" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

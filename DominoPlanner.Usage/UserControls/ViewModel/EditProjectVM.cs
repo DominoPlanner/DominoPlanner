@@ -34,7 +34,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
-            
+
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
@@ -278,10 +278,31 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
             RaisePropertyChanged("DominoList");
         }
-
+        private void UpdateUIElements()
+        {
+            RefreshColorAmount();
+            DominoProject.InvalidateVisual();
+        }
+        private void RefreshColorAmount()
+        {
+            for (int i = 0; i < _DominoList.Count(); i++)
+            {
+                _DominoList[i].ProjectCount.Clear();
+                if (CurrentProject.counts.Length > i + 1)
+                {
+                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[i + 1]);
+                }
+                else
+                {
+                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[0]);
+                }
+            }
+        }
         private void refreshList()
         {
+            _DominoList.Clear();
             int counter = 0;
+
             foreach (DominoColor domino in CurrentProject.colors.RepresentionForCalculation.OfType<DominoColor>())
             {
                 _DominoList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = CurrentProject.colors.Anzeigeindizes[counter] });
@@ -320,6 +341,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         List<int> toCopy = new List<int>();
         private void Copy()
         {
+            if (!(CurrentProject is ICopyPasteable)) return;
             toCopy.Clear();
             clearPossibleToPaste();
             if (selectedDominoes.Count < 0)
@@ -357,8 +379,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
 
             }
-
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
         }
 
         private void Paste()
@@ -373,7 +394,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 paste.Apply();
                 undoStack.Push(paste);
                 clearPossibleToPaste();
-                DominoProject.InvalidateVisual();
+                UpdateUIElements();
             }
             catch (InvalidOperationException ex)
             {
@@ -389,7 +410,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             possibleToPaste.Clear();
 
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
         }
 
         public override void Undo()
@@ -466,7 +487,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             selectedDominoes.Clear();
             UnsavedChanges = true;
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
         }
 
         private void AddRow(bool addBelow)
@@ -488,7 +509,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
                             selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
                         }
-                        DominoProject.InvalidateVisual();
+                        UpdateUIElements();
                     }
                 }
             }
@@ -517,7 +538,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
                             selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
                         }
-                        DominoProject.InvalidateVisual();
+                        UpdateUIElements();
                     }
                 }
             }
@@ -621,7 +642,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.Width = largestX;
             DominoProject.Height = largestY;
 
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
 
             RefreshSizeLabels();
         }
@@ -697,7 +718,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
             }
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
         }
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -804,7 +825,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
 
-                DominoProject.InvalidateVisual();
+                UpdateUIElements();
                 return;
             }
             double top = Canvas.GetTop(rect);
@@ -869,7 +890,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             rect.Visibility = Visibility.Hidden;
             DominoProject.Children.Remove(rect);
 
-            DominoProject.InvalidateVisual();
+            UpdateUIElements();
         }
         #endregion
 

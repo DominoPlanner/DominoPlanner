@@ -42,6 +42,11 @@ namespace DominoPlanner.Usage
                     pen.Brush = Brushes.Plum;
                     pen.Thickness = 2;
                 }
+                else
+                {
+                    pen.Brush = new SolidColorBrush(Color.FromArgb(50, 0,0, 255));
+                    pen.Thickness = 1;
+                }
 
                 dc.DrawGeometry(new SolidColorBrush(dic.StoneColor), pen, streamGeometry);
             }
