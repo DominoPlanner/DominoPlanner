@@ -362,17 +362,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Paste()
         {
-            if (selectedDominoes.Count == 0) return;
-            int pasteindex = selectedDominoes.First().idx;
-            selectedDominoes.First().isSelected = false;
-            selectedDominoes.Clear();
-            PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
-            undoStack.Push(paste);
-            paste.Apply();
-
-            clearPossibleToPaste();
-
-            DominoProject.InvalidateVisual();
+            try
+            {
+                if (selectedDominoes.Count == 0) return;
+                int pasteindex = selectedDominoes.First().idx;
+                selectedDominoes.First().isSelected = false;
+                selectedDominoes.Clear();
+                PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
+                paste.Apply();
+                undoStack.Push(paste);
+                clearPossibleToPaste();
+                DominoProject.InvalidateVisual();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
+            }
         }
 
         private void clearPossibleToPaste()
@@ -465,79 +470,107 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddRow(bool addBelow)
         {
-            if (selectedDominoes.Count > 0)
+            try
             {
-                DominoInCanvas selDomino = selectedDominoes.First();
-                if (CurrentProject is IRowColumnAddableDeletable)
+                if (selectedDominoes.Count > 0)
                 {
-                    AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
-                    undoStack.Push(addRows);
-                    addRows.Apply();
-                    ClearCanvas();
-                    RefreshCanvas();
-                    for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                    DominoInCanvas selDomino = selectedDominoes.First();
+                    if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
-                        selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                        AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addBelow);
+                        addRows.Apply();
+                        undoStack.Push(addRows);
+                        ClearCanvas();
+                        RefreshCanvas();
+                        for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                        {
+                            DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
+                            selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                        }
+                        DominoProject.InvalidateVisual();
                     }
-                    DominoProject.InvalidateVisual();
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
             }
         }
 
         private void AddColumn(bool addRight)
         {
-            if (selectedDominoes.Count > 0)
+            try
             {
-                DominoInCanvas selDomino = selectedDominoes.First();
-                if (CurrentProject is IRowColumnAddableDeletable)
+                if (selectedDominoes.Count > 0)
                 {
-                    AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
-                    undoStack.Push(addRows);
-                    addRows.Apply();
-                    ClearCanvas();
-                    RefreshCanvas();
-                    for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                    DominoInCanvas selDomino = selectedDominoes.First();
+                    if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
-                        selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                        AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino.idx, 1, selDomino.domino.color, addRight);
+                        addRows.Apply();
+                        undoStack.Push(addRows);
+                        ClearCanvas();
+                        RefreshCanvas();
+                        for (int i = 0; i < addRows.added_indizes.Count(); i++)
+                        {
+                            DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
+                            selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                        }
+                        DominoProject.InvalidateVisual();
                     }
-                    DominoProject.InvalidateVisual();
                 }
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
             }
         }
 
         private void RemoveSelRows()
         {
-            if (selectedDominoes.Count > 0)
+            try
             {
-                List<int> toRemove = new List<int>();
-                foreach (DominoInCanvas selDomino in selectedDominoes)
+                if (selectedDominoes.Count > 0)
                 {
-                    toRemove.Add(selDomino.idx);
+                    List<int> toRemove = new List<int>();
+                    foreach (DominoInCanvas selDomino in selectedDominoes)
+                    {
+                        toRemove.Add(selDomino.idx);
+                    }
+                    DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
+                    deleteRows.Apply();
+                    undoStack.Push(deleteRows);
+                    ClearCanvas();
+                    RefreshCanvas();
                 }
-                DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
-                undoStack.Push(deleteRows);
-                deleteRows.Apply();
-                ClearCanvas();
-                RefreshCanvas();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
             }
         }
 
         private void RemoveSelColumns()
         {
-            if (selectedDominoes.Count > 0)
+            try
             {
-                List<int> toRemove = new List<int>();
-                foreach (DominoInCanvas selDomino in selectedDominoes)
+                if (selectedDominoes.Count > 0)
                 {
-                    toRemove.Add(selDomino.idx);
+                    List<int> toRemove = new List<int>();
+                    foreach (DominoInCanvas selDomino in selectedDominoes)
+                    {
+                        toRemove.Add(selDomino.idx);
+                    }
+                    DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
+                    deleteColumns.Apply();
+                    undoStack.Push(deleteColumns);
+                    ClearCanvas();
+                    RefreshCanvas();
                 }
-                DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
-                undoStack.Push(deleteColumns);
-                deleteColumns.Apply();
-                ClearCanvas();
-                RefreshCanvas();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK);
             }
         }
 
