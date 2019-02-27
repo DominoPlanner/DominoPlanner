@@ -389,21 +389,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             string thispath = Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly);
             foreach (DocumentNode project in dominoAssembly.children)
             {
-                var counts2 = Workspace.LoadColorList<IDominoProvider>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                if (counts2.Item1 != thispath)
+                try
                 {
-                    Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} used a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
-                    continue;
+                    var counts2 = Workspace.LoadColorList<IDominoProvider>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
+                    if (counts2.Item1 != thispath)
+                    {
+                        Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                        continue;
+                    }
+                    for (int i = 0; i < counts2.Item2.Length; i++)
+                    {
+                        _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                    }
+                    for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
+                    {
+                        _ColorList[i].ProjectCount.Add(0);
+                    }
+                    AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
                 }
-                for (int i = 0; i < counts2.Item2.Length; i++)
+                catch
                 {
-                    _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                    Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
                 }
-                for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
-                {
-                    _ColorList[i].ProjectCount.Add(0);
-                }
-                AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
             }
         }
 
