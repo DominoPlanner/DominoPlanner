@@ -54,9 +54,9 @@
             <Label Content="a:" Grid.Row="2" HorizontalAlignment="Right"/>
             <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.a}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" />
             <Label Content="b:" Grid.Row="0" HorizontalAlignment="Right" />
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.b}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
+            <xctk:IntegerUpDown Minimum="1" Value="{Binding SelectedItem.Sizes.b}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
             <Label Content="c:" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" />
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.c}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,-5,0" />
+            <xctk:IntegerUpDown Minimum="1" Value="{Binding SelectedItem.Sizes.c}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,-5,0" />
             <Label Content="d:" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" />
             <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.d}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="0,0,-5,0" />
         </Grid>

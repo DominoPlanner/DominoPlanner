@@ -102,7 +102,7 @@ namespace DominoPlanner.Core
         internal override void CalculateColors()
         {
             var colors = this.colors.RepresentionForCalculation;
-            if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
+            //if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
             RTree<IDominoShape> tree = new RTree<IDominoShape>(9, new GuttmannQuadraticSplit<IDominoShape>());
             // wird nur beim Dithering benötigt und nur dann ausgeführt; sortiert alle Shapes nach deren Mittelpunktskoordinate 

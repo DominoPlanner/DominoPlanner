@@ -68,9 +68,9 @@ namespace DominoPlanner.Core
             {
                 // get dimensions of the structure
                 
-                int x_min = shapes.Min(s => s.GetContainer().x1);
-                int y_min = shapes.Min(s => s.GetContainer().y1);
-                scalingFactor = (double)targetWidth / width;
+                //int x_min = shapes.Min(s => s.GetContainer().x1);
+                //int y_min = shapes.Min(s => s.GetContainer().y1);
+                scalingFactor = Math.Min((double)targetWidth / width, (double)targetWidth/heigth);
             }
             Image<Emgu.CV.Structure.Bgra, byte> bitmap
                 = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor), (int)(heigth * scalingFactor),

@@ -51,8 +51,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _a = value;
-                shapesValid = false;
+                if (value >= 0 && value != _a)
+                {
+                    _a = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -69,8 +72,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _b = value;
-                shapesValid = false;
+                if (value > 0 && value != _b)
+                {
+                    _b = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -87,8 +93,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _c = value;
-                shapesValid = false;
+                if (value > 0 && value != _c)
+                {
+                    _c = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -105,8 +114,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _d = value;
-                shapesValid = false;
+                if (value >= 0 && value != _d)
+                {
+                    _d = value;
+                    shapesValid = false;
+                }
             }
         }
     
@@ -146,9 +158,12 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _length = value;
-                _current_width = value;
-                shapesValid = false;
+                if (value > 0 && value != _length)
+                {
+                    _length = value;
+                    _current_width = value;
+                    shapesValid = false;
+                }
             }
         }
         private int _height;
@@ -164,8 +179,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _height = value;
-                shapesValid = false;
+                if (value > 0 && value != _height)
+                {
+                    _height = value;
+                    shapesValid = false;
+                }
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
@@ -257,8 +275,6 @@ namespace DominoPlanner.Core
         internal override void ReadUsedColors()
         {
             if (!shapesValid) throw new InvalidOperationException("erst die Shapes aktualisieren");
-            if (length < 2) length = 2;
-            if (height < 2) height = 2;
             resizedImage = new Mat();
             CvInvoke.Resize(image_filtered, resizedImage,
                 new System.Drawing.Size() { Height = height, Width = length }, interpolation: resizeMode);
