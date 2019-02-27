@@ -29,7 +29,8 @@ namespace DominoPlanner.Core
                 //shapes[length * yi + xi]
                 int row = source_domain[i] / current_width;
                 int col = source_domain[i] % current_width;
-                target_domain[i] = (row + rowshift) * (current_width) + (col + colshift);
+                target_domain[i] = (row + rowshift < current_height && col + colshift < current_width) ? 
+                    (row + rowshift) * (current_width) + (col + colshift) : last.length;
             }
             return target_domain;
         }
