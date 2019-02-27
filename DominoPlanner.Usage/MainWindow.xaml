@@ -42,7 +42,7 @@
         <KeyBinding Key="C" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
     </Window.InputBindings>
     <Grid>
-        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0">
+        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0" VerticalContentAlignment="Center">
             <MenuItem Header="New">
                 <MenuItem.Icon>
                     <Image Source="/Icons/new.ico"/>
@@ -195,9 +195,9 @@
                                 <ColumnDefinition Width="2"/>
                                 <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center"/>
+                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center" MaxHeight="25"/>
                             <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
-                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}">
+                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
                                 <Button.Background>
                                     <ImageBrush ImageSource="Icons/closewindow.ico"/>
                                 </Button.Background>
