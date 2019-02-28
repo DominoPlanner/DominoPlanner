@@ -1,4 +1,5 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using Microsoft.Win32;
 using System;
@@ -86,7 +87,12 @@ namespace DominoPlanner.Usage
             try
             {
                 openFileDialog.InitialDirectory = ColorVM.FilePath;
-                openFileDialog.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
+                openFileDialog.Filter = "All color files |*.DColor;*.clr;*.farbe|" +
+                    "DominoPlanner 3.x color files (*.DColor)|*.DColor|" +
+                    "DominoPlanner 2.x color files (*.clr)|*.clr|" +
+                    "Dominorechner color files (*.farbe)|*.farbe|" +
+                    "All files (*.*)|*.*";
+                openFileDialog.InitialDirectory = Path.Combine(Environment.CurrentDirectory, "Resources");
             }
             catch (Exception) { }
             
@@ -94,8 +100,37 @@ namespace DominoPlanner.Usage
             {
                 if (File.Exists(openFileDialog.FileName))
                 {
+                    ColorRepository colorList;
+                    int colorListVersion = 0;
+                    try
+                    {
+                         colorList = Workspace.Load<ColorRepository>(openFileDialog.FileName);
+                        colorListVersion = 3;
+                    }
+                    catch
+                    {
+                        // Colorlist version 1 or 2
+                        try
+                        {
+                            colorList = new ColorRepository(openFileDialog.FileName);
+                            colorListVersion = 1;
+                        }
+                        catch
+                        {
+                            // file not readable
+                            Errorhandler.RaiseMessage("Color repository file is invalid", "Error", Errorhandler.MessageType.Error);
+                            return;
+                        }
+                    }
                     File.Delete(Properties.Settings.Default.StandardColorArray);
-                    File.Copy(openFileDialog.FileName, Properties.Settings.Default.StandardColorArray);
+                    if (colorListVersion == 3)
+                    {
+                        File.Copy(openFileDialog.FileName, Properties.Settings.Default.StandardColorArray);
+                    }
+                    else if (colorListVersion != 0)
+                    {
+                        colorList.Save(Properties.Settings.Default.StandardColorArray);
+                    }
                 }
                 var item = Workspace.Instance.openedFiles.Find(x => x.Item1.Equals(Properties.Settings.Default.StandardColorArray));
                 if(item != null)
