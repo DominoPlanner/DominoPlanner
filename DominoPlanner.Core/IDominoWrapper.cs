@@ -34,7 +34,7 @@ namespace DominoPlanner.Core
         }
         public static IDominoWrapper CreateNodeFromPath(DominoAssembly futureParent, string path)
         {
-            var parentPath = Workspace.Instance.openedFiles.Find(x => x.Item2 == futureParent).Item1;
+            var parentPath = Workspace.Find(futureParent);
             var relPath = Workspace.MakeRelativePath(parentPath, path);
             var deserialized = Workspace.Load<IDominoProvider>(path);
             switch (deserialized)

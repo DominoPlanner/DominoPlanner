@@ -132,11 +132,7 @@ namespace DominoPlanner.Usage
                         colorList.Save(Properties.Settings.Default.StandardColorArray);
                     }
                 }
-                var item = Workspace.Instance.openedFiles.Find(x => x.Item1.Equals(Properties.Settings.Default.StandardColorArray));
-                if(item != null)
-                {
-                    Workspace.Instance.openedFiles.Remove(item);
-                }
+                Workspace.CloseFile(Properties.Settings.Default.StandardColorArray);
                 ColorVM.Reload(Properties.Settings.Default.StandardColorArray);
             }
         }

@@ -58,7 +58,7 @@ namespace DominoPlanner.CoreTests
         }
         public static void LoadProject()
         {
-            Workspace.Instance.openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+            Workspace.Clear();
             string rootpath = Path.GetFullPath("tests/");
             var mainnode = new AssemblyNode(Path.Combine(rootpath, "main.DProject"));
             PrintProjectStructure(mainnode, "");

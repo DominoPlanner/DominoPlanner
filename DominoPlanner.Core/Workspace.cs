@@ -19,12 +19,19 @@ namespace DominoPlanner.Core
         private Workspace() {
             openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
         }
-
-        public static Workspace Instance
+        private static Workspace Instance
         {
             get
             {
                 return _mySingleton.Value;
+            }
+        }
+        private static void Add(string absolutePath, IWorkspaceLoadable obj)
+        {
+            if (Find<IWorkspaceLoadable>(absolutePath) == null)
+            {
+                Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(absolutePath, obj));
+                Console.WriteLine($"File {absolutePath} added to workspace");
             }
         }
         public static string AbsolutePathFromReference(string relativePath, IWorkspaceLoadable reference)
@@ -62,7 +69,7 @@ namespace DominoPlanner.Core
             try
             {
                 Instance.FileInWork = absPath;
-                var result = (T)Workspace.Instance.Find<T>(absPath);
+                var result = (T)Find<T>(absPath);
                 Console.WriteLine("Datei " + absPath + " öffnen");
                 if (result == null)
                 {
@@ -71,7 +78,7 @@ namespace DominoPlanner.Core
                     {
                         result = Serializer.Deserialize<T>(file);
                     }
-                    Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(absPath, result));
+                    Add(absPath, result);
                 }
                 return result;
             }
@@ -110,7 +117,7 @@ namespace DominoPlanner.Core
                 Serializer.Serialize(stream, obj);
                 if (addToList)
                 {
-                    Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(filepath, obj));
+                    Add(filepath, obj);
                 }
             }
         }
@@ -121,7 +128,7 @@ namespace DominoPlanner.Core
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
         {
             relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Workspace.Instance.Find<T>(relativePath);
+            var result = (T)Find<T>(relativePath);
             Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für ImageFilter");
             if (result == null)
             {
@@ -140,7 +147,7 @@ namespace DominoPlanner.Core
         public static Tuple<string, int[]> LoadColorList<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
             relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Workspace.Instance.Find<T>(relativePath);
+            var result = (T)Find<T>(relativePath);
             Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für Farbenliste");
             int[] counts;
             string absolute_path;
@@ -170,7 +177,7 @@ namespace DominoPlanner.Core
         public static bool LoadEditingState<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
             relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Workspace.Instance.Find<T>(relativePath);
+            var result = (T)Find<T>(relativePath);
             Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für Editing State");
             if (result == null)
             {
@@ -182,11 +189,36 @@ namespace DominoPlanner.Core
             }
             return result.Editing;
         }
-        public object Find<T>(string AbsolutePath)
+        public static void CloseFile(string path)
         {
-            var result = openedFiles.Where(x => x.Item1 == AbsolutePath && x.Item2 is T);
+            if (new Uri(path, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
+            {
+                Instance.openedFiles.RemoveAll(x => x.Item1 == path);
+            }
+        }
+        public static void CloseFile(string relativePath, IWorkspaceLoadable reference)
+        {
+            CloseFile(AbsolutePathFromReference(relativePath, reference));
+        }
+        public static void CloseFile(IWorkspaceLoadable reference)
+        {
+            Instance.openedFiles.RemoveAll(x => x.Item2 == reference);
+        }
+        public static void Clear()
+        {
+            Instance.openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+        }
+        public static object Find<T>(string AbsolutePath)
+        {
+            var result = Instance.openedFiles.Where(x => x.Item1 == AbsolutePath && x.Item2 is T);
             if (result.Count() == 0) return null;
             return result.First().Item2;
+        }
+        public static string Find(IWorkspaceLoadable obj) 
+        {
+            var result = Instance.openedFiles.Where(x => x.Item2 == obj);
+            if (result.Count() == 0) return null;
+            return result.First().Item1;
         }
         public static String MakeRelativePath(String fromPath, String toPath)
         {

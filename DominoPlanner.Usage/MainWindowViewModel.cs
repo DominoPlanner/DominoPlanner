@@ -224,6 +224,8 @@ namespace DominoPlanner.Usage
                         var ext = Path.GetExtension(ex.FileName);
                         Errorhandler.RaiseMessage($"The object {toOpen.Project.FilePath} contains a reference to the file ${ex.FileName}," +
                             $"which could not be located. The object has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
+                        // Delete object from project
+                        // update project tree
                     }
                 }
             }
@@ -310,7 +312,7 @@ namespace DominoPlanner.Usage
                     DominoAssembly assembly = mainnode.obj;
                     bool colorpathExists = File.Exists(Workspace.AbsolutePathFromReference(mainnode.obj.colorPath, mainnode.obj));
                 }
-                catch (Exception ex)
+                catch
                 {
                     string colorpath = Path.Combine(newProject.path, "Planner Files", "colors.DColor");
                     // restore project if colorfile exists
@@ -324,10 +326,9 @@ namespace DominoPlanner.Usage
                             var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
                         }
                         newMainNode.Save();
-
-                        Workspace.Instance.openedFiles.RemoveAll(x => x.Item1 == projectpath);
+                        Workspace.CloseFile(projectpath);
                         mainnode = new AssemblyNode(projectpath);
-                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Demaged File", Errorhandler.MessageType.Info);
+                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
                     }
                     else
                     {
