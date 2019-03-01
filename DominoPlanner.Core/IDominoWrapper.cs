@@ -109,7 +109,7 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    return Workspace.LoadColorList<IDominoProvider>(relativePath).Item2;
+                    return Workspace.LoadColorList<IDominoProviderPreview>(relativePath).Item2;
                 return obj.counts;
             }
         }

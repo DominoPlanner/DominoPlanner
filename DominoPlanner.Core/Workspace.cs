@@ -60,33 +60,47 @@ namespace DominoPlanner.Core
         }
         public static T Load<T>(string absolutePath) where T : IWorkspaceLoadable
         {
-            return Load<T>(absolutePath, null);
+            /*return Load<T>(absolutePath, null);*/
+            return LoadInternal<T, T, T>(absolutePath, a => a, a => a);
         }
-        public static T Load<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadable
+        private static Out LoadInternal<FullType, LoadType, Out>
+            (string absolutePath, Func<LoadType, Out> func, Func<FullType, Out> func2) where FullType : IWorkspaceLoadable where LoadType : IWorkspaceLoadable
         {
-            var absPath = AbsolutePathFromReference(relativePath, reference);
+            bool preview = typeof(LoadType) != typeof(FullType);
+            var result = (FullType)Find<FullType>(absolutePath);
             string old_file_in_work = Instance.FileInWork;
+            Console.WriteLine($"Datei {absolutePath} {(preview ? "als Vorschau" : "vollwertig")} öffnen");
             try
             {
-                Instance.FileInWork = absPath;
-                var result = (T)Find<T>(absPath);
-                Console.WriteLine("Datei " + absPath + " öffnen");
+                if (!preview) Instance.FileInWork = absolutePath;
                 if (result == null)
                 {
-                    Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
-                    using (var file = File.OpenRead(absPath))
+                    LoadType resultLoaded;
+                    Console.WriteLine($"Datei noch nicht geöffnet, als {typeof(LoadType)} deserialisieren");
+                    using (var file = File.OpenRead(absolutePath))
                     {
-                        result = Serializer.Deserialize<T>(file);
+                        resultLoaded = Serializer.Deserialize<LoadType>(file);
                     }
-                    Add(absPath, result);
+                    if (!preview) Add(absolutePath, resultLoaded);
+                    return func.Invoke(resultLoaded);
                 }
-                return result;
+                Console.WriteLine("Datei bereits geöffnet, aus Workspace nehmen");
+                return func2.Invoke(result);
             }
             finally
             {
                 Instance.FileInWork = old_file_in_work;
             }
-
+        }
+        private static Out LoadInternal<FullType, LoadType, Out>
+            (string relativePath, IWorkspaceLoadable reference, Func<LoadType, Out> func, Func<FullType, Out> func2) where FullType : IWorkspaceLoadable where LoadType : IWorkspaceLoadable
+        {
+            var absPath = AbsolutePathFromReference(relativePath, reference);
+            return LoadInternal(absPath, func, func2);
+        }
+        public static T Load<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadable
+        {
+            return LoadInternal<T, T, T>(relativePath, reference, a => a, a => a);
         }
         public static void Save(IWorkspaceLoadable obj, string filepath = "")
         {
@@ -123,71 +137,30 @@ namespace DominoPlanner.Core
         }
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string absolutePath) where T : IWorkspaceLoadImageFilter
         {
-            return LoadImageFilters<T>(absolutePath, null);
+            return LoadInternal<T, IDominoProviderImageFilter, ObservableCollection<ImageFilter>>(absolutePath, a => a.ImageFilters, a => a.ImageFilters);
         }
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
         {
-            relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Find<T>(relativePath);
-            Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für ImageFilter");
-            if (result == null)
-            {
-                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
-                using (var file = File.OpenRead(relativePath))
-                {
-                    return Serializer.Deserialize<IDominoProviderImageFilter>(file).ImageFilters;
-                }
-            }
-            return result.ImageFilters;
+            return LoadImageFilters<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static Tuple<string, int[]> LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
-            return LoadColorList<T>(absolutePath, null);
+            return LoadInternal<IDominoProvider, IDominoProviderPreview, Tuple<string, int[]>>(absolutePath,
+                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.counts),
+                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.counts)
+                );
         }
         public static Tuple<string, int[]> LoadColorList<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
-            relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Find<T>(relativePath);
-            Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für Farbenliste");
-            int[] counts;
-            string absolute_path;
-            if (result == null)
-            {
-                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
-                using (var file = File.OpenRead(relativePath))
-                {
-                    var deser = Serializer.Deserialize<IDominoProviderPreview>(file);
-                    counts = deser.counts;
-                    absolute_path = deser.ColorPath;
-                }
-            }
-            else
-            {
-                counts = result.counts;
-                absolute_path = result.ColorPath;
-            }
-            string directoryofreference = Path.GetDirectoryName(relativePath);
-            absolute_path = Path.GetFullPath(Path.Combine(directoryofreference, absolute_path));
-            return new Tuple<string, int[]>(absolute_path, counts);
+            return LoadColorList<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static bool LoadEditingState<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {
-            return LoadEditingState<T>(absolutePath, null);
+            return LoadInternal<IDominoProvider, IDominoProviderPreview, bool>(absolutePath, a => a.Editing, a => a.Editing);
         }
         public static bool LoadEditingState<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
-            relativePath = AbsolutePathFromReference(relativePath, reference);
-            var result = (T)Find<T>(relativePath);
-            Console.WriteLine("Datei " + relativePath + " als Vorschau öffnen für Editing State");
-            if (result == null)
-            {
-                Console.WriteLine("Datei noch nicht geöffnet, deserialisieren");
-                using (var file = File.OpenRead(relativePath))
-                {
-                    return Serializer.Deserialize<IDominoProviderPreview>(file).Editing;
-                }
-            }
-            return result.Editing;
+            return LoadEditingState<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static void CloseFile(string path)
         {

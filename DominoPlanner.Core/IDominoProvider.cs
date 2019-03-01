@@ -621,7 +621,7 @@ namespace DominoPlanner.Core
 
         string ColorPath { get; set; }
     }
-    public interface IWorkspaceLoadImageFilter
+    public interface IWorkspaceLoadImageFilter : IWorkspaceLoadable
     {
         ObservableCollection<ImageFilter> ImageFilters { get;}
     }

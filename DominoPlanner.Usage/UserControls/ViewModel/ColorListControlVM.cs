@@ -391,8 +391,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 try
                 {
-                    var counts2 = Workspace.LoadColorList<IDominoProvider>(Workspace.AbsolutePathFromReference(project.relativePath, dominoAssembly));
-                    if (counts2.Item1 != thispath)
+                    var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, dominoAssembly);
+                    if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(thispath))
                     {
                         Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
                         continue;
