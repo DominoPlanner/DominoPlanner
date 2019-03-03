@@ -147,12 +147,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4D5BB50449E64E2493D83BA506FA96E0"
-        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_510333FC2715F61D7AF211D0BAAD47A8"
         "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
         "MsmSig" = "8:_UNDEFINED"
@@ -341,6 +335,12 @@
         {
         "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
         "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
+        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -713,12 +713,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_7D4D39467E40DF6A9FE2AABBD9A8FA6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4D5BB50449E64E2493D83BA506FA96E0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1746,37 +1740,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4D5BB50449E64E2493D83BA506FA96E0"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:EPPlus, Version=4.5.2.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_4D5BB50449E64E2493D83BA506FA96E0"
-                    {
-                    "Name" = "8:EPPlus.DLL"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:EPPlus.DLL"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_510333FC2715F61D7AF211D0BAAD47A8"
             {
             "AssemblyRegister" = "3:1"
@@ -2058,7 +2021,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:DominoPlanner.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:DominoPlanner.Core, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_766B84D92ED308CF5FD5E6E2C1B7C6CF"
@@ -3699,7 +3662,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DominoPlanner"
         "ProductCode" = "8:{CD5504F9-951D-4727-9D2F-88CF6FA7A6E6}"
-        "PackageCode" = "8:{A8BFA92A-27F8-4482-8AF6-A4315E469F06}"
+        "PackageCode" = "8:{653680BB-0FBF-41E3-895B-E8F6B944713F}"
         "UpgradeCode" = "8:{A5203434-2746-4DF1-82A6-821CBC4C4A63}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -3829,6 +3792,20 @@
             "Transitive" = "11:FALSE"
             "Target" = "8:_E146DFFE34BE4F0398F83957CB46B422"
             "Folder" = "8:_E7FC410CCD5D4BD0AA9225E44A2F6B55"
+            "WorkingFolder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
+            "Icon" = "8:_539E0B324334445F87BE95E7E885CAAF"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_524AC4892187488980B5C8F233525DE1"
+            {
+            "Name" = "8:DominoPlanner"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+            "Folder" = "8:_8252C32EF5DC4338A6C92181FBAC4505"
             "WorkingFolder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
             "Icon" = "8:_539E0B324334445F87BE95E7E885CAAF"
             "Feature" = "8:"
