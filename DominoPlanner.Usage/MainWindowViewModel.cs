@@ -17,7 +17,8 @@ namespace DominoPlanner.Usage
     {
         #region CTOR
         public MainWindowViewModel()
-        {Properties.Settings.Default.Upgrade();
+        {
+            Properties.Settings.Default.Upgrade();
             Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
             if (Properties.Settings.Default.FirstStartup)
             {
@@ -30,12 +31,12 @@ namespace DominoPlanner.Usage
             }
             Properties.Settings.Default.Save();
 
-            while(!File.Exists(Properties.Settings.Default.StandardColorArray))
+            while (!File.Exists(Properties.Settings.Default.StandardColorArray))
             {
                 Errorhandler.RaiseMessage("Please create a defaultcolortable.", "Missing Color Table", Errorhandler.MessageType.Info);
                 new SetStandardV().ShowDialog();
             }
-            
+
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
@@ -51,7 +52,7 @@ namespace DominoPlanner.Usage
 
         internal void CloseAllTabs()
         {
-            while(Tabs.Count > 0)
+            while (Tabs.Count > 0)
             {
                 RemoveItem(Tabs.First());
             }
@@ -75,16 +76,16 @@ namespace DominoPlanner.Usage
             {
                 if (_SelectedTab != value)
                 {
-                    if(_SelectedTab != null)
+                    if (_SelectedTab != null)
                     {
-                        if(_SelectedTab.Content is ColorListControlVM colorList)
+                        if (_SelectedTab.Content is ColorListControlVM colorList)
                         {
                             //hässlich aber tut... :D
                             colorList.DifColumns.Clear();
                         }
                     }
                     _SelectedTab = value;
-                    if(SelectedTab != null)
+                    if (SelectedTab != null)
                         _SelectedTab.Content.ResetContent();
                     RaisePropertyChanged();
                 }
@@ -119,9 +120,9 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Command
-	    private ICommand _AddExistingProject;
+        private ICommand _AddExistingProject;
         public ICommand AddExistingProject { get { return _AddExistingProject; } set { if (value != _AddExistingProject) { _AddExistingProject = value; } } }
-        
+
         private ICommand _AddExistingItem;
         public ICommand AddExistingItem { get { return _AddExistingItem; } set { if (value != _AddExistingItem) { _AddExistingItem = value; } } }
 
@@ -210,7 +211,7 @@ namespace DominoPlanner.Usage
             }
             else if (toOpen.ActType == NodeType.ProjectNode)
             {
-                
+
                 selTab = Tabs.FirstOrDefault(x => x.ProjectComp == toOpen);
                 if (selTab == null)
                 {
@@ -331,7 +332,8 @@ namespace DominoPlanner.Usage
                                 {
                                     var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
                                 }
-                                catch { // if error on add of file, don't add file 
+                                catch
+                                { // if error on add of file, don't add file 
                                 }
                             }
                             newMainNode.Save();
@@ -382,13 +384,13 @@ namespace DominoPlanner.Usage
 
         private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
             {
-                foreach(ProjectComposite old in e.OldItems.OfType<ProjectComposite>())
+                foreach (ProjectComposite old in e.OldItems.OfType<ProjectComposite>())
                 {
-                    foreach(TabItem tabItem in Tabs.ToArray())
+                    foreach (TabItem tabItem in Tabs.ToArray())
                     {
-                        if(tabItem.ProjectComp == old)
+                        if (tabItem.ProjectComp == old)
                         {
                             Tabs.Remove(tabItem);
                         }
@@ -449,11 +451,35 @@ namespace DominoPlanner.Usage
                 }*/
             }
             catch (Exception) { MessageBox.Show("Error loading openprojects!", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-            ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID)); 
-            newItem.IsClicked += Item_IsClicked;
-            newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
-            newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
-            return newItem;
+
+            if (Path.GetExtension(projectTransfer.FilePath).ToLower().Equals(".dcolor") || Path.GetExtension(projectTransfer.FilePath).ToLower().Equals(".dobject") && File.Exists(projectTransfer.FilePath) && File.Exists(projectTransfer.IcoPath))
+            {
+                try
+                {
+                    ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID));
+                    newItem.IsClicked += Item_IsClicked;
+                    newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
+                    newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
+                    return newItem;
+                }
+                catch (Exception ex)
+                {
+                    NotFindRemove(parentProject, projectTransfer);
+                    return null;
+                }
+            }
+            else
+            {
+                NotFindRemove(parentProject, projectTransfer);
+                return null;
+            }
+        }
+
+        private void NotFindRemove(ProjectListComposite parentProject, ProjectElement projectTransfer)
+        {
+            Errorhandler.RaiseMessage(string.Format("Could not find all files: {0}", Path.GetFileNameWithoutExtension(projectTransfer.FilePath)), "Not found!", Errorhandler.MessageType.Error);
+            ((AssemblyNode)parentProject.Project.documentNode).obj.children.Remove(projectTransfer.documentNode);
+            ((AssemblyNode)parentProject.Project.documentNode).obj.Save();
         }
 
         /// <summary>
@@ -493,7 +519,7 @@ namespace DominoPlanner.Usage
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
             openFileDialog.Filter = "project files (*.DObject)|*.DObject";
             openFileDialog.RestoreDirectory = true;
-            if(openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 if (File.Exists(openFileDialog.FileName))
                 {
@@ -571,7 +597,7 @@ namespace DominoPlanner.Usage
 
         internal void ResetContent()
         {
-            if(Content is EditProjectVM editProject)
+            if (Content is EditProjectVM editProject)
             {
                 editProject.ClearCanvas();
             }
