@@ -620,6 +620,8 @@ namespace DominoPlanner.Core
         bool Editing { get; set; }
 
         string ColorPath { get; set; }
+
+        bool hasProtocolDefinition { get; set; }
     }
     public interface IWorkspaceLoadImageFilter : IWorkspaceLoadable
     {
@@ -641,6 +643,9 @@ namespace DominoPlanner.Core
 
         [ProtoMember(7)]
         public string ColorPath { get; set; }
+
+        [ProtoMember(3)]
+        public bool hasProtocolDefinition { get; set; }
 
     }
     [ProtoContract]

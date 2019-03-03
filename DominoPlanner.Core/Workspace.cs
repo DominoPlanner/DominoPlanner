@@ -162,6 +162,15 @@ namespace DominoPlanner.Core
         {
             return LoadEditingState<T>(AbsolutePathFromReference(relativePath, reference));
         }
+        public static bool LoadHasProtocolDefinition<T>(string absolutePath) where T : IWorkspaceLoadColorList
+        {
+            return LoadInternal<IDominoProvider, IDominoProviderPreview, bool>(absolutePath, a => a.hasProtocolDefinition, 
+                a => a.hasProcotolDefinition);
+        }
+        public static bool LoadHasProtocolDefinition<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
+        {
+            return LoadHasProtocolDefinition<T>(AbsolutePathFromReference(relativePath, reference));
+        }
         public static void CloseFile(string path)
         {
             if (new Uri(path, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
