@@ -280,14 +280,14 @@ namespace DominoPlanner.Core
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(filepath, bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
-            hasProcotolDefinition = false;
+            hasProtocolDefinition = false;
             init(rotations);
         }
         public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation,allowStretch )
         {
-            hasProcotolDefinition = false;
+            hasProtocolDefinition = false;
             init(rotations);
         }
         private void init(int rotations)

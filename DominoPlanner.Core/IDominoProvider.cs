@@ -31,7 +31,7 @@ namespace DominoPlanner.Core
         /// Auf der Basis dieser Information sollten die entsprechenden Buttons angezeigt werden oder nicht.
         /// </summary>
         [ProtoMember(3)]
-        public bool hasProcotolDefinition { get; set; }
+        public bool hasProtocolDefinition { get; set; }
         /// <summary>
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
@@ -503,7 +503,7 @@ namespace DominoPlanner.Core
         /// <returns>int-Array mit den Indizes des Farben</returns>
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!hasProcotolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
+            if (!hasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
             if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
             int[,] basefield = new int[last.dominoLength, last.dominoHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)

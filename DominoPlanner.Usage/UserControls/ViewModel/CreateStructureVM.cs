@@ -50,7 +50,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             iColorApproxMode = (int)structureParameters.colorMode.colorComparisonMode;
             TransparencyValue = structureParameters.TransparencySetting;
 
-            if (dominoProvider.hasProcotolDefinition)
+            if (dominoProvider.hasProtocolDefinition)
                 VisibleFieldplan = Visibility.Visible;
             else
                 VisibleFieldplan = Visibility.Hidden;
@@ -77,7 +77,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     CurrentProject = value;
                     if (structureParameters != null)
                     {
-                        if (structureParameters.hasProcotolDefinition)
+                        if (structureParameters.hasProtocolDefinition)
                             VisibleFieldplan = Visibility.Visible;
                         else
                             VisibleFieldplan = Visibility.Hidden;
@@ -509,7 +509,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                     if (structureParameters != null)
                     {
-                        if (structureParameters.hasProcotolDefinition)
+                        if (structureParameters.hasProtocolDefinition)
                             VisibleFieldplan = Visibility.Visible;
                         else
                             VisibleFieldplan = Visibility.Hidden;

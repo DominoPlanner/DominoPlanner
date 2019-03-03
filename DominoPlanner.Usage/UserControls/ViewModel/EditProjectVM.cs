@@ -21,7 +21,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
-            HaveBuildtools = dominoProvider.obj.hasProcotolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
             string filepath = Workspace.AbsolutePathFromReference(dominoProvider.relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);

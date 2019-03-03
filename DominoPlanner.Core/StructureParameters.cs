@@ -40,7 +40,7 @@ namespace DominoPlanner.Core
         {
             set
             {
-                hasProcotolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
+                hasProtocolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
                 name = value.Attribute("Name").Value;
                 cells = new CellDefinition[3, 3];
                 foreach (XElement part in value.Elements("PartDefinition"))

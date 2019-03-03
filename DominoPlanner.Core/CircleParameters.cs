@@ -106,7 +106,7 @@ namespace DominoPlanner.Core
         {
             
             Circles = circles;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             r = new Random();
             DominoWidth = 8;
             DominoLength = 24;

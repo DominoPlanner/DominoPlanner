@@ -22,9 +22,10 @@ namespace DominoPlanner.Usage
         public ProjectComposite(ProjectElement projectTransfer)
         {
             this.FilePath = projectTransfer.FilePath;
+            
             if (projectTransfer.documentNode is DocumentNode documentNode)
             {
-                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType, documentNode.obj.hasProcotolDefinition);
+                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType, Workspace.LoadHasProtocolDefinition<IDominoProvider>(projectTransfer.FilePath));
             }
             else
             {
@@ -64,7 +65,7 @@ namespace DominoPlanner.Usage
         {
             if (Project.documentNode is DocumentNode documentNode)
             {
-                if (!documentNode.obj.hasProcotolDefinition)
+                if (!documentNode.obj.hasProtocolDefinition)
                 {
                     Errorhandler.RaiseMessage("Could not generate a protocol!", "No Protocol", Errorhandler.MessageType.Warning);
                     return;

@@ -165,7 +165,7 @@ namespace DominoPlanner.Core
         public static bool LoadHasProtocolDefinition<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {
             return LoadInternal<IDominoProvider, IDominoProviderPreview, bool>(absolutePath, a => a.hasProtocolDefinition, 
-                a => a.hasProcotolDefinition);
+                a => a.hasProtocolDefinition);
         }
         public static bool LoadHasProtocolDefinition<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {

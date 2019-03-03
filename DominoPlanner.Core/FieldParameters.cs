@@ -225,7 +225,7 @@ namespace DominoPlanner.Core
             this.height = height;
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             //this.history = new EmptyOperation<FieldParameters>(this);
             //current = history;
         }
@@ -266,7 +266,7 @@ namespace DominoPlanner.Core
             this.d = d;
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             TargetCount = targetSize;
         }
         private FieldParameters() : base() { }

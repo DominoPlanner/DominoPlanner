@@ -45,7 +45,7 @@ namespace DominoPlanner.Core
                 height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
             };
             g.dominoes = getNewShapes(sWidth, sHeight);
-            g.HasProtocolDefinition = hasProcotolDefinition;
+            g.HasProtocolDefinition = hasProtocolDefinition;
             int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;
         }
