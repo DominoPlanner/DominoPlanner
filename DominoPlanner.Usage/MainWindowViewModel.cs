@@ -312,40 +312,57 @@ namespace DominoPlanner.Usage
                     DominoAssembly assembly = mainnode.obj;
                     bool colorpathExists = File.Exists(Workspace.AbsolutePathFromReference(mainnode.obj.colorPath, mainnode.obj));
                 }
-                catch
+                catch (Exception ex)
                 {
                     string colorpath = Path.Combine(newProject.path, "Planner Files", "colors.DColor");
                     // restore project if colorfile exists
                     if (File.Exists(colorpath))
                     {
-                        DominoAssembly newMainNode = new DominoAssembly();
-                        newMainNode.Save(projectpath);
-                        newMainNode.colorPath = Path.Combine("Planner Files", "colors.DColor");
-                        foreach (string path in Directory.EnumerateFiles(Path.Combine(newProject.path, "Planner Files"), "*.DObject"))
+                        try
                         {
-                            var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
+                            if (File.Exists(projectpath))
+                                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.DProject"));
+                            DominoAssembly newMainNode = new DominoAssembly();
+                            newMainNode.Save(projectpath);
+                            newMainNode.colorPath = Path.Combine("Planner Files", "colors.DColor");
+                            foreach (string path in Directory.EnumerateFiles(Path.Combine(newProject.path, "Planner Files"), "*.DObject"))
+                            {
+                                try
+                                {
+                                    var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
+                                }
+                                catch { // if error on add of file, don't add file 
+                                }
+                            }
+                            newMainNode.Save();
+                            Workspace.CloseFile(projectpath);
+                            mainnode = new AssemblyNode(projectpath);
+                            Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
                         }
-                        newMainNode.Save();
-                        Workspace.CloseFile(projectpath);
-                        mainnode = new AssemblyNode(projectpath);
-                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
+                        catch
+                        {
+                            Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt to restore the file has been unsuccessful. \nThe project will be removed from the list of opened projects.", "Damaged File", Errorhandler.MessageType.Error);
+                            remove = true;
+                        }
                     }
                     else
                     {
                         remove = true;
                     }
                 }
-                ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
-                actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
-                actPLC.conMenu.createMI.Click += CreateMI_Click;
-                actPLC.conMenu.removeMI.Click += RemoveMI_Click;
-                actPLC.Children.CollectionChanged += Children_CollectionChanged;
-                Projects.Add(actPLC);
-
-                foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                if (!remove)
                 {
+                    ProjectListComposite actPLC = new ProjectListComposite(newProject.id, newProject.name, newProject.path, new ProjectElement(mainnode.Path, "", mainnode));
+                    actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
+                    actPLC.conMenu.createMI.Click += CreateMI_Click;
+                    actPLC.conMenu.removeMI.Click += RemoveMI_Click;
+                    actPLC.Children.CollectionChanged += Children_CollectionChanged;
+                    Projects.Add(actPLC);
 
-                    AddProjectToTree(actPLC, currPT);
+                    foreach (ProjectElement currPT in getProjects(mainnode.obj))
+                    {
+                        AddProjectToTree(actPLC, currPT);
+                    }
                 }
                 // }
                 //else remove = true;
