@@ -21,6 +21,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
+            HaveBuildtools = dominoProvider.obj.hasProcotolDefinition ? Visibility.Visible : Visibility.Hidden;
+
             string filepath = Workspace.AbsolutePathFromReference(dominoProvider.relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
 
@@ -83,6 +85,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
+        private Visibility _HaveBuildtools;
+        public Visibility HaveBuildtools
+        {
+            get { return _HaveBuildtools; }
+            set
+            {
+                if (_HaveBuildtools != value)
+                {
+                    _HaveBuildtools = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
         private Cursor _UICursor;
         public Cursor UICursor
         {
@@ -341,7 +357,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         List<int> toCopy = new List<int>();
         private void Copy()
         {
-            if (!(CurrentProject is ICopyPasteable)) return;
+            if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
             toCopy.Clear();
             clearPossibleToPaste();
             if (selectedDominoes.Count < 0)
@@ -386,6 +402,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
+                if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
                 if (selectedDominoes.Count == 0) return;
                 int pasteindex = selectedDominoes.First().idx;
                 selectedDominoes.First().isSelected = false;
@@ -511,6 +528,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         }
                         UpdateUIElements();
                     }
+                    else
+                    {
+                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                    }
                 }
             }
             catch (InvalidOperationException ex)
@@ -540,6 +561,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         }
                         UpdateUIElements();
                     }
+                    else
+                    {
+                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                    }
                 }
             }
             catch (InvalidOperationException ex)
@@ -552,18 +577,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (CurrentProject is IRowColumnAddableDeletable)
                 {
-                    List<int> toRemove = new List<int>();
-                    foreach (DominoInCanvas selDomino in selectedDominoes)
+                    if (selectedDominoes.Count > 0)
                     {
-                        toRemove.Add(selDomino.idx);
+                        List<int> toRemove = new List<int>();
+                        foreach (DominoInCanvas selDomino in selectedDominoes)
+                        {
+                            toRemove.Add(selDomino.idx);
+                        }
+                        DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
+                        deleteRows.Apply();
+                        undoStack.Push(deleteRows);
+                        ClearCanvas();
+                        RefreshCanvas();
                     }
-                    DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
-                    deleteRows.Apply();
-                    undoStack.Push(deleteRows);
-                    ClearCanvas();
-                    RefreshCanvas();
+                }
+                else
+                {
+                    Errorhandler.RaiseMessage("Could not remove a row in this project.", "Remove Row", Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
@@ -576,18 +608,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (CurrentProject is IRowColumnAddableDeletable)
                 {
-                    List<int> toRemove = new List<int>();
-                    foreach (DominoInCanvas selDomino in selectedDominoes)
+                    if (selectedDominoes.Count > 0)
                     {
-                        toRemove.Add(selDomino.idx);
+                        List<int> toRemove = new List<int>();
+                        foreach (DominoInCanvas selDomino in selectedDominoes)
+                        {
+                            toRemove.Add(selDomino.idx);
+                        }
+                        DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
+                        deleteColumns.Apply();
+                        undoStack.Push(deleteColumns);
+                        ClearCanvas();
+                        RefreshCanvas();
                     }
-                    DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), toRemove.ToArray());
-                    deleteColumns.Apply();
-                    undoStack.Push(deleteColumns);
-                    ClearCanvas();
-                    RefreshCanvas();
+                }
+                else
+                {
+                    Errorhandler.RaiseMessage("Could not remove a column in this project.", "Remove Column", Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)

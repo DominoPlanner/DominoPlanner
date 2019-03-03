@@ -22,8 +22,15 @@ namespace DominoPlanner.Usage
         public ProjectComposite(ProjectElement projectTransfer)
         {
             this.FilePath = projectTransfer.FilePath;
-            conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType);
-            conMenu.fieldprotoMI.Click += FieldprotoMI_Click;
+            if (projectTransfer.documentNode is DocumentNode documentNode)
+            {
+                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType, documentNode.obj.hasProcotolDefinition);
+            }
+            else
+            {
+                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType);
+            }
+                conMenu.fieldprotoMI.Click += FieldprotoMI_Click;
             conMenu.exportImageMI.Click += ExportImageMI_Click;
             conMenu.openFolderMI.Click += OpenFolderMI_Click;
             MouseClickCommand = new RelayCommand(o => { IsClicked?.Invoke(this, EventArgs.Empty); });
@@ -283,7 +290,7 @@ namespace DominoPlanner.Usage
 
     public class ContextMenueSelector
     {
-        public static ContextMenueProjectList TreeViewMenues(NodeType nodeType)
+        public static ContextMenueProjectList TreeViewMenues(NodeType nodeType, bool hasProtocol = false)
         {
             ContextMenueProjectList cm = new ContextMenueProjectList();
             switch (nodeType)
@@ -296,7 +303,7 @@ namespace DominoPlanner.Usage
                     break;
                 case NodeType.ProjectNode:
                     cm.Items.Add(cm.exportImageMI);
-                    cm.Items.Add(cm.fieldprotoMI);
+                    if(hasProtocol) cm.Items.Add(cm.fieldprotoMI);
                     cm.Items.Add(cm.removeMI);
                     break;
                 default:

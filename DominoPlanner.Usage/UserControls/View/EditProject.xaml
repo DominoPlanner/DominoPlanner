@@ -138,7 +138,7 @@
                     <Label Content="Basic Settings" />
                 </StackPanel>
             </Button>
-            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding BuildtoolsClick}">
+            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Visibility="{Binding HaveBuildtools}" Command="{Binding BuildtoolsClick}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Buildtools" />

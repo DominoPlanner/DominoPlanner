@@ -50,6 +50,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             iColorApproxMode = (int)structureParameters.colorMode.colorComparisonMode;
             TransparencyValue = structureParameters.TransparencySetting;
 
+            if (dominoProvider.hasProcotolDefinition)
+                VisibleFieldplan = Visibility.Visible;
+            else
+                VisibleFieldplan = Visibility.Hidden;
+
             CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
             draw_borders = true;
             Refresh();

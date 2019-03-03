@@ -34,7 +34,7 @@ namespace DominoPlanner.Usage
                 Pen pen = new Pen();
                 if (dic.isSelected)
                 {
-                    pen.Brush = Brushes.IndianRed;
+                    pen.Brush = Brushes.Blue;
                     pen.Thickness = 2;
                 }
                 else if (dic.PossibleToPaste)
