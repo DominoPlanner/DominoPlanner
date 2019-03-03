@@ -36,7 +36,7 @@ namespace DominoPlanner.Usage
         }
         private string _ProjectPath;
         public string ProjectPath { get { return _ProjectPath; } }
-        public string ObjectPath { get { return string.Format("{0}\\{1}{2}", _ProjectPath, _filename, _endung); } }
+        public string ObjectPath { get { return string.Format("{0}\\Planner Files\\{1}{2}", _ProjectPath, _filename, _endung); } }
 
         string picturePath;
 
