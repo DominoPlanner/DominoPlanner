@@ -1,4 +1,6 @@
-﻿using DominoPlanner.Usage.Serializer;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
+using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,14 +16,16 @@ namespace DominoPlanner.Usage
     class ProjectListComposite : ProjectComposite
     {
         #region CTOR
-        public ProjectListComposite(int id, string Name, string path) : base(id, 0, Name, "", path, NodeType.ProjectNode)
+        public ProjectListComposite(int id, string Name, string path, ProjectElement dominoAssembly) : base(dominoAssembly)
         {
+            this.OwnID = id;
+            this.Name = Name;
             _Children = new ObservableCollection<ProjectComposite>();
+            Img = "/Icons/folder_txt.ico";
         }
         #endregion
 
         #region Prop
-
         private ObservableCollection<ProjectComposite> _Children;
         public ObservableCollection<ProjectComposite> Children
         {
@@ -39,9 +43,9 @@ namespace DominoPlanner.Usage
         public ProjectComposite AddProject(ProjectComposite addObject)
         {
             _Children.Add(addObject);
+            addObject.ParentProjectID = this.OwnID;
             return addObject;
         }
-
         #endregion
 
         #region Methods
@@ -51,8 +55,7 @@ namespace DominoPlanner.Usage
             return Name;
         }
         #endregion
-
-        internal void RemoveMI_Object_Click(object sender, System.Windows.RoutedEventArgs e)
+        internal void RemoveMI_Object_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -60,31 +63,18 @@ namespace DominoPlanner.Usage
                 MessageBoxResult mbr = MessageBox.Show(string.Format("Delete {0}?", removeName), "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (mbr == MessageBoxResult.Yes)
                 {
-                    string picturepath = ((ProjectComposite)((MenuItem)sender).DataContext).PicturePath;
-                    string objectpath = ((ProjectComposite)((MenuItem)sender).DataContext).FilePath;
-                    if (ProjectSerializer.RemoveProject(FilePath, ((ProjectComposite)((MenuItem)sender).DataContext).OwnID))
-                        Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
-                    MessageBoxResult mbrRemoveAll = MessageBox.Show("Delete all files?", "Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if(mbrRemoveAll == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            File.Delete(picturepath);
-                            File.Delete(objectpath);
-                        }
-                        catch (Exception)
-                        {
-                            MessageBox.Show("Error removing projectfiles!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
+                    DocumentNode dn = (DocumentNode)((ProjectComposite)((MenuItem)sender).DataContext).Project.documentNode;
+                    dn.parent.children.Remove(dn);
+                    dn.parent.Save();
+                    this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
                 }
-                MessageBox.Show(string.Format("{0} is remove!", removeName), "Removed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                Errorhandler.RaiseMessage(string.Format("{0} has been removed!", removeName), "Removed", Errorhandler.MessageType.Error);
             }
             catch (Exception)
             {
-                MessageBox.Show("Could not remove the project!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
         }
-            #endregion
-        }
+        #endregion
+    }
 }

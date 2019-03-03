@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DominoPlanner.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -19,12 +20,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
+        internal virtual void ResetContent() { }
         public abstract void Undo();
         public abstract void Redo();
         public abstract bool Save();
         #endregion
 
         #region prope
+        private IDominoProvider _CurrentProject;
+        public IDominoProvider CurrentProject
+        {
+            get { return _CurrentProject; }
+            set
+            {
+                if (_CurrentProject != value)
+                {
+                    _CurrentProject = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
         private bool _UnsavedChanges;
         public bool UnsavedChanges
         {
@@ -34,8 +50,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_UnsavedChanges != value)
                 {
                     _UnsavedChanges = value;
-                    if (Changes != null)
-                        Changes(this, value);
+                    Changes?.Invoke(this, value);
+                }
+            }
+        }
+
+        private string _FilePath;
+        public string FilePath
+        {
+            get { return _FilePath; }
+            set
+            {
+                if (_FilePath != value)
+                {
+                    _FilePath = value;
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -47,10 +76,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public event EventHandler<bool> Changes;
         #endregion
 
+        internal virtual void Close(){ }
+
         protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.RaisePropertyChanged(propertyName);
-            if(!propertyName.Equals("SelectedStone"))
+            if(!propertyName.Equals("SelectedStone") && !propertyName.Equals("DestinationImage") && !propertyName.Equals("cursor") && !propertyName.Equals("CurrentPlan") && !propertyName.Equals("ShowProjects"))
                 UnsavedChanges = true;
         }
 

@@ -41,12 +41,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>DominoCalculator.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=3.4.3.3016, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.4.3.3016\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.World, Version=3.4.3.3016, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.4.3.3016\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus, Version=4.5.3.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.1\lib\net40\EPPlus.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
@@ -55,8 +61,10 @@
       <HintPath>..\packages\OpenTK.GLControl.1.1.2225.0\lib\net20\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -110,9 +118,14 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BindingProxy.cs" />
+    <Compile Include="ColorListEntry.cs" />
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="DominoInCanvas.cs" />
     <Compile Include="DominoStone.cs" />
+    <Compile Include="HelperClass\Errorhandler.cs" />
+    <Compile Include="HelperClass\ImageConvert.cs" />
+    <Compile Include="ImageHelper.cs" />
     <Compile Include="LiveBuildHelperV.xaml.cs">
       <DependentUpon>LiveBuildHelperV.xaml</DependentUpon>
     </Compile>
@@ -126,6 +139,7 @@
       <DependentUpon>NewProject.xaml</DependentUpon>
     </Compile>
     <Compile Include="NewProjectVM.cs" />
+    <Compile Include="ProjectCanvas.cs" />
     <Compile Include="ProjectComposite.cs" />
     <Compile Include="ProjectListComposite.cs" />
     <Compile Include="ProtocolV.xaml.cs">
@@ -133,7 +147,7 @@
     </Compile>
     <Compile Include="ProtocolVM.cs" />
     <Compile Include="Serializer\OpenProjectSerializer.cs" />
-    <Compile Include="Serializer\ProjectSerializer.cs" />
+    <Compile Include="Serializer\ProjectElement.cs" />
     <Compile Include="SetStandardV.xaml.cs">
       <DependentUpon>SetStandardV.xaml</DependentUpon>
     </Compile>
@@ -146,6 +160,7 @@
     <Compile Include="UserControls\ViewModel\CreateStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\EditProjectVM.cs" />
     <Compile Include="UserControls\ViewModel\FieldSizeVM.cs" />
+    <Compile Include="UserControls\ViewModel\OnlyOwnStonesVM.cs" />
     <Compile Include="UserControls\ViewModel\RectangularSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\RoundSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\StructureViewModel.cs" />
@@ -170,6 +185,9 @@
     </Compile>
     <Compile Include="UserControls\View\FieldSize.xaml.cs">
       <DependentUpon>FieldSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\View\OnlyOwnStonesV.xaml.cs">
+      <DependentUpon>OnlyOwnStonesV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\RectangularSize.xaml.cs">
       <DependentUpon>RectangularSize.xaml</DependentUpon>
@@ -241,6 +259,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\View\OnlyOwnStonesV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\View\RectangularSize.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -277,6 +299,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Resources\Lamping %28en%29.DColor" />
+    <None Include="Resources\lamping.DColor">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -357,6 +383,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="License-LGPL.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Structures.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="DominoCalculator.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.3.4.3.3016\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.3.4.3.3016\build\EMGU.CV.targets')" />

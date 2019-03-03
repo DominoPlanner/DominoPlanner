@@ -19,7 +19,7 @@ namespace DominoPlanner.Usage.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -277,6 +277,21 @@ namespace DominoPlanner.Usage.Properties {
             get {
                 object obj = ResourceManager.GetObject("remove", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;StructureDefinitions&gt;
+        ///	&lt;StructureDefinition Name=&quot;Wall&quot; HasProtocolDefinition=&quot;true&quot;&gt;
+        ///		&lt;PartDefinition HorizontalPosition=&quot;Left&quot; VerticalPosition=&quot;Top&quot; Width=&quot;80&quot; Height=&quot;0&quot;/&gt;
+        ///		&lt;PartDefinition HorizontalPosition=&quot;Center&quot; VerticalPosition=&quot;Top&quot; Width=&quot;80&quot; Height=&quot;0&quot;/&gt;
+        ///		&lt;PartDefinition HorizontalPosition=&quot;Right&quot; VerticalPosition=&quot;Top&quot; Width=&quot;48&quot; Height=&quot;0&quot;/&gt;
+        ///		&lt;PartDefinition HorizontalPosition=&quot;Left&quot; VerticalPosition=&quot;Center&quot; Width=&quot;80&quot; Height=&quot;96&quot;&gt;
+        ///			&lt;RectangleDomino  x=&quot;0&quot; y=&quot;0&quot; Width=&quot;40&quot; Heigh [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string Structures {
+            get {
+                return ResourceManager.GetString("Structures", resourceCulture);
             }
         }
         

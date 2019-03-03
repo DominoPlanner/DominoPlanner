@@ -31,17 +31,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             switch (structType)
             {
                 case StructureType.Round:
-                    CurrentViewModel = new RoundSizeVM();
+                    CurrentViewModel = new RoundSizeVM() { PossibleTypeChange = true };
                     break;
                 case StructureType.Rectangular:
-                    CurrentViewModel = new RectangularSizeVM();
+                    CurrentViewModel = new RectangularSizeVM() { StandAlone = true, StrucSize = 2000 } ;
                     break;
                 default:
                     break;
             }
         }
         #endregion
-
+        #region
+        #endregion
         #region prop
         private ModelBase _CurrentViewModel;
         public ModelBase CurrentViewModel
@@ -94,6 +95,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_Path != value)
                 {
                     _Path = value;
+                    if(!string.IsNullOrWhiteSpace(sPath))
+                        pImage = sPath; 
                     RaisePropertyChanged();
                 }
             }

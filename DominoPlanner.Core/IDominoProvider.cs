@@ -10,31 +10,54 @@ using Emgu.CV.CvEnum;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using ProtoBuf;
+using System.ComponentModel;
+using System.Collections.Specialized;
+using Emgu.CV.Structure;
+using System.Linq;
 
 namespace DominoPlanner.Core
 {
     /// <summary>
     /// Die allgemeine Basisklasse für die Erstellung jeglicher Domino-Objekte.
     /// </summary>
-    public abstract class IDominoProvider : ICloneable
+    [ProtoContract]
+    [ProtoInclude(100, typeof(FieldParameters))]
+    [ProtoInclude(101, typeof(GeneralShapesProvider))]
+    public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
     {
         #region public properties
         /// <summary>
         /// Gibt an, ob das Objekt eine Protokolldefinition besitzt oder nicht.
         /// Auf der Basis dieser Information sollten die entsprechenden Buttons angezeigt werden oder nicht.
         /// </summary>
-        public bool hasProcotolDefinition { get; set; }
+        [ProtoMember(3)]
+        public bool hasProtocolDefinition { get; set; }
         /// <summary>
         /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
         /// </summary>
         protected Mat source;
+        IterationInformation _iterationInfo;
         /// <summary>
         /// Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// </summary>
-        public virtual IterationInformation IterationInformation { get; set; }
+        [ProtoMember(5)]
+        public IterationInformation IterationInformation
+        {
+            get
+            {
+                return _iterationInfo;
+            }
+            set
+            {
+                _iterationInfo = value;
+                _iterationInfo.PropertyChanged +=
+                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
+                lastValid = false;
+            }
+        }
         private byte _TransparencySetting;
-            
+        [ProtoMember(6)]
         public byte TransparencySetting { get => _TransparencySetting; set { lastValid = false; _TransparencySetting = value; }}
         // das Repo wird nicht serialisiert, nur der Pfad dazu
         private ColorRepository _colors;
@@ -51,6 +74,7 @@ namespace DominoPlanner.Core
             }
         }
         private string _colorPath;
+        [ProtoMember(7)]
         public string ColorPath
         {
             get
@@ -60,21 +84,20 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = ColorRepository.Load(value);
+                colors = Workspace.Load<ColorRepository>(value, this);
             }
         }
         public ColorRepository color_filtered { get; private set; }
         public Mat image_filtered { get; private set; }
-        public DominoTransfer last_filtered;
         /// <summary>
         /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
         /// </summary>
-        public abstract int targetCount { set; }
         private IColorComparison _colorMode;
         /// <summary>
         /// Der Interpolationsmodus, der zur Farberkennung berechnet wird.
         /// </summary>
+        
         public IColorComparison colorMode
         {
             get
@@ -83,64 +106,202 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _colorMode = value;
-                lastValid = false;
+                if (value.GetType() != _colorMode?.GetType())
+                {
+                    _colorMode = value;
+                    lastValid = false;
+                }
             }
         }
-
+        [ProtoMember(11)]
+        public string colorMode_surrogate
+        {
+            get
+            {
+                Console.WriteLine(_colorMode.GetType().AssemblyQualifiedName);
+                Console.WriteLine(_colorMode.GetType().Name);
+                return _colorMode.GetType().Name;
+            }
+            set
+            {
+                _colorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+            }
+        }
         /// <summary>
         /// Liste der Filter, die vor der Berechnung angewendet werden
         /// </summary>
+        [ProtoMember(12)]
         public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
-
+        [ProtoMember(13)]
         public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
-
-        public ObservableCollection<PostFilter> PostFilters { get; private set; }
         /// <summary>
         /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
         /// </summary>
+        [ProtoMember(1, OverwriteList = true)]
         public int[] counts
         {
             get
             {
-                if (!shapesValid || !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
+                if (last == null) return null;
+                if (!Editing && (!shapesValid || !lastValid)) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
                 if (last != null)
                 {
-                    foreach (int item in last.dominoes)
+                    foreach (var shape in last.shapes)
                     {
-                        if (item >= 0)
-                        {
-                            counts[item]++;
-                        }
+                        counts[shape.color]++;
                     }
                 }
                 return counts;
             }
+            private set { }
+        }
+
+
+        [ProtoMember(15)]
+        private int _imagewidth;
+        public int ImageWidth
+        {
+            get { return _imagewidth; }
+            set
+            {
+                _imagewidth = value; sourceValid = false;
+            }
+        }
+        [ProtoMember(16)]
+        private int _imageheigth;
+        public int ImageHeight
+        {
+            get => _imageheigth;
+            set { _imageheigth = value; sourceValid = false; }
+        }
+        private Color _background;
+        [ProtoMember(17)]
+        private String ColorSerialized
+        {
+            get
+            {
+                return _background.ToString();
+            }
+            set { background = (Color)ColorConverter.ConvertFromString(value); }
+        }
+        public Color background
+        {
+            get { return _background; }
+            set { _background = value; sourceValid = false; }
+        }
+        private Dithering _ditherMode;
+        /// <summary>
+        /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
+        /// </summary>
+        public Dithering ditherMode
+        {
+            get
+            {
+                return _ditherMode;
+            }
+            set
+            {
+                if (value.GetType() != _ditherMode?.GetType())
+                {
+                    _ditherMode = value;
+                    lastValid = false;
+                }
+            }
+        }
+        [ProtoMember(18)]
+        private string DitheringSurrogate
+        {
+            get
+            {
+                return (_ditherMode.GetType().Name);
+            }
+            set
+            {
+                _ditherMode = (Dithering)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+            }
         }
         #endregion
-        protected bool shapesValid = false;
-        public bool lastValid = false;
+        // müssen nach den Unterklassen deserialisiert werden
+        [ProtoMember(1000)]
+        private bool _shapesValid = false;
+        protected bool shapesValid { get => _shapesValid;
+            set => _shapesValid = value; }
+        [ProtoMember(1001)]
+        private bool _lastValid = false;
+        public bool lastValid { get => _lastValid;
+            set => _lastValid = value; }
+        [ProtoMember(1002)]
         public bool colorsValid = false;
+        [ProtoMember(1003)]
         public bool imageValid = false;
+        [ProtoMember(1004)]
+        public bool sourceValid = false;
+        [ProtoMember(1005)]
+        private bool _usedColorsValid = false;
+        public bool usedColorsValid { get => _usedColorsValid;
+            set => _usedColorsValid = value;
+        }
+        private bool _Editing;
+        [ProtoMember(4)]
+        public bool Editing
+        {
+            get { return _Editing; }
+            set
+            {
+                if (_Editing != value)
+                {
+                    _Editing = value;
+                    EditingChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        [ProtoMember(2)]
         public DominoTransfer last;
         #region const
-        protected IDominoProvider(Mat bitmap, IColorComparison comp, string colorpath, IterationInformation iterationInformation)
+        protected IDominoProvider(string filepath, string bitmapPath, IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) 
+            : this()
         {
+            
+            this.colorMode = comp;
+            this.IterationInformation = iterationInformation;
+            this.ditherMode = ditherMode;
+            this.Save(filepath);
+            this.ColorPath = colorpath;
             //source = overlayImage(bitmap);
-            source = bitmap;
+            var BlendFileFilter = new BlendFileFilter() { FilePath = bitmapPath, parent = this };
+            BlendFileFilter.UpdateMat();
+            ImageWidth = BlendFileFilter.GetSizeOfMat().Width;
+            ImageHeight = BlendFileFilter.GetSizeOfMat().Height;
+            BlendFileFilter.CenterX = ImageWidth / 2;
+            BlendFileFilter.CenterY = ImageHeight / 2;
+            UpdateSource();
+            this.ImageFilters.Add(BlendFileFilter);
+            
+            
+        }
+        protected IDominoProvider()
+        {
+            this.ColorFilters = new ObservableCollection<ColorFilter>();
+            this.ImageFilters = new ObservableCollection<ImageFilter>();
+            this.ColorFilters.CollectionChanged +=
+                new NotifyCollectionChangedEventHandler((sender, e) => ColorFiltersChanged(sender,e));
+            this.ImageFilters.CollectionChanged +=
+               new NotifyCollectionChangedEventHandler((sender, e) => ImageFiltersChanged(sender, e));
+            background = Colors.Transparent;
+        }
+        protected IDominoProvider(int imageWidth, int imageHeight, Color background, 
+            IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) : this()
+        {
+            ImageWidth = imageWidth;
+            ImageHeight = imageHeight;
+            this.background = background;
+            UpdateSource();
             this.colorMode = comp;
             this.ColorPath = colorpath;
             this.IterationInformation = iterationInformation;
-            this.ColorFilters = new ObservableCollection<ColorFilter>();
-            this.ImageFilters = new ObservableCollection<ImageFilter>();
-            this.PostFilters = new ObservableCollection<PostFilter>();
-            this.ColorFilters.CollectionChanged += 
-                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => colorsValid = false);
-            this.ImageFilters.CollectionChanged +=
-                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => imageValid = false);
-            this.PostFilters.CollectionChanged +=
-                new System.Collections.Specialized.NotifyCollectionChangedEventHandler((sender, e) => lastValid = false);
+            this.ditherMode = ditherMode;
         }
         #endregion
         #region public methods
@@ -150,7 +311,45 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
-        public abstract DominoTransfer Generate(IProgress<string> progressIndicator = null);
+        public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
+        {
+            Console.WriteLine("Regenerate");
+            if (Editing) return last;
+            if (!sourceValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating source image");
+                UpdateSource();
+            }
+            if (!colorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
+                ApplyColorFilters();
+            }
+            if (!imageValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
+                ApplyImageFilters();
+            }
+            if (!shapesValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Calculating domino shapes...");
+                GenerateShapes();
+                usedColorsValid = false;
+            }
+            if (!usedColorsValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Reading pixels from image...");
+                ReadUsedColors();
+                lastValid = false;
+            }
+            if (!lastValid)
+            {
+                if (progressIndicator != null) progressIndicator.Report("Calculating ideal colors...");
+                CalculateColors();
+                lastValid = true;
+            }
+            return last;
+        }
         /// <summary>
         /// Liefert das HTML-Protokoll eines Objekts.
         /// Falls das Objekt keine Strukturdefinition besitzt, wird eine InvalidOperationException geworfen.
@@ -188,7 +387,7 @@ namespace DominoPlanner.Core
         public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool reverse = false)
         {
             int[,] dominoes = GetBaseField(o);
-            int[,] tempdominoes = new int[dominoes.GetLength(0), dominoes.GetLength(1)];
+            int[,] tempdominoes;
             if (reverse == true)
             {
                 // if reversed building direction
@@ -197,9 +396,10 @@ namespace DominoPlanner.Core
                 {
                     for (int j = 0; j < dominoes.GetLength(1); j++)
                     {
-                        dominoes[i, j] = tempdominoes[dominoes.GetLength(0) - i - 1, dominoes.GetLength(1) - j - 1];
+                        tempdominoes[i, j] = dominoes[dominoes.GetLength(0) - i - 1, dominoes.GetLength(1) - j - 1];
                     }
                 }
+                dominoes = tempdominoes;
             }
             ProtocolTransfer d = new ProtocolTransfer();
             d.dominoes = new List<List<Tuple<int, int>>>[dominoes.GetLength(1)];
@@ -242,6 +442,60 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region internal methods
+        
+        private void ImageFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                var newitems = e.NewItems;
+                foreach (var item in newitems)
+                {
+                    ((ImageFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => imageValid = false);
+                }
+            }
+            imageValid = false;
+        }
+        private void ColorFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (color_filtered == null)
+            {
+                this.color_filtered = Serializer.DeepClone(colors);
+            }
+            // dann nur den neu hinzugekommenen Filter anwenden und mit einem Event versehen
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var newitems = e.NewItems;
+                foreach (var item in newitems)
+                {
+                    ((ColorFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => ApplyColorFilters());
+                    ((ColorFilter)item).Apply(color_filtered);
+                }
+            }
+            else ApplyColorFilters();
+            lastValid = false;
+        }
+        internal void UpdateSource()
+        {
+            this.source = new Image<Emgu.CV.Structure.Bgra, byte>(ImageWidth, ImageHeight,
+                new Emgu.CV.Structure.Bgra(background.B, background.G, background.R, background.A)).Mat;
+            imageValid = false;
+            sourceValid = true;
+        }
+        internal abstract void GenerateShapes();
+
+        internal abstract void ReadUsedColors();
+
+        internal abstract void CalculateColors();
+
+        internal void ResetDitherColors(IDominoShape[] shapes)
+        {
+            foreach (var domino in shapes)
+            {
+                domino.ditherColor = domino.originalColor;
+                domino.color = 0;
+            }
+        }
+
         /// <summary>
         /// Berechnet das Basisfeld eines Objekts aus dessen Protokolldefinition. 
         /// </summary>
@@ -249,8 +503,8 @@ namespace DominoPlanner.Core
         /// <returns>int-Array mit den Indizes des Farben</returns>
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!hasProcotolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
-            if (!lastValid || !shapesValid) throw new InvalidOperationException("This object has unreflected changes.");
+            if (!hasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
+            if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
             int[,] basefield = new int[last.dominoLength, last.dominoHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)
             {
@@ -261,9 +515,9 @@ namespace DominoPlanner.Core
             }
             for (int i = 0; i < last.length; i++)
             {
-                if (last[i].Item1.position != null) // to avoid null reference
+                if (last[i].position != null)
                 {
-                    basefield[last[i].Item1.position.x, last[i].Item1.position.y] = last.dominoes[i];
+                    basefield[last[i].position.x, last[i].position.y] = last[i].color;
                 }
             }
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
@@ -287,8 +541,7 @@ namespace DominoPlanner.Core
                    }
                }
            });
-            
-            overlay_img.Save("tests/res.png");
+           
             watch.Stop();
             Console.WriteLine("Blend " + watch.ElapsedMilliseconds);
             return overlay_img.Mat;
@@ -312,6 +565,7 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
+        
         internal void ApplyColorFilters()
         {
             color_filtered = Serializer.DeepClone(colors);
@@ -319,17 +573,91 @@ namespace DominoPlanner.Core
             {
                 filter.Apply(color_filtered);
             }
+            lastValid = false;
+            colorsValid = true;
         }
         internal void ApplyImageFilters()
         {
-            image_filtered = source.Clone();
+            var image_filtered = source.ToImage<Emgu.CV.Structure.Bgra, byte>();
             foreach (ImageFilter filter in ImageFilters)
             {
+                filter.parent = this;
                 filter.Apply(image_filtered);
             }
+            this.image_filtered = image_filtered.Mat;
+            lastValid = false;
+            imageValid = true;
+        }
+        public void Save(string filepath = "")
+        {
+            Workspace.Save(this, filepath);
+        }
+        [ProtoAfterDeserialization]
+        public void restoreShapes()
+        {
+            bool lastValidTemp = lastValid;
+            //if (!Editing)
+            //{
+                UpdateSource();
+                ApplyImageFilters();
+                ApplyColorFilters();
+                GenerateShapes();
+                ReadUsedColors();
+            //}
+            lastValid = lastValidTemp;
         }
         public abstract object Clone();
         #endregion
+        #region EVENTS
+        public event EventHandler EditingChanged;
+        #endregion
     }
+
+    public interface IWorkspaceLoadColorList : IWorkspaceLoadable
+    {
+        int[] counts { get; }
+
+        bool Editing { get; set; }
+
+        string ColorPath { get; set; }
+
+        bool hasProtocolDefinition { get; set; }
+    }
+    public interface IWorkspaceLoadImageFilter : IWorkspaceLoadable
+    {
+        ObservableCollection<ImageFilter> ImageFilters { get;}
+    }
+    public interface IWorkspaceLoadable
+    {
+
+    }
+
+    [ProtoContract]
+    public class IDominoProviderPreview : IWorkspaceLoadColorList
+    {
+        [ProtoMember(1)]
+        public int[] counts { get; set; }
+
+        [ProtoMember(4)]
+        public bool Editing { get; set; }
+
+        [ProtoMember(7)]
+        public string ColorPath { get; set; }
+
+        [ProtoMember(3)]
+        public bool hasProtocolDefinition { get; set; }
+
+    }
+    [ProtoContract]
+    public class IDominoProviderImageFilter : IWorkspaceLoadImageFilter
+    {
+        [ProtoMember(13)]
+        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
+    }
+    public interface ICountTargetable
+    {
+        int TargetCount { set; }
+    }
+
 }
 

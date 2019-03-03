@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DominoPlanner.Core.RTree;
+using Emgu.CV.Structure;
+using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,17 +13,17 @@ namespace DominoPlanner.Core
     /// <summary>
     /// Interface für alle Formen von Steinen (Pfad-Stein, Rechteck-Stein). 
     /// Stellt Methoden wie IsInside, GetContainer oder GetPath bereit.
-    /// In dieser Klasse wird nur die Form angegeben, die Verknüpfung mit der Farbe erfolgt in 
+    /// In dieser Klasse wird nur die Form angegeben, die Verknüpfung mit der Farbe erfolgt in DominoTransfer
     /// </summary>
-    public abstract class IDominoShape : IEquatable<IDominoShape>
+    [ProtoContract(SkipConstructor =true)]
+    [ProtoInclude(10, typeof(RectangleDomino))]
+    [ProtoInclude(11, typeof(PathDomino))]
+    public abstract class IDominoShape : IEquatable<IDominoShape>, Geometry
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
         /// </summary>
-        public bool hasProtocolDefinition { get; set; }
-        /// <summary>
-        /// Gibt an, ob der Stein eine verschiebbare Protokolldefinition enthält (z.B. bei Feldern oder Walls)
-        /// </summary>
+        
         public bool hasTransformableProtocolDefinition
         {
             get
@@ -28,9 +31,18 @@ namespace DominoPlanner.Core
                 return (position != null && position.xParams != null && position.yParams != null);
             }
         }
+        public string midpoint
+        {
+            get
+            {
+                var rect = getBoundingRectangle();
+                return "x: " + (rect.x + rect.width / 2) + ", y: " + (rect.y + rect.height/2);
+            }
+        }
         /// <summary>
         /// Die ProtocolDefinition des Steins.
         /// </summary>
+        [ProtoMember(1)]
         public ProtocolDefinition position;
         /// <summary>
         /// Gibt die Grenze eines Steins als Punktliste zurück.  
@@ -66,14 +78,14 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract bool IsInside(System.Windows.Point point, double scaling_x, double scaling_y);
+        public abstract bool IsInside(Point point, double scaling_x, double scaling_y);
         /// <summary>
         /// Überprüft, ob ein Punkt innerhalb des Steins liegt, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="point">Punkt, der geprüft werden soll</param>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public bool IsInside(System.Windows.Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
+        public bool IsInside(Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
         /// <summary>
         /// Überprüft, ob zwei Dominosteine gleich sind. 
         /// Berücksichtigt keine Unterschiede in der Protokolldefinition
@@ -135,6 +147,53 @@ namespace DominoPlanner.Core
 
 
             return dominoDefinition;
+        }
+
+        public virtual bool Intersects(DominoRectangle rect)
+        {
+            return GetContainer().Intersects(rect);
+        }
+
+        public DominoRectangle getBoundingRectangle()
+        {
+            return GetContainer();
+        }
+        Bgra _originalColor;
+        public Bgra originalColor
+        {
+            get { return _originalColor; }
+            set { _originalColor = value;  ditherColor = originalColor; }
+        }
+        public Bgra ditherColor;
+
+        private int _color;
+        public event EventHandler ColorChanged;
+        [ProtoMember(2)]
+        public int color
+        {
+            get { return _color; }
+            set
+            {
+                if(_color != value)
+                {
+                    _color = value;
+                    ColorChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
+        {
+            double minimum = int.MaxValue;
+            for (int color = 0; color < colors.Length; color++)
+            {
+                double value = colors[color].distance(ditherColor, comp, TransparencyThreshold) * weights[color];
+                if (value < minimum)
+                {
+                    minimum = value;
+                    this.color = color;
+                }
+            }
         }
     }
 }

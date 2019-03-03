@@ -1,6 +1,9 @@
-﻿using DominoPlanner.Usage.Serializer;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
+using DominoPlanner.Usage.Serializer;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -39,32 +42,29 @@ namespace DominoPlanner.Usage
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    MessageBox.Show("This Folder already exists. Please choose another Project-Name.", "Existing Folder", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Errorhandler.RaiseMessage("This Folder already exists. Please choose another Project-Name.", "Existing Folder", Errorhandler.MessageType.Error);
                     return;
                 }
 
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName));
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Source Image"));
-                Directory.CreateDirectory(Path.Combine(SelectedPath, ProjectName, "Planner Files"));
-                bool create = ProjectSerializer.CreateProject(Path.Combine(SelectedPath, ProjectName), ProjectName);
-                if (create)
-                {
-                    if(ProjectSerializer.AddProject(Path.Combine(SelectedPath, ProjectName), "colors.dpcol", @".\Icons\colorLine.ico") == -1)
-                    {
-                        create = false;
-                    }
-                }
+                string projectpath = Path.Combine(SelectedPath, ProjectName);
+                Directory.CreateDirectory(projectpath);
+                Directory.CreateDirectory(Path.Combine(projectpath, "Source Image"));
+                Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
+
+                DominoAssembly main = new DominoAssembly();
+                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
+
                 if (File.Exists(sPath))
-                    File.Copy(sPath, Path.Combine(SelectedPath, ProjectName, "Planner Files", "colors.dpcol"));
-                if (create)
                 {
-                    MessageBox.Show("Create new project", "Created", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                    Close = true;
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", "colors.DColor");
+                    File.Copy(sPath, colorPath);
+                    main.colorPath = Path.Combine("Planner Files", "colors.DColor");
                 }
-                else
-                {
-                    MessageBox.Show("Could not create the new project.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+
+                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
+
+                Errorhandler.RaiseMessage("Create new project", "Created", Errorhandler.MessageType.Info);
+                Close = true;
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage
             try
             {
                 openFileDialog.InitialDirectory = sPath;
-                openFileDialog.Filter = "domino color files (*.dpcol)|*.dcol|All files (*.*)|*.*";
+                openFileDialog.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
             }
             catch (Exception) { }
 

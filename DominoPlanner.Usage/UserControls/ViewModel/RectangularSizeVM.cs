@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Windows.Media.Imaging;
+using System.IO;
+using System.Xml.Linq;
+using System.Linq;
+using DominoPlanner.Core;
+using System.Reflection;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
     class RectangularSizeVM : StructureViewModel
     {
         #region CTOR
-        public RectangularSizeVM()
-        {   
+        public RectangularSizeVM() : base()
+        {
             list = new List<string>();
             StuctureTypes();
+            structure_index = 0;
+
+            sHeight = 1;
+            sLength = 1;
         }
         #endregion
 
-        #region prop
-        private string _Path = @"D:\Dropbox\Dropbox\Structures.xml";
-        public string Path
-        {
-            get { return _Path; }
-            set
-            {
-                if (_Path != value)
-                {
-                    _Path = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
+        #region fields
+        IEnumerable<XElement> structures;
+        #endregion
 
+        #region prop
         private List<string> _list;
         public List<string> list
         {
@@ -72,7 +70,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _structure_index;
+        private int _structure_index = -1;
         public int structure_index
         {
             get { return _structure_index; }
@@ -81,10 +79,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_structure_index != value)
                 {
                     _structure_index = value;
+                    selectedStructureElement = structures.ElementAt(_structure_index);
+
+                    RefreshDescriptionImages();
+
                     RaisePropertyChanged();
                 }
             }
         }
+
+        public event EventHandler SelStructureTypeChanged;
 
         private BitmapSource[] _description_imgs;
         public BitmapSource[] description_imgs
@@ -100,21 +104,38 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         #endregion
-        
+
         #region Methods
         private void StuctureTypes()
         {
             try
             {
-                XmlDocument document = new XmlDocument();
-                document.Load(_Path);
-                for (int i = 0; i < document.FirstChild.ChildNodes.Count; i++)
-                    list.Add(document.FirstChild.ChildNodes[i].Attributes["Name"].Value);
+                XElement xElement = XElement.Parse(Properties.Resources.Structures);
+                structures = xElement.Elements();
+
+                foreach (var structure in structures)
+                {
+                    list.Add(structure.FirstAttribute.Value);
+                }
             }
             catch (Exception es)
             {
                 System.Diagnostics.Debug.WriteLine(es);
             }
+        }
+
+        public void RefreshDescriptionImages()
+        {
+            WriteableBitmap[,] previews = StructureParameters.getPreviews(51, selectedStructureElement);
+            description_imgs = new BitmapSource[9];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    description_imgs[i + j * 3] = previews[i, j];
+                }
+            }
+            RaisePropertyChanged("description_imgs");
         }
         #endregion
     }

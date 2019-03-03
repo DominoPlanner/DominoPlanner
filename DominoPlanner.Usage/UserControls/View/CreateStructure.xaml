@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="700">
+             d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type vm:RectangularSizeVM}">
             <local:RectangularSize HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
@@ -15,74 +16,118 @@
             <local:RoundSize HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
     </UserControl.Resources>
-    <Grid>
+    <Grid Cursor="{Binding cursor, Delay=200}" Background="#02FFFFFF">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="260"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Image Grid.Row="0" Grid.Column="0" Source="{Binding SourceImage}"/>
         <Image Grid.Row="0" Grid.Column="2" Source="{Binding DestinationImage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0">
-            <ContentControl Margin="1,1,1,1" Content="{Binding CurrentViewModel}"/>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="2" Width="300" HorizontalAlignment="Left" Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Label Margin="5" Grid.Row="0">Color Approximation Mode:</Label>
-            <Label Margin="5" Grid.Row="1" Content="{Binding sColorApproxMode}"/>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
-                <Label Margin="5" Grid.Column="0">Fast</Label>
-                <Slider Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}"/>
-                <Label Margin="5" Grid.Column="2">Slow</Label>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0">
+                <ContentControl Margin="1,1,1,1" Content="{Binding CurrentViewModel}"/>
             </Grid>
-            <Label Margin="5" Grid.Row="3">Pixel Selection Mode</Label>
-            <Grid Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <RadioButton Grid.Column="0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding SinglePixel}"/>
-                <RadioButton Grid.Column="1" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" IsChecked="{Binding AverageArea}"/>
+            <Grid Grid.Column="1" Width="228" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Margin="5" Grid.Row="0">Color Approximation Mode:</Label>
+                <Label Margin="5" Grid.Row="1" Content="{Binding sColorApproxMode}"/>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Margin="5" Grid.Column="0">Fast</Label>
+                    <Slider Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}" TickPlacement="BottomRight"/>
+                    <Label Margin="5" Grid.Column="2">Slow</Label>
+                </Grid>
+                <Label Margin="5" Grid.Row="3">Pixel Selection Mode</Label>
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Column="0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding SinglePixel}"/>
+                    <RadioButton Grid.Column="1" HorizontalAlignment="Center" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" IsChecked="{Binding AverageArea}"/>
+                </Grid>
+                <CheckBox Margin="5,5.4,72,5.4" IsChecked="{Binding draw_borders}" Grid.Row="5" Content="Draw Domino Borders"></CheckBox>
+                <xctk:ColorPicker Grid.Row="5" Margin="0,2.4,2,2.4" HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
+                <CheckBox Margin="5" IsChecked="{Binding allow_stretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
             </Grid>
-            <CheckBox Margin="5" IsChecked="{Binding draw_borders}" Grid.Row="5" Content="Draw Domino Borders in Preview Image"></CheckBox>
-            <CheckBox Margin="5" IsChecked="{Binding allow_stretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <local:OnlyOwnStonesV Grid.Column="2" Height="83" Margin="0.2,5,-0.2,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" DataContext="{Binding OnlyOwnStonesVM}" />
+                <Grid Grid.Row="1" Width="222" HorizontalAlignment="Left">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Diffusion Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Top" Margin="0,-2,0,0"/>
+                    <Label Grid.Row="1" Content="{Binding sDiffusionMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="None" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                        <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="2" Height="60" Width="222" HorizontalAlignment="Left">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Use Transparency" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Top" Height="31" Grid.RowSpan="2"/>
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="No" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                        <Slider Grid.Column="1" TickFrequency="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="255" Value="{Binding TransparencyValue}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="Full" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Grid>
-        
-        <Button Grid.Row="2" Grid.Column="0" Height="30" Margin="10,10,0,10" Width="120" HorizontalAlignment="Left">
+        <Button Grid.Row="2" Grid.Column="0" Height="30" Margin="10,10,0,10" Width="120" HorizontalAlignment="Left" Command="{Binding EditClick}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                 <Label Content="Edit" />
             </StackPanel>
         </Button>
-        <Button Grid.Row="2" Height="30" Margin="217,10,0,10" Width="120" HorizontalAlignment="Right" Grid.Column="2">
+        <!--Button Grid.Row="2" Height="30" Margin="217,10,0,10" Width="120" HorizontalAlignment="Right" Grid.Column="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                 <Label Content="Save Structure" />
             </StackPanel>
-        </Button>
-        <Button Grid.Column="2" Grid.Row="2" Height="30" Margin="0,10,135,10" Width="120" HorizontalAlignment="Right" Visibility="{Binding VisibleFieldplan}" Command="{Binding ShowFieldPlan}">
+        </-->
+        <Button Grid.Row="2" Height="30" Margin="135,9.6,0,10" Width="120" HorizontalAlignment="Left" Visibility="{Binding VisibleFieldplan}" Command="{Binding ShowFieldPlan}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
-                <Label Content="Show Fieldplan" />
+                <Label Content="Buildtools" />
             </StackPanel>
         </Button>
     </Grid>

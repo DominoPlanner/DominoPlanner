@@ -394,7 +394,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="StandardColorArray" Type="System.String" Scope="User">
-      <Value Profile="(Default)">%appdata%/DominoPlanner/dominoes.dcol</Value>
+      <Value Profile="(Default)">%appdata%/DominoPlanner/colors.DColor</Value>
     </Setting>
     <Setting Name="StandardProjectPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">%user%/DominoPlanner</Value>

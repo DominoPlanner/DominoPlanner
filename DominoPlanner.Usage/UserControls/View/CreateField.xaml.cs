@@ -23,7 +23,19 @@ namespace DominoPlanner.Usage.UserControls.View
     {
         public CreateField()
         {
+            this.DataContextChanged += CreateField_DataContextChanged;
             InitializeComponent();
+        }
+
+        private void CreateField_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(DataContext != null)
+            {
+                if(DataContext is CreateFieldVM)
+                {
+                    ((CreateFieldVM)DataContext).dispatcher = Dispatcher; 
+                }
+            }
         }
     }
 }
