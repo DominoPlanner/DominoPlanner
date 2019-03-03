@@ -20,7 +20,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ggiAAIAACAEBBMMgBCSAMJhMBZEA4gCUUAhAHXAAIrQ=</HashCode>
+      <HashCode>ggiAAIAACAEBBMMgBCSAIJhMBZEA4gCUUAhAHXAAIrQ=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -296,7 +296,7 @@
   <Class Name="DominoPlanner.Core.IDominoProviderPreview">
     <Position X="13.75" Y="10.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAAACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -307,7 +307,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAgJARAAAAAAAAABAAAAAAAAAIAAAQQAAAAgAAAAA=</HashCode>
+      <HashCode>AAIBhJARAAAQAAAAABAAAAAIAAAIAAAQQAAAAgBAABA=</HashCode>
       <FileName>Workspace.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -320,7 +320,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAIIAAAAAAAAAABAAAAAQAgEAMAAAABACABAAAAAA=</HashCode>
+      <HashCode>AAAAIIAAAAAAAAAABAAAAAQAgEAMAAAABACQBAAAAAA=</HashCode>
       <FileName>DominoColor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -340,7 +340,7 @@
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>DominoColor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -475,7 +475,7 @@
   <Class Name="DominoPlanner.Core.IDominoWrapper">
     <Position X="10" Y="25.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAABADAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAABADAAAAAAAAIAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>IDominoWrapper.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -562,7 +562,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>BAAAAAAAAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>BAAAAIAAAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IDominoWrapper.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -635,7 +635,7 @@
   <Interface Name="DominoPlanner.Core.IWorkspaceLoadColorList" Collapsed="true">
     <Position X="13.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAAACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
   </Interface>
