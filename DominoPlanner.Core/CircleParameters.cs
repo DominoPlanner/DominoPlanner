@@ -32,7 +32,7 @@ namespace DominoPlanner.Core
 
             }
         }
-        int _start_diameter = 0;
+        int _start_diameter = 20;
         [ProtoMember(2)]
         public int StartDiameter
         {
@@ -87,10 +87,10 @@ namespace DominoPlanner.Core
         }
         private Random r;
 
-        public CircleParameters(string imagepath, int circles,
+        public CircleParameters(string filepath, string imagepath, int circles,
             string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
             IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
+            base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             init(circles);
         }
@@ -104,14 +104,15 @@ namespace DominoPlanner.Core
         }
         private void init(int circles)
         {
-            this.StartDiameter = 4 * DominoLength;
+            
             Circles = circles;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             r = new Random();
             DominoWidth = 8;
             DominoLength = 24;
             NormalDistance = 8;
             TangentialDistance = 8;
+            this.StartDiameter = 4 * DominoLength;
         }
         private CircleParameters() : base() { r = new Random(); }
         internal override void GenerateShapes()

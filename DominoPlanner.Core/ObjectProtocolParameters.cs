@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -89,6 +90,22 @@ namespace DominoPlanner.Core
             return html.ToString();
 
         }
+        private List<ColorSortHelper> OrderedColorBalance(ProtocolTransfer obj)
+        {
+            var list = new List<ColorSortHelper>();
+            int counter = 0;
+            for (int i = 0; i < obj.counts.Length; i++)
+            {
+                int anzeigeindex = -1;
+                if (obj.colors[i] is DominoColor)
+                {
+                    anzeigeindex = obj.colors.Anzeigeindizes[counter];
+                    counter++;
+                }
+                list.Add(new ColorSortHelper() { color = obj.colors[i], count = obj.counts[i], index = anzeigeindex});
+            }
+            return list.OrderBy(x => x.index).ToList();
+        }
         private String GetSmallDominoBalanceHTML(ProtocolTransfer obj)
         {
             if (summaryMode == SummaryMode.None) return "";
@@ -99,6 +116,7 @@ namespace DominoPlanner.Core
         }
         private string GetLargeDominoBalanceHTML(ProtocolTransfer obj)
         {
+            var orderedList = OrderedColorBalance(obj);
             if (summaryMode != SummaryMode.Large)
             {
                 return "";
@@ -114,15 +132,15 @@ namespace DominoPlanner.Core
             s.Append("           <th>" + "Used" + "</th>\n");
             s.Append("       </tr>\n");
             s.Append("  </thead>\n");
-            for (int i = 0; i < obj.counts.Length; i++)
+            for (int i = 0; i < orderedList.Count; i++)
             {
-                if (obj.counts[i] != 0)
+                if (orderedList[i].count != 0)
                 {
                     s.Append("      <tr>\n");
-                    s.Append("          <td bgcolor=\'" + obj.colors[i].mediaColor.ToHTML() + "\'>" + "&nbsp;&nbsp;" + "</td>\n");
-                    s.Append("          <td> " + obj.colors[i].name + "</td>\n");
-                    s.Append("          <td> " + obj.colors[i].count + "</td>\n");
-                    s.Append("          <td> " + obj.counts[i] + "</td>\n");
+                    s.Append("          <td bgcolor=\'" + orderedList[i].color.mediaColor.ToHTML() + "\'>" + "&nbsp;&nbsp;" + "</td>\n");
+                    s.Append("          <td> " + orderedList[i].color.name + "</td>\n");
+                    s.Append("          <td> " + (orderedList[i].color is DominoColor ? orderedList[i].color.count.ToString() : "&nbsp;")+ "</td>\n");
+                    s.Append("          <td> " + orderedList[i].count + "</td>\n");
                     s.Append("      </tr>\n");
                 }
             }
@@ -280,6 +298,7 @@ namespace DominoPlanner.Core
             ws.PrinterSettings.FooterMargin = (decimal)0.2;
             if (summaryMode == SummaryMode.Large)
             {
+                var orderedList = OrderedColorBalance(trans);
                 // The list is first stored to a new workbook to get the minimum size of each column.
                 ExcelWorksheet summary = pack.Workbook.Worksheets.Add("Summary");
                 summary.Cells[1, 1].Value = " ";
@@ -287,13 +306,14 @@ namespace DominoPlanner.Core
                 summary.Cells[1, 3].Value = "Total";
                 summary.Cells[1, 4].Value = "Used";
                 int non_empty_cols = 0;
-                for (int i = 0; i < trans.counts.Length; i++)
+                for (int i = 0; i < orderedList.Count; i++)
                 {
-                    if (trans.counts[i] != 0)
+                    if (orderedList[i].count != 0)
                     {
-                        summary.Cells[i + 2, 2].Value = trans.colors[i].name;
-                        summary.Cells[i + 2, 3].Value = trans.colors[i].count;
-                        summary.Cells[i + 2, 4].Value = trans.counts[i];
+                        summary.Cells[i + 2, 2].Value = orderedList[i].color.name;
+                        if (orderedList[i].color is DominoColor)
+                            summary.Cells[i + 2, 3].Value = orderedList[i].color.count;
+                        summary.Cells[i + 2, 4].Value = orderedList[i].count;
                         non_empty_cols++;
                     }
                 }
@@ -343,36 +363,39 @@ namespace DominoPlanner.Core
                     SetAllBorders(Used_Header, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                     Used_Header.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
                 }
-                for (int i = 0; i < trans.counts.Length - 1; i++)
+                for (int i = 0; i < orderedList.Count; i++)
                 {
-                    if (trans.counts[i] > 0)
-                    {
+                    if (orderedList[i].count != 0)
+                    { 
                         rowcounter++;
                         using (ExcelRange color_cell = ws.Cells[rowcounter, 1])
                         {
                             color_cell.Value = " ";
                             color_cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            color_cell.Style.Fill.BackgroundColor.SetColor(trans.colors[i].mediaColor.ToSD());
+                            color_cell.Style.Fill.BackgroundColor.SetColor(orderedList[i].color.mediaColor.ToSD());
                             SetAllBorders(color_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                         }
                         using (ExcelRange name_cell = ws.Cells[rowcounter, 2, rowcounter, indices[0]])
                         {
                             name_cell.Merge = true;
-                            name_cell.Value = trans.colors[i].name;
+                            name_cell.Value = orderedList[i].color.name;
                             SetAllBorders(name_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                             name_cell.Style.Font.SetFromFont(textfont);
                         }
                         using (ExcelRange count_cell = ws.Cells[rowcounter, indices[0] + 1, rowcounter, indices[1]])
                         {
                             count_cell.Merge = true;
-                            count_cell.Value = trans.colors[i].count;
+                            if (orderedList[i].color is DominoColor)
+                            {
+                                count_cell.Value = orderedList[i].color.count;
+                            }
                             SetAllBorders(count_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                             count_cell.Style.Font.SetFromFont(textfont);
                         }
                         using (ExcelRange used_cell = ws.Cells[rowcounter, indices[1] + 1, rowcounter, indices[2]])
                         {
                             used_cell.Merge = true;
-                            used_cell.Value = trans.counts[i];
+                            used_cell.Value = orderedList[i].count;
                             SetAllBorders(used_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                             used_cell.Style.Font.SetFromFont(textfont);
                         }
@@ -407,5 +430,11 @@ namespace DominoPlanner.Core
             return f;
         }
 
+    }
+    public struct ColorSortHelper
+    {
+        public int count { get; set; }
+        public IDominoColor color { get; set; }
+        public int index { get; set; }
     }
 }

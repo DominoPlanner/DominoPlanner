@@ -40,7 +40,7 @@ namespace DominoPlanner.Core
         {
             set
             {
-                hasProcotolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
+                hasProtocolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
                 name = value.Attribute("Name").Value;
                 cells = new CellDefinition[3, 3];
                 foreach (XElement part in value.Elements("PartDefinition"))
@@ -68,9 +68,14 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _length = value;
-                _current_width = value;
-                shapesValid = false;
+                bool hasinLeftRight = (cells == null || cells[0, 0].Count + cells[0, 1].Count + cells[0, 2].Count +
+                    cells[2, 0].Count + cells[2, 1].Count + cells[2, 2].Count > 0);
+                if (hasinLeftRight ? value >= 0 : value > 0 && value != _length)
+                {
+                    _length = value;
+                    _current_width = value;
+                    shapesValid = false;
+                }
             }
         }
         private int _height;
@@ -86,8 +91,14 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _height = value;
-                shapesValid = false;
+                // Höhe 0 nur erlaubt, wenn in oberster und unterster Reihe Steine sind
+                bool hasinTopBottom = (cells == null || cells[0, 0].Count + cells[1, 0].Count + cells[2, 0].Count +
+                    cells[0, 2].Count + cells[1, 2].Count + cells[2, 2].Count > 0);
+                if (hasinTopBottom ? value >= 0 : value > 0 && value != _length)
+                {
+                    _height = value;
+                    shapesValid = false;
+                }
             }
         }
         /// <summary>
@@ -145,9 +156,9 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public StructureParameters(string imagepath, XElement definition, int length, int height, string colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int length, int height, string colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
-            base(imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
+            base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
             this.length = length;
@@ -166,9 +177,9 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         /// <param name="targetSize">Die Zielgröße des Objekts.</param>
-        public StructureParameters(string imagepath, XElement definition, int targetSize, String colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int targetSize, String colors, 
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : this(imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
+            : this(filepath, imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             TargetCount = targetSize;
         }

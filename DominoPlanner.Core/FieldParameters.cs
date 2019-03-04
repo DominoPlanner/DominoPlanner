@@ -51,8 +51,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _a = value;
-                shapesValid = false;
+                if (value >= 0 && value != _a)
+                {
+                    _a = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -69,8 +72,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _b = value;
-                shapesValid = false;
+                if (value > 0 && value != _b)
+                {
+                    _b = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -87,8 +93,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _c = value;
-                shapesValid = false;
+                if (value > 0 && value != _c)
+                {
+                    _c = value;
+                    shapesValid = false;
+                }
             }
         }
 
@@ -105,8 +114,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _d = value;
-                shapesValid = false;
+                if (value >= 0 && value != _d)
+                {
+                    _d = value;
+                    shapesValid = false;
+                }
             }
         }
     
@@ -124,8 +136,12 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _resizeMode = value;
-                usedColorsValid = false;
+
+                if (_resizeMode != value)
+                {
+                    _resizeMode = value;
+                    usedColorsValid = false;
+                }
             }
         }
         
@@ -142,9 +158,12 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _length = value;
-                _current_width = value;
-                shapesValid = false;
+                if (value > 0 && value != _length)
+                {
+                    _length = value;
+                    _current_width = value;
+                    shapesValid = false;
+                }
             }
         }
         private int _height;
@@ -160,8 +179,11 @@ namespace DominoPlanner.Core
             }
             set
             {
-                _height = value;
-                shapesValid = false;
+                if (value > 0 && value != _height)
+                {
+                    _height = value;
+                    shapesValid = false;
+                }
             }
         }
         public HistoryTree<FieldParameters> history { get; set; }
@@ -191,9 +213,9 @@ namespace DominoPlanner.Core
         /// <param name="iterationInformation">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
-        public FieldParameters(string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
+        public FieldParameters(string filepath, string imagePath, string colors, int a, int b, int c, int d, int width, int height, 
             Inter scalingMode,IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) 
-            : base(imagePath, colorMode, ditherMode, colors, iterationInformation)
+            : base(filepath, imagePath, colorMode, ditherMode, colors, iterationInformation)
         {
             this.a = a;
             this.b = b;
@@ -203,7 +225,7 @@ namespace DominoPlanner.Core
             this.height = height;
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             //this.history = new EmptyOperation<FieldParameters>(this);
             //current = history;
         }
@@ -228,9 +250,9 @@ namespace DominoPlanner.Core
         /// Hat keine Wirkung, wenn ein Fehlerkorrekturalgorithmus verwendet werden soll.</param>
         /// <param name="targetSize">Gibt die Zielgröße des Feldes an.
         /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.</param>
-        public FieldParameters(String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
+        public FieldParameters(string filepath, String imagePath, string colors, int a, int b, int c, int d, int targetSize, 
             Inter scalingMode,  IColorComparison interpolationMode, Dithering ditherMode, IterationInformation iterationInformation) 
-            : this(imagePath, colors, a, b, c, d, 1, 1, scalingMode,  interpolationMode, ditherMode, iterationInformation)
+            : this(filepath, imagePath, colors, a, b, c, d, 1, 1, scalingMode,  interpolationMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
@@ -244,7 +266,7 @@ namespace DominoPlanner.Core
             this.d = d;
             this.resizeMode = scalingMode;
             this.ditherMode = ditherMode;
-            hasProcotolDefinition = true;
+            hasProtocolDefinition = true;
             TargetCount = targetSize;
         }
         private FieldParameters() : base() { }
@@ -253,8 +275,6 @@ namespace DominoPlanner.Core
         internal override void ReadUsedColors()
         {
             if (!shapesValid) throw new InvalidOperationException("erst die Shapes aktualisieren");
-            if (length < 2) length = 2;
-            if (height < 2) height = 2;
             resizedImage = new Mat();
             CvInvoke.Resize(image_filtered, resizedImage,
                 new System.Drawing.Size() { Height = height, Width = length }, interpolation: resizeMode);
@@ -264,13 +284,14 @@ namespace DominoPlanner.Core
                 {
                     for (int yi = 0; yi < height; yi++)
                     {
-                        usedColorsValid = true;
+                        
                         if (shapes == null) restoreShapes();
                         shapes[length * yi + xi].originalColor = image[yi, xi];
                     }
                 });
             }
-            
+            usedColorsValid = true;
+
         }
         internal override void GenerateShapes()
         {
@@ -280,23 +301,6 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region private helper methods
-        /// <summary>
-        /// Verkleinert das Bild mit der spezifizierten Genauigkeit und auf die spezifizierte Größe.
-        /// </summary>
-        /// <param name="image">Das zu verkleinernde Bild.</param>
-        [ProtoAfterDeserialization]
-        
-        /// <summary>
-        /// Berechnet die Shapes mit den angegebenen Parametern.
-        /// </summary>
-        
-        public void restoreShapes()
-        {
-            //bool last_valid_temp = lastValid;
-            shapes = last.shapes;
-            ReadUsedColors();
-            //lastValid = last_valid_temp;
-        }
         /// <summary>
         /// Berechnet aus dem Shape-Array die Farben.
         /// </summary>

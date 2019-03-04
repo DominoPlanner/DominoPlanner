@@ -1,6 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
+using Microsoft.Win32;
+using OfficeOpenXml;
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -8,24 +17,154 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public class ColorListControlVM : TabBaseVM
     {
         #region CTOR
-        public ColorListControlVM() : base()
+        public ColorListControlVM(string filepath) : base()
         {
-            DominoList = new ObservableCollection<DominoStone>();
-            DominoList.Add(new DominoStone("Weiß", 12345, System.Windows.Media.Color.FromRgb(255, 255, 255), 0));
-            DominoList.Add(new DominoStone("Schwarz", 12345, System.Windows.Media.Color.FromRgb(0, 0, 0), 1));
+            ColorList = new ObservableCollection<ColorListEntry>();
+
+            Reload(filepath);
+            
             BtnAddColor = new RelayCommand(o => { AddNewColor(); });
             BtnSaveColors = new RelayCommand(o => { Save(); });
             BtnRemove = new RelayCommand(o => { RemoveSelected(); });
+            BtnMoveDown = new RelayCommand(o => { MoveDown(); });
+            BtnMoveUp = new RelayCommand(o => { MoveUp(); });
+            BtnExportXLSX = new RelayCommand(o => { ExportXLSX(); });
             base.UnsavedChanges = false;
+            
+            ShowProjects = false;
         }
 
-        public ColorListControlVM(string path) : this()
+        public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly))
         {
-            Path = path;
+            this.dominoAssembly = dominoAssembly;
         }
         #endregion
 
         #region Methods
+        public void ResetList()
+        {
+            FilePath = String.Empty;
+            colorRepository.Anzeigeindizes.CollectionChanged -= Anzeigeindizes_CollectionChanged;
+            colorRepository = new ColorRepository();
+            colorRepository.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
+            _ColorList.Clear();
+            refreshList();
+            UnsavedChanges = false;
+        }
+
+        internal void Reload(string fileName)
+        {
+            FilePath = fileName;
+            _ColorList.Clear();
+            if (colorRepository != null) colorRepository.Anzeigeindizes.CollectionChanged -= Anzeigeindizes_CollectionChanged;
+            colorRepository = Workspace.Load<ColorRepository>(FilePath);
+            colorRepository.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
+            refreshList();
+            UnsavedChanges = false;
+        }
+
+        private void refreshList()
+        {
+            int counter = 0;
+            if (colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
+            {
+                _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
+            }
+            foreach (DominoColor domino in colorRepository.RepresentionForCalculation.OfType<DominoColor>())
+            {
+                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = colorRepository.Anzeigeindizes[counter] });
+                counter++;
+            }
+        }
+        private void ExportXLSX()
+        {
+            using (var p = new ExcelPackage())
+            {
+                // content
+                var ws = p.Workbook.Worksheets.Add("Overview");
+                ws.Cells["A1"].Value = "Color Usage Overview";
+                ws.Cells["A1"].Style.Font.Size = 15;
+                ws.Cells["B3"].Value = "Color";
+                ws.Cells["C3"].Value = "Available";
+                
+                // Write project titles
+                for (int i = 0; i < DifColumns.Count; i++)
+                { 
+                    ws.Cells[3, 4 + i].Value = DifColumns[i].Header;
+                    
+                    ws.Cells[4 + ColorList.Count, 4+i].Formula
+                        = "SUM(" + ws.Cells[4, 4+i].Address + ":" + ws.Cells[3 + ColorList.Count, 4+i].Address + ")";
+                }
+                ws.Cells[4 + ColorList.Count, 3].Formula
+                        = "SUM(" + ws.Cells[4, 3].Address + ":" + ws.Cells[3 + ColorList.Count, 3].Address + ")";
+                ws.Cells[ColorList.Count + 4, 4 + DifColumns.Count].Formula =
+                     "SUM(" + ws.Cells[4, 4 + DifColumns.Count].Address + ":" + ws.Cells[3 + ColorList.Count, 4 + DifColumns.Count].Address + ")";
+                if (DifColumns.Count != 0)  ws.Cells[3, 4 + DifColumns.Count].Value = "Sum";
+                ws.Cells[4 + ColorList.Count, 2].Value = "Sum";
+                // fill color counts
+                for (int i = 0; i < ColorList.Count; i++)
+                {
+
+                    ws.Cells[i + 4, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    ws.Cells[i + 4, 1].Style.Fill.BackgroundColor.SetColor(ColorList[i].DominoColor.mediaColor.ToSD());
+                    ws.Cells[i + 4, 2].Value = ColorList[i].DominoColor.name;
+                    ws.Cells[i + 4, 3].Value = ColorList[i].DominoColor.count;
+                    for (int j = 0; j < ColorList[i].ProjectCount.Count; j++)
+                    {
+                        ws.Cells[4 + i, 4 + j].Value = ColorList[i].ProjectCount[j];
+                    }
+                    if (DifColumns.Count != 0)
+                    {
+                        ws.Cells[4 + i, 4 + DifColumns.Count].Formula
+                            = "SUM(" + ws.Cells[4 + i, 4].Address + ":"
+                            + ws.Cells[4 + i, 3 + DifColumns.Count].Address + ")";
+                    }
+                }
+                
+                ws.Cells["C4"].Value = ""; // Count of empty domino
+                ws.Calculate();
+
+                //styling 
+                
+                ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
+                ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
+
+                ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Font.Bold = true;
+                ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Font.Bold = true;
+                ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                if (DifColumns.Count != 0)
+                {
+                    ws.Cells[3, 4, 4 + ColorList.Count, 3 + DifColumns.Count].Style.Border.Right.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                    ws.Cells[4, 2, 3 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Bottom.Style
+                        = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+                }
+
+                ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Top.Style 
+                    = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Left.Style
+                    = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+                
+                SaveFileDialog dlg = new SaveFileDialog();
+                dlg.FileName = "ColorList";
+                dlg.DefaultExt = ".xlsx";
+                dlg.Filter = "Excel files (.xlsx)|*.xlsx|All Files (*.*)|*";
+                if (dlg.ShowDialog() == true)
+                {
+                    try
+                    {
+                        p.SaveAs(new FileInfo(dlg.FileName));
+                        Process.Start(dlg.FileName);
+                    }
+                    catch
+                    {
+                        Errorhandler.RaiseMessage("Save failed", "Fail", Errorhandler.MessageType.Error);
+                    }
+                }
+                    
+            }
+        }
         public override void Undo()
         {
             throw new NotImplementedException();
@@ -37,79 +176,135 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void RemoveSelected()
         {
-            if (!DominoList.Contains(SelectedStone))
-                return;
-            DominoList.Remove(SelectedStone);
+            throw new NotImplementedException();
             UnsavedChanges = true;
+        }
+
+        private void MoveUp()
+        {
+            try
+            {
+                if (SelectedStone.DominoColor is DominoColor dominoColor)
+                {
+                    colorRepository.MoveUp(dominoColor);
+                }
+                RaisePropertyChanged("ColorList");
+            }
+            catch (Exception) { }
+        }
+
+        private void MoveDown()
+        {
+            try
+            {
+                if (SelectedStone.DominoColor is DominoColor dominoColor)
+                {
+                    colorRepository.MoveDown(dominoColor);
+                }
+                RaisePropertyChanged("ColorList");
+            }
+            catch (Exception) { }
         }
 
         private void AddNewColor()
         {
-            DominoList.Add(new DominoStone("New Color", 1000, System.Windows.Media.Color.FromRgb(0, 0, 0), 3));
+            colorRepository.Add(new DominoColor(System.Windows.Media.Colors.IndianRed, 0, "New Color"));
+            _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last(),
+             ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))});
+
             UnsavedChanges = true;
         }
 
         public override bool Save()
         {
-            System.Windows.MessageBox.Show("Ja mach mal das mit speichern und so");
+            if(FilePath == string.Empty)
+            {
+                SaveFileDialog ofd = new SaveFileDialog();
+                ofd.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
+                if (ofd.ShowDialog() == true)
+                {
+                    if (ofd.FileName != string.Empty)
+                    {
+                        FilePath = ofd.FileName;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            colorRepository.Save(FilePath);
             UnsavedChanges = false;
             return true;
         }
 
-        private DominoStone _SelectedStone;
-        public DominoStone SelectedStone
-        {
-            get { return _SelectedStone; }
-            set
-            {
-                if (_SelectedStone != value)
-                {
-                    if (_SelectedStone != null)
-                        _SelectedStone.PropertyChanged -= SelectedStone_PropertyChanged;
-                    _SelectedStone = value;
-                    if(_SelectedStone != null)
-                        _SelectedStone.PropertyChanged += SelectedStone_PropertyChanged;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private void SelectedStone_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void DominoColor_PropertyChanged(object sender, string e)
         {
             UnsavedChanges = true;
         }
 
+        private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    _ColorList.Where(x => x.DominoColor is DominoColor).ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
+                    break;
+            }
+            UnsavedChanges = false;
+            RaisePropertyChanged("ColorList");
+        }
         #endregion
+
+        #region COMMANDS
+        private ICommand _BtnExportXLSX;
+        public ICommand BtnExportXLSX { get { return _BtnExportXLSX; } set { if (value != _BtnExportXLSX) { _BtnExportXLSX = value; } } }
 
         private ICommand _BtnSendMail;
         public ICommand BtnSendMail { get { return _BtnSendMail; } set { if (value != _BtnSendMail) { _BtnSendMail = value; } } }
-        
+
         private ICommand _BtnAddColor;
         public ICommand BtnAddColor { get { return _BtnAddColor; } set { if (value != _BtnAddColor) { _BtnAddColor = value; } } }
 
         private ICommand _BtnSaveColors;
         public ICommand BtnSaveColors { get { return _BtnSaveColors; } set { if (value != _BtnSaveColors) { _BtnSaveColors = value; } } }
-        
-		private ICommand _BtnRemove;
+
+        private ICommand _BtnRemove;
         public ICommand BtnRemove { get { return _BtnRemove; } set { if (value != _BtnRemove) { _BtnRemove = value; } } }
 
+        private ICommand _BtnMoveDown;
+        public ICommand BtnMoveDown { get { return _BtnMoveDown; } set { if (value != _BtnMoveDown) { _BtnMoveDown = value; } } }
 
+        private ICommand _BtnMoveUp;
+        public ICommand BtnMoveUp { get { return _BtnMoveUp; } set { if (value != _BtnMoveUp) { _BtnMoveUp = value; } } }
+        #endregion
 
         #region prop
-        private string _Path;
-        public string Path
+        private DominoAssembly dominoAssembly;
+        public DominoAssembly DominoAssembly
         {
-            get { return _Path; }
+            get { return dominoAssembly; }
+        }
+        private ColorListEntry _SelectedStone;
+        public ColorListEntry SelectedStone
+        {
+            get { return _SelectedStone; }
             set
             {
-                if (_Path != value)
+                if (value != null && !(value.DominoColor is EmptyDomino))
                 {
-                    _Path = value;
-                    RaisePropertyChanged();
+                    if (_SelectedStone != value)
+                    {
+                        if (_SelectedStone != null)
+                            _SelectedStone.DominoColor.PropertyChanged -= DominoColor_PropertyChanged;
+                        _SelectedStone = value;
+                        if (_SelectedStone != null)
+                            _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
+                    }
                 }
+                RaisePropertyChanged();
             }
         }
-
         public override TabItemType tabType
         {
             get
@@ -118,18 +313,124 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private ObservableCollection<DominoStone> _DominoList;
-        public ObservableCollection<DominoStone> DominoList
+        private ColorRepository _ColorRepository;
+        public ColorRepository colorRepository
         {
-            get { return _DominoList; }
+            get { return _ColorRepository; }
             set
             {
-                if (_DominoList != value)
+                if (_ColorRepository != value)
                 {
-                    _DominoList = value;
+                    _ColorRepository = value;
                     RaisePropertyChanged();
                 }
             }
+        }
+
+        private ObservableCollection<ColorListEntry> _ColorList;
+        public ObservableCollection<ColorListEntry> ColorList
+        {
+            get { return new ObservableCollection<ColorListEntry>(_ColorList.OrderBy(x => x.SortIndex)); }
+            set
+            {
+                if (_ColorList != value)
+                {
+                    if (_ColorList != null) _ColorList.CollectionChanged -= _ColorList_CollectionChanged;
+                    _ColorList = value;
+                    _ColorList.CollectionChanged += _ColorList_CollectionChanged;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private void _ColorList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RaisePropertyChanged("ColorList");
+        }
+
+        private ObservableCollection<DataGridColumn> _DifColumns;
+        public ObservableCollection<DataGridColumn> DifColumns
+        {
+            get { return _DifColumns; }
+            set
+            {
+                if (_DifColumns != value)
+                {
+                    _DifColumns = value;
+                }
+            }
+        }
+
+        internal event EventHandler ShowProjectsChanged;
+
+        private bool _ShowProjects;
+        public bool ShowProjects
+        {
+            get { return _ShowProjects; }
+            set
+            {
+                if (_ShowProjects != value)
+                {
+                    _ShowProjects = value;
+                    ShowProjectsChanged?.Invoke(this, EventArgs.Empty);
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        internal override void ResetContent()
+        {
+            ShowProjects = true;
+            DifColumns = new ObservableCollection<DataGridColumn>();
+            foreach(ColorListEntry cle in _ColorList)
+            {
+                cle.ProjectCount.Clear();
+            }
+            string thispath = Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly);
+            foreach (DocumentNode project in dominoAssembly.children)
+            {
+                try
+                {
+                    var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, dominoAssembly);
+                    if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(thispath))
+                    {
+                        Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                        continue;
+                    }
+                    for (int i = 0; i < counts2.Item2.Length; i++)
+                    {
+                        _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                    }
+                    for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
+                    {
+                        _ColorList[i].ProjectCount.Add(0);
+                    }
+                    AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
+                }
+                catch
+                {
+                    Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
+                }
+            }
+        }
+
+        private void AddProjectCountsColumn(string projectName)
+        {
+            Binding amountBinding = new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString()));
+            amountBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+
+            DataTemplate amountLabel = new DataTemplate();
+            FrameworkElementFactory _textboxFactory = new FrameworkElementFactory(typeof(TextBlock));
+
+            DataGridTemplateColumn c = new DataGridTemplateColumn();
+            c.Header = projectName;
+            FrameworkElementFactory textFactory = new FrameworkElementFactory(typeof(Label));
+            textFactory.SetValue(Label.ContentProperty, amountBinding);
+
+            DataTemplate columnTemplate = new DataTemplate();
+            columnTemplate.VisualTree = textFactory;
+            c.CellTemplate = columnTemplate;
+            DifColumns.Add(c);
         }
         #endregion
     }

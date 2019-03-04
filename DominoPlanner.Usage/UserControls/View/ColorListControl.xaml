@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl"
              mc:Ignorable="d" 
@@ -12,48 +11,75 @@
     <UserControl.Resources>
         <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="234"/>
         </Grid.RowDefinitions>
-        <ListView Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding DominoList}" SelectedItem="{Binding SelectedStone}" Margin="5,5,5,5">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="30">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Rectangle Height="24" Width="16" Fill="{Binding RGB, Converter={StaticResource ColorToBrushConverter}}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Name" Width="120" />
-                    <GridViewColumn Header="RGB" Width="90">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Label Content="{Binding RGB, Converter={StaticResource ColorToHTMLConverter}}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Count" Width="100">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Label Content="{Binding Count}" ContentStringFormat=" {0:##,#}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <DataGrid SelectedIndex="{Binding selindex}" x:Name="dGrid" GridLinesVisibility="None" RowHeaderWidth="0" local:ColorListControl.BindableColumns="{Binding DifColumns}" Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding ColorList}" SelectedItem="{Binding SelectedStone}" Margin="5,5,5,5" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" SelectionMode="Single" CanUserResizeRows="False" BorderBrush="{x:Null}" RowHeight="30" Background="{x:Null}" CanUserDeleteRows="False" HeadersVisibility="Column" CanUserSortColumns="False">
+            <DataGrid.Resources>
+                <parent:BindingProxy x:Key="FirstColumnCheckedProxy" Data="{Binding ShowProjects}"   />
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="30">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Rectangle Height="24" Width="16" Fill="{Binding DominoColor.mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Width="120" Header="Name" FrameworkElement.FlowDirection="LeftToRight">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding DominoColor.name}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="RGB" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding DominoColor.mediaColor, Converter={StaticResource ColorToHTMLConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn CanUserSort="False" Header="Count" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,0}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn x:Name="sumtemplate" Header="Sum" Width="50" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="140"/>
             </Grid.ColumnDefinitions>
-            <xctk:PropertyGrid Grid.Column="0" Margin="5,0,0,0" VerticalAlignment="Stretch" SelectedObject="{Binding SelectedStone}" HorizontalAlignment="Stretch"/>
-            <Button Grid.Column="2" Height="30" Margin="5,0,5,75" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnAddColor}">
+            <xctk:PropertyGrid Grid.Column="0" Margin="5,0,0,0" VerticalAlignment="Stretch" SelectedObject="{Binding SelectedStone.DominoColor}" HorizontalAlignment="Stretch"/>
+            <Button Grid.Column="2" Height="30" Margin="5.2,0,4.8,109.6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnMoveUp}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/up.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Label Content="Move up" />
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Height="30" Margin="5.2,0,4.8,74.6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnMoveDown}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/down.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Label Content="Move Down" />
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Height="30" Margin="5.2,0,4.8,39.6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnAddColor}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/add.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality" />
                     <Label Content="Add Color" />
@@ -65,10 +91,16 @@
                     <Label Content="Save Colors" />
                 </StackPanel>
             </Button>
-            <Button Grid.Column="2" Height="30" Margin="5,0,5,40" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnRemove}">
+            <Button  Grid.Column="2" Height="30" Margin="5,0,5,40" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnRemove}" Visibility="Hidden">
                 <StackPanel Orientation="Horizontal">
                     <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/remove.ico" Height="20" />
                     <Label Content="Remove Selected" />
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Height="30" Margin="5,0,5,5" VerticalAlignment="Top" Command="{Binding BtnExportXLSX}" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Horizontal">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/document_save.ico" Height="20" />
+                    <Label Content="Export to Excel" />
                 </StackPanel>
             </Button>
         </Grid>

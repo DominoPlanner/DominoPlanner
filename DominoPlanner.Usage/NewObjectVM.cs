@@ -1,26 +1,20 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
+using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
     public class NewObjectVM : ModelBase
     {
         #region CTOR
-        public NewObjectVM(string folderpath)
+        public NewObjectVM(string folderpath, DominoAssembly parentProject)
         {
+            this.parentProject = parentProject;
             _ProjectPath = folderpath;
             CreateIt = new RelayCommand(o => { mCreateIt(); });
             selectedType = 7;
@@ -31,12 +25,20 @@ namespace DominoPlanner.Usage
         #region fields
         public string internPictureName { get; private set; }
         public int ObjectID { get; private set; }
+        private DominoAssembly parentProject;
         #endregion
 
         #region prop
+        private DocumentNode resultNode;
+        public DocumentNode ResultNode
+        {
+            get { return resultNode; }
+        }
         private string _ProjectPath;
         public string ProjectPath { get { return _ProjectPath; } }
-        public string ObjectPath { get { return string.Format("{0}\\{1}{2}", _ProjectPath, _filename, _endung); } }
+        public string ObjectPath { get { return string.Format("{0}\\Planner Files\\{1}{2}", _ProjectPath, _filename, _endung); } }
+
+        string picturePath;
 
         private int _selectedType;
         public int selectedType
@@ -46,24 +48,45 @@ namespace DominoPlanner.Usage
             {
                 if (_selectedType != value)
                 {
+                    switch (_selectedType)
+                    {
+                        case 0:
+                            if(CurrentViewModel is AddFieldVM addField)
+                            {
+                                picturePath = addField.sPath;
+                            }
+                            break;
+                        case 1:
+                        case 2:
+                            if(CurrentViewModel is AddStructureVM addStructureVM)
+                            {
+                                picturePath = addStructureVM.sPath;
+                            }
+                            break;
+                    }
                     _selectedType = value;
                     switch (value)
                     {
                         case 0:
-                            endung = ".dpfd";
+                            endung = ".dobject";
                             CurrentViewModel = new AddFieldVM();
+                            ((AddFieldVM)CurrentViewModel).sPath = picturePath;
                             break;
-                        case 1:
-                            endung = ".dpffd";
+                        /*case 1:
+                            endung = ".dobject";
                             CurrentViewModel = new FieldSizeVM(false);
+                            break;*/
+                        case 1:
+                            endung = ".dobject";
+                            CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
+                            if(picturePath != null)
+                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         case 2:
-                            endung = ".dpst";
-                            CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
-                            break;
-                        case 3:
-                            endung = ".dpst";
+                            endung = ".dobject";
                             CurrentViewModel = new AddStructureVM(StructureType.Round);
+                            if(picturePath != null)
+                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
                             break;
                         default: break;
                     }
@@ -144,71 +167,126 @@ namespace DominoPlanner.Usage
         {
             try
             {
+                foreach (DocumentNode dc in parentProject.children)
+                {
+                    if (filename == Path.GetFileNameWithoutExtension(dc.relativePath))
+                    {
+                        Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose different Name.", "Error!", Errorhandler.MessageType.Error);
+                        return;
+                    }
+                }
                 if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
                 {
-                    MessageBox.Show("You forget to choose a name.", "Missing Values", MessageBoxButton.OK);
+                    Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
                     return;
                 }
+                string colorlist = parentProject.colorPath;
+                string relResultPath = Path.Combine("Planner Files", string.Format("{0}.DObject", filename));
+                string relColorList = $@"..\{colorlist}";
+                string resultPath = Path.Combine(ProjectPath, relResultPath);
 
-                //hier muss die colorliste geladen werden, damit amn sie dann den FieldParametern hinzufügen kann
-                Path.Combine(_ProjectPath, @"Planner Files\colors.dpcol");
-                Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-                List<DominoColor> ColorList = new List<DominoColor>();
-                ColorList.Add(new DominoColor(Colors.Black, 1000, "black"));
-                ColorList.Add(new DominoColor(Colors.White, 1000, "white"));
-
-                switch (selectedType)
+                switch (_selectedType)
                 {
-                    case 0: //Field with Picture
-                        if (string.IsNullOrEmpty(((AddFieldVM)CurrentViewModel).sPath) || string.IsNullOrWhiteSpace(((AddFieldVM)CurrentViewModel).sPath))
+                    case 0:
+                        if (CurrentViewModel is AddFieldVM addField)
                         {
-                            MessageBox.Show("You forget to choose an image.", "Missing Values", MessageBoxButton.OK);
-                            return;
+                            picturePath = addField.sPath;
                         }
-
-                        internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath));
-                        File.Copy(((AddFieldVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddFieldVM)CurrentViewModel).sPath)));
-                        BitmapImage bI = new BitmapImage(new Uri(((AddFieldVM)CurrentViewModel).pImage, UriKind.Relative));
-                        WriteableBitmap wbi = new WriteableBitmap(bI);
-                        FieldParameters p = new FieldParameters(wbi, ColorList, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.a, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.b, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.c, ((AddFieldVM)CurrentViewModel).fieldSizeVM.SelectedItem.Sizes.d, ((AddFieldVM)CurrentViewModel).fieldSizeVM.FieldSize, BitmapScalingMode.HighQuality, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
-
-                        DominoTransfer t = p.Generate(progress);
-                        //t.Save(); Was auch immer hier dann Übergeben werden kann und so
-                        
                         break;
-                    case 1: //Free Field
-                        internPictureName = "";
+                    case 1:
+                    case 2:
+                        if (CurrentViewModel is AddStructureVM addStructureVM)
+                        {
+                            picturePath = addStructureVM.sPath;
+                        }
                         break;
-                    case 2: //Rectangular Structure
-                        progress = new Progress<string>(pr => Console.WriteLine(pr));
-
-                        internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
-                        File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
-
-                        //StreamReader sr = new StreamReader(new FileStream("Structures.xml", FileMode.Open));
-                        //XElement xml = XElement.Parse(sr.ReadToEnd());
-                        //new StructureParameters(((AddStructureVM)CurrentViewModel).pImage, xml.Elements().ElementAt(6), ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel).StrucSize, ColorList, ColorDetectionMode.CieDe2000Comparison, AverageMode.Average, true);
-                        //hier muss irgendwie noch was hin zum speichern :D
-                        break;
-                    case 3: //Round Structure
-                        progress = new Progress<string>(pr => Console.WriteLine(pr));
-                        internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath));
-                        File.Copy(((AddStructureVM)CurrentViewModel).sPath, string.Format("{0}\\Source Image\\{1}{2}", _ProjectPath, filename, Path.GetExtension(((AddStructureVM)CurrentViewModel).sPath)));
-                        RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
-                        BitmapImage b = new BitmapImage(new Uri(((AddStructureVM)CurrentViewModel).pImage, UriKind.Relative));
-                        WriteableBitmap wb = new WriteableBitmap(b);
-                        new SpiralParameters(wb, rsvm.StrucSize, rsvm.dWidth, rsvm.dHeight, rsvm.beLines, rsvm.beDominoes, ColorList, ColorDetectionMode.CieDe2000Comparison, false, AverageMode.Corner);
-                        break;
-                    default: break;
                 }
-                if(!string.IsNullOrEmpty(internPictureName))
-                     ObjectID = ProjectSerializer.AddProject(_ProjectPath, filename + endung, internPictureName);
+
+                if (selectedType >= 0 && selectedType <= 2)
+                {
+                    // project with image
+                    string originalImagePath = picturePath;
+                    
+                    if (string.IsNullOrEmpty(originalImagePath) || string.IsNullOrWhiteSpace(originalImagePath))
+                    {
+                        Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error);
+                        return;
+                    }
+
+                    internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(originalImagePath));
+                    try
+                    {
+                        File.Copy(originalImagePath, Path.Combine(_ProjectPath, "Source Image", internPictureName));
+                    }
+                    catch (IOException es)
+                    {
+                        Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning);
+                        return;
+                    }
+                    string relPicturePath = $@"..\Source Image\{internPictureName}";
+                    try
+                    {
+                        switch (selectedType)
+                        {
+                            case 0: //Field with Picture
+                                var fieldVM = ((AddFieldVM)CurrentViewModel).fieldSizeVM;
+                                FieldParameters p = new FieldParameters(resultPath, relPicturePath, relColorList,
+                                    fieldVM.SelectedItem.Sizes.a, fieldVM.SelectedItem.Sizes.b, fieldVM.SelectedItem.Sizes.c,
+                                    fieldVM.SelectedItem.Sizes.d, fieldVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4,
+                                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
+                                p.Generate();
+                                p.Save();
+                                resultNode = new FieldNode(relResultPath, parentProject);
+                                break;
+                            case 1: //Rectangular Structure
+                                var structureVM = ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel);
+                                StructureParameters sp = new StructureParameters(resultPath, relPicturePath,
+                                    structureVM.SelectedStructureElement, structureVM.StrucSize, relColorList,
+                                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                                sp.Generate();
+                                sp.Save();
+                                resultNode = new StructureNode(relResultPath, parentProject);
+                                break;
+                            case 2: //Round Structure
+                                RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
+                                CircularStructure circularStructure;
+                                if (rsvm.TypeSelected.Equals("Spiral"))
+                                {
+                                    circularStructure = new SpiralParameters(resultPath, relPicturePath, rsvm.Amount,
+                                        relColorList, ColorDetectionMode.CieDe2000Comparison, new Dithering(),
+                                        AverageMode.Corner, new NoColorRestriction());
+                                    circularStructure.Generate();
+                                    circularStructure.Save();
+                                    resultNode = new SpiralNode(relResultPath, parentProject);
+                                }
+                                else
+                                {
+                                    circularStructure = new CircleParameters(resultPath, relPicturePath, rsvm.Amount, relColorList,
+                                        ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
+                                    circularStructure.Generate();
+                                    circularStructure.Save();
+                                    resultNode = new CircleNode(relResultPath, parentProject);
+                                }
+                                break;
+                            default: break;
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        File.Delete(Workspace.AbsolutePathFromReference(relResultPath, parentProject));
+                        File.Delete(Path.Combine(_ProjectPath, "Source Image", internPictureName));
+                        resultNode = null;
+                        Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
+                    }
+                    parentProject.Save();
+                }
+                
 
                 Close = true;
             }
-            catch (Exception)
+            catch (Exception es)
             {
-                MessageBox.Show("Could not create a new Project!", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error);
             }
         }
         #endregion

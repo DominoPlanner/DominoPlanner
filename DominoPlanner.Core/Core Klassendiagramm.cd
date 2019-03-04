@@ -5,77 +5,50 @@
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
+    <AssociationLine Name="color_filtered" Type="DominoPlanner.Core.ColorRepository" FixedFromPoint="true">
+      <Path>
+        <Point X="13.5" Y="7.568" />
+        <Point X="15" Y="7.568" />
+      </Path>
+    </AssociationLine>
     <AssociationLine Name="ImageFilters" Type="DominoPlanner.Core.ImageFilter" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="10.75" Y="6.237" />
-        <Point X="10.375" Y="6.237" />
+        <Point X="10.75" Y="6.248" />
+        <Point X="10.375" Y="6.248" />
         <Point X="10.375" Y="1.812" />
         <Point X="7.25" Y="1.812" />
       </Path>
     </AssociationLine>
-    <AssociationLine Name="PostFilters" Type="DominoPlanner.Core.PostFilter" ManuallyRouted="true" FixedFromPoint="true">
-      <Path>
-        <Point X="11.875" Y="6" />
-        <Point X="11.875" Y="2.353" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="color_filtered" Type="DominoPlanner.Core.ColorRepository" FixedFromPoint="true">
-      <Path>
-        <Point X="13.5" Y="7.5" />
-        <Point X="15" Y="7.5" />
-      </Path>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>gAiAAIAACAEABMMgBAQAMIhNBBEAYgC0QAgEHVAgIhQ=</HashCode>
+      <HashCode>ggiAAIAACAEBBMMgBCSAIJhMBZEA4gCUUAhAHXAAIrQ=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="colorMode" />
       <Property Name="IterationInformation" />
       <Property Name="colors" />
       <Property Name="color_filtered" />
+      <Property Name="colorMode" />
+      <Property Name="ditherMode" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
-      <Property Name="ImageFilters" />
-      <Property Name="PostFilters" />
       <Property Name="ColorFilters" />
+      <Property Name="ImageFilters" />
     </ShowAsCollectionAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="DominoPlanner.Core.FieldParameters">
     <Position X="10.5" Y="15" Width="2.75" />
     <Members>
-      <Method Name="Generate" Hidden="true" />
       <Method Name="GetBaseField" Hidden="true" />
     </Members>
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AACAgAAAACCAQAQAAGDAIACAgQAAAAC0BQBAAEIBBrA=</HashCode>
-      <FileName>FieldParameters.cs</FileName>
+      <HashCode>gACBgACBACCBQAQhQEDAoAAAgAAAggGkBQBAAAMBJhA=</HashCode>
+      <FileName>FieldOperations.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="ditherMode" />
-    </ShowAsAssociation>
     <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="DominoPlanner.Core.RectangleDominoProvider">
-    <Position X="13.5" Y="15.25" Width="2.25" />
-    <Members>
-      <Method Name="Generate" Hidden="true" />
-    </Members>
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAMAAAgCAAAAAAAACAAAAAAAAAEAgBAA=</HashCode>
-      <FileName>RectangleDominoProvider.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="shapes" />
-      <Property Name="average" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="DominoPlanner.Core.StructureParameters">
     <Position X="13.25" Y="20" Width="3.25" />
@@ -86,12 +59,9 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAICCACAYAAECAAAAAIAAABAAABAAAAAAAABA=</HashCode>
-      <FileName>StructureParameters.cs</FileName>
+      <HashCode>gAABAACBgCCBAAYxQEDkgAACIAQENgAIBAAAAAkAIBA=</HashCode>
+      <FileName>StructureDefinition.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="structureDefinition" />
-    </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="DominoPlanner.Core.SpiralParameters">
@@ -103,32 +73,14 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAwAAAIEIAAAAADAAaAAAEEIEQgCAAmAAACIEQmBDA=</HashCode>
+      <HashCode>AAAwAAAIBAAAAAADAAaAAAEEAEQACAIkAAACIAAEBDA=</HashCode>
       <FileName>SpiralParameters.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DominoPlanner.Core.ClusterStructureDefinition">
-    <Position X="13.5" Y="23.5" Width="2.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAQAAAEAAACAAQEMAAAAAAAAAAAAAA=</HashCode>
-      <FileName>StructureDefinition.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsCollectionAssociation>
-      <Field Name="cells" />
-    </ShowAsCollectionAssociation>
-  </Class>
   <Class Name="DominoPlanner.Core.CellDefinition">
-    <Position X="10" Y="23.75" Width="2.75" />
-    <AssociationLine Name="dominoes" Type="DominoPlanner.Core.IDominoShape" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="11.656" Y="23.75" />
-        <Point X="11.656" Y="19.898" />
-        <Point X="9.438" Y="19.898" />
-        <Point X="9.438" Y="16.151" />
-      </Path>
-    </AssociationLine>
+    <Position X="3.25" Y="18" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAQAAAAAEAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAQAQAAAAAUAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>StructureDefinition.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -143,7 +95,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="DominoPlanner.Core.ProtocolDefinition">
-    <Position X="0.5" Y="14.25" Width="2.75" />
+    <Position X="0.5" Y="15.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAgAEAAAAAAAAAAAAAAAAAAAAAAEIAAABgAAAAAAA=</HashCode>
       <FileName>ProtocolDefinition.cs</FileName>
@@ -156,7 +108,7 @@
   <Class Name="DominoPlanner.Core.ObjectProtocolParameters">
     <Position X="18.5" Y="8" Width="2.75" />
     <TypeIdentifier>
-      <HashCode>AAABAAAAQAQAgAACAIAiAAAIAAAAAEIAiIAADAEQAAA=</HashCode>
+      <HashCode>AAABAAAAQAQAgAACAIAiAAIIAAAAAEIAiIAADAEQAAA=</HashCode>
       <FileName>ObjectProtocolParameters.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -167,18 +119,9 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="DominoPlanner.Core.IDominoShape">
-    <Position X="6.75" Y="13.25" Width="3.5" />
-    <AssociationLine Name="position" Type="DominoPlanner.Core.ProtocolDefinition" ManuallyRouted="true">
-      <Path>
-        <Point X="6.75" Y="14.826" />
-        <Point X="6.562" Y="14.826" />
-        <Point X="6.562" Y="13.937" />
-        <Point X="1.875" Y="13.937" />
-        <Point X="1.875" Y="14.25" />
-      </Path>
-    </AssociationLine>
+    <Position X="6.75" Y="13" Width="3.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAAAAAAAAgCABIEAAAAAGAAAAAAAAQAAAAAA=</HashCode>
+      <HashCode>AAAEAAAAAAAJAIACgCABIEAAAAAGAICAQAAAQBBAAIA=</HashCode>
       <FileName>IDominoShape.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -190,10 +133,8 @@
     <Position X="3.5" Y="10.5" Width="2.75" />
     <InheritanceLine Type="DominoPlanner.Core.IDominoShape" FixedFromPoint="true">
       <Path>
-        <Point X="6.75" Y="13.438" />
-        <Point X="6.51" Y="13.438" />
-        <Point X="6.51" Y="12.111" />
-        <Point X="6.25" Y="12.111" />
+        <Point X="6.75" Y="13.188" />
+        <Point X="6.25" Y="13.188" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -205,9 +146,9 @@
     <Position X="7.25" Y="10" Width="2.75" />
     <InheritanceLine Type="DominoPlanner.Core.IDominoShape" FixedFromPoint="true">
       <Path>
-        <Point X="9.688" Y="13.25" />
-        <Point X="9.688" Y="12.946" />
-        <Point X="8.625" Y="12.946" />
+        <Point X="9.688" Y="13" />
+        <Point X="9.688" Y="12.838" />
+        <Point X="8.625" Y="12.838" />
         <Point X="8.625" Y="12.646" />
       </Path>
     </InheritanceLine>
@@ -219,7 +160,7 @@
   <Class Name="DominoPlanner.Core.DominoTransfer">
     <Position X="7" Y="3.25" Width="3" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAQAAAAAAAACEAAAAEAAAQAAgCAAAAAAAAABBA=</HashCode>
+      <HashCode>ABAAAAAQAAAAAAAACEAAAAAAAAQAAgCAAAAAAAAABBA=</HashCode>
       <FileName>DominoTransfer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -230,7 +171,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQAQAAAAAAAAwAAEACAAQBgAAAAAAA=</HashCode>
+      <HashCode>AAAgAAAAAAUAgAQAQAAABAAAAwAAEACAAQBgAAAQAIA=</HashCode>
       <FileName>DominoRectanglePath.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -244,66 +185,17 @@
   <Class Name="DominoPlanner.Core.PostFilter">
     <Position X="10.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DominoFilter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="DominoPlanner.Core.ImageFilter">
     <Position X="5.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAgAABAAAEAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAgAABAAAEBAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DominoFilter.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="DominoPlanner.Core.RemoveColorPreFilter">
-    <Position X="13.25" Y="2" Width="2.5" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <InheritanceLine Type="DominoPlanner.Core.ColorFilter" ManuallyRouted="true" FixedFromPoint="true">
-      <Path>
-        <Point X="15.438" Y="1.312" />
-        <Point X="15.438" Y="1.625" />
-        <Point X="14.5" Y="1.625" />
-        <Point X="14.5" Y="2" />
-      </Path>
-    </InheritanceLine>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAgAAAAAAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
-      <FileName>DominoFilter.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="DominoPlanner.Core.ChangeCountFilter">
-    <Position X="16" Y="2" Width="2" />
-    <Compartments>
-      <Compartment Name="Fields" Collapsed="true" />
-    </Compartments>
-    <TypeIdentifier>
-      <HashCode>AAQAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAA=</HashCode>
-      <FileName>DominoFilter.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="DominoPlanner.Core.Dithering.FloydSteinbergDithering" Collapsed="true">
-    <Position X="6.5" Y="20.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Dithering\FloydSteinbergDithering.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="DominoPlanner.Core.Dithering.StuckiDithering" Collapsed="true">
-    <Position X="8.75" Y="20.5" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Dithering\StuckiDithering.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="DominoPlanner.Core.Dithering.JarvisJudiceNinkeDithering" Collapsed="true">
-    <Position X="4" Y="20.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Dithering\JarvisJudiceNinkeDithering.cs</FileName>
-    </TypeIdentifier>
   </Class>
   <Class Name="DominoPlanner.Core.ColorFilter" Collapsed="true">
     <Position X="15" Y="0.75" Width="1.5" />
@@ -369,17 +261,10 @@
       <FileName>ImageFilter.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DominoPlanner.Core.Dithering.Dithering">
-    <Position X="6.25" Y="17.5" Width="2.5" />
-    <TypeIdentifier>
-      <HashCode>AAADABAAAAQAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Dithering\BasicDithering.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="DominoPlanner.Core.CieDe2000Comparison" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="17.5" Y="12.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAA=</HashCode>
       <FileName>Colors.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -387,7 +272,7 @@
   <Class Name="DominoPlanner.Core.CmcComparison" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="16.25" Y="13.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAQAAAEAAA=</HashCode>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAEAAAABAAAAQAAAEAAA=</HashCode>
       <FileName>Colors.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -395,7 +280,7 @@
   <Class Name="DominoPlanner.Core.Cie94Comparison" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="18" Y="13.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAQABAIAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAgAAAAAAAQABAIAAAAAAAAAA=</HashCode>
       <FileName>Colors.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -403,7 +288,7 @@
   <Class Name="DominoPlanner.Core.Cie1976Comparison" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="19.75" Y="13.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
       <FileName>Colors.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -411,9 +296,10 @@
   <Class Name="DominoPlanner.Core.IDominoProviderPreview">
     <Position X="13.75" Y="10.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAAACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="DominoPlanner.Core.Workspace">
     <Position X="23.5" Y="4.25" Width="2.5" />
@@ -421,7 +307,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAgBAAAAAAABAAAAAAAAAAAAAIAgAQQAAAAgAAAAA=</HashCode>
+      <HashCode>AAIBhJARAAAQAAAAABAAAAAIAAAIAAAQQAAAAgBAABA=</HashCode>
       <FileName>Workspace.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -434,7 +320,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAIAAAAAAAAAABAAAAAQAAEAMAAAABAAABAAAAAA=</HashCode>
+      <HashCode>AAAAIIAAAAAAAAAABAAAAAQAgEAMAAAABACQBAAAAAA=</HashCode>
       <FileName>DominoColor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -454,7 +340,7 @@
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>DominoColor.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -481,7 +367,7 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AQAAIAAAAaAAAIAAAACCAAAEACAAAEAAAAgFAmAigBA=</HashCode>
+      <HashCode>AQAAAAAAAQAABAAAAACAAAAAAAAAAEIAIAgFAiAAABA=</HashCode>
       <FileName>CircleParameters.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -524,17 +410,189 @@
       <FileName>IterationInformation.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="DominoPlanner.Core.GeneralShapesProvider">
+    <Position X="14.25" Y="14.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAMAAAAAAAAAAAAACgAAAAAABAAAgBAA=</HashCode>
+      <FileName>GeneralShapesProvider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.CircularStructure">
+    <Position X="18.75" Y="17" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAKAAAIAAAQBAAAEQgAAA=</HashCode>
+      <FileName>SpiralParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.Dithering" Collapsed="true">
+    <Position X="13.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAIAIAIQAAECAAAAAAAAAACQAQABAEAAAAAAAAAA=</HashCode>
+      <FileName>Dithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.FloydSteinbergDithering" Collapsed="true">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.JarvisJudiceNinkeDithering" Collapsed="true">
+    <Position X="15.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.StuckiDithering" Collapsed="true">
+    <Position X="15.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dithering.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.ChangeCountColorFilter" Collapsed="true">
+    <Position X="17.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAgAAAASAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>DominoFilter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.ChangeRGBColorFilter" Collapsed="true">
+    <Position X="17.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAIAAAAAAAgAAAAAAAAAAAAAAEAhAAAAAA=</HashCode>
+      <FileName>DominoFilter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.IDominoWrapper">
+    <Position X="10" Y="25.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABADAAAAAAAAIAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="innode" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="outnodes" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DominoPlanner.Core.DominoAssembly" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.25" Y="29.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAQAAAAAAAAEAAAAAACAAAAQEAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DominoPlanner.Core.DocumentNode" Collapsed="true">
+    <Position X="10" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAIAAABAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.FieldNode" Collapsed="true">
+    <Position X="13.5" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.StructureNode" Collapsed="true">
+    <Position X="6.75" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.SpiralNode" Collapsed="true">
+    <Position X="9" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.CircleNode" Collapsed="true">
+    <Position X="11.25" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.LineNode" Collapsed="true">
+    <Position X="18" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.LineBlockNode" Collapsed="true">
+    <Position X="2.25" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.ArbitraryColorMatchedObject" Collapsed="true">
+    <Position X="4.5" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.FreeObject" Collapsed="true">
+    <Position X="15.75" Y="28" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DominoPlanner.Core.AssemblyNode">
+    <Position X="20.25" Y="28" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>BAAAAIAAAAAAIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="obj" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DominoPlanner.Core.DominoConnector">
+    <Position X="5.25" Y="25.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="next" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DominoPlanner.Core.Constraint" Collapsed="true">
+    <Position X="17.75" Y="29.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDominoWrapper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Struct Name="DominoPlanner.Core.GenStructHelper">
     <Position X="16.75" Y="14.75" Width="2.25" />
     <AssociationLine Name="dominoes" Type="DominoPlanner.Core.IDominoShape" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
         <Point X="18.125" Y="14.75" />
-        <Point X="18.125" Y="14.5" />
-        <Point X="14.708" Y="14.5" Type="JumpStart" />
-        <Point X="14.542" Y="14.5" Type="JumpEnd" />
-        <Point X="12.208" Y="14.5" Type="JumpStart" />
-        <Point X="12.042" Y="14.5" Type="JumpEnd" />
-        <Point X="10.25" Y="14.5" />
+        <Point X="18.125" Y="14.25" />
+        <Point X="10.25" Y="14.25" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="1.846" Y="0.036" />
@@ -570,14 +628,14 @@
   <Interface Name="DominoPlanner.Core.IColorComparison">
     <Position X="15.75" Y="12" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAA=</HashCode>
       <FileName>Colors.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="DominoPlanner.Core.IWorkspaceLoadColorList" Collapsed="true">
     <Position X="13.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAAACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -617,7 +675,7 @@
     </TypeIdentifier>
   </Enum>
   <Enum Name="DominoPlanner.Core.AverageMode">
-    <Position X="16.5" Y="17.25" Width="1.5" />
+    <Position X="16.5" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Enums.cs</FileName>

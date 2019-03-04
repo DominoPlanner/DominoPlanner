@@ -29,7 +29,10 @@ namespace DominoPlanner.Core
             GetDiscreteArray();
             
         }
-        
+
+        protected DitherMode mode = DitherMode.NoDithering;
+        public DitherMode Mode { get { return mode; } }
+
         public void AddToPixel(IDominoShape shape, int r, int g, int b)
         {
             shape.ditherColor.Red = Saturate(shape.ditherColor.Red + r);
@@ -77,6 +80,8 @@ namespace DominoPlanner.Core
             GetDiscreteArray();
             resetColors = true;
             maxDegreeOfParallelism = 1;
+
+            mode = DitherMode.FloydSteinberg;
         }
     }
     public class JarvisJudiceNinkeDithering : Dithering
@@ -94,6 +99,8 @@ namespace DominoPlanner.Core
             resetColors = true;
             maxDegreeOfParallelism = 1;
             GetDiscreteArray();
+
+            mode = DitherMode.JarvisJudiceNinke;
         }
     }
     public class StuckiDithering : Dithering
@@ -111,6 +118,8 @@ namespace DominoPlanner.Core
             resetColors = true;
             maxDegreeOfParallelism = 1;
             GetDiscreteArray();
+
+            mode = DitherMode.Stucki;
         }
     }
 }

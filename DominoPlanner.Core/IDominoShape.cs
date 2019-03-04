@@ -166,8 +166,21 @@ namespace DominoPlanner.Core
         }
         public Bgra ditherColor;
 
+        private int _color;
+        public event EventHandler ColorChanged;
         [ProtoMember(2)]
-        public int color;
+        public int color
+        {
+            get { return _color; }
+            set
+            {
+                if(_color != value)
+                {
+                    _color = value;
+                    ColorChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
 
         public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
         {

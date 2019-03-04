@@ -116,12 +116,12 @@ namespace DominoPlanner.Core
         public string FilePath
         {
             get => _filepath;
-            set { if (SetField(ref _filepath, value)) UpdateMat(); }
+            set { if (SetField(ref _filepath, value)) { mat_valid = false; } }
         }
         [ProtoAfterDeserialization]
         public override void UpdateMat()
         {
-            to_blend = new Image<Bgra, byte>(Workspace.Instance.MakePathAbsolute(_filepath));
+            to_blend = new Image<Bgra, byte>(Workspace.AbsolutePathFromReference(_filepath, parent));
         }
         public BlendFileFilter()
         {

@@ -9,16 +9,33 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     class RoundSizeVM : StructureViewModel
     {
         #region CTOR
-        public RoundSizeVM()
+        public RoundSizeVM() : base()
         {
             list = new List<String>();
             list.Add("Spiral");
             list.Add("Circle Bomb");
             TypeSelected = "Spiral";
+            PossibleTypeChange = false;
+            Amount = 10;
         }
         #endregion
 
         #region Prop
+        private bool _PossibleTypeChange;
+        public bool PossibleTypeChange
+        {
+            get { return _PossibleTypeChange; }
+            set
+            {
+                if (_PossibleTypeChange != value)
+                {
+                    _PossibleTypeChange = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+
         private List<string> _list;
         public List<string> list
         {
@@ -42,9 +59,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_TypeSelected != value)
                 {
                     _TypeSelected = value;
-                    if (((string)value).CompareTo("Spiral") == 0)
+                    if (value.CompareTo("Spiral") == 0)
                     {
                         lType = "Quarter rotations:";
+                    }else if(value.CompareTo("Circle Bomb") == 0)
+                    {
+                        lType = "Rounds";
                     }
                     RaisePropertyChanged();
                 }
@@ -82,7 +102,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _dWidth;
+        private int _dWidth = 8;
         public int dWidth
         {
             get { return _dWidth; }
@@ -96,7 +116,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _dHeight;
+        private int _dHeight = 24;
         public int dHeight
         {
             get { return _dHeight; }
@@ -110,7 +130,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _beLines;
+        private int _beLines = 8;
         public int beLines
         {
             get { return _beLines; }
@@ -124,7 +144,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private int _beDominoes;
+        private int _beDominoes = 8;
         public int beDominoes
         {
             get { return _beDominoes; }

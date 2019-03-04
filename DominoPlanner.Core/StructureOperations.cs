@@ -84,7 +84,7 @@ namespace DominoPlanner.Core
             int reihe = (index < row_counts[0]) ? -1 : 
                 ((index < row_counts[0] + row_counts[1] * current_height) ? (index - row_counts[0]) / row_counts[1] : current_height);
             int steine_vor_reihe = (reihe == -1 ? 0 : row_counts[0] + reihe * row_counts[1]);
-            int reihentyp = getTyp(index, false, current_width, current_height);
+            int reihentyp = getTyp(reihe, false, current_width, current_height);
             int index_in_reihe = index - steine_vor_reihe;
             int spalte = (index_in_reihe < cells[0, reihentyp].Count) ? -1 :
                 ((index_in_reihe < cells[0, reihentyp].Count + cells[1, reihentyp].Count * current_width) 
@@ -92,6 +92,12 @@ namespace DominoPlanner.Core
             int steine_vor_zelle = (spalte == -1 ? 0 : cells[0, reihentyp].Count + spalte * cells[1, reihentyp].Count);
             int index_in_zelle = index_in_reihe - steine_vor_zelle;
             return new PositionWrapper() { X = spalte, Y = reihe, CountInsideCell = index_in_zelle };
+        }
+
+
+        public PositionWrapper getPositionFromIndex(int index, int new_width, int new_height)
+        {
+            return getPositionFromIndex(index);
         }
         public int getIndexFromPosition(int reihe, int spalte, int index_in_zelle, int width, int height, bool swap = false)
         {
@@ -129,8 +135,9 @@ namespace DominoPlanner.Core
                     var (targetindex, target_rowtyp, target_coltyp) = getIndexUndTyp(target_y, target_x, 0, target_width, target_height, false);
                     var (sourceindex, source_rowtyp, source_coltyp) = getIndexUndTyp(source_y, source_x, 0, current_width, current_height, false);
                     if (target_rowtyp != source_rowtyp || target_coltyp != source_coltyp) throw new InvalidOperationException("type mismatch");
-                    for (int i=0; i < cells[target_rowtyp, target_coltyp].Count; i++)
+                    for (int i=0; i < cells[target_coltyp, target_rowtyp].Count; i++)
                     {
+                        if (targetindex + i >= target.Length) break;
                         target[targetindex + i].color = last.shapes[sourceindex + i].color;
                     }
                 }
@@ -209,6 +216,16 @@ namespace DominoPlanner.Core
             int rowtyp = getTyp(swap ? column : row, false, width, height);
             int coltyp = getTyp(swap ? row : column, true, width, height);
             return (startindex, rowtyp, coltyp);
+        }
+
+        public (int startindex, int endindex) getIndicesOfCell(int row, int col, int target_width, int target_height)
+        {
+            if (row >= -1 && col >= -1 && row <= target_height && col <= target_width)
+            {
+                var (targetindex, target_rowtyp, target_coltyp) = getIndexUndTyp(row, col, 0, target_width, target_height, false);
+                return (targetindex, targetindex + cells[target_coltyp, target_rowtyp].Count - 1);
+            }
+            return (0, -1);
         }
     }
 }

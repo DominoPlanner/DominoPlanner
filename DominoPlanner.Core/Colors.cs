@@ -43,9 +43,19 @@ namespace DominoPlanner.Core
     public interface IColorComparison
     {
         double Distance(Lab lab1, Lab lab2);
+
+        ColorComparisonMode colorComparisonMode { get; }
     }
     public class CieDe2000Comparison : IColorComparison
     {
+        ColorComparisonMode IColorComparison.colorComparisonMode
+        {
+            get
+            {
+                return ColorComparisonMode.Cie2000;
+            }
+        }
+
         public double Distance(Lab lab1, Lab lab2)
         {
             //Set weighting factors to 1
@@ -165,6 +175,14 @@ namespace DominoPlanner.Core
     }
     public class CmcComparison : IColorComparison
     {
+        ColorComparisonMode IColorComparison.colorComparisonMode
+        {
+            get
+            {
+                return ColorComparisonMode.CmcComparison;
+            }
+        }
+
         private readonly double _lightness = 2;
         private readonly double _chroma = 1;
         public double Distance(Emgu.CV.Structure.Lab lab1, Emgu.CV.Structure.Lab lab2)
@@ -206,6 +224,14 @@ namespace DominoPlanner.Core
     }
     public class Cie94Comparison : IColorComparison
     {
+        ColorComparisonMode IColorComparison.colorComparisonMode
+        {
+            get
+            {
+                return ColorComparisonMode.Cie94;
+            }
+        }
+
         double Kl = 1.0;
         double K1 = .045;
         double K2 = .015;
@@ -239,6 +265,13 @@ namespace DominoPlanner.Core
     }
     public class Cie1976Comparison : IColorComparison
     {
+        ColorComparisonMode IColorComparison.colorComparisonMode {
+            get
+            {
+                return ColorComparisonMode.Cie76;
+            }
+        }
+
         public double Distance(Lab lab1, Lab lab2)
         {
 

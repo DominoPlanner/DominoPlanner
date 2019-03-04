@@ -1,4 +1,6 @@
-﻿using DominoPlanner.Usage.Serializer;
+﻿using DominoPlanner.Core;
+using DominoPlanner.Usage.HelperClass;
+using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,35 +16,42 @@ using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage
 {
-    class ProjectComposite : ModelBase
-    {
+    public class ProjectComposite : ModelBase
+    { 
         #region CTOR
-        public ProjectComposite(int ownID, int projectID, string path, NodeType actType)
+        public ProjectComposite(ProjectElement projectTransfer)
         {
-            OwnID = ownID;
-            ParentProjectID = projectID;
-            FilePath = path;
-            ActType = actType;
-            conMenu = ContextMenueSelector.TreeViewMenues(actType);
-            conMenu.fieldprotoMI.Click += FieldprotoMI_Click;
+            this.FilePath = projectTransfer.FilePath;
+            
+            if (projectTransfer.documentNode is DocumentNode documentNode)
+            {
+                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType, Workspace.LoadHasProtocolDefinition<IDominoProvider>(projectTransfer.FilePath));
+            }
+            else
+            {
+                conMenu = ContextMenueSelector.TreeViewMenues(projectTransfer.CurrType);
+            }
+                conMenu.fieldprotoMI.Click += FieldprotoMI_Click;
             conMenu.exportImageMI.Click += ExportImageMI_Click;
             conMenu.openFolderMI.Click += OpenFolderMI_Click;
             MouseClickCommand = new RelayCommand(o => { IsClicked?.Invoke(this, EventArgs.Empty); });
+
+            this.Name = projectTransfer.Name;
+            this.PicturePath = projectTransfer.IcoPath;
+
+            if (projectTransfer.CurrType == NodeType.MasterplanNode)
+                Img = "/Icons/folder_txt.ico";
+            else if (projectTransfer.CurrType == NodeType.ColorListNode)
+                Img = "/Icons/colorLine.ico";
+            else
+                Img = PicturePath;
+            this.ActType = projectTransfer.CurrType;
+            Project = projectTransfer;
         }
 
-        public ProjectComposite(int ownID, int projectID, string Name, string picturePath, string path, NodeType actType) : this(ownID, projectID, path, actType)
+        public ProjectComposite(ProjectElement projectTransfer, int parentID) : this(projectTransfer)
         {
-            this.Name = Name;
-            this.PicturePath = picturePath;
-
-            if (actType == NodeType.ProjectNode)
-                Img = "/Icons/folder_txt.ico";
-            else if (actType == NodeType.ColorListNode)
-                Img = "/Icons/colorLine.ico";
-            else if (actType == NodeType.FreeHandFieldNode)
-                Img = "/Icons/draw_freehand.ico";
-            else
-                Img = picturePath;
+            this.ParentProjectID = parentID;
         }
         #endregion
 
@@ -52,25 +61,67 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Methods
-        private void FieldprotoMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void FieldprotoMI_Click(object sender, RoutedEventArgs e)
         {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(FilePath);
-            protocolV.ShowDialog();
+            if (Project.documentNode is DocumentNode documentNode)
+            {
+                if (!documentNode.obj.hasProtocolDefinition)
+                {
+                    Errorhandler.RaiseMessage("Could not generate a protocol!", "No Protocol", Errorhandler.MessageType.Warning);
+                    return;
+                }
+                ProtocolV protocolV = new ProtocolV();
+                if (documentNode.obj.last == null)
+                    documentNode.obj.Generate();
+                protocolV.DataContext = new ProtocolVM(documentNode.obj, Path.GetFileNameWithoutExtension(documentNode.relativePath));
+                protocolV.ShowDialog();
+            }
         }
 
-        private void ExportImageMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void ExportImageMI_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (Project.documentNode is DocumentNode documentNode)
+                {
+                    System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+                    saveFileDialog.Filter = "png files (*.png)|*.png";
+                    saveFileDialog.RestoreDirectory = true;
+
+                    if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        if (File.Exists(saveFileDialog.FileName))
+                        {
+                            File.Delete(saveFileDialog.FileName);
+                        }
+                        documentNode.obj.Generate().GenerateImage().Save(saveFileDialog.FileName);
+                    }
+                }
+            }
+            catch (Exception) { }
         }
 
-        private void OpenFolderMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void OpenFolderMI_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", this.FilePath));
         }
         #endregion
 
         #region prope
+        private ProjectElement _Project;
+        public ProjectElement Project
+        {
+            get { return _Project; }
+            set
+            {
+                if (_Project != value)
+                {
+                    _Project = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private int _OwnID;
         public int OwnID
         {
@@ -99,8 +150,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-
-        public string PicturePath { get; set; }
+        public string PicturePath;
 
         private string _Name;
         public string Name
@@ -206,16 +256,13 @@ namespace DominoPlanner.Usage
         public event EventHandler SelectedEvent;
         public event EventHandler IsClicked;
         #endregion
-
     }
 
     public enum NodeType
     {
-        ProjectNode,
+        MasterplanNode,
         ColorListNode,
-        FieldNode,
-        FreeHandFieldNode,
-        StructureNode
+        ProjectNode
     }
 
     public class ContextMenueProjectList : ContextMenu
@@ -244,29 +291,20 @@ namespace DominoPlanner.Usage
 
     public class ContextMenueSelector
     {
-        public static ContextMenueProjectList TreeViewMenues(NodeType nodeType)
+        public static ContextMenueProjectList TreeViewMenues(NodeType nodeType, bool hasProtocol = false)
         {
             ContextMenueProjectList cm = new ContextMenueProjectList();
             switch (nodeType)
             {
-                case NodeType.ProjectNode:
+                case NodeType.MasterplanNode:
                     cm.Items.Add(cm.createMI);
                     cm.Items.Add(cm.removeMI);
                     break;
                 case NodeType.ColorListNode:
                     break;
-                case NodeType.FieldNode:
+                case NodeType.ProjectNode:
                     cm.Items.Add(cm.exportImageMI);
-                    cm.Items.Add(cm.fieldprotoMI);
-                    cm.Items.Add(cm.removeMI);
-                    break;
-                case NodeType.FreeHandFieldNode:
-                    cm.Items.Add(cm.exportImageMI);
-                    cm.Items.Add(cm.fieldprotoMI);
-                    cm.Items.Add(cm.removeMI);
-                    break;
-                case NodeType.StructureNode:
-                    cm.Items.Add(cm.exportImageMI);
+                    if(hasProtocol) cm.Items.Add(cm.fieldprotoMI);
                     cm.Items.Add(cm.removeMI);
                     break;
                 default:

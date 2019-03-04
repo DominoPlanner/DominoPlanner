@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace DominoPlanner.Core
                 height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
             };
             g.dominoes = getNewShapes(sWidth, sHeight);
-            g.HasProtocolDefinition = hasProcotolDefinition;
+            g.HasProtocolDefinition = hasProtocolDefinition;
             int a = g.dominoes.Max(s => s.GetContainer().x2);
             return g;
         }
@@ -89,14 +90,19 @@ namespace DominoPlanner.Core
             return array;
         }
     }
+    [ProtoContract]
     public struct GenStructHelper
     {
+        [ProtoMember(1)]
         public double width;
+        [ProtoMember(2)]
         public double height;
+        [ProtoMember(3)]
         public IDominoShape[] dominoes;
+        [ProtoMember(4)]
         public bool HasProtocolDefinition;
     }
-    internal class CellDefinition
+    public class CellDefinition
     {
         public double width;
         public double height;

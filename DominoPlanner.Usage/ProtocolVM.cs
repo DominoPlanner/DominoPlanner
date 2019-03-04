@@ -1,9 +1,10 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Core.ColorMine.Comparisons;
+using DominoPlanner.Usage.HelperClass;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,24 +21,15 @@ namespace DominoPlanner.Usage
         #region CTOR
         public ProtocolVM(string filePath)
         {
-            //hier muss dann mal die Datei geladen werden
-            Mat mat = CvInvoke.Imread(filePath, ImreadModes.AnyColor);
-            fParameters = new FieldParameters(mat, new List<DominoColor>(), 8, 8, 24, 8, 1500, Inter.Lanczos4, DitherMode.NoDithering, ColorDetectionMode.CieDe2000Comparison);
-            fParameters.colors.Add(new DominoColor(Colors.Black, 1000, "black"));
-            fParameters.colors.Add(new DominoColor(Colors.Blue, 1000, "blue"));
-            fParameters.colors.Add(new DominoColor(Colors.Green, 1000, "green"));
-            fParameters.colors.Add(new DominoColor(Colors.Yellow, 1000, "yellow"));
-            fParameters.colors.Add(new DominoColor(Colors.Red, 1000, "red"));
-            fParameters.colors.Add(new DominoColor(Colors.White, 1000, "white"));
-            dominoTransfer = fParameters.Generate(progress);
-
+            Titel = Path.GetFileNameWithoutExtension(filePath);
             Init();
         }
 
-        public ProtocolVM(IDominoProvider fieldParameters)
+        public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
         {
-            fParameters = fieldParameters;
-            dominoTransfer = fParameters.Generate(progress);
+            DominoProvider = dominoProvider;
+            dominoTransfer = DominoProvider.last;
+            Titel = fieldName;
             Init();
         }
         #endregion
@@ -45,7 +37,7 @@ namespace DominoPlanner.Usage
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
-        IDominoProvider fParameters;
+        IDominoProvider DominoProvider;
         DominoTransfer dominoTransfer;
         #endregion
 
@@ -269,7 +261,7 @@ namespace DominoPlanner.Usage
                 if (_UseBlocks != value)
                 {
                     _UseBlocks = value;
-
+                    currentOPP.templateLength = _UseBlocks ? StonesPerBlock : int.MaxValue;
                     RaisePropertyChanged();
                 }
             }
@@ -324,8 +316,8 @@ namespace DominoPlanner.Usage
         #region Methods
         private void Init()
         {
-            Titel = "Field";
-            StonesPerBlock = 20;
+            StonesPerBlock = 50;
+            UseBlocks = true;
             BuildReverse = false;
             currentOPP.reverse = false;
             HasShortProperties = true;
@@ -335,7 +327,7 @@ namespace DominoPlanner.Usage
             HideText = true;
             currentOPP.orientation = Core.Orientation.Horizontal;
 
-            CurrentProtocol = fParameters.GetHTMLProcotol(currentOPP);
+            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
             SaveHTML = new RelayCommand(o => { SaveHTMLFile(); });
@@ -345,30 +337,32 @@ namespace DominoPlanner.Usage
         }
         private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            CurrentProtocol = fParameters.GetHTMLProcotol(currentOPP);
+            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
         }
         private void ShowLiveHelper()
         {
             LiveBuildHelperV lbhv = new LiveBuildHelperV();
-            lbhv.DataContext = new LiveBuildHelperVM(fParameters, StonesPerBlock);
+            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock);
             lbhv.ShowDialog();
         }
 
         public void SaveExcelFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.DefaultExt = ".xlsx";
-            dlg.Filter = "Excel Document (.xlsx)|*.xlsx";
-            dlg.FileName = Titel;
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                DefaultExt = ".xlsx",
+                Filter = "Excel Document (.xlsx)|*.xlsx",
+                FileName = Titel
+            };
 
             if (dlg.ShowDialog() == true)
             {
                 try
                 {
-                    fParameters.SaveXLSFieldPlan(dlg.FileName, currentOPP);
-                    MessageBox.Show("Save protocol in excel file.", "Save", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP);
+                    Process.Start(dlg.FileName);
                 }
-                catch (Exception ex) { MessageBox.Show("Fehler: " + ex.Message); }
+                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
 
@@ -387,9 +381,9 @@ namespace DominoPlanner.Usage
                     StreamWriter sw = new StreamWriter(fs);
                     sw.Write(CurrentProtocol);
                     fs.Close();
-                    MessageBox.Show("Save protocol in .html file!", "Save", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    Process.Start(filename);
                 }
-                catch (Exception ex) { MessageBox.Show("Fehler: " + ex.Message); }
+                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
         #endregion

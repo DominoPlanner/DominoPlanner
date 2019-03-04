@@ -12,7 +12,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 {
     class FieldSizeVM : ModelBase
     {
-        //View.FieldSize asdf;
         #region CTOR
         public FieldSizeVM(bool EditState)
         {

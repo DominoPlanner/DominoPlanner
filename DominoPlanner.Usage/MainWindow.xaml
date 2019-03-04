@@ -8,7 +8,7 @@
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="Domino Planner" Height="700" Width="1200" MinWidth="820" Icon="Icons/DominoCalculator.ico">
+        Title="Domino Planner" Height="700" Width="1200" MinWidth="820" Icon="Icons/DominoCalculator.ico" Closing="Window_Closing">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
             <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
@@ -34,9 +34,15 @@
         <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.CopyCom}"/>
         <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.PasteCom}"/>
         <KeyBinding Key="A" Modifiers="Ctrl" Command="{Binding SelectedTab.Content.SelectAllCom}"/>
+        <KeyBinding Key="W" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
+        <KeyBinding Key="A" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
+        <KeyBinding Key="S" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
+        <KeyBinding Key="D" Modifiers="Alt" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
+        <KeyBinding Key="R" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveRows}"/>
+        <KeyBinding Key="C" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
     </Window.InputBindings>
-    <Grid >
-        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0">
+    <Grid>
+        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0" VerticalContentAlignment="Center">
             <MenuItem Header="New">
                 <MenuItem.Icon>
                     <Image Source="/Icons/new.ico"/>
@@ -51,6 +57,16 @@
                         <Image Source="/Icons/new.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Add Existing Project" Command="{Binding AddExistingProject}">
+                <MenuItem.Icon>
+                    <Image Source="Icons/add.ico"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="Add Existing Item" Command="{Binding AddExistingItem}">
+                <MenuItem.Icon>
+                    <Image Source="Icons/add.ico"/>
+                </MenuItem.Icon>
             </MenuItem>
             <MenuItem Header="Save">
                 <MenuItem.Icon>
@@ -102,7 +118,7 @@
                         <Image Source="Icons/Paste.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Mirror">
+                <!--MenuItem Header="Mirror">
                     <MenuItem Header="Flip Horizontally" Command="{Binding SelectedTab.Content.FlipHorizontallyCom}">
                         <MenuItem.Icon>
                             <Image Source="Icons/flip hori.ico"/>
@@ -113,34 +129,33 @@
                             <Image Source="Icons/flip vertical.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                </MenuItem>
+                </-->
                 <MenuItem Header="Add">
                     <MenuItem.Icon>
                         <Image Source="Icons/add.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Add row above" ToolTip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
-                    <MenuItem Header="Add row below" ToolTip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
-                    <MenuItem Header="Add column right" ToolTip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
-                    <MenuItem Header="Add column left" ToolTip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
+                    <MenuItem Header="Add row above" ToolTip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}" InputGestureText="Alt+W"/>
+                    <MenuItem Header="Add row below" ToolTip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}" InputGestureText="Alt+S"/>
+                    <MenuItem Header="Add column right" ToolTip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}" InputGestureText="Alt+D"/>
+                    <MenuItem Header="Add column left" ToolTip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}" InputGestureText="Alt+A"/>
                 </MenuItem>
                 <MenuItem Header="Remove">
                     <MenuItem.Icon>
                         <Image Source="Icons/remove.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Remove row above" ToolTip="Remove Row above selected stone" Command="{Binding SelectedTab.Content.RemoveRowAbove}"/>
-                    <MenuItem Header="Remove row below" ToolTip="Remove Row below selected stone" Command="{Binding SelectedTab.Content.RemoveRowBelow}"/>
-                    <MenuItem Header="Remove column right" ToolTip="Remove column at the right from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnRight}"/>
-                    <MenuItem Header="Remove column left" ToolTip="Remove column at the left from the selected stone" Command="{Binding SelectedTab.Content.RemoveColumnLeft}"/>
+                    <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" InputGestureText="Alt+R"/>
+                    <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGestureText="Alt+C"/>
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Grid Margin="0,25,0,0">
+        <Border  Margin="0,25,0,0" BorderBrush="Red" BorderThickness="0">
+        <Grid >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" MinWidth="95"/>
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="9*" MinWidth="720"/>
+                <ColumnDefinition Width="200" MinWidth="180"/>
+                <ColumnDefinition Width="3" />
+                <ColumnDefinition Width="720*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" Margin="0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
+            <TreeView Grid.Column="0" Margin="0,0,4.6,0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
@@ -167,8 +182,8 @@
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            <GridSplitter HorizontalAlignment="Center" Margin="0,0,0,0" Width="5" Grid.Column="1" Background="#33F0F0F0"/>
-            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" MinWidth="720" Background="#33FFFFFF">
+            <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#33F0F0F0" Grid.Column="1"/>
+            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,3,0">
                 <TabControl.ItemTemplate>
                     <!-- this is the header template-->
                     <DataTemplate>
@@ -180,9 +195,9 @@
                                 <ColumnDefinition Width="2"/>
                                 <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center"/>
+                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center" MaxHeight="25"/>
                             <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
-                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}">
+                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
                                 <Button.Background>
                                     <ImageBrush ImageSource="Icons/closewindow.ico"/>
                                 </Button.Background>
@@ -193,10 +208,11 @@
                 <TabControl.ContentTemplate>
                     <!-- this is the body of the TabItem template-->
                     <DataTemplate>
-                        <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding Content}"/>
+                        <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Content="{Binding Content}"/>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
         </Grid>
+        </Border>
     </Grid>
 </Window>

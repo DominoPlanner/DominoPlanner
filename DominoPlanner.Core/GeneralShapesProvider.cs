@@ -41,7 +41,7 @@ namespace DominoPlanner.Core
             set
             {
                 _average = value;
-                lastValid = false;
+                usedColorsValid = false;
             }
         }
         private bool _allowStretch;
@@ -59,7 +59,7 @@ namespace DominoPlanner.Core
             set
             {
                 _allowStretch = value;
-                lastValid = false;
+                usedColorsValid = false;
             }
         }
         #endregion
@@ -75,9 +75,9 @@ namespace DominoPlanner.Core
         /// <param name="filter"></param>
         /// <param name="averageMode"></param>
         /// <param name="allowStretch"></param>
-        protected GeneralShapesProvider(string imagePath, string colors, IColorComparison comp, Dithering ditherMode,
+        protected GeneralShapesProvider(string filepath, string imagePath, string colors, IColorComparison comp, Dithering ditherMode,
             AverageMode averageMode, bool allowStretch, IterationInformation iterationInformation)
-            : base(imagePath, comp, ditherMode, colors, iterationInformation)
+            : base(filepath, imagePath, comp, ditherMode, colors, iterationInformation)
         {
             this.allowStretch = allowStretch;
             average = averageMode;
@@ -102,7 +102,7 @@ namespace DominoPlanner.Core
         internal override void CalculateColors()
         {
             var colors = this.colors.RepresentionForCalculation;
-            if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
+            //if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
             IterationInformation.weights = Enumerable.Repeat(1.0, colors.Length).ToArray();
             RTree<IDominoShape> tree = new RTree<IDominoShape>(9, new GuttmannQuadraticSplit<IDominoShape>());
             // wird nur beim Dithering benötigt und nur dann ausgeführt; sortiert alle Shapes nach deren Mittelpunktskoordinate 
@@ -234,12 +234,12 @@ namespace DominoPlanner.Core
                         {
                             for (int y_iterator = container.y1; y_iterator <= container.y2; y_iterator++)
                             {
-                                if (shapes.dominoes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY))
+                                if (shapes.dominoes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY) )
                                 {
-                                    R += img.Data[container.y1, container.x1, 2];
-                                    G += img.Data[container.y1, container.x1, 1];
-                                    B += img.Data[container.y1, container.x1, 0];
-                                    A += img.Data[container.y1, container.x1, 3];
+                                    R += img.Data[y_iterator, x_iterator, 2];
+                                    G += img.Data[y_iterator, x_iterator, 1];
+                                    B += img.Data[y_iterator, x_iterator, 0];
+                                    A += img.Data[y_iterator, x_iterator, 3];
                                     counter++;
                                 }
                             }
@@ -256,7 +256,9 @@ namespace DominoPlanner.Core
                     }
                 });
             }
+            usedColorsValid = true;
         }
+        
         #endregion
     }
 

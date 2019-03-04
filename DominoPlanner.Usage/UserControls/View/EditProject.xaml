@@ -7,18 +7,18 @@
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}">
+             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" SizeChanged="UserControl_SizeChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
     </UserControl.Resources>
-    <Grid>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid x:Name="CanGrid" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="300"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
@@ -41,14 +41,14 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Name"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectName}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Rows"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Stones/Row"/>
-                    <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Amount"/>
-                    <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Name"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectName}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Rows"/>
+                    <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Stones/Row"/>
+                    <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount"/>
+                    <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
                 </Grid>
                 <Image Grid.Row="1" Source="{Binding ImageSource}">
                     <i:Interaction.Triggers>
@@ -86,15 +86,22 @@
                                 <GridViewColumn Width="30">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Rectangle Height="24" Width="16" Fill="{Binding mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
+                                            <Rectangle Height="24" Width="16" Fill="{Binding DominoColor.mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn DisplayMemberBinding="{Binding name}" Header="Name" Width="70"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding DominoColor.name}" Header="Name" Width="70"/>
                                 <GridViewColumn Header="Count" Width="80">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Content="{Binding count}" ContentStringFormat=" {0:##,#}" />
+                                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,0}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Sum" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -103,44 +110,35 @@
                     </ListView>
                 </Grid>
             </Grid>
-            <ScrollViewer Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
-                <ContentControl Content="{Binding DominoProject}"/>
+            <ScrollViewer x:Name="ScrollViewer" Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                <ContentControl Grid.Column="2" Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
             <Grid Grid.Column="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="150"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="0"/>
-                <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5">
-                    <Slider.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform Angle="180"/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Slider.RenderTransform>
-                </Slider>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="2"/>
+                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
+                <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
+                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="2"/>
             </Grid>
         </Grid>
 
         <Grid Grid.Row="1">
-            <Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
+            <!--Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Save Field" />
                 </StackPanel>
-            </Button>
+            </-->
             <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding RestoreBasicSettings}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/draw_freehand.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Basic Settings" />
                 </StackPanel>
             </Button>
-            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding BuildtoolsClick}">
+            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Visibility="{Binding HaveBuildtools}" Command="{Binding BuildtoolsClick}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Buildtools" />
