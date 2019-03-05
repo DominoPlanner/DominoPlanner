@@ -23,7 +23,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
-            string filepath = Workspace.AbsolutePathFromReference(dominoProvider.relativePath, dominoProvider.parent);
+            string filepath = Workspace.AbsolutePathFromReference(ref dominoProvider.relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
 
             UICursor = null;

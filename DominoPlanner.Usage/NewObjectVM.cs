@@ -273,7 +273,7 @@ namespace DominoPlanner.Usage
                     }
                     catch(Exception ex)
                     {
-                        File.Delete(Workspace.AbsolutePathFromReference(relResultPath, parentProject));
+                        File.Delete(Workspace.AbsolutePathFromReference(ref relResultPath, parentProject));
                         File.Delete(Path.Combine(_ProjectPath, "Source Image", internPictureName));
                         resultNode = null;
                         Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);

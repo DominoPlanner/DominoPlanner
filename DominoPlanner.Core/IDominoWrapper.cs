@@ -70,7 +70,7 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(_colorPath, this);
+                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
         }
         public ColorRepository colors { get; private set; }
@@ -83,7 +83,7 @@ namespace DominoPlanner.Core
         {
             Workspace.Save(this, relativePath);
         }
-
+        
     }
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(100, typeof(FieldNode))]

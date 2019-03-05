@@ -33,8 +33,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             
             ShowProjects = false;
         }
-
-        public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly))
+        
+        public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReferenceLoseUpdate(dominoAssembly.colorPath, dominoAssembly))
         {
             this.dominoAssembly = dominoAssembly;
         }
@@ -386,7 +386,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cle.ProjectCount.Clear();
             }
-            string thispath = Workspace.AbsolutePathFromReference(dominoAssembly.colorPath, dominoAssembly);
+            string colorpath = dominoAssembly.colorPath;
+            string thispath = Workspace.AbsolutePathFromReference(ref colorpath, dominoAssembly);
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 try
