@@ -144,9 +144,7 @@
                     <Label Content="Buildtools" />
                 </StackPanel>
             </Button>
-            <CheckBox Grid.Row="2" Margin="255, 5, 0, 5" VerticalAlignment="Center" Visibility="{Binding IsExpandible}" Checked="{Binding Expanded}">
-                Hide spaces
-            </CheckBox>
+            <CheckBox Grid.Row="2" Margin="255, 5, 0, 5" VerticalAlignment="Center" Content="Hide spaces" Visibility="{Binding IsExpandible}" IsChecked="{Binding Expanded}"/>
         </Grid>
     </Grid>
 </UserControl>
