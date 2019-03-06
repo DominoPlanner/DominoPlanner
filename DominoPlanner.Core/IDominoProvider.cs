@@ -84,7 +84,7 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(value, this);
+                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
         }
         public ColorRepository color_filtered { get; private set; }
@@ -607,6 +607,11 @@ namespace DominoPlanner.Core
             lastValid = lastValidTemp;
         }
         public abstract object Clone();
+
+        public void AfterDeserializationOperation()
+        {
+            restoreShapes();
+        }
         #endregion
         #region EVENTS
         public event EventHandler EditingChanged;
@@ -647,12 +652,19 @@ namespace DominoPlanner.Core
         [ProtoMember(3)]
         public bool hasProtocolDefinition { get; set; }
 
+        public void AfterDeserializationOperation()
+        {
+        }
     }
     [ProtoContract]
     public class IDominoProviderImageFilter : IWorkspaceLoadImageFilter
     {
         [ProtoMember(13)]
         public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
+
+        public void AfterDeserializationOperation()
+        {
+        }
     }
     public interface ICountTargetable
     {

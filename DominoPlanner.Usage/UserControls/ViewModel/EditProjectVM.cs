@@ -23,7 +23,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
-            string filepath = Workspace.AbsolutePathFromReference(dominoProvider.relativePath, dominoProvider.parent);
+            IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
+
+            string filepath = Workspace.AbsolutePathFromReference(ref dominoProvider.relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
 
             UICursor = null;
@@ -98,7 +100,34 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        
+        private Visibility _IsExpandible;
+        public Visibility IsExpandible
+        {
+            get { return _IsExpandible; }
+            set
+            {
+                if (_IsExpandible != value)
+                {
+                    _IsExpandible = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private bool _Expanded;
+        public bool Expanded
+        {
+            get => _Expanded;
+            set
+            {
+                if (_Expanded != value)
+                {
+                    _Expanded = value;
+                    RaisePropertyChanged();
+                    RefreshCanvas();
+                    UpdateUIElements();
+                }
+            }
+        }
         private Cursor _UICursor;
         public Cursor UICursor
         {
@@ -664,7 +693,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
-                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i], CurrentProject.colors);
+                DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i], CurrentProject.colors, !Expanded);
                 dic.MouseDown += Dic_MouseDown;
                 System.Windows.Shapes.Path sd = new System.Windows.Shapes.Path();
 
@@ -825,7 +854,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (rect == null || rect.Visibility != Visibility.Visible)
             {
-                for (int i = 0; i < DominoProject.Stones.Count - 1; i++)
+                for (int i = 0; i < DominoProject.Stones.Count; i++)
                 {
                     if (DominoProject.Stones[i] is DominoInCanvas dic)
                     {
@@ -872,7 +901,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             double bottom = Canvas.GetTop(rect) + rect.ActualHeight;
             double left = Canvas.GetLeft(rect);
 
-            for (int i = 0; i < DominoProject.Stones.Count - 1; i++)
+            for (int i = 0; i < DominoProject.Stones.Count; i++)
             {
                 if (DominoProject.Stones[i] is DominoInCanvas dic)
                 {

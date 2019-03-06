@@ -20,7 +20,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ggiAAIAACAEBBMMgBCSAIJhMBZEA4gCUUAhAHXAAIrQ=</HashCode>
+      <HashCode>ggiAAIAACAEBBMMgBCSAIJhMBZEA4gCUUAhIHXAAIrQ=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -296,7 +296,7 @@
   <Class Name="DominoPlanner.Core.IDominoProviderPreview">
     <Position X="13.75" Y="10.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAAACAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAIAAQAAAIACAAAAA=</HashCode>
       <FileName>IDominoProvider.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -306,8 +306,15 @@
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
+    <NestedTypes>
+      <Delegate Name="DominoPlanner.Core.Workspace.FileReplacementDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Workspace.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAIBhJARAAAQAAAAABAAAAAIAAAIAAAQQAAAAgBAABA=</HashCode>
+      <HashCode>AAIBhJARAAAQAAAAEBAAgAAIAAAIAAAQQAAAAgBAABA=</HashCode>
       <FileName>Workspace.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>

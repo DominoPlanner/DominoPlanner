@@ -74,7 +74,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        public DominoInCanvas(int idx, IDominoShape domino, ColorRepository colorlist)
+        public DominoInCanvas(int idx, IDominoShape domino, ColorRepository colorlist, bool showSpaces)
         {
             colorRepository = colorlist;
             this.idx = idx;
@@ -84,10 +84,32 @@ namespace DominoPlanner.Usage
             Stroke = Brushes.Blue;
             StrokeThickness = 1;
             DominoPath rectangle = domino.GetPath();
-            canvasPoints[0] = new System.Windows.Point(rectangle.points[0].X, rectangle.points[0].Y);
-            canvasPoints[1] = new System.Windows.Point(rectangle.points[1].X, rectangle.points[1].Y);
-            canvasPoints[2] = new System.Windows.Point(rectangle.points[2].X, rectangle.points[2].Y);
-            canvasPoints[3] = new System.Windows.Point(rectangle.points[3].X, rectangle.points[3].Y);
+            if (domino is RectangleDomino rectangleDomino)
+            {
+                double stoneWidth = 0;
+                double stoneHeight = 0;
+                if (showSpaces)
+                {
+                    stoneHeight = rectangleDomino.height;
+                    stoneWidth = rectangleDomino.width;
+                }
+                else
+                {
+                    stoneHeight = rectangleDomino.expanded_height;
+                    stoneWidth = rectangleDomino.expanded_width;
+                }
+                canvasPoints[0] = new System.Windows.Point(rectangleDomino.x, rectangleDomino.y);
+                canvasPoints[1] = new System.Windows.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y);
+                canvasPoints[2] = new System.Windows.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y + stoneHeight);
+                canvasPoints[3] = new System.Windows.Point(rectangleDomino.x, rectangleDomino.y + stoneHeight);
+            }
+            else
+            {
+                canvasPoints[0] = new System.Windows.Point(rectangle.points[0].X, rectangle.points[0].Y);
+                canvasPoints[1] = new System.Windows.Point(rectangle.points[1].X, rectangle.points[1].Y);
+                canvasPoints[2] = new System.Windows.Point(rectangle.points[2].X, rectangle.points[2].Y);
+                canvasPoints[3] = new System.Windows.Point(rectangle.points[3].X, rectangle.points[3].Y);
+            }
         }
 
         private void Domino_ColorChanged(object sender, System.EventArgs e)

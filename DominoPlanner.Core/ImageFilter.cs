@@ -38,7 +38,11 @@ namespace DominoPlanner.Core
         private Image<Bgra, byte> _to_blend;
         internal Image<Bgra, byte> to_blend
         {
-            get { return _to_blend; }
+            get
+            {
+                if (_to_blend == null) UpdateMat();
+                return _to_blend;
+            }
             set
             {
                 _to_blend = value;
@@ -118,10 +122,9 @@ namespace DominoPlanner.Core
             get => _filepath;
             set { if (SetField(ref _filepath, value)) { mat_valid = false; } }
         }
-        [ProtoAfterDeserialization]
         public override void UpdateMat()
         {
-            to_blend = new Image<Bgra, byte>(Workspace.AbsolutePathFromReference(_filepath, parent));
+            to_blend = new Image<Bgra, byte>(Workspace.AbsolutePathFromReference(ref _filepath, parent));
         }
         public BlendFileFilter()
         {
