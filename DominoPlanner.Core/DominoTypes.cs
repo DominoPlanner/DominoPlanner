@@ -22,8 +22,9 @@ namespace DominoPlanner.Core
         public double x;
         [ProtoMember(2)]
         public double y;
-        [ProtoMember(3)]
+        
         private double _width;
+        [ProtoMember(3)]
         public double width
         {
             get => _width; set
@@ -32,8 +33,8 @@ namespace DominoPlanner.Core
                 expanded_width = value;
             }
         }
-        [ProtoMember(4)]
         private double _height;
+        [ProtoMember(4)]
         public double height
         {
             get => _height; set
