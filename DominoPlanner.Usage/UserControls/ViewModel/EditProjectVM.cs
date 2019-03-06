@@ -23,6 +23,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
+            IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
+
             string filepath = Workspace.AbsolutePathFromReference(ref dominoProvider.relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
 
@@ -98,7 +100,33 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        
+        private Visibility _IsExpandible;
+        public Visibility IsExpandible
+        {
+            get { return _IsExpandible; }
+            set
+            {
+                if (_IsExpandible != value)
+                {
+                    _IsExpandible = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private bool _Expanded;
+        public bool Expanded
+        {
+            get => _Expanded;
+            set
+            {
+                if (_Expanded != value)
+                {
+                    _Expanded = value;
+                    RaisePropertyChanged();
+                    UpdateUIElements();
+                }
+            }
+        }
         private Cursor _UICursor;
         public Cursor UICursor
         {

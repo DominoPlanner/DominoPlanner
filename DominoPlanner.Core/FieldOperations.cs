@@ -84,6 +84,8 @@ namespace DominoPlanner.Core
                         y = (c + d) * yi,
                         width = b,
                         height = c,
+                        expanded_width = b + a,
+                        expanded_height = c + d,
                         position = new ProtocolDefinition() { x = xi, y = yi }
                     };
                     array[length * yi + xi] = shape;

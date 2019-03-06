@@ -23,10 +23,29 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public double y;
         [ProtoMember(3)]
-        public double width;
+        private double _width;
+        public double width
+        {
+            get => _width; set
+            {
+                _width = value;
+                expanded_width = value;
+            }
+        }
         [ProtoMember(4)]
-        public double height;
-
+        private double _height;
+        public double height
+        {
+            get => _height; set
+            {
+                _height = value;
+                expanded_height = value;
+            }
+        }
+        [ProtoMember(5)]
+        public double expanded_width;
+        [ProtoMember(6)]
+        public double expanded_height;
         public override DominoRectangle GetContainer(double scaling_x, double scaling_y)
         {
             return new DominoRectangle() { width = this.width * scaling_x, height = this.height * scaling_y, x = this.x * scaling_x, y = this.y * scaling_y};
