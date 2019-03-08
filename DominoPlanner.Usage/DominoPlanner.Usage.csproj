@@ -162,6 +162,7 @@
     <Compile Include="UserControls\ViewModel\FieldSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\OnlyOwnStonesVM.cs" />
     <Compile Include="UserControls\ViewModel\RectangularSizeVM.cs" />
+    <Compile Include="UserControls\ViewModel\RenameObjectVM.cs" />
     <Compile Include="UserControls\ViewModel\RoundSizeVM.cs" />
     <Compile Include="UserControls\ViewModel\StructureViewModel.cs" />
     <Compile Include="UserControls\ViewModel\TabBaseVM.cs" />
@@ -191,6 +192,9 @@
     </Compile>
     <Compile Include="UserControls\View\RectangularSize.xaml.cs">
       <DependentUpon>RectangularSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\View\RenameObject.xaml.cs">
+      <DependentUpon>RenameObject.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\RoundSize.xaml.cs">
       <DependentUpon>RoundSize.xaml</DependentUpon>
@@ -264,6 +268,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\View\RectangularSize.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\RenameObject.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

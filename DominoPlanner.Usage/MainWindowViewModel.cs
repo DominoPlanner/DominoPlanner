@@ -475,6 +475,7 @@ namespace DominoPlanner.Usage
                     ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID));
                     newItem.IsClicked += Item_IsClicked;
                     newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
+                    newItem.conMenu.renameMI.Click += parentProject.RenameMI_Object_Click;
                     newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
                     return newItem;
                 }

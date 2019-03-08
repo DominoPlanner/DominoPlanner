@@ -75,6 +75,29 @@ namespace DominoPlanner.Usage
                 Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
         }
+
+        internal void RenameMI_Object_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var proj = ((ProjectComposite)((MenuItem)sender).DataContext).Project;
+                DocumentNode dn = (DocumentNode)proj.documentNode;
+                RenameObject ro = new RenameObject(Path.GetFileName(dn.relativePath));
+                if (ro.ShowDialog() == true)
+                {
+                    Workspace.CloseFile(proj.FilePath);
+                    // jojo Tabs schließen
+                    dn.relativePath = Path.Combine(Path.GetDirectoryName(dn.relativePath), ((RenameObjectVM)ro.DataContext).NewName);
+                    ((ProjectComposite)((MenuItem)sender).DataContext).Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
+                    dn.parent.Save();
+                    File.Move(proj.FilePath, Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName));
+                }
+            }
+            catch
+            {
+                Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
+            }
+        }
         #endregion
     }
 }
