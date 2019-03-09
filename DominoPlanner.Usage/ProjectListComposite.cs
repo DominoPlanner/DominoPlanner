@@ -67,8 +67,8 @@ namespace DominoPlanner.Usage
                     dn.parent.children.Remove(dn);
                     dn.parent.Save();
                     this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
+                    Errorhandler.RaiseMessage(string.Format("{0} has been removed!", removeName), "Removed", Errorhandler.MessageType.Error);
                 }
-                Errorhandler.RaiseMessage(string.Format("{0} has been removed!", removeName), "Removed", Errorhandler.MessageType.Error);
             }
             catch (Exception)
             {
@@ -80,20 +80,22 @@ namespace DominoPlanner.Usage
         {
             try
             {
-                var proj = ((ProjectComposite)((MenuItem)sender).DataContext).Project;
-                DocumentNode dn = (DocumentNode)proj.documentNode;
+                var proj = ((ProjectComposite)((MenuItem)sender).DataContext);
+                DocumentNode dn = (DocumentNode)proj.Project.documentNode;
                 RenameObject ro = new RenameObject(Path.GetFileName(dn.relativePath));
                 if (ro.ShowDialog() == true)
                 {
                     Workspace.CloseFile(proj.FilePath);
                     // jojo Tabs schließen
                     dn.relativePath = Path.Combine(Path.GetDirectoryName(dn.relativePath), ((RenameObjectVM)ro.DataContext).NewName);
-                    ((ProjectComposite)((MenuItem)sender).DataContext).Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
+                    proj.Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
+                    string old_path = proj.FilePath;
+                    proj.FilePath = Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName);
                     dn.parent.Save();
-                    File.Move(proj.FilePath, Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName));
+                    File.Move(old_path, proj.FilePath);
                 }
             }
-            catch
+            catch 
             {
                 Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
             }
