@@ -339,6 +339,7 @@ namespace DominoPlanner.Usage
                     {
                         try
                         {
+                            Workspace.CloseFile(projectpath);
                             if (File.Exists(projectpath))
                                 File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.DProject"));
                             DominoAssembly newMainNode = new DominoAssembly();
