@@ -74,13 +74,13 @@
                     </Border>
                 </ListBoxItem>
             </ListBox>
-            <TextBox Grid.Row="1" HorizontalAlignment="Right" Height="23" Margin="0,5,72,0" TextWrapping="Wrap" Text="{Binding filename}" VerticalAlignment="Top" Width="189"/>
+            <TextBox Grid.Row="1" HorizontalAlignment="Right" Height="23" Margin="0,5,72,0" TextWrapping="Wrap" Text="{Binding filename, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="189"/>
             <Label Content="Filename:" Grid.Row="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="81" Height="26"/>
             <Label Grid.Row="1" Content="{Binding endung}" HorizontalAlignment="Right" Margin="0,2,0,0" VerticalAlignment="Top" Height="26" Width="67" />
             <Grid Grid.Row="2" Margin="2" Height="381" Width="390">
                 <ContentControl Margin="1,1,1,1" Content="{Binding CurrentViewModel}"/>
             </Grid>
-            <Button Grid.Row="3" Margin="5,5,5,5" Command="{Binding CreateIt}">
+            <Button Grid.Row="3" Margin="5,5,5,5" Command="{Binding CreateIt}" IsDefault="True">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/ok.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <Label Content="Create"/>
