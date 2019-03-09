@@ -92,8 +92,21 @@ namespace DominoPlanner.Core
     [ProtoInclude(103, typeof(SpiralNode))]
     public abstract class DocumentNode : IDominoWrapper
     {
+
+        private string _relativePath;
         [ProtoMember(1)]
-        public string relativePath;
+        public string relativePath
+        {
+            get => _relativePath;
+            set
+            {
+                if (value != _relativePath)
+                {
+                    _relativePath = value;
+                    _obj = null;
+                }
+            }
+        }
         private IDominoProvider _obj;
         public IDominoProvider obj
         {

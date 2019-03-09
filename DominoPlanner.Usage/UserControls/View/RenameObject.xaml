@@ -16,7 +16,7 @@
         <DockPanel Height="24" Margin="10,10,10,0" VerticalAlignment="Top">
             <Label DockPanel.Dock="Left">New name:</Label>
             <Label DockPanel.Dock="Right" Content="{Binding Extension}"></Label>
-            <TextBox Margin="10,0,0, 0" Text="{Binding CurrentName}"></TextBox>
+            <TextBox Margin="10,0,0, 0" Text="{Binding CurrentName}" local:SelectAllFocusBehavior.Enable="True"></TextBox>
         </DockPanel>
         <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10" IsCancel="True" Command="{Binding Cancel}">Cancel</Button>
 

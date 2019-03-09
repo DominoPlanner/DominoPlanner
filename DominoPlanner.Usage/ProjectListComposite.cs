@@ -26,6 +26,11 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Prop
+        public delegate bool CloseTabDelegate(ProjectComposite comp);
+        public CloseTabDelegate closeTabDelegate;
+        public delegate void OpenTabDelegate(ProjectComposite comp);
+        public OpenTabDelegate openTabDelegate;
+
         private ObservableCollection<ProjectComposite> _Children;
         public ObservableCollection<ProjectComposite> Children
         {
@@ -59,14 +64,16 @@ namespace DominoPlanner.Usage
         {
             try
             {
-                string removeName = ((ProjectComposite)((MenuItem)sender).DataContext).Name;
-                MessageBoxResult mbr = MessageBox.Show(string.Format("Delete {0}?", removeName), "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (mbr == MessageBoxResult.Yes)
+                var proj = ((ProjectComposite)((MenuItem)sender).DataContext);
+                string removeName = proj.Name;
+                if (closeTabDelegate.Invoke(proj) &&
+                    MessageBox.Show($"Remove file {removeName} from project {this.Name}?\nThe file won't be permanently deleted.", "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    DocumentNode dn = (DocumentNode)((ProjectComposite)((MenuItem)sender).DataContext).Project.documentNode;
+                    DocumentNode dn = (DocumentNode)proj.Project.documentNode;
+                    Workspace.CloseFile(proj.FilePath);
                     dn.parent.children.Remove(dn);
                     dn.parent.Save();
-                    this.Children.Remove((ProjectComposite)((MenuItem)sender).DataContext);
+                    this.Children.Remove(proj);
                     Errorhandler.RaiseMessage(string.Format("{0} has been removed!", removeName), "Removed", Errorhandler.MessageType.Error);
                 }
             }
@@ -83,16 +90,16 @@ namespace DominoPlanner.Usage
                 var proj = ((ProjectComposite)((MenuItem)sender).DataContext);
                 DocumentNode dn = (DocumentNode)proj.Project.documentNode;
                 RenameObject ro = new RenameObject(Path.GetFileName(dn.relativePath));
-                if (ro.ShowDialog() == true)
+                if (closeTabDelegate.Invoke(proj) && ro.ShowDialog() == true)
                 {
                     Workspace.CloseFile(proj.FilePath);
-                    // jojo Tabs schließen
                     dn.relativePath = Path.Combine(Path.GetDirectoryName(dn.relativePath), ((RenameObjectVM)ro.DataContext).NewName);
                     proj.Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
                     string old_path = proj.FilePath;
                     proj.FilePath = Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName);
                     dn.parent.Save();
                     File.Move(old_path, proj.FilePath);
+                    openTabDelegate(proj);
                 }
             }
             catch 
