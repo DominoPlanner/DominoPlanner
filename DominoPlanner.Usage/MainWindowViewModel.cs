@@ -191,6 +191,30 @@ namespace DominoPlanner.Usage
                 Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
         }
+        private void RenameMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var proj = (ProjectListComposite)((System.Windows.Controls.MenuItem)sender).DataContext;
+            foreach (TabItem item in Tabs.Where(x => x.ProjectID == proj.OwnID).ToList())
+                RemoveItem(item);
+            var dn = (AssemblyNode)proj.Project.documentNode;
+            RenameObject ro = new RenameObject(Path.GetFileName(proj.FilePath));
+            if (ro.ShowDialog() == true)
+            {
+                Workspace.CloseFile(proj.FilePath);
+                OpenProjectSerializer.RemoveOpenProject(proj.OwnID);
+                dn.Path = Path.Combine(Path.GetDirectoryName(dn.Path), ((RenameObjectVM)ro.DataContext).NewName);
+                proj.Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
+                string old_path = proj.FilePath;
+                proj.FilePath = Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName);
+                File.Move(old_path, proj.FilePath);
+                var projectcomposite = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(proj.FilePath), Path.GetDirectoryName(proj.FilePath));
+                Projects.Remove(proj);
+                loadProject(projectcomposite);
+                Workspace.Load<DominoAssembly>(proj.FilePath);
+            }
+
+
+        }
         /// <summary>
         /// Clickevent wenn in der Baumstruktur ein Projektnode geklickt wird
         /// </summary>
@@ -396,6 +420,7 @@ namespace DominoPlanner.Usage
                     actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
                     actPLC.conMenu.createMI.Click += CreateMI_Click;
                     actPLC.conMenu.removeMI.Click += RemoveMI_Click;
+                    actPLC.conMenu.renameMI.Click += RenameMI_Click;
                     actPLC.closeTabDelegate = RemoveProjectComposite;
                     actPLC.openTabDelegate = OpenItem;
                     Projects.Add(actPLC);
