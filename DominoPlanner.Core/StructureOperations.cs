@@ -21,11 +21,6 @@ namespace DominoPlanner.Core
             set { }
         }
 
-         public override object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool IsValidPastePosition(int source_position, int target_position)
         {
             var source =getPositionFromIndex(source_position);

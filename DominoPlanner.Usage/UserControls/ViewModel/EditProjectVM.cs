@@ -717,8 +717,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void RefreshSizeLabels()
         {
-            ProjectHeight = dominoTransfer.dominoHeight.ToString();
-            ProjectWidth = dominoTransfer.dominoLength.ToString();
+            ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
+            ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
             ProjectAmount = dominoTransfer.shapes.Count().ToString();
         }
 

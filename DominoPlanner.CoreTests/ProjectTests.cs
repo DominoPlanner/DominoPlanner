@@ -33,7 +33,8 @@ namespace DominoPlanner.CoreTests
             structure.Save();
             new StructureNode("structure.DObject", main);
             DominoAssembly sub = new DominoAssembly();
-            sub.Save(Workspace.AbsolutePathFromReference("sub.DProject", main));
+            string subpath = "sub.DProject";
+            sub.Save(Workspace.AbsolutePathFromReference(ref subpath, main));
             sub.colorPath = "colors.DColor";
             new AssemblyNode("sub.DProject", main);
             FieldParameters sub1 = new FieldParameters(Path.GetFullPath("tests/field2.DObject"), "transparent.png", main.colorPath, 8, 8, 24, 8, 10000, Emgu.CV.CvEnum.Inter.Lanczos4,

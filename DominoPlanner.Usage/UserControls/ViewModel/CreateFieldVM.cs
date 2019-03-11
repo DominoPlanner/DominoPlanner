@@ -382,23 +382,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else if (e.PropertyName.Equals("Length"))
             {
-                fieldParameters.length = (int)fsvm.Length;
+                fieldParameters.Length = (int)fsvm.Length;
                 if (fsvm.BindSize)
                 {
                     double fieldWidth = fsvm.Length * (fieldParameters.a + fieldParameters.b);
                     double stoneHeightWidhSpace = fieldParameters.c + fieldParameters.d;
-                    fieldParameters.height = (int)(fieldWidth / (double)fieldParameters.image_filtered.Size.Width * fieldParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
+                    fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.image_filtered.Size.Width * fieldParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
                 }
                 important = true;
             }
             else if (e.PropertyName.Equals("Height"))
             {
-                fieldParameters.height = (int)fsvm.Height;
+                fieldParameters.Height = (int)fsvm.Height;
                 if (fsvm.BindSize)
                 {
                     double fieldHeight = fsvm.Height * (fieldParameters.c + fieldParameters.d);
                     double stoneWidthWidthSpace = fieldParameters.a + fieldParameters.b;
-                    fieldParameters.length = (int)(fieldHeight / (double)fieldParameters.image_filtered.Size.Height * fieldParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
+                    fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.image_filtered.Size.Height * fieldParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
                 }
                 important = true;
             }
@@ -453,9 +453,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void ReloadSizes()
         {
             fsvm.PropertyChanged -= CreateFieldVM_PropertyChanged;
-            fsvm.FieldSize = fieldParameters.height * fieldParameters.length;
-            fsvm.Length = fieldParameters.length;
-            fsvm.Height = fieldParameters.height;
+            fsvm.FieldSize = fieldParameters.Height * fieldParameters.Length;
+            fsvm.Length = fieldParameters.Length;
+            fsvm.Height = fieldParameters.Height;
 
             Sizes currentSize = new Sizes(fieldParameters.a, fieldParameters.b, fieldParameters.c, fieldParameters.d);
             bool found = false;

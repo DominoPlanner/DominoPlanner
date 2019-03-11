@@ -45,7 +45,7 @@ namespace DominoPlanner.Core
     [ProtoInclude(104, typeof(ReplaceColorFilter))]
     public abstract class ImageFilter : INotifyPropertyChanged
     {
-        [ProtoMember(1, AsReference = true)]
+        //[ProtoMember(1, AsReference = true)]
         public IDominoProvider parent;
         public event PropertyChangedEventHandler PropertyChanged;
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

@@ -40,7 +40,7 @@ namespace DominoPlanner.Core
         {
             set
             {
-                hasProtocolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
+                HasProtocolDefinition = value.Attribute("HasProtocolDefinition").Value == "true";
                 name = value.Attribute("Name").Value;
                 cells = new CellDefinition[3, 3];
                 foreach (XElement part in value.Elements("PartDefinition"))
@@ -60,7 +60,7 @@ namespace DominoPlanner.Core
         /// Die Länge der Struktur (Wiederholungen des mittleren Blocks in x-Richtung)
         /// </summary>
         [ProtoMember(1)]
-        public int length
+        public int Length
         {
             get
             {
@@ -83,7 +83,7 @@ namespace DominoPlanner.Core
         /// Die Breite der Struktur (Wiederholungen des mittleren Blocks in y-Richtung)
         /// </summary>
         [ProtoMember(2)]
-        public int height
+        public int Height
         {
             get
             {
@@ -107,9 +107,12 @@ namespace DominoPlanner.Core
 
         public int TargetCount
         {
+            
             // Maple sagt, dass diese Formel passt... ;)
             set
             {
+                int height = PrimaryImageTreatment.Height;
+                int width = PrimaryImageTreatment.Width;
                 double cw = cells[1, 1].width;
                 double ch = cells[1, 1].height;
                 double addw = cells[0, 0].width + cells[2, 2].width;
@@ -121,28 +124,28 @@ namespace DominoPlanner.Core
                 double cc = cells[1, 1].dominoes.Length;
                 double constant = cells[0, 0].dominoes.Length + cells[0, 2].dominoes.Length + cells[2, 0].dominoes.Length 
                     + cells[2, 2].dominoes.Length;
-                double root = Math.Sqrt(Math.Pow(cc * addw - cw * (lc + rc), 2) * Math.Pow(source.Height, 2) +
-                    (2 * (-addh * addw * cc * cc + (((-2 * constant + 2 * value) * cw + addw * (bc + tc)) * ch + cw * addh * (lc + rc)) * cc + ch * cw * (lc + rc) * (bc + tc))) * source.Width * source.Height
-                    + Math.Pow(source.Width, 2) * Math.Pow(-addh * cc + ch * (bc + tc), 2));
-                double templength = (.5d * (root + (-cc * addw + (-lc - rc) * cw) * source.Height + (addh * cc + (-bc - tc) * ch) * source.Width)) / (cc * cw * source.Height);
-                double tempheight = (.5d * (root + (-addh * cc + (-bc - tc) * ch) * source.Width + (cc * addw + (-lc - rc) * cw) * source.Height)) / (cc * ch * source.Width);
+                double root = Math.Sqrt(Math.Pow(cc * addw - cw * (lc + rc), 2) * Math.Pow(height, 2) +
+                    (2 * (-addh * addw * cc * cc + (((-2 * constant + 2 * value) * cw + addw * (bc + tc)) * ch + cw * addh * (lc + rc)) * cc + ch * cw * (lc + rc) * (bc + tc))) * width * height
+                    + Math.Pow(width, 2) * Math.Pow(-addh * cc + ch * (bc + tc), 2));
+                double templength = (.5d * (root + (-cc * addw + (-lc - rc) * cw) * height + (addh * cc + (-bc - tc) * ch) * width)) / (cc * cw * height);
+                double tempheight = (.5d * (root + (-addh * cc + (-bc - tc) * ch) * width + (cc * addw + (-lc - rc) * cw) * height)) / (cc * ch * width);
 
                 if (templength < tempheight)
                 {
-                    length = (int)Math.Round(templength);
-                    height = (int)Math.Round(-(-cw * length * source.Height + addh * source.Width - addw * source.Height) / (ch * source.Width));
+                    Length = (int)Math.Round(templength);
+                    Height = (int)Math.Round(-(-cw * Length * height + addh * width - addw * height) / (ch * width));
                 }
                 else
                 {
-                    height = (int)Math.Round(tempheight);
-                    length = (int)Math.Round((ch * height * source.Width + addh * source.Width - addw * source.Height) / (cw * source.Height));
+                    Height = (int)Math.Round(tempheight);
+                    Length = (int)Math.Round((ch * Height * width + addh * width - addw * height) / (cw * height));
                 }
 
 
             }
         }
         #endregion
-        #region public constructors
+        #region constructors
         /// <summary>
         /// Generiert eine Struktur mit den angegebenen Wiederholparametern in x- und y-Richtung.
         /// </summary>
@@ -156,13 +159,13 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public StructureParameters(string filepath, string imagepath, XElement definition, int length, int height, string colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int length, int height, string colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
             structureDefinitionXML = definition;
-            this.length = length;
-            this.height = height;
+            this.Length = length;
+            this.Height = height;
         }
         /// <summary>
         /// Generiert eine Struktur mit der angegebenen Steineanzahl.
@@ -177,7 +180,7 @@ namespace DominoPlanner.Core
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
         /// <param name="targetSize">Die Zielgröße des Objekts.</param>
-        public StructureParameters(string filepath, string imagepath, XElement definition, int targetSize, String colors, 
+        public StructureParameters(string filepath, string imagepath, XElement definition, int targetSize, String colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : this(filepath, imagepath, definition, 1, 1, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
@@ -194,9 +197,9 @@ namespace DominoPlanner.Core
         private StructureParameters() : base() { }
         #endregion
         #region private helper methods
-        internal override void GenerateShapes()
+        protected override void RegenerateShapes()
         {
-            shapes = GenerateStructure(length, height);
+            last = GenerateStructure(Length, Height);
             shapesValid = true;
         }
 

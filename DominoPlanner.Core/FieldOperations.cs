@@ -8,9 +8,8 @@ namespace DominoPlanner.Core
 {
     public partial class FieldParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
-        int _current_width;
-        public int current_width { get => _current_width; set => _current_width = value; }
-        public int current_height { get => last.length / _current_width; set { } }
+        public int current_width { get; set; }
+        public int current_height { get => last.length / current_width; set { } }
         public bool IsValidPastePosition(int source_position, int target_position)
         {
             return true;
@@ -80,12 +79,12 @@ namespace DominoPlanner.Core
                 {
                     RectangleDomino shape = new RectangleDomino()
                     {
-                        x = (b + a) * xi,
-                        y = (c + d) * yi,
-                        width = b,
-                        height = c,
-                        expanded_width = b + a,
-                        expanded_height = c + d,
+                        x = (HorizontalDistance + HorizontalSize) * xi,
+                        y = (VerticalDistance + VerticalSize) * yi,
+                        width = HorizontalSize,
+                        height = VerticalSize,
+                        expanded_width = HorizontalDistance + HorizontalSize,
+                        expanded_height = VerticalDistance + VerticalSize,
                         position = new ProtocolDefinition() { x = xi, y = yi }
                     };
                     array[length * yi + xi] = shape;

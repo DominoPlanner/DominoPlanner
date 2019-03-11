@@ -23,8 +23,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 CurrentViewModel = new RectangularSizeVM();
 
-                ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
-                ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
+                ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).Length;
+                ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).Height;
             }
             else
             {
@@ -456,8 +456,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (CurrentViewModel is RectangularSizeVM rs)
                     {
-                        rs.sHeight = sp.height;
-                        rs.sLength = sp.length;
+                        rs.sHeight = sp.Height;
+                        rs.sLength = sp.Length;
                     }
                 }
             }
@@ -495,12 +495,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (e.PropertyName.Equals("sLength"))
                 {
-                    ((StructureParameters)structureParameters).length = ((RectangularSizeVM)CurrentViewModel).sLength;
+                    ((StructureParameters)structureParameters).Length = ((RectangularSizeVM)CurrentViewModel).sLength;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("sHeight"))
                 {
-                    ((StructureParameters)structureParameters).height = ((RectangularSizeVM)CurrentViewModel).sHeight;
+                    ((StructureParameters)structureParameters).Height = ((RectangularSizeVM)CurrentViewModel).sHeight;
                     changed = true;
                 }
                 else if (e.PropertyName.Equals("structure_index"))

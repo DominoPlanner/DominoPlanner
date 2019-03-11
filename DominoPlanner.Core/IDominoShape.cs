@@ -92,7 +92,14 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public abstract bool Equals(IDominoShape other);
+        public bool Equals(IDominoShape other)
+        {
+            bool shapeEquals = ShapeEquals(other);
+            bool primaryColorEquals = color == other.color;
+            bool secondaryColorEquals = SecondaryDomino.Equals(other.SecondaryDomino);
+            return shapeEquals && primaryColorEquals && secondaryColorEquals;
+        }
+        public abstract bool ShapeEquals(IDominoShape other);
         /// <summary>
         /// Verschiebt einen Stein um angegebene Koordinaten und transformiert die Protokolldefinition in die neue Position.
         /// Dabei wird die endgültige Position im Feldplan angegeben.
@@ -159,12 +166,12 @@ namespace DominoPlanner.Core
             return GetContainer();
         }
         Bgra _originalColor;
-        public Bgra originalColor
+        public Bgra PrimaryOriginalColor
         {
             get { return _originalColor; }
-            set { _originalColor = value;  ditherColor = originalColor; }
+            set { _originalColor = value;  PrimaryDitherColor = PrimaryOriginalColor; }
         }
-        public Bgra ditherColor;
+        public Bgra PrimaryDitherColor;
 
         private int _color;
         public event EventHandler ColorChanged;
@@ -181,13 +188,15 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        public SecondaryDomino SecondaryDomino { get; set; }
+        
 
         public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
         {
             double minimum = int.MaxValue;
             for (int color = 0; color < colors.Length; color++)
             {
-                double value = colors[color].distance(ditherColor, comp, TransparencyThreshold) * weights[color];
+                double value = colors[color].distance(PrimaryDitherColor, comp, TransparencyThreshold) * weights[color];
                 if (value < minimum)
                 {
                     minimum = value;
@@ -195,5 +204,10 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        
+    }
+    public abstract class SecondaryDomino : IEquatable<SecondaryDomino>
+    {
+        public abstract bool Equals(SecondaryDomino other);
     }
 }
