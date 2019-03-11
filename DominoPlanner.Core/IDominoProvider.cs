@@ -67,7 +67,7 @@ namespace DominoPlanner.Core
         public bool SecondarySideCalculated { get => SecondaryImageTreatment != null; }
 
         protected ImageTreatment _primaryImageTreatment;
-        [ProtoMember(19)]
+        //[ProtoMember(19)]
         public virtual ImageTreatment PrimaryImageTreatment
         {
             get => _primaryImageTreatment;
@@ -82,7 +82,7 @@ namespace DominoPlanner.Core
             }
         }
         protected ImageTreatment _secondaryImageTreatment;
-        [ProtoMember(20)]
+        //[ProtoMember(20)]
         public virtual ImageTreatment SecondaryImageTreatment
         {
             get => _secondaryImageTreatment;
@@ -97,7 +97,7 @@ namespace DominoPlanner.Core
             }
         }
         protected Calculation _primaryCalculation;
-        [ProtoMember(21)]
+        //[ProtoMember(21)]
         public virtual Calculation PrimaryCalculation
         {
             get => _primaryCalculation;
@@ -119,7 +119,7 @@ namespace DominoPlanner.Core
             }
         }
         protected Calculation _secondaryCalculation = new EmptyCalculation();
-        [ProtoMember(22)]
+        //[ProtoMember(22)]
         public virtual Calculation SecondaryCalculation
         {
             get => _secondaryCalculation;
@@ -160,6 +160,7 @@ namespace DominoPlanner.Core
         public DominoTransfer Generate()
         {
             if (Editing) return last;
+            
             if (!shapesValid)
             {
                 RegenerateShapes();
@@ -169,6 +170,7 @@ namespace DominoPlanner.Core
                 if (SecondaryImageTreatment != null)
                     SecondaryImageTreatment.colorsValid = false;
             }
+            last.colors = colors;
             if (SecondaryImageTreatment != null && !SecondaryImageTreatment.colorsValid)
             {
                 SecondaryImageTreatment.FillDominos(last);
@@ -434,7 +436,19 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        [ProtoMember(13)]
+        [ProtoMember(12)]
+        private ObservableCollection<ColorFilter> ColorFilters
+        {
+            get
+            {
+                return new ObservableCollection<ColorFilter>();
+            }
+            set
+            {
+                //
+            }
+        }
+        [ProtoMember(13, OverwriteList =true)]
         private ObservableCollection<ImageFilter> ImageFilters
         {
             get

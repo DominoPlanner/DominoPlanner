@@ -45,12 +45,12 @@ namespace DominoPlanner.CoreTests
             //for (int i = 0; i < 1; i++)
             //SpiralTest("gre.jpg");
             //Console.WriteLine("PROTO for DominoProvider");
-            //Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProvider)));
+            Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProvider)));
             //Console.WriteLine("PROTO for DominoFilters");
             //Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProviderImageFilter)));
-            var obj = Workspace.Load<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\abc.DObject");
-            var obj2 = Workspace.LoadImageFilters<IDominoProvider>("tests/FieldTest.DObject");
-            //obj.Generate().GenerateImage().Save("abc.png");
+            var obj = Workspace.Load<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\struc.DObject");
+            obj.Generate().GenerateImage().Save("tests/compatibility_test.png");
+            //var obj2 = Workspace.LoadImageFilters<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\a.DObject");
             WallTest("gre.jpg");
             //ColorRepoSaveTest();
             FieldTest("bird.jpg");

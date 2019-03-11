@@ -18,7 +18,7 @@ namespace DominoPlanner.Core
     {
         [ProtoMember(1)]
         public IDominoShape[] shapes;
-        [ProtoMember(3, AsReference = true)]
+        //[ProtoMember(3, AsReference = true)]
         public ColorRepository colors;
         [ProtoMember(4, AsReference = true)]
         public IterationInformation iterationInfo {get; set;}
