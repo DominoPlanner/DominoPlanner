@@ -21,10 +21,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             fsvm = new FieldSizeVM(true);
             OnlyOwnStonesVM = new OnlyOwnStonesVM();
 
-            iResizeMode = (int)fieldParameters.resizeMode;
-            iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;
-            iDiffusionMode = (int)fieldParameters.ditherMode.Mode;
-            TransparencyValue = fieldParameters.TransparencySetting;
+            iResizeMode = (int)((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode;
+            iColorApproxMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode.colorComparisonMode;
+            iDiffusionMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering.Mode;
+            TransparencyValue = ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting;
 
             ReloadSizes();
 
@@ -126,11 +126,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fieldParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
                 }
                 else
                 {
-                    fieldParameters.IterationInformation = new NoColorRestriction();
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new NoColorRestriction();
                 }
                 refresh();
             }
@@ -138,7 +138,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fieldParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
                     refresh();
                 }
             }
@@ -146,7 +146,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    ((IterativeColorRestriction)fieldParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
+                    ((IterativeColorRestriction)((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
                     refresh();
                 }
             }
@@ -217,8 +217,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_iResizeMode != value)
                 {
                     _iResizeMode = value;
-                    fieldParameters.resizeMode = (Inter)value;
-                    sResizeMode = fieldParameters.resizeMode.ToString();
+                    ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode = (Inter)value;
+                    sResizeMode = ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode.ToString();
                     RaisePropertyChanged();
                     refresh();
                 }
@@ -237,19 +237,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     switch (value)
                     {
                         case 0:
-                            fieldParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie1976Comparison;
                             sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
                             break;
                         case 1:
-                            fieldParameters.colorMode = ColorDetectionMode.CmcComparison;
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CmcComparison;
                             sColorApproxMode = "CMC (l:c) Comparison";
                             break;
                         case 2:
-                            fieldParameters.colorMode = ColorDetectionMode.Cie94Comparison;
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie94Comparison;
                             sColorApproxMode = "CIE-94 Comparison (DIN 99)";
                             break;
                         case 3:
-                            fieldParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CieDe2000Comparison;
                             sColorApproxMode = "CIE-E-2000 Comparison";
                             break;
                         default:
@@ -270,7 +270,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_TransparencyValue != value)
                 {
                     _TransparencyValue = value;
-                    fieldParameters.TransparencySetting = _TransparencyValue;
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting = _TransparencyValue;
                     refresh();
                     RaisePropertyChanged();
                 }
@@ -290,19 +290,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         case DitherMode.NoDithering:
                             sDiffusionMode = "NoDiffusion";
-                            fieldParameters.ditherMode = new Dithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new Dithering();
                             break;
                         case DitherMode.FloydSteinberg:
                             sDiffusionMode = "Floyd/Steinberg Dithering";
-                            fieldParameters.ditherMode = new FloydSteinbergDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new FloydSteinbergDithering();
                             break;
                         case DitherMode.JarvisJudiceNinke:
                             sDiffusionMode = "Jarvis/Judice/Ninke Dithering";
-                            fieldParameters.ditherMode = new JarvisJudiceNinkeDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new JarvisJudiceNinkeDithering();
                             break;
                         case DitherMode.Stucki:
                             sDiffusionMode = "Stucki Dithering";
-                            fieldParameters.ditherMode = new StuckiDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new StuckiDithering();
                             break;
                         default:
                             break;
@@ -385,9 +385,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 fieldParameters.Length = (int)fsvm.Length;
                 if (fsvm.BindSize)
                 {
-                    double fieldWidth = fsvm.Length * (fieldParameters.a + fieldParameters.b);
-                    double stoneHeightWidhSpace = fieldParameters.c + fieldParameters.d;
-                    fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.image_filtered.Size.Width * fieldParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
+                    double fieldWidth = fsvm.Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
+                    double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
+                    fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
                 }
                 important = true;
             }
@@ -396,9 +396,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 fieldParameters.Height = (int)fsvm.Height;
                 if (fsvm.BindSize)
                 {
-                    double fieldHeight = fsvm.Height * (fieldParameters.c + fieldParameters.d);
-                    double stoneWidthWidthSpace = fieldParameters.a + fieldParameters.b;
-                    fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.image_filtered.Size.Height * fieldParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
+                    double fieldHeight = fsvm.Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
+                    double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
+                    fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
                 }
                 important = true;
             }
@@ -429,17 +429,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (fsvm.Vertical)
             {
-                fieldParameters.a = fsvm.SelectedItem.Sizes.d;
-                fieldParameters.b = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.c = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.d = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.a;
             }
             else
             {
-                fieldParameters.a = fsvm.SelectedItem.Sizes.a;
-                fieldParameters.b = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.c = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.d = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.d;
             }
         }
 
@@ -457,7 +457,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             fsvm.Length = fieldParameters.Length;
             fsvm.Height = fieldParameters.Height;
 
-            Sizes currentSize = new Sizes(fieldParameters.a, fieldParameters.b, fieldParameters.c, fieldParameters.d);
+            Sizes currentSize = new Sizes(fieldParameters.HorizontalDistance, fieldParameters.HorizontalSize, fieldParameters.VerticalSize, fieldParameters.VerticalDistance);
             bool found = false;
             foreach (StandardSize sSize in fsvm.field_templates)
             {

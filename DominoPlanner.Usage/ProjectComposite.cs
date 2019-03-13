@@ -65,14 +65,13 @@ namespace DominoPlanner.Usage
         {
             if (Project.documentNode is DocumentNode documentNode)
             {
-                if (!documentNode.obj.hasProtocolDefinition)
+                if (!documentNode.obj.HasProtocolDefinition)
                 {
                     Errorhandler.RaiseMessage("Could not generate a protocol!", "No Protocol", Errorhandler.MessageType.Warning);
                     return;
                 }
                 ProtocolV protocolV = new ProtocolV();
-                if (documentNode.obj.last == null)
-                    documentNode.obj.Generate();
+                documentNode.obj.Generate();
                 protocolV.DataContext = new ProtocolVM(documentNode.obj, Path.GetFileNameWithoutExtension(documentNode.relativePath));
                 protocolV.ShowDialog();
             }

@@ -50,7 +50,7 @@ namespace DominoPlanner.CoreTests
             //Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProviderImageFilter)));
             var obj = Workspace.Load<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\struc.DObject");
             obj.Generate().GenerateImage().Save("tests/compatibility_test.png");
-            //var obj2 = Workspace.LoadImageFilters<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\a.DObject");
+            var obj2 = Workspace.LoadImageFilters<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\struc.DObject");
             WallTest("gre.jpg");
             //ColorRepoSaveTest();
             FieldTest("bird.jpg");

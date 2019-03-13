@@ -8,6 +8,10 @@ namespace DominoPlanner.Core
 {
     partial class StructureParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
+        public void ResetSize()
+        {
+            current_width = Length;
+        }
         private int _current_width;
         public int current_width { get => _current_width; set => _current_width = value; }
 

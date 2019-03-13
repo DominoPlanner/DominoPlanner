@@ -77,7 +77,9 @@ namespace DominoPlanner.Usage
         private void CurrentProject_EditingChanged(object sender, EventArgs e)
         {
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
+            //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
             tabItem.Content.Save();
+            
             tabItem.ResetContent();
         }
         #endregion

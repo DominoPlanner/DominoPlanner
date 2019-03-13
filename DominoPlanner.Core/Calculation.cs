@@ -151,9 +151,12 @@ namespace DominoPlanner.Core
         internal ColorRepository ApplyColorFilters(ColorRepository repo)
         {
             var color_filtered = Serializer.DeepClone(repo);
-            foreach (ColorFilter filter in ColorFilters)
+            if (ColorFilters != null)
             {
-                filter.Apply(color_filtered);
+                foreach (ColorFilter filter in ColorFilters)
+                {
+                    filter.Apply(color_filtered);
+                }
             }
             return color_filtered;
         }
@@ -302,7 +305,7 @@ namespace DominoPlanner.Core
         }
         #endregion
     }
-    [ProtoContract]
+    [ProtoContract(SkipConstructor =true)]
     public class FieldCalculation : UncoupledCalculation
     {
         #region constructors

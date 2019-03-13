@@ -73,6 +73,7 @@ namespace DominoPlanner.Core
     }
     public interface IRowColumnAddableDeletable
     {
+        void ResetSize();
         int current_width { get; set;  }
         int current_height { get; set; }
 

@@ -214,18 +214,20 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
+        
         [ProtoMember(6)]
         private Inter resizeMode
         {
             get
             {
-                return Inter.Cubic; //((FieldReadout)PrimaryImageTreatment).ResizeMode;
+                return ((FieldReadout)PrimaryImageTreatment)?.ResizeMode ?? Inter.Cubic; 
             }
             set
             {
                 ((FieldReadout)CreatePrimaryTreatment()).ResizeMode = value;
             }
         }
+        
         #endregion
     }
 

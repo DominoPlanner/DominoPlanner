@@ -200,7 +200,7 @@ namespace DominoPlanner.Core
                 if (value < minimum)
                 {
                     minimum = value;
-                    this.color = color;
+                    this._color = color;
                 }
             }
         }

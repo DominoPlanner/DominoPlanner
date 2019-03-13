@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace DominoPlanner.Core
 {
-    [ProtoContract(SkipConstructor = true)]
+    [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
     [ProtoInclude(101, typeof(GeneralShapesProvider))]
     public abstract class IDominoProvider : IWorkspaceLoadable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
@@ -20,7 +20,7 @@ namespace DominoPlanner.Core
             get
             {
                 if (last == null) return null;
-                if (!Editing && !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
+                //if (!Editing && !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
                 if (last != null)
                 {
@@ -60,14 +60,20 @@ namespace DominoPlanner.Core
                 if (_editing != value)
                 {
                     _editing = value;
+                    shapesValid = false;
+                    if (this is IRowColumnAddableDeletable)
+                    {
+                        (this as IRowColumnAddableDeletable).ResetSize();
+                    }
                     EditingChanged?.Invoke(this, EventArgs.Empty);
+                    
                 }
             }
         }
         public bool SecondarySideCalculated { get => SecondaryImageTreatment != null; }
 
         protected ImageTreatment _primaryImageTreatment;
-        //[ProtoMember(19)]
+        [ProtoMember(19)]
         public virtual ImageTreatment PrimaryImageTreatment
         {
             get => _primaryImageTreatment;
@@ -78,11 +84,12 @@ namespace DominoPlanner.Core
                     _primaryImageTreatment = value;
                     _primaryImageTreatment.colorsValid = false;
                     _primaryImageTreatment.StateReference = StateReference.Before;
+                    _primaryImageTreatment.parent = this;
                 }
             }
         }
         protected ImageTreatment _secondaryImageTreatment;
-        //[ProtoMember(20)]
+        [ProtoMember(20)]
         public virtual ImageTreatment SecondaryImageTreatment
         {
             get => _secondaryImageTreatment;
@@ -93,11 +100,12 @@ namespace DominoPlanner.Core
                     _secondaryImageTreatment = value;
                     _secondaryImageTreatment.colorsValid = false;
                     _secondaryImageTreatment.StateReference = StateReference.After;
+                    _secondaryImageTreatment.parent = this;
                 }
             }
         }
         protected Calculation _primaryCalculation;
-        //[ProtoMember(21)]
+        [ProtoMember(21)]
         public virtual Calculation PrimaryCalculation
         {
             get => _primaryCalculation;
@@ -119,7 +127,7 @@ namespace DominoPlanner.Core
             }
         }
         protected Calculation _secondaryCalculation = new EmptyCalculation();
-        //[ProtoMember(22)]
+        [ProtoMember(22)]
         public virtual Calculation SecondaryCalculation
         {
             get => _secondaryCalculation;
@@ -136,13 +144,25 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        protected bool lastValid { get => (SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false); }
+        protected bool lastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
         #endregion
         #region internal vars
         protected int charLength;
+        private DominoTransfer _last;
         [ProtoMember(2)]
-        internal DominoTransfer last;
+        internal DominoTransfer last
+        {
+            get => _last;
+            set
+            {
 
+                if (_last != value)
+                {
+                    _last = value;
+                    shapesValid = false;
+                }
+            }
+        }
         [ProtoMember(1000)]
         internal bool shapesValid;
         #endregion
@@ -157,7 +177,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region public methods
-        public DominoTransfer Generate()
+        public DominoTransfer Generate(IProgress<string> progress = null)
         {
             if (Editing) return last;
             
@@ -348,6 +368,7 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
+            
             //bool lastValidTemp = lastValid;
             ////if (!Editing)
             ////{
@@ -363,6 +384,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
+        
         internal Calculation CreatePrimaryCalculation()
         {
             if (PrimaryCalculation == null)
@@ -398,7 +420,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return new NoColorRestriction(); // ((NonEmptyCalculation)PrimaryCalculation).IterationInformation;
+                return ((NonEmptyCalculation)PrimaryCalculation)?.IterationInformation ?? new NoColorRestriction();
             }
             set
             {
@@ -412,7 +434,7 @@ namespace DominoPlanner.Core
         [ProtoMember(6)]
         private byte TransparencySetting
         {
-            get => 0; //((NonEmptyCalculation)PrimaryCalculation).TransparencySetting;
+            get => ((NonEmptyCalculation)PrimaryCalculation)?.TransparencySetting ?? 0;
             set
             {
                 if (CreatePrimaryCalculation() is NonEmptyCalculation)
@@ -426,7 +448,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return "CieDe2000Comparison";//((NonEmptyCalculation)PrimaryCalculation).ColorMode.GetType().Name;
+                return ((NonEmptyCalculation)PrimaryCalculation)?.ColorMode.GetType().Name ?? "CieDe2000Comparison";
             }
             set
             {
@@ -448,22 +470,24 @@ namespace DominoPlanner.Core
                 //
             }
         }
-        [ProtoMember(13, OverwriteList =true)]
+        [ProtoMember(13, OverwriteList = true)]
         private ObservableCollection<ImageFilter> ImageFilters
         {
             get
             {
-                return new ObservableCollection<ImageFilter>(); //(PrimaryImageTreatment).ImageFilters;
+                return (PrimaryImageTreatment)?.ImageFilters ?? new ObservableCollection<ImageFilter>();
             }
             set
             {
-                CreatePrimaryTreatment().ImageFilters = value;
+                if (CreatePrimaryTreatment().ImageFilters != null)
+                    CreatePrimaryTreatment().ImageFilters = value;
             }
         }
         [ProtoMember(15)]
         private int ImageWidth
         {
-            get => 10; //PrimaryImageTreatment.Width;
+            get => 
+                PrimaryImageTreatment?.Width ?? 10;
             set
             {
                 CreatePrimaryTreatment().Width = value;
@@ -472,7 +496,7 @@ namespace DominoPlanner.Core
         [ProtoMember(16)]
         private int ImageHeight
         {
-            get => 10; // return PrimaryImageTreatment.Height;
+            get => PrimaryImageTreatment?.Height ?? 10;
             set
             {
                 CreatePrimaryTreatment().Height = value;
@@ -483,7 +507,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return Colors.Transparent.ToString(); //PrimaryImageTreatment.Background.ToString();
+                return PrimaryImageTreatment?.Background.ToString() ?? Colors.Transparent.ToString();
             }
             set { CreatePrimaryTreatment().Background = (Color)ColorConverter.ConvertFromString(value); }
         }
@@ -492,7 +516,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return new Dithering().GetType().Name; //((NonEmptyCalculation)PrimaryCalculation).Dithering.GetType().Name;
+                return ((NonEmptyCalculation)PrimaryCalculation)?.Dithering.GetType().Name ?? new Dithering().GetType().Name;
             }
             set
             {
@@ -503,6 +527,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        
         #endregion
 
     }
@@ -543,12 +568,13 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
+        /*
         [ProtoMember(1)]
         private AverageMode average
         {
             get
             {
-                return AverageMode.Corner; //((NormalReadout)PrimaryImageTreatment).Average;
+                return ((NormalReadout)PrimaryImageTreatment)?.Average ?? AverageMode.Corner; 
             }
             set
             {
@@ -560,13 +586,14 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return true; //return ((NormalReadout)PrimaryImageTreatment).AllowStretch;
+                return ((NormalReadout)PrimaryImageTreatment)?.AllowStretch ?? true;
             }
             set
             {
                 ((NormalReadout)CreatePrimaryTreatment()).AllowStretch = value;
             }
         }
+        */
         #endregion
     }
 

@@ -8,6 +8,10 @@ namespace DominoPlanner.Core
 {
     public partial class FieldParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
+        public void ResetSize()
+        {
+            current_width = Length;
+        }
         public int current_width { get; set; }
         public int current_height { get => last.length / current_width; set { } }
         public bool IsValidPastePosition(int source_position, int target_position)

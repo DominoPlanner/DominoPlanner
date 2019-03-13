@@ -53,8 +53,16 @@ namespace DominoPlanner.Core
             get { return _background; }
             set { _background = value; sourceValid = false; }
         }
-        [ProtoMember(4)]
-        public ObservableCollection<ImageFilter> ImageFilters { get; set; }
+        private ObservableCollection<ImageFilter> _imageFilters;
+        [ProtoMember(4, OverwriteList = true)]
+        public ObservableCollection<ImageFilter> ImageFilters
+        {
+            get => _imageFilters;
+            set
+            {
+                _imageFilters = value;
+            }
+        }
 
         public StateReference StateReference { get; set; }
 
