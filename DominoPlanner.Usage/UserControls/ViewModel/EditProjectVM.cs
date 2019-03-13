@@ -698,15 +698,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 System.Windows.Shapes.Path sd = new System.Windows.Shapes.Path();
 
                 DominoProject.Stones.Add(dic);
-                for (int k = 0; k < 4; k++)
-                {
-                    if (largestX == 0 || largestX < dominoTransfer[i].GetPath().points[k].X)
-                        largestX = dominoTransfer[i].GetPath().points[k].X;
-
-                    if (largestY == 0 || largestY < dominoTransfer[i].GetPath().points[k].Y)
-                        largestY = dominoTransfer[i].GetPath().points[k].Y;
-                }
             }
+            largestX = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
+            largestY = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
             DominoProject.Width = largestX;
             DominoProject.Height = largestY;
 

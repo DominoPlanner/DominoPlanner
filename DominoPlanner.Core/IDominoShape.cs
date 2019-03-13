@@ -63,14 +63,14 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract DominoRectangle GetContainer(double scaling_x, double scaling_y);
+        public abstract DominoRectangle GetContainer(double scaling_x, double scaling_y, bool expanded = false);
         /// <summary>
         /// Gibt den Container des Steins als Rechteck zurück, mit seitenverhältniserhaltender Skalierung.
         /// Das Rechteck berührt den Stein, sodass das Rechteck alle Punkte des Steins enthält.
         /// </summary>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public DominoRectangle GetContainer(double scaling = 1) { return GetContainer(scaling, scaling); }
+        public DominoRectangle GetContainer(double scaling = 1, bool expanded = false) { return GetContainer(scaling, scaling, expanded); }
         /// <summary>
         /// Überprüft, ob ein Punkt innerhalb des Steins liegt.
         /// </summary>

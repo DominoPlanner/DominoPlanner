@@ -47,9 +47,15 @@ namespace DominoPlanner.Core
         public double expanded_width;
         [ProtoMember(6)]
         public double expanded_height;
-        public override DominoRectangle GetContainer(double scaling_x, double scaling_y)
+        public override DominoRectangle GetContainer(double scaling_x, double scaling_y, bool expanded = false)
         {
-            return new DominoRectangle() { width = this.width * scaling_x, height = this.height * scaling_y, x = this.x * scaling_x, y = this.y * scaling_y};
+            return new DominoRectangle()
+            {
+                width = (expanded ? expanded_width : this.width) * scaling_x,
+                height = (expanded ? expanded_height : this.height) * scaling_y,
+                x = this.x * scaling_x,
+                y = this.y * scaling_y
+            };
         }
 
         public override DominoPath GetPath(double scaling_x, double scaling_y)
@@ -129,7 +135,7 @@ namespace DominoPlanner.Core
             }
             return false;
         }
-        public override DominoRectangle GetContainer(double scaling_x, double scaling_y)
+        public override DominoRectangle GetContainer(double scaling_x, double scaling_y, bool expanded = false)
         {
             double xmin = points.Min(p => p.X);
             double ymin = points.Min(p => p.Y);
