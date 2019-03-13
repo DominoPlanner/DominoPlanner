@@ -23,7 +23,7 @@ namespace DominoPlanner.Core
         public bool reverse { get; set; }
         public Color fixedBackColor { get; set; }
         public Orientation orientation { get; set; }
-        public String path { get; set; }
+        public String project { get; set; }
         public ObjectProtocolParameters()
         {
             reverse = false;
@@ -284,12 +284,12 @@ namespace DominoPlanner.Core
             ws.HeaderFooter.OddFooter.CenteredText = string.Format("Page {0} of {1}", ExcelHeaderFooter.PageNumber, ExcelHeaderFooter.NumberOfPages);
             ws.HeaderFooter.OddHeader.RightAlignedText = DateTime.Today.ToShortDateString();
             ws.HeaderFooter.EvenHeader.RightAlignedText = DateTime.Today.ToShortDateString();
-            ws.HeaderFooter.FirstHeader.LeftAlignedText = "Project: " + new DirectoryInfo(Path.GetDirectoryName(path)).Name;
+            ws.HeaderFooter.FirstHeader.LeftAlignedText = "Project: " + project;
             ws.HeaderFooter.OddHeader.LeftAlignedText = title;
             ws.HeaderFooter.EvenHeader.LeftAlignedText = title;
             ws.HeaderFooter.FirstHeader.RightAlignedText = "Go to View -> Page Break Preview for page overview";
-            ws.HeaderFooter.OddHeader.CenteredText = "Project: " + new DirectoryInfo(Path.GetDirectoryName(path)).Name;
-            ws.HeaderFooter.EvenHeader.CenteredText = "Project: " + new DirectoryInfo(Path.GetDirectoryName(path)).Name;
+            ws.HeaderFooter.OddHeader.CenteredText = "Project: " + project;
+            ws.HeaderFooter.EvenHeader.CenteredText = "Project: " + project;
             ws.PrinterSettings.TopMargin = (decimal)0.5;
             ws.PrinterSettings.LeftMargin = (decimal)0.4;
             ws.PrinterSettings.RightMargin = (decimal)0.4;

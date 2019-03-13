@@ -359,7 +359,7 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP);
+                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, "", currentOPP); // Jojo hier Projektname einfügen
                     Process.Start(dlg.FileName);
                 }
                 catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }

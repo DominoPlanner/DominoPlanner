@@ -366,9 +366,9 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="path">Der Speicherort des Protokolls.</param>
         /// <param name="parameters">Die Parameter des Protokolls.</param>
-        public void SaveXLSFieldPlan(string path, ObjectProtocolParameters parameters)
+        public void SaveXLSFieldPlan(string path, string projectname, ObjectProtocolParameters parameters)
         {
-            parameters.path = path;
+            parameters.project = projectname;
             FileInfo file = new FileInfo(path);
             if (file.Exists) file.Delete();
             ExcelPackage pack = new ExcelPackage(file);
