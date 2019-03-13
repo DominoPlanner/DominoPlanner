@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace DominoPlanner.Core
     partial class StructureParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
         private int _current_width;
+        [ProtoMember(50)]
         public int current_width { get => _current_width; set => _current_width = value; }
 
         public int current_height
