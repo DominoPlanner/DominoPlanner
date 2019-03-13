@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,9 @@ namespace DominoPlanner.Core
     public partial class FieldParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
         int _current_width;
-        public int current_width { get => _current_width; set => _current_width = value; }
+        [ProtoMember(50)]
+        public int current_width { get => _current_width;
+            set => _current_width = value; }
         public int current_height { get => last.length / _current_width; set { } }
         public bool IsValidPastePosition(int source_position, int target_position)
         {
