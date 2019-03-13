@@ -179,7 +179,7 @@ namespace DominoPlanner.Usage
             List<TabItem> removeList = Tabs.Where(x => x.ProjectID == ((ProjectListComposite)((System.Windows.Controls.MenuItem)sender).DataContext).OwnID).ToList<TabItem>();
             for (int i = 0; i < removeList.Count; i++)
             {
-                Tabs.Remove(removeList[0]);
+                RemoveItem(removeList[0]);
             }
 
             if (OpenProjectSerializer.RemoveOpenProject(((ProjectListComposite)((System.Windows.Controls.MenuItem)sender).DataContext).OwnID))
@@ -190,6 +190,30 @@ namespace DominoPlanner.Usage
             {
                 Errorhandler.RaiseMessage("Could not remove the project!", "Error", Errorhandler.MessageType.Error);
             }
+        }
+        private void RenameMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var proj = (ProjectListComposite)((System.Windows.Controls.MenuItem)sender).DataContext;
+            foreach (TabItem item in Tabs.Where(x => x.ProjectID == proj.OwnID).ToList())
+                RemoveItem(item);
+            var dn = (AssemblyNode)proj.Project.documentNode;
+            RenameObject ro = new RenameObject(Path.GetFileName(proj.FilePath));
+            if (ro.ShowDialog() == true)
+            {
+                Workspace.CloseFile(proj.FilePath);
+                OpenProjectSerializer.RemoveOpenProject(proj.OwnID);
+                dn.Path = Path.Combine(Path.GetDirectoryName(dn.Path), ((RenameObjectVM)ro.DataContext).NewName);
+                proj.Name = Path.GetFileNameWithoutExtension(((RenameObjectVM)ro.DataContext).NewName);
+                string old_path = proj.FilePath;
+                proj.FilePath = Path.Combine(Path.GetDirectoryName(proj.FilePath), ((RenameObjectVM)ro.DataContext).NewName);
+                File.Move(old_path, proj.FilePath);
+                var projectcomposite = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(proj.FilePath), Path.GetDirectoryName(proj.FilePath));
+                Projects.Remove(proj);
+                loadProject(projectcomposite);
+                Workspace.Load<DominoAssembly>(proj.FilePath);
+            }
+
+
         }
         /// <summary>
         /// Clickevent wenn in der Baumstruktur ein Projektnode geklickt wird
@@ -277,18 +301,37 @@ namespace DominoPlanner.Usage
                 RemoveItem(tabItem);
             }
         }
-
-        private void RemoveItem(TabItem tabItem)
+        private bool RemoveProjectComposite(ProjectComposite comp)
         {
+            bool result = true;
+            foreach (TabItem tabItem in Tabs.Where(x => x.ProjectComp == comp).ToArray())
+            {
+                result = result && RemoveItem(tabItem);
+            }
+            return result;
+        }
+        private bool RemoveItem(TabItem tabItem)
+        {
+            bool remove = false;
             if (tabItem.Content.UnsavedChanges)
             {
                 System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show($"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?", "Warning", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Warning);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
                     tabItem.Content.Save();
+                    remove = true;
+                }
+                if (result == System.Windows.Forms.DialogResult.No)
+                {
+                    remove = true;
                 }
             }
-            Tabs.Remove(tabItem);
+            else
+            {
+                remove = true;
+            }
+            if (remove) Tabs.Remove(tabItem);
+            return remove;
         }
 
         #endregion
@@ -339,6 +382,7 @@ namespace DominoPlanner.Usage
                     {
                         try
                         {
+                            Workspace.CloseFile(projectpath);
                             if (File.Exists(projectpath))
                                 File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.DProject"));
                             DominoAssembly newMainNode = new DominoAssembly();
@@ -376,7 +420,9 @@ namespace DominoPlanner.Usage
                     actPLC.SelectedEvent += MainWindowViewModel_SelectedEvent;
                     actPLC.conMenu.createMI.Click += CreateMI_Click;
                     actPLC.conMenu.removeMI.Click += RemoveMI_Click;
-                    actPLC.Children.CollectionChanged += Children_CollectionChanged;
+                    actPLC.conMenu.renameMI.Click += RenameMI_Click;
+                    actPLC.closeTabDelegate = RemoveProjectComposite;
+                    actPLC.openTabDelegate = OpenItem;
                     Projects.Add(actPLC);
 
                     foreach (ProjectElement currPT in getProjects(mainnode.obj))
@@ -395,24 +441,6 @@ namespace DominoPlanner.Usage
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
             }
         }
-
-        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            {
-                foreach (ProjectComposite old in e.OldItems.OfType<ProjectComposite>())
-                {
-                    foreach (TabItem tabItem in Tabs.ToArray())
-                    {
-                        if (tabItem.ProjectComp == old)
-                        {
-                            Tabs.Remove(tabItem);
-                        }
-                    }
-                }
-            }
-        }
-
         private List<ProjectElement> getProjects(DominoAssembly dominoAssembly)
         {
             List<ProjectElement> returnList = new List<ProjectElement>();
@@ -427,7 +455,9 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    string filepath = Workspace.AbsolutePathFromReference(ref dominoWrapper.relativePath, dominoWrapper.parent);
+                    string relativePath = dominoWrapper.relativePath;
+                    string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoWrapper.parent);
+                    dominoWrapper.relativePath = relativePath;
                     string picturepath = ImageHelper.GetImageOfFile(filepath);
                     ProjectElement project = new ProjectElement(filepath,
                         picturepath, dominoWrapper);
@@ -475,6 +505,7 @@ namespace DominoPlanner.Usage
                     ProjectComposite newItem = parentProject.AddProject(new ProjectComposite(projectTransfer, parentProject.OwnID));
                     newItem.IsClicked += Item_IsClicked;
                     newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
+                    newItem.conMenu.renameMI.Click += parentProject.RenameMI_Object_Click;
                     newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
                     return newItem;
                 }

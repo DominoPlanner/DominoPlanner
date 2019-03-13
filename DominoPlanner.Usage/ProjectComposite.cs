@@ -279,7 +279,8 @@ namespace DominoPlanner.Usage
             createMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/add.ico", UriKind.Relative)) };
             fieldprotoMI.Header = "Generate Fieldprotocol";
             fieldprotoMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/file_export.ico", UriKind.Relative)) };
-
+            renameMI.Header = "Rename";
+            renameMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/draw_freehand.ico", UriKind.Relative)) };
             Items.Add(openFolderMI);
         }
         public MenuItem fieldprotoMI = new MenuItem();
@@ -287,6 +288,7 @@ namespace DominoPlanner.Usage
         public MenuItem removeMI = new MenuItem();
         public MenuItem exportImageMI = new MenuItem();
         public MenuItem openFolderMI = new MenuItem();
+        public MenuItem renameMI = new MenuItem();
     }
 
     public class ContextMenueSelector
@@ -298,13 +300,16 @@ namespace DominoPlanner.Usage
             {
                 case NodeType.MasterplanNode:
                     cm.Items.Add(cm.createMI);
+                    cm.Items.Add(cm.renameMI);
                     cm.Items.Add(cm.removeMI);
+                    
                     break;
                 case NodeType.ColorListNode:
                     break;
                 case NodeType.ProjectNode:
                     cm.Items.Add(cm.exportImageMI);
                     if(hasProtocol) cm.Items.Add(cm.fieldprotoMI);
+                    cm.Items.Add(cm.renameMI);
                     cm.Items.Add(cm.removeMI);
                     break;
                 default:

@@ -42,7 +42,7 @@ namespace DominoPlanner.Usage
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    Errorhandler.RaiseMessage("This Folder already exists. Please choose another Project-Name.", "Existing Folder", Errorhandler.MessageType.Error);
+                    Errorhandler.RaiseMessage("This folder already exists. Please choose another project name.", "Existing Folder", Errorhandler.MessageType.Error);
                     return;
                 }
 
@@ -63,12 +63,12 @@ namespace DominoPlanner.Usage
 
                 main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
 
-                Errorhandler.RaiseMessage("Create new project", "Created", Errorhandler.MessageType.Info);
+                Errorhandler.RaiseMessage($"The project {ProjectName}.DProject has been created", "Created", Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)
             {
-                Console.WriteLine("The process failed: {0}", e.ToString());
+                Console.WriteLine("Project creation failed: {0}", e.ToString());
             }
         }
 

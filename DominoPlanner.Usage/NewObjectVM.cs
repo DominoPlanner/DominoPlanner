@@ -214,6 +214,12 @@ namespace DominoPlanner.Usage
                     }
 
                     internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(originalImagePath));
+                    int counter = 1;
+                    while (File.Exists(Path.Combine(_ProjectPath, "Source Image", internPictureName)))
+                    {
+                        internPictureName = $"{filename} ({counter}){Path.GetExtension(originalImagePath)}";
+                        counter++;
+                    }
                     try
                     {
                         File.Copy(originalImagePath, Path.Combine(_ProjectPath, "Source Image", internPictureName));
