@@ -185,7 +185,7 @@ namespace DominoPlanner.Core
             ExcelWorksheet ws = pack.Workbook.Worksheets.Add(title);
             int cols = 0;
             int rowcounter = 1;
-
+            ws.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             for (int i = 0; i < trans.dominoes.Length; i++) // foreach row
             {
                 if (trans.dominoes[i] == null) throw new InvalidOperationException("Object not valid!");
@@ -247,9 +247,6 @@ namespace DominoPlanner.Core
                                 {
                                     cell.Value = parsed;
                                 }
-                            
-
-
                             }
                         }
                     }
