@@ -5,6 +5,7 @@ using OfficeOpenXml;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -418,6 +419,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void AddProjectCountsColumn(string projectName)
         {
             Binding amountBinding = new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString()));
+            MultiBinding colorBinding = new MultiBinding();
+            colorBinding.Bindings.Add(new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString())));
+            colorBinding.Bindings.Add(new Binding("DominoColor.count"));
+            colorBinding.Converter = new AmountToColorConverter();
+
             amountBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
             DataTemplate amountLabel = new DataTemplate();
@@ -426,7 +432,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DataGridTemplateColumn c = new DataGridTemplateColumn();
             c.Header = projectName;
             FrameworkElementFactory textFactory = new FrameworkElementFactory(typeof(Label));
-            textFactory.SetValue(Label.ContentProperty, amountBinding);
+            textFactory.SetValue(ContentControl.ContentProperty, amountBinding);
+            textFactory.SetValue(Control.ForegroundProperty, colorBinding);
 
             DataTemplate columnTemplate = new DataTemplate();
             columnTemplate.VisualTree = textFactory;
@@ -435,4 +442,5 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         #endregion
     }
+    
 }

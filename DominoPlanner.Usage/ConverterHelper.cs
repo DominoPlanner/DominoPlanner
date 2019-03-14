@@ -9,6 +9,26 @@ namespace DominoPlanner.Usage
     class ConverterHelper
     {
     }
+    public class AmountToColorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            int anzahl = 0, gesamt = 0;
+            if (int.TryParse(values[0].ToString(), out anzahl) && int.TryParse(values[1].ToString(), out gesamt))
+            {
+                if (anzahl > gesamt)
+                {
+                    return System.Windows.Media.Brushes.Red;
+                }
+            }
+            return System.Windows.Media.Brushes.Black;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public class ColorToHTMLConverter : IValueConverter
     {
