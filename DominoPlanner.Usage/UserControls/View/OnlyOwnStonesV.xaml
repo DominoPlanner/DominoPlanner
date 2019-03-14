@@ -17,11 +17,13 @@
             <CheckBox IsChecked="{Binding OnlyUse}">Try to match Available dominoes</CheckBox>
             <Grid Grid.Row="1" IsEnabled="{Binding OnlyUse}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="2.5*"/>
+                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <Label VerticalContentAlignment="Top" Grid.Column="0">Penalty</Label>
-                <Slider Value="{Binding Weight, Delay=500}" Grid.Column="1" Minimum="0" Maximum="1" Margin="0,5,0,0" SmallChange="0.01" TickFrequency="0" LargeChange="0.1" TickPlacement="BottomRight" />
+                <Slider Value="{Binding Weight, Delay=200}" Grid.Column="1" Minimum="0" Maximum="0.5" Margin="0,5,0,0" SmallChange="0.01" TickFrequency="0" LargeChange="0.1" TickPlacement="BottomRight" />
+                <xctk:DecimalUpDown Value="{Binding Weight}" Grid.Column="2" Minimum="0" Maximum="0.5" Increment="0.001" Margin="0, 0, 2, 5" FormatString="F3"></xctk:DecimalUpDown>
             </Grid>
             <Grid Grid.Row="2" IsEnabled="{Binding OnlyUse}">
                 <Grid.ColumnDefinitions>
