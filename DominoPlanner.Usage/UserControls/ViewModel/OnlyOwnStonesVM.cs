@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DominoPlanner.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             OnlyUse = false;
             Weight = 0.5;
             Iterations = 1;
+        }
+        public OnlyOwnStonesVM(IterationInformation res)
+        {
+            _onlyUse = res is IterativeColorRestriction;
+            if (_onlyUse)
+            {
+                var r = res as IterativeColorRestriction;
+                _iteration = r.maxNumberOfIterations;
+                _weight = r.iterationWeight;
+            }
         }
 
         private bool _onlyUse;

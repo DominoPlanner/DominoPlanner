@@ -19,7 +19,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             CurrentProject = dominoProvider.obj;
             
             fsvm = new FieldSizeVM(true);
-            OnlyOwnStonesVM = new OnlyOwnStonesVM();
+            OnlyOwnStonesVM = new OnlyOwnStonesVM(fieldParameters.IterationInformation);
 
             iResizeMode = (int)fieldParameters.resizeMode;
             iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;

@@ -16,7 +16,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public CreateStructureVM(IDominoProvider dominoProvider, bool rectangular) : base()
         {
             CurrentProject = dominoProvider;
-            OnlyOwnStonesVM = new OnlyOwnStonesVM();
+            OnlyOwnStonesVM = new OnlyOwnStonesVM(dominoProvider.IterationInformation);
             structureIsRectangular = rectangular;
 
             if (structureIsRectangular)
