@@ -42,6 +42,34 @@ namespace DominoPlanner.Core
                 return shapes.Max(y => (y.position != null) ? y.position.y : 0) + 1;
             }
         }
+        public int physicalLength
+        {
+            get
+            {
+                return shapes.Max(x => x.GetContainer().x2) + 1;
+            }
+        }
+        public int physicalHeight
+        {
+            get
+            {
+                return shapes.Max(y => y.GetContainer().y2) + 1;
+            }
+        }
+        public int physicalExpandedLength
+        {
+            get
+            {
+                return shapes.Max(x => x.GetContainer(expanded: true).x2) + 1;
+            }
+        }
+        public int physicalExpandedHeight
+        {
+            get
+            {
+                return shapes.Max(y => y.GetContainer(expanded: true).y2) + 1;
+            }
+        }
         public IDominoShape this[int index]
         {
             get
@@ -58,7 +86,7 @@ namespace DominoPlanner.Core
         {
             return GenerateImage(Colors.White, targetWidth, borders);
         }
-        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false)
+        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false)
         {
 
             double scalingFactor = 1;
@@ -84,7 +112,7 @@ namespace DominoPlanner.Core
                //    (byte)shapes[i].ditherColor.Green, (byte)shapes[i].ditherColor.Blue);
                if (shapes[i] is RectangleDomino)
                {
-                   DominoRectangle rect = shapes[i].GetContainer(scalingFactor);
+                   DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);
                    if (c.A != 0)
                    {
                        CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()

@@ -123,6 +123,10 @@
     <Compile Include="ConverterHelper.cs" />
     <Compile Include="DominoInCanvas.cs" />
     <Compile Include="DominoStone.cs" />
+    <Compile Include="ExportOptions.xaml.cs">
+      <DependentUpon>ExportOptions.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExportOptionsVM.cs" />
     <Compile Include="HelperClass\Errorhandler.cs" />
     <Compile Include="HelperClass\ImageConvert.cs" />
     <Compile Include="ImageHelper.cs" />
@@ -200,6 +204,10 @@
       <DependentUpon>RoundSize.xaml</DependentUpon>
     </Compile>
     <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExportOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

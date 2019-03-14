@@ -92,18 +92,6 @@ namespace DominoPlanner.Usage
         #endregion
 
     }
-    public class FilenameToTitleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return "Rename file " + value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
     // from https://www.codeproject.com/Tips/1249276/WPF-Select-All-Focus-Behavior
     public class SelectAllFocusBehavior
     {

@@ -33,6 +33,8 @@ namespace DominoPlanner.Usage
             }
                 conMenu.fieldprotoMI.Click += FieldprotoMI_Click;
             conMenu.exportImageMI.Click += ExportImageMI_Click;
+
+            conMenu.exportImageExtendedMI.Click += ExportImageExtendedMI_Click;
             conMenu.openFolderMI.Click += OpenFolderMI_Click;
             MouseClickCommand = new RelayCommand(o => { IsClicked?.Invoke(this, EventArgs.Empty); });
 
@@ -80,10 +82,38 @@ namespace DominoPlanner.Usage
 
         private void ExportImageMI_Click(object sender, RoutedEventArgs e)
         {
+            ExportImage(false);
+        }
+        private void ExportImageExtendedMI_Click(object sender, RoutedEventArgs e)
+        {
+            ExportImage(true);
+        }
+        private void ExportImage(bool userdefinedExport)
+        {
             try
             {
                 if (Project.documentNode is DocumentNode documentNode)
                 {
+                    int width = 2000;
+                    bool collapsed = false;
+                    bool drawBorders = false;
+                    System.Windows.Media.Color background = Colors.Transparent;
+                    if (userdefinedExport)
+                    {
+                        ExportOptions exp = new ExportOptions(documentNode.obj);
+                        if (exp.ShowDialog() == true)
+                        {
+                            var dc = exp.DataContext as ExportOptionsVM;
+                            width = dc.ImageSize;
+                            collapsed = dc.Collapsed;
+                            drawBorders = dc.DrawBorders;
+                            background = dc.BackgroundColor;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
                     System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
                     saveFileDialog.Filter = "png files (*.png)|*.png";
                     saveFileDialog.RestoreDirectory = true;
@@ -94,11 +124,11 @@ namespace DominoPlanner.Usage
                         {
                             File.Delete(saveFileDialog.FileName);
                         }
-                        documentNode.obj.Generate().GenerateImage().Save(saveFileDialog.FileName);
+                        documentNode.obj.Generate().GenerateImage(background, width, drawBorders, collapsed).Save(saveFileDialog.FileName);
                     }
                 }
             }
-            catch (Exception) { }
+            catch (Exception ex) { Errorhandler.RaiseMessage("Export failed" + ex, "Error", Errorhandler.MessageType.Error); }
         }
 
         private void OpenFolderMI_Click(object sender, RoutedEventArgs e)
@@ -273,11 +303,13 @@ namespace DominoPlanner.Usage
             openFolderMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/folder_tar.ico", UriKind.Relative)) };
             exportImageMI.Header = "Export as Image";
             exportImageMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/image.ico", UriKind.Relative)) };
+            exportImageExtendedMI.Header = "Custom Image Export";
+            exportImageExtendedMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/image.ico", UriKind.Relative)) };
             removeMI.Header = "Remove";
             removeMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/remove.ico", UriKind.Relative)) };
             createMI.Header = "Create Field/Structure";
             createMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/add.ico", UriKind.Relative)) };
-            fieldprotoMI.Header = "Generate Fieldprotocol";
+            fieldprotoMI.Header = "Generate Field Protocol";
             fieldprotoMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/file_export.ico", UriKind.Relative)) };
             renameMI.Header = "Rename";
             renameMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/draw_freehand.ico", UriKind.Relative)) };
@@ -287,6 +319,7 @@ namespace DominoPlanner.Usage
         public MenuItem createMI = new MenuItem();
         public MenuItem removeMI = new MenuItem();
         public MenuItem exportImageMI = new MenuItem();
+        public MenuItem exportImageExtendedMI = new MenuItem();
         public MenuItem openFolderMI = new MenuItem();
         public MenuItem renameMI = new MenuItem();
     }
@@ -308,7 +341,8 @@ namespace DominoPlanner.Usage
                     break;
                 case NodeType.ProjectNode:
                     cm.Items.Add(cm.exportImageMI);
-                    if(hasProtocol) cm.Items.Add(cm.fieldprotoMI);
+                    cm.Items.Add(cm.exportImageExtendedMI);
+                    if (hasProtocol) cm.Items.Add(cm.fieldprotoMI);
                     cm.Items.Add(cm.renameMI);
                     cm.Items.Add(cm.removeMI);
                     break;
