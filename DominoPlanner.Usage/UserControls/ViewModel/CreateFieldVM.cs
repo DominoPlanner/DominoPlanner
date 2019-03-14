@@ -276,7 +276,35 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        
+        private bool _draw_borders;
+        public bool draw_borders
+        {
+            get { return _draw_borders; }
+            set
+            {
+                if (_draw_borders != value)
+                {
+                    _draw_borders = value;
+                    refresh();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private System.Windows.Media.Color _backgroundColor;
+        public System.Windows.Media.Color backgroundColor
+        {
+            get { return _backgroundColor; }
+            set
+            {
+                if (_backgroundColor != value)
+                {
+                    _backgroundColor = value;
+                    RaisePropertyChanged();
+                    refresh();
+                }
+            }
+        }
+
         private int _iDiffusionMode = 1;
         public int iDiffusionMode
         {
@@ -319,14 +347,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             System.Diagnostics.Debug.WriteLine(progress.ToString());
             if (dispatcher == null)
             {
-                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
                 cursor = null;
             }
             else
             {
                 dispatcher.BeginInvoke((Action)(() =>
                 {
-                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
                     CurrentPlan = newBitmap;
                     cursor = null;
                 }));

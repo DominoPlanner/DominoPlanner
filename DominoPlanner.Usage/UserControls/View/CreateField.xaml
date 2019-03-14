@@ -31,11 +31,12 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="Resize mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                <Label Grid.Row="1" Content="{Binding sResizeMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                <Grid Grid.Row="2">
+                <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,-2,0,0">
+                    <TextBlock>Resize mode:&#160;</TextBlock>
+                    <TextBlock Text="{Binding sResizeMode}"></TextBlock>
+                </StackPanel>
+                <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="3*"/>
@@ -45,9 +46,9 @@
                     <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="5" Value="{Binding iResizeMode}" TickPlacement="BottomRight"/>
                     <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
-                <Label Grid.Row="3" Content="Color Approximation Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                <Label Grid.Row="4" Content="{Binding sColorApproxMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                <Grid Grid.Row="5">
+                <Label Grid.Row="2" Content="Color Approximation Mode:" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Label Grid.Row="3" Content="{Binding sColorApproxMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                <Grid Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="3*"/>
@@ -55,11 +56,13 @@
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="Fast" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                     <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}" TickPlacement="BottomRight"/>
-                    <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
+                    <Label Grid.Column="2" Content="Accurate" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
-                <Label Grid.Row="6" Content="Diffusion Mode" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Top" Margin="0,-2,0,0"/>
-                <Label Grid.Row="7" Content="{Binding sDiffusionMode}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
-                <Grid Grid.Row="8">
+                <StackPanel Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,-2,0,0" Orientation="Horizontal">
+                    <TextBlock>Diffusion Mode:&#160;</TextBlock>
+                    <TextBlock Text="{Binding sDiffusionMode}"></TextBlock>
+                </StackPanel> 
+                <Grid Grid.Row="6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="3*"/>
@@ -69,6 +72,9 @@
                     <Slider Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}" TickPlacement="BottomRight"/>
                     <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                 </Grid>
+                <CheckBox Margin="5,5.4,72,5.4" IsChecked="{Binding draw_borders}" Grid.Row="7" Content="Draw Domino Borders"></CheckBox>
+                <xctk:ColorPicker Grid.Row="7" Margin="0,0,2,0" HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
+
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
