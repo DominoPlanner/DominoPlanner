@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -26,6 +27,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                 ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
                 ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
+                for (int i = 0; i < ((RectangularSizeVM)CurrentViewModel).structures.Count; i++)
+                {
+                    if (XNode.DeepEquals(((RectangularSizeVM)CurrentViewModel).structures[i], XElement.Parse(((StructureParameters)structureParameters)._structureDefinitionXML)))
+                    {
+                        ((RectangularSizeVM)CurrentViewModel).structure_index = i;
+                    }
+                }
             }
             else
             {
@@ -62,6 +70,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
             ShowFieldPlan = new RelayCommand(o => { FieldPlan(); });
             EditClick = new RelayCommand(o => { CurrentProject.Editing = true; });
+            
+            
             cs = new CancellationTokenSource();
         }
         #endregion

@@ -20,7 +20,7 @@ namespace DominoPlanner.Core
         // spiegelt das XElement für die Serialisierung, damit wir nicht das gesamte StructureDefinition-Objekt serialisieren müssen
         private string __structureDefXML;
         [ProtoMember(3)]
-        private string _structureDefinitionXML
+        public string _structureDefinitionXML
         {
             set
             {
