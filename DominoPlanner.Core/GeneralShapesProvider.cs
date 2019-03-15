@@ -13,6 +13,7 @@ using System.ComponentModel;
 using Emgu.CV.Structure;
 using ProtoBuf;
 using DominoPlanner.Core.RTree;
+using System.Threading;
 //using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
@@ -190,9 +191,17 @@ namespace DominoPlanner.Core
                     ResetDitherColors(shapes.dominoes);
                     IterationInformation.numberofiterations = iter;
                     Console.WriteLine($"Iteration {iter}");
-                    Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                    CancellationTokenSource cts = new CancellationTokenSource();
+                    Parallel.For(0, shapes.dominoes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1, CancellationToken= cts.Token }, (i) =>
                     {
-                        shapes.dominoes[i].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                        try
+                        {
+                            shapes.dominoes[i].CalculateColor(colors, colorMode, TransparencySetting, IterationInformation.weights);
+                        }
+                        catch (Exception)
+                        {
+                            cts.Cancel();
+                        }
                     });
                 }
                 // Farben zählen

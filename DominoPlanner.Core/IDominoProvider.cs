@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using Emgu.CV.Structure;
 using System.Linq;
+using System.Threading;
 
 namespace DominoPlanner.Core
 {
@@ -311,7 +312,7 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
-        public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
+        public virtual DominoTransfer Generate(CancellationToken ct, IProgress<string> progressIndicator = null)
         {
             Console.WriteLine("Regenerate");
             if (Editing) return last;
@@ -320,28 +321,33 @@ namespace DominoPlanner.Core
                 if (progressIndicator != null) progressIndicator.Report("Updating source image");
                 UpdateSource();
             }
+            ct.ThrowIfCancellationRequested();
             if (!colorsValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
                 ApplyColorFilters();
             }
+            ct.ThrowIfCancellationRequested();
             if (!imageValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Applying image filters");
                 ApplyImageFilters();
             }
+            ct.ThrowIfCancellationRequested();
             if (!shapesValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Calculating domino shapes...");
                 GenerateShapes();
                 usedColorsValid = false;
             }
+            ct.ThrowIfCancellationRequested();
             if (!usedColorsValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Reading pixels from image...");
                 ReadUsedColors();
                 lastValid = false;
             }
+            ct.ThrowIfCancellationRequested();
             if (!lastValid)
             {
                 if (progressIndicator != null) progressIndicator.Report("Calculating ideal colors...");

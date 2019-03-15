@@ -79,7 +79,7 @@ namespace DominoPlanner.Core
         {
             if (obj is IDominoProvider)
             {
-                ((IDominoProvider)obj).Generate();
+               // ((IDominoProvider)obj).Generate();
             }
             else throw (new Exception("kein unterstützter Datentyp übergeben"));
         }
@@ -121,7 +121,7 @@ namespace DominoPlanner.Core
         {
             if(!input.lastValid)
             {
-                input.Generate();
+                //input.Generate();
                 state_before = (T)input.Clone();
             }
             executeInternal(input);

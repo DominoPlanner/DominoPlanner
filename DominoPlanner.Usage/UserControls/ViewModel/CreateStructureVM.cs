@@ -3,6 +3,7 @@ using DominoPlanner.Usage.HelperClass;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -61,10 +62,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
             ShowFieldPlan = new RelayCommand(o => { FieldPlan(); });
             EditClick = new RelayCommand(o => { CurrentProject.Editing = true; });
+            cs = new CancellationTokenSource();
         }
         #endregion
 
         #region fields
+        CancellationTokenSource cs = new CancellationTokenSource();
+
         public System.Windows.Threading.Dispatcher dispatcher;
         private Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private GeneralShapesProvider structureParameters
@@ -113,7 +117,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
+        
         private byte _TransparencyValue;
         public byte TransparencyValue
         {
@@ -387,6 +391,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region Methods
         private void refreshPlanPic()
         {
+            CurrentViewModel.PropertyChanged -= CurrentViewModel_PropertyChanged;
             if (dispatcher == null)
             {
                 CurrentViewModel.StrucSize = dominoTransfer.shapes.Count();
@@ -402,6 +407,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     cursor = null;
                 }));
             }
+            CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
         }
         private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -443,15 +449,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             throw new NotImplementedException();
         }
-
         private async void Refresh()
         {
-            CurrentViewModel.PropertyChanged -= CurrentViewModel_PropertyChanged;
+            cs.Cancel();
+            cs = new CancellationTokenSource();
+            Console.WriteLine("Refresh called");
+            Console.WriteLine(new System.Diagnostics.StackTrace());
+            //CurrentViewModel.PropertyChanged -= CurrentViewModel_PropertyChanged;
             try
             {
                 cursor = Cursors.Wait;
-                Func<DominoTransfer> function = new Func<DominoTransfer>(() => structureParameters.Generate(progress));
-                dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(function);
+                dominoTransfer = await Task.Factory.StartNew<DominoTransfer>(() =>
+                {
+                    try
+                    {
+                        return structureParameters.Generate(cs.Token, progress);
+                    }
+                    catch (Exception)
+                    {
+                        
+                    }
+                    return structureParameters.last;
+                }, cs.Token);
                 if (structureParameters is StructureParameters sp)
                 {
                     if (CurrentViewModel is RectangularSizeVM rs)
@@ -465,7 +484,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cursor = null;
             }
-            CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
+            //CurrentViewModel.PropertyChanged += CurrentViewModel_PropertyChanged;
         }
         public override bool Save()
         {

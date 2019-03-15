@@ -4,6 +4,7 @@ using Emgu.CV.CvEnum;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -99,7 +100,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
+        
         private OnlyOwnStonesVM _onlyOwnStonesVM;
 
         public OnlyOwnStonesVM OnlyOwnStonesVM
@@ -360,12 +361,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }));
             }
         }
-        
+
+        CancellationToken ct;
         private async void refresh()
         {
             cursor = Cursors.Wait;
             refrshCounter++;
-            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(progress));
+            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(ct, progress));
             DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
             refrshCounter--;
             if(refrshCounter == 0)
