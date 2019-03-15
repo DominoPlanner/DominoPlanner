@@ -49,6 +49,36 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+        private int _physicalLength;
+        public int PhysicalLength
+        {
+            get
+            {
+                return _physicalLength;
+            }
+            set
+            {
+                if (_physicalLength != value)
+                {
+                    _physicalLength = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _physicalHeight;
+        public int PhysicalHeight
+        {
+            get { return _physicalHeight; }
+            set
+            {
+                if (_physicalHeight != value)
+                {
+                    _physicalHeight = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
 
         private int _FieldSize;

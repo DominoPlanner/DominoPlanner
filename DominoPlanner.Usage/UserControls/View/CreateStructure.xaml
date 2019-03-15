@@ -23,16 +23,93 @@
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Image Grid.Row="0" Grid.Column="2" Source="{Binding DestinationImage}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*" MinWidth="200"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MinWidth="280"/>
+                <ColumnDefinition Width="*" MinWidth="280"/>
             </Grid.ColumnDefinitions>
-            <Grid HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0">
-                <ContentControl Margin="1,1,1,1" Content="{Binding CurrentViewModel}"/>
+            <Grid Margin="0, 0, 10, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <GroupBox>
+                    <GroupBox.Header>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}Structure Dimensions: {0}mm x {1}mm">
+                                    <Binding Path="PhysicalLength"></Binding>
+                                    <Binding Path="PhysicalHeight"></Binding>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </GroupBox.Header>
+                    <ContentControl Content="{Binding CurrentViewModel}" Margin="0, 2, 0, 0"/>
+                </GroupBox>
             </Grid>
-            <Grid Grid.Column="1" Width="228" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <DockPanel Grid.Column="1">
+                <GroupBox DockPanel.Dock="Top" Header="Image readout">
+                    <DockPanel>
+                    <Grid Grid.Row="4" DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding SinglePixel}"/>
+                        <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" IsChecked="{Binding AverageArea}"/>
+                       
+
+                    </Grid>
+                        <CheckBox Margin="5" IsChecked="{Binding allow_stretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
+                    </DockPanel>
+                </GroupBox>
+                <GroupBox DockPanel.Dock="Top" Header="{Binding sColorApproxMode}" HeaderStringFormat="Color Comparison: {0}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Fast" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iColorApproxMode}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="Accurate" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox DockPanel.Dock="Top" Header="{Binding sDiffusionMode}" HeaderStringFormat="Diffusion: {0}">
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="None" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Slider Grid.Column="1" Margin="0, 5, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" Minimum="0" Maximum="3" Value="{Binding iDiffusionMode}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="Slow" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox DockPanel.Dock="Top" Header="Transparency Threshold">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Slider Margin="0, 5, 0, 0" Grid.Column="1" TickFrequency="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="255" Value="{Binding TransparencyValue}" TickPlacement="BottomRight"/>
+                        <Label Grid.Column="2" Content="255" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                    </Grid>
+                </GroupBox>
+            </DockPanel>
+            <DockPanel Grid.Column="2" Margin="10, 0, 0, 0">
+                <local:OnlyOwnStonesV DockPanel.Dock="Top" DataContext="{Binding OnlyOwnStonesVM}" />
+                <GroupBox Grid.Row="1" Header="Preview Options">
+                    <StackPanel Orientation="Vertical">
+                        <DockPanel>
+                            <Label>Background Color:</Label>
+                            <xctk:ColorPicker HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
+                        </DockPanel>
+                        <CheckBox Margin="5" IsChecked="{Binding draw_borders}" Content="Draw Domino Borders"></CheckBox>
+                    </StackPanel>
+                </GroupBox>
+            </DockPanel>
+            <!--<Grid Grid.Column="1" Width="228" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -66,8 +143,9 @@
                 <CheckBox Margin="5,5.4,72,5.4" IsChecked="{Binding draw_borders}" Grid.Row="5" Content="Draw Domino Borders"></CheckBox>
                 <xctk:ColorPicker Grid.Row="5" Margin="0,2.4,2,2.4" HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
                 <CheckBox Margin="5" IsChecked="{Binding allow_stretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
-            </Grid>
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" Grid.Column="2">
+            </Grid>-->
+            <!--
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0" Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
@@ -110,7 +188,7 @@
                         <Label Grid.Column="2" Content="Full" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="0,-2,0,0"/>
                     </Grid>
                 </Grid>
-            </Grid>
+            </Grid>-->
         </Grid>
         <Button Grid.Row="2" Grid.Column="0" Height="30" Margin="10,10,0,10" Width="120" HorizontalAlignment="Left" Command="{Binding EditClick}">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">

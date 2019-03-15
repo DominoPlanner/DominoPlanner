@@ -240,7 +240,7 @@ namespace DominoPlanner.Usage
                                     fieldVM.SelectedItem.Sizes.a, fieldVM.SelectedItem.Sizes.b, fieldVM.SelectedItem.Sizes.c,
                                     fieldVM.SelectedItem.Sizes.d, fieldVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4,
                                     ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
-                                p.Generate();
+                                p.Generate(new System.Threading.CancellationToken());
                                 p.Save();
                                 resultNode = new FieldNode(relResultPath, parentProject);
                                 break;
@@ -249,7 +249,7 @@ namespace DominoPlanner.Usage
                                 StructureParameters sp = new StructureParameters(resultPath, relPicturePath,
                                     structureVM.SelectedStructureElement, structureVM.StrucSize, relColorList,
                                     ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                                sp.Generate();
+                                sp.Generate(new System.Threading.CancellationToken());
                                 sp.Save();
                                 resultNode = new StructureNode(relResultPath, parentProject);
                                 break;
@@ -261,7 +261,7 @@ namespace DominoPlanner.Usage
                                     circularStructure = new SpiralParameters(resultPath, relPicturePath, rsvm.Amount,
                                         relColorList, ColorDetectionMode.CieDe2000Comparison, new Dithering(),
                                         AverageMode.Corner, new NoColorRestriction());
-                                    circularStructure.Generate();
+                                    circularStructure.Generate(new System.Threading.CancellationToken());
                                     circularStructure.Save();
                                     resultNode = new SpiralNode(relResultPath, parentProject);
                                 }
@@ -269,7 +269,7 @@ namespace DominoPlanner.Usage
                                 {
                                     circularStructure = new CircleParameters(resultPath, relPicturePath, rsvm.Amount, relColorList,
                                         ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                                    circularStructure.Generate();
+                                    circularStructure.Generate(new System.Threading.CancellationToken());
                                     circularStructure.Save();
                                     resultNode = new CircleNode(relResultPath, parentProject);
                                 }

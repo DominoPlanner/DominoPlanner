@@ -74,7 +74,7 @@ namespace DominoPlanner.Usage
                 }
                 ProtocolV protocolV = new ProtocolV();
                 if (documentNode.obj.last == null)
-                    documentNode.obj.Generate();
+                    documentNode.obj.Generate(new System.Threading.CancellationToken());
                 protocolV.DataContext = new ProtocolVM(documentNode.obj, Path.GetFileNameWithoutExtension(documentNode.relativePath));
                 protocolV.ShowDialog();
             }
@@ -124,7 +124,7 @@ namespace DominoPlanner.Usage
                         {
                             File.Delete(saveFileDialog.FileName);
                         }
-                        documentNode.obj.Generate().GenerateImage(background, width, drawBorders, collapsed).Save(saveFileDialog.FileName);
+                        documentNode.obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(saveFileDialog.FileName);
                     }
                 }
             }

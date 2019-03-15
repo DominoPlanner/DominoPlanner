@@ -60,6 +60,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 _dominoTransfer = value;
                 refreshPlanPic();
+
+                fsvm.PhysicalLength = dominoTransfer.physicalLength;
+                fsvm.PhysicalHeight = dominoTransfer.physicalHeight;
             }
         }
         #endregion
@@ -239,19 +242,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         case 0:
                             fieldParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
-                            sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
+                            sColorApproxMode = "CIE-76 (ISO 12647)";
                             break;
                         case 1:
                             fieldParameters.colorMode = ColorDetectionMode.CmcComparison;
-                            sColorApproxMode = "CMC (l:c) Comparison";
+                            sColorApproxMode = "CMC (l:c)";
                             break;
                         case 2:
                             fieldParameters.colorMode = ColorDetectionMode.Cie94Comparison;
-                            sColorApproxMode = "CIE-94 Comparison (DIN 99)";
+                            sColorApproxMode = "CIE-94 (DIN 99)";
                             break;
                         case 3:
                             fieldParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
-                            sColorApproxMode = "CIE-E-2000 Comparison";
+                            sColorApproxMode = "CIE-E-2000";
                             break;
                         default:
                             break;
@@ -286,6 +289,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_draw_borders != value)
                 {
                     _draw_borders = value;
+                    refresh();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private bool _collapsed;
+        public bool Collapsed
+        {
+            get { return _collapsed; }
+            set
+            {
+                if (_collapsed != value)
+                {
+                    _collapsed = value;
                     refresh();
                     RaisePropertyChanged();
                 }
@@ -348,14 +365,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             System.Diagnostics.Debug.WriteLine(progress.ToString());
             if (dispatcher == null)
             {
-                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
+                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                 cursor = null;
             }
             else
             {
                 dispatcher.BeginInvoke((Action)(() =>
                 {
-                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders).Bitmap);
+                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                     CurrentPlan = newBitmap;
                     cursor = null;
                 }));

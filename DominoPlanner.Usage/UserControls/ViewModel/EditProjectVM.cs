@@ -689,7 +689,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-            dominoTransfer = CurrentProject.Generate(progress);
+            dominoTransfer = CurrentProject.Generate(new System.Threading.CancellationToken(), progress);
 
             for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
