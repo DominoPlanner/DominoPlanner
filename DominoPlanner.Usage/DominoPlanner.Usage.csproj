@@ -200,6 +200,9 @@
     <Compile Include="UserControls\View\RenameObject.xaml.cs">
       <DependentUpon>RenameObject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\View\RenderOptions.xaml.cs">
+      <DependentUpon>RenderOptions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\View\RoundSize.xaml.cs">
       <DependentUpon>RoundSize.xaml</DependentUpon>
     </Compile>
@@ -280,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\View\RenameObject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\RenderOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

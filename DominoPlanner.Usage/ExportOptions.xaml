@@ -4,32 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoPlanner.Usage"
+        xmlns:views="clr-namespace:DominoPlanner.Usage.UserControls.View"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="{Binding Filename, StringFormat=Export file {0}}" Height="170" Width="250" ResizeMode="NoResize" Icon="Icons/DominoCalculator.ico">
+        Title="{Binding Filename, StringFormat=Export file {0}}" Width="280" Height="200" ResizeMode="NoResize" Icon="Icons/DominoCalculator.ico">
     <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <DockPanel VerticalAlignment="Center" Grid.Row="0">
-            <TextBlock VerticalAlignment="Center">Image size (larger side):</TextBlock>
-            <xctk:IntegerUpDown Width="100" HorizontalAlignment="Right" Minimum="200" Maximum="{Binding MaxSize}" Value="{Binding ImageSize}"/>
-        </DockPanel>
-        <DockPanel VerticalAlignment="Center" Grid.Row="1">
-            <TextBlock VerticalAlignment="Center">Background color:</TextBlock>
-            <xctk:ColorPicker HorizontalAlignment="Right" Width="100" SelectedColor="{Binding BackgroundColor}"/>
-        </DockPanel>
-        <DockPanel VerticalAlignment="Center" Grid.Row="2">
-            <CheckBox VerticalAlignment="Center" IsChecked="{Binding DrawBorders}" Grid.Row="2" Content="Draw Domino Borders"></CheckBox>
-            <CheckBox Visibility="{Binding Expandable}" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Collapsed}" Grid.Row="2" Content="Hide spaces"></CheckBox>
-        </DockPanel>
-        <DockPanel VerticalAlignment="Center" Grid.Row="3">
+        <DockPanel>
+        <views:RenderOptions DockPanel.Dock="Top"
+            ImageSize="{Binding ImageSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            MaxSize="{Binding MaxSize}"
+            BackgroundColor="{Binding BackgroundColor}"
+            DrawBorders="{Binding DrawBorders}"
+            Collapsible="{Binding Expandable}"
+            Collapse="{Binding Collapsed}"/>
+
+        <DockPanel DockPanel.Dock="Bottom">
             <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsCancel="True" Command="{Binding Cancel}">Cancel</Button>
             <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True" Command="{Binding OK}">OK</Button>
         </DockPanel>
-        
+        </DockPanel>
     </Grid>
 </Window>

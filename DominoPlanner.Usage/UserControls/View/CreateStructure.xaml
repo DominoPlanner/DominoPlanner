@@ -100,13 +100,11 @@
             <DockPanel Grid.Column="2" Margin="10, 0, 0, 0">
                 <local:OnlyOwnStonesV DockPanel.Dock="Top" DataContext="{Binding OnlyOwnStonesVM}" />
                 <GroupBox Grid.Row="1" Header="Preview Options">
-                    <StackPanel Orientation="Vertical">
-                        <DockPanel>
-                            <Label>Background Color:</Label>
-                            <xctk:ColorPicker HorizontalAlignment="Right" Width="70" ToolTip="Background Color of the Plan" SelectedColor="{Binding backgroundColor}"/>
-                        </DockPanel>
-                        <CheckBox Margin="5" IsChecked="{Binding draw_borders}" Content="Draw Domino Borders"></CheckBox>
-                    </StackPanel>
+                    <local:RenderOptions
+                        DrawBorders="{Binding draw_borders}"
+                        BackgroundColor="{Binding backgroundColor}"
+                        ShowImageSize="Collapsed">
+                    </local:RenderOptions>
                 </GroupBox>
             </DockPanel>
             <!--<Grid Grid.Column="1" Width="228" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

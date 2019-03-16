@@ -131,6 +131,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     fieldParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+
+                    OnlyOwnStonesVM.Iterations = 2;
+                    OnlyOwnStonesVM.Weight = 0.1;
                 }
                 else
                 {

@@ -26,8 +26,9 @@ namespace DominoPlanner.Usage
                 Collapsed = true;
             }
             DrawBorders = true;
-            MaxSize = height > width ? height : width;
-            ImageSize = MaxSize;
+            MaxSize = 10000; // height > width ? height : width;
+            ImageSize = height > width ? height : width;
+            ImageSize = ImageSize > MaxSize ? MaxSize : ImageSize;
             Filename = Path.GetFileName(Workspace.Find(provider));
         }
         #region properties
@@ -123,11 +124,11 @@ namespace DominoPlanner.Usage
                     RaisePropertyChanged();
                     if (Collapsed)
                     {
-                        MaxSize = expanded_height > expanded_width ? expanded_height : expanded_width;
+                        //MaxSize = expanded_height > expanded_width ? expanded_height : expanded_width;
                     }
                     else
                     {
-                        MaxSize = height > width ? height : width;
+                        //MaxSize = height > width ? height : width;
                     }
                 }
             }
