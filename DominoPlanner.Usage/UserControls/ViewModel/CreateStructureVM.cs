@@ -18,15 +18,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public CreateStructureVM(IDominoProvider dominoProvider, bool rectangular) : base()
         {
             CurrentProject = dominoProvider;
-            OnlyOwnStonesVM = new OnlyOwnStonesVM(dominoProvider.IterationInformation);
+            OnlyOwnStonesVM = new OnlyOwnStonesVM(((UncoupledCalculation)dominoProvider.PrimaryCalculation).IterationInformation);
             structureIsRectangular = rectangular;
 
             if (structureIsRectangular)
             {
                 CurrentViewModel = new RectangularSizeVM();
 
-                ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).length;
-                ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).height;
+                ((RectangularSizeVM)CurrentViewModel).sLength = ((StructureParameters)structureParameters).Length;
+                ((RectangularSizeVM)CurrentViewModel).sHeight = ((StructureParameters)structureParameters).Height;
                 for (int i = 0; i < ((RectangularSizeVM)CurrentViewModel).structures.Count; i++)
                 {
                     if (XNode.DeepEquals(((RectangularSizeVM)CurrentViewModel).structures[i], XElement.Parse(((StructureParameters)structureParameters)._structureDefinitionXML)))
@@ -329,26 +329,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iColorApproxMode; }
             set
             {
-                if (_iColorApproxMode != value)
+                if (_iColorApproxMode != value || _sColorApproxMode == null)
                 {
                     _iColorApproxMode = value;
                     switch (value)
                     {
                         case 0:
-                            sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
+                            sColorApproxMode = "CIE-76 (ISO 12647)";
                             ((UncoupledCalculation)structureParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie1976Comparison;
                             break;
                         case 1:
                             ((UncoupledCalculation)structureParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CmcComparison;
-                            sColorApproxMode = "CMC (l:c) Comparison";
+                            sColorApproxMode = "CMC (l:c)";
                             break;
                         case 2:
                             ((UncoupledCalculation)structureParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie94Comparison;
-                            sColorApproxMode = "CIE-94 Comparison (DIN 99)";
+                            sColorApproxMode = "CIE-94 (DIN 99)";
                             break;
                         case 3:
                             ((UncoupledCalculation)structureParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CieDe2000Comparison;
-                            sColorApproxMode = "CIE-E-2000 Comparison";
+                            sColorApproxMode = "CIE-E-2000";
                             break;
                         default:
                             break;
@@ -364,7 +364,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iDiffusionMode; }
             set
             {
-                if (_iDiffusionMode != value)
+                if (_iDiffusionMode != value || _sDiffusionMode == null)
                 {
                     _iDiffusionMode = value;
                     switch ((DitherMode)value)
@@ -414,7 +414,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private System.Windows.Media.Color _backgroundColor;
+        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
         public System.Windows.Media.Color backgroundColor
         {
             get { return _backgroundColor; }
@@ -458,6 +458,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((UncoupledCalculation)structureParameters.PrimaryCalculation).IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                    if (OnlyOwnStonesVM.Iterations == 0)
+                    {
+                        OnlyOwnStonesVM.Iterations = 2;
+                        OnlyOwnStonesVM.Weight = 0.1;
+                    }
                 }
                 else
                 {

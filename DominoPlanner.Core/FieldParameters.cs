@@ -200,9 +200,9 @@ namespace DominoPlanner.Core
         }
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!shapesValid || !usedColorsValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            current_width = last.dominoLength;
-            current_height = last.dominoHeight;
+            if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
+            current_width = last.FieldPlanLength;
+            current_height = last.FieldPlanHeight;
             int[,] result = new int[current_width, current_height];
             for (int i = 0; i < current_width; i++)
             {

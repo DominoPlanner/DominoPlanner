@@ -79,14 +79,17 @@ namespace DominoPlanner.Core
             if (!sourceValid)
             {
                 UpdateSource();
+                sourceValid = true;
             }
             if (!imageValid)
             {
                 ApplyImageFilters();
+                imageValid = true;
             }
             if (!colorsValid)
             {
                 ReadoutColors(shapes);
+                colorsValid = true;
             }
         }
         public abstract void ReadoutColors(DominoTransfer shapes);
@@ -204,8 +207,8 @@ namespace DominoPlanner.Core
         {
             using (Image<Bgra, byte> img = imageFiltered.ToImage<Bgra, byte>())
             {
-                double scalingX = (double)(Width - 1) / shapes.DominoWidth;
-                double scalingY = (double)(Height - 1) / shapes.DominoHeight;
+                double scalingX = (double)(Width - 1) / shapes.physicalLength;
+                double scalingY = (double)(Height - 1) / shapes.physicalHeight;
                 if (!AllowStretch)
                 {
                     if (scalingX > scalingY) scalingX = scalingY;

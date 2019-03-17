@@ -20,7 +20,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             CurrentProject = dominoProvider.obj;
             
             fsvm = new FieldSizeVM(true);
-            OnlyOwnStonesVM = new OnlyOwnStonesVM(fieldParameters.IterationInformation);
+            OnlyOwnStonesVM = new OnlyOwnStonesVM(((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation);
 
             iResizeMode = (int)((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode;
             iColorApproxMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode.colorComparisonMode;
@@ -131,9 +131,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
-
-                    OnlyOwnStonesVM.Iterations = 2;
-                    OnlyOwnStonesVM.Weight = 0.1;
+                    if (OnlyOwnStonesVM.Iterations == 0)
+                    {
+                        OnlyOwnStonesVM.Iterations = 2;
+                        OnlyOwnStonesVM.Weight = 0.1;
+                    }
                 }
                 else
                 {
@@ -221,7 +223,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iResizeMode; }
             set
             {
-                if (_iResizeMode != value)
+                if (_iResizeMode != value || _sResizeMode == null)
                 {
                     _iResizeMode = value;
                     ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode = (Inter)value;
@@ -238,7 +240,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iColorApproxMode; }
             set
             {
-                if (_iColorApproxMode != value)
+                if (_iColorApproxMode != value || sColorApproxMode == null)
                 {
                     _iColorApproxMode = value;
                     switch (value)
@@ -311,7 +313,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private System.Windows.Media.Color _backgroundColor;
+        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
         public System.Windows.Media.Color backgroundColor
         {
             get { return _backgroundColor; }
@@ -332,7 +334,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iDiffusionMode; }
             set
             {
-                if (_iDiffusionMode != value)
+                if (_iDiffusionMode != value || _sDiffusionMode == null)
                 {
                     _iDiffusionMode = value;
                     switch ((DitherMode)value)

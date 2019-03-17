@@ -73,8 +73,7 @@ namespace DominoPlanner.Usage
                     return;
                 }
                 ProtocolV protocolV = new ProtocolV();
-                if (documentNode.obj.last == null)
-                    documentNode.obj.Generate(new System.Threading.CancellationToken());
+                documentNode.obj.Generate(new System.Threading.CancellationToken());
                 protocolV.DataContext = new ProtocolVM(documentNode.obj, Path.GetFileNameWithoutExtension(documentNode.relativePath));
                 protocolV.ShowDialog();
             }

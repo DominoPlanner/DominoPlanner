@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 using System.Windows.Media;
 
 namespace DominoPlanner.Core
@@ -71,9 +72,9 @@ namespace DominoPlanner.Core
             }
         }
         public bool SecondarySideCalculated { get => SecondaryImageTreatment != null; }
-
-        protected ImageTreatment _primaryImageTreatment;
         [ProtoMember(19)]
+        protected ImageTreatment _primaryImageTreatment;
+        
         public virtual ImageTreatment PrimaryImageTreatment
         {
             get => _primaryImageTreatment;
@@ -150,7 +151,7 @@ namespace DominoPlanner.Core
         protected int charLength;
         private DominoTransfer _last;
         [ProtoMember(2)]
-        internal DominoTransfer last
+        public DominoTransfer last
         {
             get => _last;
             set
@@ -186,7 +187,7 @@ namespace DominoPlanner.Core
         public virtual DominoTransfer Generate(CancellationToken ct, IProgress<string> progressIndicator = null)
         {
             if (Editing) return last;
-            
+            ct.ThrowIfCancellationRequested();
             if (!shapesValid)
             {
                 RegenerateShapes();
@@ -196,9 +197,12 @@ namespace DominoPlanner.Core
                 if (SecondaryImageTreatment != null)
                     SecondaryImageTreatment.colorsValid = false;
             }
+            ct.ThrowIfCancellationRequested();
             last.colors = colors;
             if (SecondaryImageTreatment != null && !SecondaryImageTreatment.colorsValid)
             {
+
+                SecondaryImageTreatment.parent = this;
                 SecondaryImageTreatment.FillDominos(last);
                 SecondaryCalculation.LastValid = false;
                 if (PrimaryCalculation is CoupledCalculation)
@@ -207,24 +211,32 @@ namespace DominoPlanner.Core
                 }
                 SecondaryImageTreatment.colorsValid = true;
             }
+            ct.ThrowIfCancellationRequested();
             if (!PrimaryImageTreatment.colorsValid)
             {
+                PrimaryImageTreatment.parent = this;
                 PrimaryImageTreatment.FillDominos(last);
                 PrimaryImageTreatment.colorsValid = true;
                 PrimaryCalculation.LastValid = false;
             }
+            ct.ThrowIfCancellationRequested();
             last.colors = this.colors;
             if (!PrimaryCalculation.LastValid)
             {
                 PrimaryCalculation.Calculate(last, charLength);
                 PrimaryCalculation.LastValid = true;
             }
+            ct.ThrowIfCancellationRequested();
             if (!SecondaryCalculation.LastValid)
             {
                 SecondaryCalculation.Calculate(last, charLength);
                 SecondaryCalculation.LastValid = true;
             }
             return last;
+        }
+        public DominoTransfer Generate()
+        {
+            return Generate(new CancellationToken());
         }
         // <summary>
         /// Liefert das HTML-Protokoll eines Objekts.
@@ -374,7 +386,16 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
-            
+            if (PrimaryCalculation == null)
+            {
+                PrimaryCalculation = CreatePrimaryCalculation();
+            }
+            if (PrimaryImageTreatment == null)
+            {
+                PrimaryImageTreatment = CreatePrimaryTreatment();
+            }
+            Generate();
+            //CreatePrimaryTreatment();
             //bool lastValidTemp = lastValid;
             ////if (!Editing)
             ////{
@@ -389,66 +410,72 @@ namespace DominoPlanner.Core
             //lastValid = lastValidTemp;
         }
         #endregion
+
         #region compatibility properties
-        
+        private Calculation TempCalculation;
+        private ImageTreatment TempImageTreatment;
         internal Calculation CreatePrimaryCalculation()
         {
-            if (PrimaryCalculation == null)
+            if (TempCalculation == null)
             {
                 if (this is FieldParameters)
                 {
-                    PrimaryCalculation = new FieldCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+                    TempCalculation = new FieldCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
                 }
                 else
                 {
-                    PrimaryCalculation = new UncoupledCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+                    TempCalculation = new UncoupledCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
                 }
             }
-            return PrimaryCalculation;
+            return TempCalculation;
         }
         internal ImageTreatment CreatePrimaryTreatment()
         {
-            if (PrimaryImageTreatment == null)
+            if (TempImageTreatment == null)
             {
                 if (this is FieldParameters)
                 {
-                    PrimaryImageTreatment = new FieldReadout((FieldParameters)this, 10, 10, Emgu.CV.CvEnum.Inter.Cubic);
+                    TempImageTreatment = new FieldReadout((FieldParameters)this, 10, 10, Emgu.CV.CvEnum.Inter.Cubic);
                 }
                 else
                 {
-                    PrimaryImageTreatment = new NormalReadout(this, 10, 10, AverageMode.Average, true);
+                    TempImageTreatment = new NormalReadout(this, 10, 10, AverageMode.Average, true);
                 }
             }
-            return PrimaryImageTreatment;
+            return TempImageTreatment;
         }
+        
         [ProtoMember(5)]
         private IterationInformation IterationInformation
         {
             get
             {
                 return ((NonEmptyCalculation)PrimaryCalculation)?.IterationInformation ?? new NoColorRestriction();
+                return new NoColorRestriction();
             }
             set
             {
-                if (CreatePrimaryCalculation() is NonEmptyCalculation)
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
                 {
-                    ((NonEmptyCalculation)PrimaryCalculation).IterationInformation = value;
+                    calc.IterationInformation = value;
                 }
                 
             }
         }
+        
         [ProtoMember(6)]
         private byte TransparencySetting
         {
             get => ((NonEmptyCalculation)PrimaryCalculation)?.TransparencySetting ?? 0;
             set
             {
-                if (CreatePrimaryCalculation() is NonEmptyCalculation)
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
                 {
-                    ((NonEmptyCalculation)PrimaryCalculation).TransparencySetting = value;
+                    calc.TransparencySetting = value;
                 }
             }
         }
+        
         [ProtoMember(11)]
         private string colorMode_surrogate
         {
@@ -458,12 +485,13 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (CreatePrimaryCalculation() is NonEmptyCalculation)
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
                 {
-                    ((NonEmptyCalculation)PrimaryCalculation).ColorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+                    calc.ColorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
                 }
             }
         }
+        
         [ProtoMember(12)]
         private ObservableCollection<ColorFilter> ColorFilters
         {
@@ -476,6 +504,7 @@ namespace DominoPlanner.Core
                 //
             }
         }
+        
         [ProtoMember(13, OverwriteList = true)]
         private ObservableCollection<ImageFilter> ImageFilters
         {
@@ -489,6 +518,7 @@ namespace DominoPlanner.Core
                     CreatePrimaryTreatment().ImageFilters = value;
             }
         }
+        
         [ProtoMember(15)]
         private int ImageWidth
         {
@@ -508,6 +538,7 @@ namespace DominoPlanner.Core
                 CreatePrimaryTreatment().Height = value;
             }
         }
+        
         [ProtoMember(17)]
         private string ColorSerialized
         {
@@ -517,6 +548,7 @@ namespace DominoPlanner.Core
             }
             set { CreatePrimaryTreatment().Background = (Color)ColorConverter.ConvertFromString(value); }
         }
+        
         [ProtoMember(18)]
         private string DitheringSurrogate
         {
@@ -526,16 +558,16 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (CreatePrimaryCalculation() is NonEmptyCalculation)
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
                 {
-                    ((NonEmptyCalculation)PrimaryCalculation).Dithering =
+                    calc.Dithering =
                         (Dithering)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
                 }
             }
         }
         
         #endregion
-
+        
     }
     [ProtoContract]
     [ProtoInclude(100, typeof(StructureParameters))]
@@ -574,7 +606,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
-        /*
+        
         [ProtoMember(1)]
         private AverageMode average
         {
@@ -599,7 +631,7 @@ namespace DominoPlanner.Core
                 ((NormalReadout)CreatePrimaryTreatment()).AllowStretch = value;
             }
         }
-        */
+        
         #endregion
     }
 

@@ -276,9 +276,17 @@ namespace DominoPlanner.Core
                     ResetDitherColors(shapes);
                     IterationInformation.numberofiterations = iter;
                     Console.WriteLine($"Iteration {iter}");
-                    Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, (i) =>
+                    var cs = new System.Threading.CancellationTokenSource();
+                    Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = -1 , CancellationToken = cs.Token}, (i) =>
                     {
-                        shapes[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
+                        try
+                        {
+                            shapes[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
+                        }
+                        catch
+                        {
+                            cs.Cancel();
+                        }
                     });
                 }
                 // Farben zählen

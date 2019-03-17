@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace DominoPlanner.Usage
 {
@@ -28,7 +29,7 @@ namespace DominoPlanner.Usage
         public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
         {
             DominoProvider = dominoProvider;
-            dominoTransfer = DominoProvider.Generate();
+            dominoTransfer = DominoProvider.Generate(new System.Threading.CancellationToken());
             Titel = fieldName;
             Init();
         }
