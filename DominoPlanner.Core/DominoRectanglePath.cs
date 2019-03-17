@@ -63,9 +63,9 @@ namespace DominoPlanner.Core
             }
             return pointcol;*/
         }
-        public System.Drawing.Point[] getSDPath()
+        public System.Drawing.Point[] getSDPath(int xShift = 0, int yShift = 0)
         {
-            return points.Select(point => new System.Drawing.Point() { X = (int) point.X, Y = (int) point.Y }).ToArray();
+            return points.Select(point => new System.Drawing.Point() { X = (int) point.X + xShift, Y = (int) point.Y  + xShift}).ToArray();
         }
 
         /// <summary>
