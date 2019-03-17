@@ -186,6 +186,7 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public virtual DominoTransfer Generate(CancellationToken ct, IProgress<string> progressIndicator = null)
         {
+            last.colors = colors;
             if (Editing) return last;
             ct.ThrowIfCancellationRequested();
             if (!shapesValid)
@@ -198,7 +199,6 @@ namespace DominoPlanner.Core
                     SecondaryImageTreatment.colorsValid = false;
             }
             ct.ThrowIfCancellationRequested();
-            last.colors = colors;
             if (SecondaryImageTreatment != null && !SecondaryImageTreatment.colorsValid)
             {
 
@@ -220,7 +220,6 @@ namespace DominoPlanner.Core
                 PrimaryCalculation.LastValid = false;
             }
             ct.ThrowIfCancellationRequested();
-            last.colors = this.colors;
             if (!PrimaryCalculation.LastValid)
             {
                 PrimaryCalculation.Calculate(last, charLength);
