@@ -16,26 +16,24 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     public class DominoTransfer : ICloneable
     {
-        //[ProtoMember(2, IsPacked = true)]
-        //public int[] dominoes { get; set; }
         [ProtoMember(1)]
         public IDominoShape[] shapes;
-        [ProtoMember(3, AsReference = true)]
-        ColorRepository colors;
+        //[ProtoMember(3, AsReference = true)]
+        public ColorRepository colors;
         [ProtoMember(4, AsReference = true)]
         public IterationInformation iterationInfo {get; set;}
         public int length
         {
             get { return shapes.Length; }
         }
-        public int dominoLength
+        public int FieldPlanLength
         {
             get
             {
                 return shapes.Max(x => (x.position != null) ? x.position.x : 0) + 1;
             }
         }
-        public int dominoHeight
+        public int FieldPlanHeight
         {
             get
             {

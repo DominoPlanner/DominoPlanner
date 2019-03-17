@@ -173,7 +173,7 @@ namespace DominoPlanner.Core
         }
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string absolutePath) where T : IWorkspaceLoadImageFilter
         {
-            return LoadInternal<T, IDominoProviderImageFilter, ObservableCollection<ImageFilter>>(absolutePath, a => a.ImageFilters, a => a.ImageFilters);
+            return LoadInternal<T, IDominoProviderImageFilter, ObservableCollection<ImageFilter>>(absolutePath, a => a.PrimaryImageTreatment.ImageFilters, a => a.PrimaryImageTreatment.ImageFilters);
         }
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
         {
@@ -182,8 +182,8 @@ namespace DominoPlanner.Core
         public static Tuple<string, int[]> LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
             return LoadInternal<IDominoProvider, IDominoProviderPreview, Tuple<string, int[]>>(absolutePath,
-                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.counts),
-                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.counts)
+                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.Counts),
+                a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.Counts)
                 );
         }
         public static Tuple<string, int[]> LoadColorList<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
@@ -200,8 +200,8 @@ namespace DominoPlanner.Core
         }
         public static bool LoadHasProtocolDefinition<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {
-            return LoadInternal<IDominoProvider, IDominoProviderPreview, bool>(absolutePath, a => a.hasProtocolDefinition, 
-                a => a.hasProtocolDefinition);
+            return LoadInternal<IDominoProvider, IDominoProviderPreview, bool>(absolutePath, a => a.HasProtocolDefinition, 
+                a => a.HasProtocolDefinition);
         }
         public static bool LoadHasProtocolDefinition<T>(string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {

@@ -257,7 +257,7 @@ namespace DominoPlanner.Core
             }
         }
         private int _normalGroupDistance = 8;
-        
+
         #endregion
         #region constructors
 
@@ -276,18 +276,18 @@ namespace DominoPlanner.Core
         /// <param name="allowStretch">Gibt an, ob beim Berechnen die Struktur an das Bild angepasst werden darf.</param>
         /// <param name="useOnlyMyColors">Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
         /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.</param>
-        public SpiralParameters(string filepath, string bitmap, int rotations, string colors, 
+        public SpiralParameters(string filepath, string bitmap, int rotations, string colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(filepath, bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
-            hasProtocolDefinition = false;
+            HasProtocolDefinition = false;
             init(rotations);
         }
-        public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors, 
+        public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
-            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation,allowStretch )
+            : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
-            hasProtocolDefinition = false;
+            HasProtocolDefinition = false;
             init(rotations);
         }
         private void init(int rotations)
@@ -301,7 +301,7 @@ namespace DominoPlanner.Core
         private SpiralParameters() : base() { }
         #endregion
         #region private methods
-        internal override void GenerateShapes()
+        protected override void RegenerateShapes()
         {
             Point endpoint = getPoint(ThetaMax, nGroup * (DominoLength + NormalDistance) / a);
             double end_radius = Math.Sqrt(endpoint.X * endpoint.X + endpoint.Y * endpoint.Y);
@@ -352,12 +352,7 @@ namespace DominoPlanner.Core
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
 
             });
-            GenStructHelper g = new GenStructHelper();
-            g.HasProtocolDefinition = false;
-            g.dominoes = dominoes;
-            g.width = x_max - x_min;
-            g.height = y_max - y_min;
-            shapes = g;
+            last = new DominoTransfer(dominoes, colors);
             shapesValid = true;
         }
         /// <summary>
@@ -439,11 +434,6 @@ namespace DominoPlanner.Core
             Point point = getPoint(theta, shift, rotate);
             Point point2 = getPoint(theta + 0.00001, shift, rotate);
             return -Math.Atan((point.Y - point2.Y) / (point2.X - point.X));
-        }
-
-        public override object Clone()
-        {
-            throw new NotImplementedException();
         }
         #endregion
     }

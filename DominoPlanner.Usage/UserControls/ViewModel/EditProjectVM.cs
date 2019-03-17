@@ -21,7 +21,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
-            HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.obj.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
             IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
             string relativePath = dominoProvider.relativePath;
@@ -333,13 +333,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             for (int i = 0; i < _DominoList.Count(); i++)
             {
                 _DominoList[i].ProjectCount.Clear();
-                if (CurrentProject.counts.Length > i + 1)
+                if (CurrentProject.Counts.Length > i + 1)
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[i + 1]);
+                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[i + 1]);
                 }
                 else
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[0]);
+                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[0]);
                 }
             }
         }
@@ -711,8 +711,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void RefreshSizeLabels()
         {
-            ProjectHeight = dominoTransfer.dominoHeight.ToString();
-            ProjectWidth = dominoTransfer.dominoLength.ToString();
+            ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
+            ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
             ProjectAmount = dominoTransfer.shapes.Count().ToString();
         }
 

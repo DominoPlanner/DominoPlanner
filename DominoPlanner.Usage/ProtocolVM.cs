@@ -28,7 +28,7 @@ namespace DominoPlanner.Usage
         public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
         {
             DominoProvider = dominoProvider;
-            dominoTransfer = DominoProvider.last;
+            dominoTransfer = DominoProvider.Generate();
             Titel = fieldName;
             Init();
         }

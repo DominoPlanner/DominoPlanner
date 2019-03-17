@@ -123,7 +123,7 @@ namespace DominoPlanner.Core
             {
                 if (_obj == null)
                     return Workspace.LoadColorList<IDominoProviderPreview>(relativePath).Item2;
-                return obj.counts;
+                return obj.Counts;
             }
         }
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)

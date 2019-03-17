@@ -9,6 +9,10 @@ namespace DominoPlanner.Core
 {
     partial class StructureParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
+        public void ResetSize()
+        {
+            current_width = Length;
+        }
         private int _current_width;
         [ProtoMember(50)]
         public int current_width { get => _current_width; set => _current_width = value; }
@@ -21,11 +25,6 @@ namespace DominoPlanner.Core
                     / getLengthOfRow(1,_current_width);
             }
             set { }
-        }
-
-         public override object Clone()
-        {
-            throw new NotImplementedException();
         }
 
         public bool IsValidPastePosition(int source_position, int target_position)

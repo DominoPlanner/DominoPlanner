@@ -80,7 +80,7 @@ namespace DominoPlanner.Core
             return true;
         }
 
-        public override bool Equals(IDominoShape other)
+        public override bool ShapeEquals(IDominoShape other)
         {
             if (other is RectangleDomino)
             {
@@ -119,7 +119,7 @@ namespace DominoPlanner.Core
     {
         [ProtoMember(1)]
         public Point[] points;
-        public override bool Equals(IDominoShape other)
+        public override bool ShapeEquals(IDominoShape other)
         {
             if (other is PathDomino)
             {

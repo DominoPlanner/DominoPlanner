@@ -25,7 +25,7 @@ namespace DominoPlanner.CoreTests
             //ProjectTests.CreateProject();
             //ProjectTests.LoadProject();
             Thread.Sleep(500);
-           // PostFilterTests.PostFilterTest("bird.jpg");
+            //PostFilterTests.PostFilterTest("bird.jpg");
             //TreeTests.TreeTest();
             //HistoryTreeFieldTest("tests/NewField.jpg");
             /*try
@@ -44,9 +44,16 @@ namespace DominoPlanner.CoreTests
             //CircleTest("gre.jpg");
             //for (int i = 0; i < 1; i++)
             //SpiralTest("gre.jpg");
-            //WallTest("gre.jpg");
+            //Console.WriteLine("PROTO for DominoProvider");
+            Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProvider)));
+            //Console.WriteLine("PROTO for DominoFilters");
+            //Console.WriteLine(ProtoBuf.Meta.RuntimeTypeModel.Default.GetSchema(typeof(IDominoProviderImageFilter)));
+            var obj = Workspace.Load<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\struc.DObject");
+            obj.Generate().GenerateImage().Save("tests/compatibility_test.png");
+            var obj2 = Workspace.LoadImageFilters<IDominoProvider>(@"C:\Users\jonat\AppData\Local\DominoPlanner\New Project4\Planner Files\struc.DObject");
+            WallTest("gre.jpg");
             //ColorRepoSaveTest();
-            ///FieldTest("bird.jpg");
+            FieldTest("bird.jpg");
             //
             //var result1 = ColorRepoLoadTest("colors.DColor");
             //var result2 = ColorRepoLoadTest("colors.DColor");
@@ -142,7 +149,7 @@ namespace DominoPlanner.CoreTests
             
             FieldParameters p = new FieldParameters(Path.GetFullPath("tests/FieldTest.DObject"), path, "colors.DColor", 8, 8, 24, 8, 20000, Inter.Lanczos4,
                 ColorDetectionMode.Cie1976Comparison, new Dithering(), new NoColorRestriction());
-            p.TransparencySetting = 128;
+            ((FieldCalculation)p.PrimaryCalculation).TransparencySetting = 128;
             var watch = System.Diagnostics.Stopwatch.StartNew();
             p.Generate().GenerateImage().Save("tests/fieldtests_before_filters.png");
             watch.Stop();
@@ -253,7 +260,8 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
-            
+
+            Workspace.Clear();
             watch = Stopwatch.StartNew();
             FieldParameters loaded = Workspace.Load<FieldParameters>(Path.GetFullPath("tests/FieldTest.DObject"));
             loaded.Generate();
@@ -266,14 +274,14 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts2));
-            Console.WriteLine("Number of image filters: " + loaded.ImageFilters.Count);
+            Console.WriteLine("Number of image filters: " + ((FieldReadout)loaded.PrimaryImageTreatment).ImageFilters.Count);
             //loaded.ImageHeight = 1500;
             //loaded.ColorFilters.Add(new ChangeCountColorFilter() { Index = 14, NewCount = 0 });
             //loaded.ColorFilters.Add(new ChangeRGBColorFilter() { Index = 30, Color = Colors.Green });
             //t = loaded.Generate();
             p.Generate().GenerateImage().Save("tests/fieldtest_after_load.png");
 
-            Console.WriteLine(String.Join(", ", loaded.counts));
+            Console.WriteLine(String.Join(", ", loaded.Counts));
         }
         static void WBXTest()
         {
@@ -340,7 +348,8 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine("Preview Load Time: " + watch.ElapsedMilliseconds);
             Console.WriteLine(String.Join(", ", counts));
-            
+
+            Workspace.Clear();
             watch = Stopwatch.StartNew();
             SpiralParameters loaded = Workspace.Load<SpiralParameters>(Path.GetFullPath("tests/Spiral.DObject"));
             loaded.Generate().GenerateImage().Save("tests/spiral_after_load.png");
@@ -356,7 +365,7 @@ namespace DominoPlanner.CoreTests
             p.AngleShiftFactor = -0.02;
             p.ForceDivisibility = 5;
             p.StartDiameter = 200;
-            p.ditherMode = new FloydSteinbergDithering();
+            ((NonEmptyCalculation)p.PrimaryCalculation).Dithering = new FloydSteinbergDithering();
             
             var watch = System.Diagnostics.Stopwatch.StartNew();
             //DominoTransfer t = await Dispatcher.CurrentDispatcher.Invoke(async () => await Task.Run(() => p.Generate(wb, progress)));
@@ -422,7 +431,8 @@ namespace DominoPlanner.CoreTests
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);
             //b2.Save("tests/WallTest.png");
-            p.ditherMode = new JarvisJudiceNinkeDithering();
+            p.Save();
+            ((NonEmptyCalculation)p.PrimaryCalculation).Dithering = new JarvisJudiceNinkeDithering();
             p.Generate().GenerateImage().Save("tests/Wall_dithered.png");
             sr.Close();
             //FileStream fs = new FileStream(@"WallPlanTest.html", FileMode.Create);
@@ -455,7 +465,8 @@ namespace DominoPlanner.CoreTests
             //});
             //sw.Close();
             p.Save();
-            StructureParameters p2 = Workspace.Load<StructureParameters>(Path.GetFullPath("tests/structure.DObject"));
+            Workspace.Clear();
+            StructureParameters p2 = Workspace.Load<StructureParameters>(Path.GetFullPath("tests/WallTest.DObject"));
             p2.Generate().GenerateImage().Save("tests/wall_after_load.png");
             
         }

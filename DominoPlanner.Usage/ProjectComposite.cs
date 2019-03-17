@@ -67,7 +67,7 @@ namespace DominoPlanner.Usage
         {
             if (Project.documentNode is DocumentNode documentNode)
             {
-                if (!documentNode.obj.hasProtocolDefinition)
+                if (!documentNode.obj.HasProtocolDefinition)
                 {
                     Errorhandler.RaiseMessage("Could not generate a protocol!", "No Protocol", Errorhandler.MessageType.Warning);
                     return;
