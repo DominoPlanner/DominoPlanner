@@ -4,8 +4,17 @@
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Top" Width="80" Height="0"/>
 		<PartDefinition HorizontalPosition="Right" VerticalPosition="Top" Width="48" Height="0"/>
 		<PartDefinition HorizontalPosition="Left" VerticalPosition="Center" Width="80" Height="96">
-			<RectangleDomino  x="0" y="0" Width="40" Height="24">
-				<ProtocolDefinition xConstant="0" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+      <RectangleDomino x="0" y="0" Width="40" Height="24">
+        <ProtocolDefinition xConstant="0" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino x="0" y="48" Width="40" Height="24">
+        <ProtocolDefinition xConstant="0" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino x="40" y="0" Width="48" Height="24">
+        <ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino  x="0" y="0" Width="40" Height="24">
+				<ProtocolDefinition xConstant="1" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="24" Width="8" Height="24">
 				<ProtocolDefinition xConstant="0" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -14,10 +23,10 @@
 				<ProtocolDefinition xConstant="1" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="0" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="1" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="48" y="48" Width="32" Height="24">
-				<ProtocolDefinition xConstant="1" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="0" yConstant="-4" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -27,14 +36,11 @@
 			</RectangleDomino>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Center" Width="80" Height="96">
-			<RectangleDomino x="-40" y="0" Width="48" Height="24">
-				<ProtocolDefinition xConstant="1" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
-			</RectangleDomino>
 			<RectangleDomino x="8" y="0" Width="32" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="3" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="40" y="0" Width="48" Height="24">
-				<ProtocolDefinition xConstant="3" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="4" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="24" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-2" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -43,10 +49,10 @@
 				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="48" y="48" Width="32" Height="24">
-				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="4" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-4" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -56,8 +62,14 @@
 			</RectangleDomino>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Right" VerticalPosition="Center" Width="48" Height="96">
-			<RectangleDomino x="8" y="0" Width="40" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
+      <RectangleDomino x="8" y="48" Width="40" Height="24">
+        <ProtocolDefinition xConstant="4" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino x="8" y="0" Width="40" Height="24">
+        <ProtocolDefinition xConstant="4" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino x="8" y="0" Width="40" Height="24">
+				<ProtocolDefinition xConstant="3" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="24" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
@@ -66,7 +78,7 @@
 				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-4" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
@@ -84,6 +96,12 @@
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Top" Width="80" Height="0"/>
 		<PartDefinition HorizontalPosition="Right" VerticalPosition="Top" Width="48" Height="0"/>
 		<PartDefinition HorizontalPosition="Left" VerticalPosition="Center" Width="80" Height="96">
+      <RectangleDomino x="0" y="24" Width="8" Height="48">
+        <ProtocolDefinition xConstant="0" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>
+      </RectangleDomino>
+      <RectangleDomino x="40" y="0" Width="48" Height="24">
+        <ProtocolDefinition xConstant="1" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>
+      </RectangleDomino>
 			<RectangleDomino  x="24" y="0" Width="16" Height="24">
 				<ProtocolDefinition xConstant="0" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
@@ -94,10 +112,10 @@
 				<ProtocolDefinition xConstant="1" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="0" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="1" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="48" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="1" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="0" yConstant="-4" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -107,9 +125,6 @@
 			</RectangleDomino>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Center" Width="80" Height="96">
-			<RectangleDomino x="-40" y="0" Width="48" Height="24">
-				<ProtocolDefinition xConstant="1" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
-			</RectangleDomino>
 			<RectangleDomino x="8" y="0" Width="32" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
@@ -123,10 +138,10 @@
 				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="48" y="48" Width="32" Height="24">
-				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="4" yConstant="-3" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-4" xPositionMultiplier="2" yPositionMultiplier="-4" WidthMultiplier="0" HeightMultiplier="4"/>  
@@ -136,6 +151,9 @@
 			</RectangleDomino>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Right" VerticalPosition="Center" Width="48" Height="96">
+      <RectangleDomino x="40" y="24" Width="8" Height="48">
+        <ProtocolDefinition xConstant="4" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>
+      </RectangleDomino>
 			<RectangleDomino x="8" y="0" Width="16" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
@@ -146,7 +164,7 @@
 				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="48" Width="48" Height="24">
-				<ProtocolDefinition xConstant="2" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
+				<ProtocolDefinition xConstant="3" yConstant="-3" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
 			</RectangleDomino>
 			<RectangleDomino x="0" y="72" Width="8" Height="24">
 				<ProtocolDefinition xConstant="2" yConstant="-4" xPositionMultiplier="0" yPositionMultiplier="-4" WidthMultiplier="2" HeightMultiplier="4"/>  
