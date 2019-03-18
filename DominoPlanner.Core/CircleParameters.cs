@@ -24,7 +24,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (value > 4 && value < 5000)
+                if (value > 0 && value < 5000)
                 {
                     _circles = value;
                     shapesValid = false;

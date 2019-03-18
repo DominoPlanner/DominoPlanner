@@ -41,10 +41,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (structureParameters is SpiralParameters sp)
                 {
                     ((RoundSizeVM)CurrentViewModel).Amount = (int)((SpiralParameters)structureParameters).QuarterRotations;
+                    ((RoundSizeVM)CurrentViewModel).TypeSelected = "Spiral";
                 }
                 else if (structureParameters is CircleParameters cp)
                 {
                     ((RoundSizeVM)CurrentViewModel).Amount = cp.Circles;
+                    ((RoundSizeVM)CurrentViewModel).TypeSelected = "Circle Bomb";
                 }
                 ((RoundSizeVM)CurrentViewModel).dWidth = ((CircularStructure)structureParameters).DominoWidth;
                 ((RoundSizeVM)CurrentViewModel).dHeight = ((CircularStructure)structureParameters).DominoLength;

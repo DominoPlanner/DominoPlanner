@@ -17,8 +17,8 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="79*" />
-                <ColumnDefinition Width="201*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
             <Label Content="Type" Margin="0,0" HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
             <ComboBox ItemsSource="{Binding list}" SelectedValue="{Binding TypeSelected}" IsEnabled="{Binding PossibleTypeChange}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1"/>
