@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl"
              mc:Ignorable="d" 
@@ -12,6 +13,7 @@
         <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -54,7 +56,14 @@
                 <DataGridTemplateColumn x:Name="sumtemplate" Header="Sum" Width="50" Visibility="{Binding Visible, Converter={StaticResource BoolToVisibilityConverter}}">
                         <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
+                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}">
+                                <Label.Foreground>
+                                    <MultiBinding Converter="{StaticResource AmountToColorConverter}">
+                                        <Binding Path="SumAll"></Binding>
+                                        <Binding Path="DominoColor.count"></Binding>
+                                    </MultiBinding>
+                                </Label.Foreground>
+                            </Label>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

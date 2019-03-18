@@ -21,7 +21,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
-            HaveBuildtools = dominoProvider.obj.hasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.obj.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
 
             IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
             string relativePath = dominoProvider.relativePath;
@@ -229,6 +229,36 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+        private int _physicalLength;
+        public int PhysicalLength
+        {
+            get
+            {
+                return _physicalLength;
+            }
+            set
+            {
+                if (_physicalLength != value)
+                {
+                    _physicalLength = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _physicalHeight;
+        public int PhysicalHeight
+        {
+            get { return _physicalHeight; }
+            set
+            {
+                if (_physicalHeight != value)
+                {
+                    _physicalHeight = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         private string _ProjectName;
         public string ProjectName
@@ -333,13 +363,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             for (int i = 0; i < _DominoList.Count(); i++)
             {
                 _DominoList[i].ProjectCount.Clear();
-                if (CurrentProject.counts.Length > i + 1)
+                if (CurrentProject.Counts.Length > i + 1)
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[i + 1]);
+                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[i + 1]);
                 }
                 else
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.counts[0]);
+                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[0]);
                 }
             }
         }
@@ -689,7 +719,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-            dominoTransfer = CurrentProject.Generate(progress);
+            dominoTransfer = CurrentProject.Generate(new System.Threading.CancellationToken(), progress);
 
             for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
@@ -698,15 +728,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 System.Windows.Shapes.Path sd = new System.Windows.Shapes.Path();
 
                 DominoProject.Stones.Add(dic);
-                for (int k = 0; k < 4; k++)
-                {
-                    if (largestX == 0 || largestX < dominoTransfer[i].GetPath().points[k].X)
-                        largestX = dominoTransfer[i].GetPath().points[k].X;
-
-                    if (largestY == 0 || largestY < dominoTransfer[i].GetPath().points[k].Y)
-                        largestY = dominoTransfer[i].GetPath().points[k].Y;
-                }
             }
+            largestX = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
+            largestY = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
             DominoProject.Width = largestX;
             DominoProject.Height = largestY;
 
@@ -717,9 +741,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void RefreshSizeLabels()
         {
-            ProjectHeight = dominoTransfer.dominoHeight.ToString();
-            ProjectWidth = dominoTransfer.dominoLength.ToString();
+            ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
+            ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
             ProjectAmount = dominoTransfer.shapes.Count().ToString();
+            PhysicalLength = dominoTransfer.physicalLength;
+            PhysicalHeight = dominoTransfer.physicalHeight;
         }
 
         private void Dic_MouseDown(object sender, MouseButtonEventArgs e)

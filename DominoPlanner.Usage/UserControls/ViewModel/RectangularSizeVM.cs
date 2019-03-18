@@ -24,7 +24,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
-        IEnumerable<XElement> structures;
+        public List<XElement> structures;
         #endregion
 
         #region prop
@@ -111,7 +111,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             try
             {
                 XElement xElement = XElement.Parse(Properties.Resources.Structures);
-                structures = xElement.Elements();
+                structures = xElement.Elements().ToList();
 
                 foreach (var structure in structures)
                 {

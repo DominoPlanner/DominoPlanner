@@ -35,9 +35,9 @@ namespace DominoPlanner.Core
 
         public void AddToPixel(IDominoShape shape, int r, int g, int b)
         {
-            shape.ditherColor.Red = Saturate(shape.ditherColor.Red + r);
-            shape.ditherColor.Blue = Saturate(shape.ditherColor.Blue + b);
-            shape.ditherColor.Green = Saturate(shape.ditherColor.Green + g);
+            shape.PrimaryDitherColor.Red = Saturate(shape.PrimaryDitherColor.Red + r);
+            shape.PrimaryDitherColor.Blue = Saturate(shape.PrimaryDitherColor.Blue + b);
+            shape.PrimaryDitherColor.Green = Saturate(shape.PrimaryDitherColor.Green + g);
         }
         double Saturate(double input)
         {

@@ -51,12 +51,14 @@ namespace DominoPlanner.Usage
             loadProjectList();
         }
 
-        internal void CloseAllTabs()
+        internal bool CloseAllTabs()
         {
             while (Tabs.Count > 0)
             {
-                RemoveItem(Tabs.First());
+                if (!RemoveItem(Tabs.First()))
+                    return false;
             }
+            return true;
         }
         private string UpdateReference(string absolutePath, string parentPath)
         {
@@ -77,7 +79,9 @@ namespace DominoPlanner.Usage
         private void CurrentProject_EditingChanged(object sender, EventArgs e)
         {
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
+            //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
             tabItem.Content.Save();
+            
             tabItem.ResetContent();
         }
         #endregion

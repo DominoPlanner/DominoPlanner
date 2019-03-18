@@ -4,6 +4,7 @@ using Emgu.CV.CvEnum;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -19,12 +20,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             CurrentProject = dominoProvider.obj;
             
             fsvm = new FieldSizeVM(true);
-            OnlyOwnStonesVM = new OnlyOwnStonesVM();
+            OnlyOwnStonesVM = new OnlyOwnStonesVM(((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation);
 
-            iResizeMode = (int)fieldParameters.resizeMode;
-            iColorApproxMode = (int)fieldParameters.colorMode.colorComparisonMode;
-            iDiffusionMode = (int)fieldParameters.ditherMode.Mode;
-            TransparencyValue = fieldParameters.TransparencySetting;
+            iResizeMode = (int)((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode;
+            iColorApproxMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode.colorComparisonMode;
+            iDiffusionMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering.Mode;
+            TransparencyValue = ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting;
 
             ReloadSizes();
 
@@ -59,6 +60,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 _dominoTransfer = value;
                 refreshPlanPic();
+
+                fsvm.PhysicalLength = dominoTransfer.physicalLength;
+                fsvm.PhysicalHeight = dominoTransfer.physicalHeight;
             }
         }
         #endregion
@@ -99,7 +103,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
+        
         private OnlyOwnStonesVM _onlyOwnStonesVM;
 
         public OnlyOwnStonesVM OnlyOwnStonesVM
@@ -126,11 +130,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fieldParameters.IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
+                    if (OnlyOwnStonesVM.Iterations == 0)
+                    {
+                        OnlyOwnStonesVM.Iterations = 2;
+                        OnlyOwnStonesVM.Weight = 0.1;
+                    }
                 }
                 else
                 {
-                    fieldParameters.IterationInformation = new NoColorRestriction();
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new NoColorRestriction();
                 }
                 refresh();
             }
@@ -138,7 +147,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    fieldParameters.IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
                     refresh();
                 }
             }
@@ -146,7 +155,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
-                    ((IterativeColorRestriction)fieldParameters.IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
+                    ((IterativeColorRestriction)((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
                     refresh();
                 }
             }
@@ -214,11 +223,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iResizeMode; }
             set
             {
-                if (_iResizeMode != value)
+                if (_iResizeMode != value || _sResizeMode == null)
                 {
                     _iResizeMode = value;
-                    fieldParameters.resizeMode = (Inter)value;
-                    sResizeMode = fieldParameters.resizeMode.ToString();
+                    ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode = (Inter)value;
+                    sResizeMode = ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode.ToString();
                     RaisePropertyChanged();
                     refresh();
                 }
@@ -231,26 +240,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _iColorApproxMode; }
             set
             {
-                if (_iColorApproxMode != value)
+                if (_iColorApproxMode != value || sColorApproxMode == null)
                 {
                     _iColorApproxMode = value;
                     switch (value)
                     {
                         case 0:
-                            fieldParameters.colorMode = ColorDetectionMode.Cie1976Comparison;
-                            sColorApproxMode = "CIE-76 Comparison (ISO 12647)";
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie1976Comparison;
+                            sColorApproxMode = "CIE-76 (ISO 12647)";
                             break;
                         case 1:
-                            fieldParameters.colorMode = ColorDetectionMode.CmcComparison;
-                            sColorApproxMode = "CMC (l:c) Comparison";
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CmcComparison;
+                            sColorApproxMode = "CMC (l:c)";
                             break;
                         case 2:
-                            fieldParameters.colorMode = ColorDetectionMode.Cie94Comparison;
-                            sColorApproxMode = "CIE-94 Comparison (DIN 99)";
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie94Comparison;
+                            sColorApproxMode = "CIE-94 (DIN 99)";
                             break;
                         case 3:
-                            fieldParameters.colorMode = ColorDetectionMode.CieDe2000Comparison;
-                            sColorApproxMode = "CIE-E-2000 Comparison";
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CieDe2000Comparison;
+                            sColorApproxMode = "CIE-E-2000";
                             break;
                         default:
                             break;
@@ -270,39 +279,81 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_TransparencyValue != value)
                 {
                     _TransparencyValue = value;
-                    fieldParameters.TransparencySetting = _TransparencyValue;
+                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting = _TransparencyValue;
                     refresh();
                     RaisePropertyChanged();
                 }
             }
         }
-        
+        private bool _draw_borders;
+        public bool draw_borders
+        {
+            get { return _draw_borders; }
+            set
+            {
+                if (_draw_borders != value)
+                {
+                    _draw_borders = value;
+                    refresh();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private bool _collapsed;
+        public bool Collapsed
+        {
+            get { return _collapsed; }
+            set
+            {
+                if (_collapsed != value)
+                {
+                    _collapsed = value;
+                    refresh();
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
+        public System.Windows.Media.Color backgroundColor
+        {
+            get { return _backgroundColor; }
+            set
+            {
+                if (_backgroundColor != value)
+                {
+                    _backgroundColor = value;
+                    RaisePropertyChanged();
+                    refresh();
+                }
+            }
+        }
+
         private int _iDiffusionMode = 1;
         public int iDiffusionMode
         {
             get { return _iDiffusionMode; }
             set
             {
-                if (_iDiffusionMode != value)
+                if (_iDiffusionMode != value || _sDiffusionMode == null)
                 {
                     _iDiffusionMode = value;
                     switch ((DitherMode)value)
                     {
                         case DitherMode.NoDithering:
                             sDiffusionMode = "NoDiffusion";
-                            fieldParameters.ditherMode = new Dithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new Dithering();
                             break;
                         case DitherMode.FloydSteinberg:
                             sDiffusionMode = "Floyd/Steinberg Dithering";
-                            fieldParameters.ditherMode = new FloydSteinbergDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new FloydSteinbergDithering();
                             break;
                         case DitherMode.JarvisJudiceNinke:
                             sDiffusionMode = "Jarvis/Judice/Ninke Dithering";
-                            fieldParameters.ditherMode = new JarvisJudiceNinkeDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new JarvisJudiceNinkeDithering();
                             break;
                         case DitherMode.Stucki:
                             sDiffusionMode = "Stucki Dithering";
-                            fieldParameters.ditherMode = new StuckiDithering();
+                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new StuckiDithering();
                             break;
                         default:
                             break;
@@ -319,25 +370,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             System.Diagnostics.Debug.WriteLine(progress.ToString());
             if (dispatcher == null)
             {
-                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                 cursor = null;
             }
             else
             {
                 dispatcher.BeginInvoke((Action)(() =>
                 {
-                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(2000).Bitmap);
+                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                     CurrentPlan = newBitmap;
                     cursor = null;
                 }));
             }
         }
-        
+
+        CancellationToken ct;
         private async void refresh()
         {
             cursor = Cursors.Wait;
             refrshCounter++;
-            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(progress));
+            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(ct, progress));
             DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
             refrshCounter--;
             if(refrshCounter == 0)
@@ -382,23 +434,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else if (e.PropertyName.Equals("Length"))
             {
-                fieldParameters.length = (int)fsvm.Length;
+                fieldParameters.Length = (int)fsvm.Length;
                 if (fsvm.BindSize)
                 {
-                    double fieldWidth = fsvm.Length * (fieldParameters.a + fieldParameters.b);
-                    double stoneHeightWidhSpace = fieldParameters.c + fieldParameters.d;
-                    fieldParameters.height = (int)(fieldWidth / (double)fieldParameters.image_filtered.Size.Width * fieldParameters.image_filtered.Size.Height / stoneHeightWidhSpace);
+                    double fieldWidth = fsvm.Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
+                    double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
+                    fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
                 }
                 important = true;
             }
             else if (e.PropertyName.Equals("Height"))
             {
-                fieldParameters.height = (int)fsvm.Height;
+                fieldParameters.Height = (int)fsvm.Height;
                 if (fsvm.BindSize)
                 {
-                    double fieldHeight = fsvm.Height * (fieldParameters.c + fieldParameters.d);
-                    double stoneWidthWidthSpace = fieldParameters.a + fieldParameters.b;
-                    fieldParameters.length = (int)(fieldHeight / (double)fieldParameters.image_filtered.Size.Height * fieldParameters.image_filtered.Size.Width / stoneWidthWidthSpace);
+                    double fieldHeight = fsvm.Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
+                    double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
+                    fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
                 }
                 important = true;
             }
@@ -429,17 +481,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (fsvm.Vertical)
             {
-                fieldParameters.a = fsvm.SelectedItem.Sizes.d;
-                fieldParameters.b = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.c = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.d = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.a;
             }
             else
             {
-                fieldParameters.a = fsvm.SelectedItem.Sizes.a;
-                fieldParameters.b = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.c = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.d = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.b;
+                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.c;
+                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.d;
             }
         }
 
@@ -453,11 +505,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void ReloadSizes()
         {
             fsvm.PropertyChanged -= CreateFieldVM_PropertyChanged;
-            fsvm.FieldSize = fieldParameters.height * fieldParameters.length;
-            fsvm.Length = fieldParameters.length;
-            fsvm.Height = fieldParameters.height;
+            fsvm.FieldSize = fieldParameters.Height * fieldParameters.Length;
+            fsvm.Length = fieldParameters.Length;
+            fsvm.Height = fieldParameters.Height;
 
-            Sizes currentSize = new Sizes(fieldParameters.a, fieldParameters.b, fieldParameters.c, fieldParameters.d);
+            Sizes currentSize = new Sizes(fieldParameters.HorizontalDistance, fieldParameters.HorizontalSize, fieldParameters.VerticalSize, fieldParameters.VerticalDistance);
             bool found = false;
             foreach (StandardSize sSize in fsvm.field_templates)
             {

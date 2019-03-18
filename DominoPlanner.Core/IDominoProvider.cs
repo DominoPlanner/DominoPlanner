@@ -1,149 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.IO;
-using OfficeOpenXml;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
+﻿using OfficeOpenXml;
 using ProtoBuf;
-using System.ComponentModel;
-using System.Collections.Specialized;
-using Emgu.CV.Structure;
-using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading;
+using System.Windows.Media;
 
 namespace DominoPlanner.Core
 {
-    /// <summary>
-    /// Die allgemeine Basisklasse für die Erstellung jeglicher Domino-Objekte.
-    /// </summary>
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
     [ProtoInclude(101, typeof(GeneralShapesProvider))]
-    public abstract class IDominoProvider : ICloneable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
+    public abstract class IDominoProvider : IWorkspaceLoadable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
     {
-        #region public properties
-        /// <summary>
-        /// Gibt an, ob das Objekt eine Protokolldefinition besitzt oder nicht.
-        /// Auf der Basis dieser Information sollten die entsprechenden Buttons angezeigt werden oder nicht.
-        /// </summary>
-        [ProtoMember(3)]
-        public bool hasProtocolDefinition { get; set; }
-        /// <summary>
-        /// Das Bitmap, welchem dem aktuellen Objekt zugrunde liegt.
-        /// </summary>
-        protected Mat source;
-        IterationInformation _iterationInfo;
-        /// <summary>
-        /// Gibt an, ob die Farben nur in der angegebenen Menge verwendet werden sollen. 
-        /// Ist diese Eigenschaft aktiviert, kann das optische Ergebnis schlechter sein, das Objekt ist aber mit den angegeben Steinen erbaubar.
-        /// </summary>
-        [ProtoMember(5)]
-        public IterationInformation IterationInformation
-        {
-            get
-            {
-                return _iterationInfo;
-            }
-            set
-            {
-                _iterationInfo = value;
-                _iterationInfo.PropertyChanged +=
-                    new PropertyChangedEventHandler(delegate (object s, PropertyChangedEventArgs e) { lastValid = false; });
-                lastValid = false;
-            }
-        }
-        private byte _TransparencySetting;
-        [ProtoMember(6)]
-        public byte TransparencySetting { get => _TransparencySetting; set { lastValid = false; _TransparencySetting = value; }}
-        // das Repo wird nicht serialisiert, nur der Pfad dazu
-        private ColorRepository _colors;
-        public ColorRepository colors
-        {
-            get
-            {
-                return _colors;
-            }
-            set
-            {
-                _colors = value;
-                lastValid = false;
-            }
-        }
-        private string _colorPath;
-        [ProtoMember(7)]
-        public string ColorPath
-        {
-            get
-            {
-                return _colorPath;
-            }
-            set
-            {
-                _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
-            }
-        }
-        public ColorRepository color_filtered { get; private set; }
-        public Mat image_filtered { get; private set; }
-        /// <summary>
-        /// Wird diese Eigenschaft gesetzt, wird ein Objekt generiert, dessen Steinanzahl möglichst nahe am angegeben Wert liegt.
-        /// Dabei wird versucht, das Seitenverhältnis des Quellbildes möglichst zu wahren.
-        /// </summary>
-        private IColorComparison _colorMode;
-        /// <summary>
-        /// Der Interpolationsmodus, der zur Farberkennung berechnet wird.
-        /// </summary>
-        
-        public IColorComparison colorMode
-        {
-            get
-            {
-                return _colorMode;
-            }
-            set
-            {
-                if (value.GetType() != _colorMode?.GetType())
-                {
-                    _colorMode = value;
-                    lastValid = false;
-                }
-            }
-        }
-        [ProtoMember(11)]
-        public string colorMode_surrogate
-        {
-            get
-            {
-                Console.WriteLine(_colorMode.GetType().AssemblyQualifiedName);
-                Console.WriteLine(_colorMode.GetType().Name);
-                return _colorMode.GetType().Name;
-            }
-            set
-            {
-                _colorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
-            }
-        }
-        /// <summary>
-        /// Liste der Filter, die vor der Berechnung angewendet werden
-        /// </summary>
-        [ProtoMember(12)]
-        public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
-        [ProtoMember(13)]
-        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
-        /// <summary>
-        /// Gibt einen Array zurück, der für alle Farben der colors-Eigenschaft die Anzahl in dem Objekt angibt.
-        /// </summary>
+        #region properties
         [ProtoMember(1, OverwriteList = true)]
-        public int[] counts
+        public int[] Counts
         {
             get
             {
                 if (last == null) return null;
-                if (!Editing && (!shapesValid || !lastValid)) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
+                //if (!Editing && !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
                 if (last != null)
                 {
@@ -157,151 +35,146 @@ namespace DominoPlanner.Core
             private set { }
         }
 
+        [ProtoMember(3)]
+        public virtual bool HasProtocolDefinition { get; set; }
 
-        [ProtoMember(15)]
-        private int _imagewidth;
-        public int ImageWidth
+        private string _colorPath;
+        [ProtoMember(7)]
+        public string ColorPath
         {
-            get { return _imagewidth; }
+            get => _colorPath;
             set
             {
-                _imagewidth = value; sourceValid = false;
+                _colorPath = value;
+                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
         }
-        [ProtoMember(16)]
-        private int _imageheigth;
-        public int ImageHeight
-        {
-            get => _imageheigth;
-            set { _imageheigth = value; sourceValid = false; }
-        }
-        private Color _background;
-        [ProtoMember(17)]
-        private String ColorSerialized
-        {
-            get
-            {
-                return _background.ToString();
-            }
-            set { background = (Color)ColorConverter.ConvertFromString(value); }
-        }
-        public Color background
-        {
-            get { return _background; }
-            set { _background = value; sourceValid = false; }
-        }
-        private Dithering _ditherMode;
-        /// <summary>
-        /// Gibt an, ob ein Fehlerkorrekturalgorithmus verwendet werden soll.
-        /// </summary>
-        public Dithering ditherMode
-        {
-            get
-            {
-                return _ditherMode;
-            }
-            set
-            {
-                if (value.GetType() != _ditherMode?.GetType())
-                {
-                    _ditherMode = value;
-                    lastValid = false;
-                }
-            }
-        }
-        [ProtoMember(18)]
-        private string DitheringSurrogate
-        {
-            get
-            {
-                return (_ditherMode.GetType().Name);
-            }
-            set
-            {
-                _ditherMode = (Dithering)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
-            }
-        }
-        #endregion
-        // müssen nach den Unterklassen deserialisiert werden
-        [ProtoMember(1000)]
-        private bool _shapesValid = false;
-        protected bool shapesValid { get => _shapesValid;
-            set => _shapesValid = value; }
-        [ProtoMember(1001)]
-        private bool _lastValid = false;
-        public bool lastValid { get => _lastValid;
-            set => _lastValid = value; }
-        [ProtoMember(1002)]
-        public bool colorsValid = false;
-        [ProtoMember(1003)]
-        public bool imageValid = false;
-        [ProtoMember(1004)]
-        public bool sourceValid = false;
-        [ProtoMember(1005)]
-        private bool _usedColorsValid = false;
-        public bool usedColorsValid { get => _usedColorsValid;
-            set => _usedColorsValid = value;
-        }
-        private bool _Editing;
+        public ColorRepository colors;
+        
+        bool _editing;
         [ProtoMember(4)]
         public bool Editing
         {
-            get { return _Editing; }
+            get { return _editing; }
             set
             {
-                if (_Editing != value)
+                if (_editing != value)
                 {
-                    _Editing = value;
+                    _editing = value;
+                    shapesValid = false;
+                    if (this is IRowColumnAddableDeletable)
+                    {
+                        (this as IRowColumnAddableDeletable).ResetSize();
+                    }
                     EditingChanged?.Invoke(this, EventArgs.Empty);
+                    
                 }
             }
         }
-
-        [ProtoMember(2)]
-        public DominoTransfer last;
-        #region const
-        protected IDominoProvider(string filepath, string bitmapPath, IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) 
-            : this()
+        public bool SecondarySideCalculated { get => SecondaryImageTreatment != null; }
+        [ProtoMember(19)]
+        protected ImageTreatment _primaryImageTreatment;
+        
+        public virtual ImageTreatment PrimaryImageTreatment
         {
-            
-            this.colorMode = comp;
-            this.IterationInformation = iterationInformation;
-            this.ditherMode = ditherMode;
-            this.Save(filepath);
-            this.ColorPath = colorpath;
-            //source = overlayImage(bitmap);
-            var BlendFileFilter = new BlendFileFilter() { FilePath = bitmapPath, parent = this };
-            BlendFileFilter.UpdateMat();
-            ImageWidth = BlendFileFilter.GetSizeOfMat().Width;
-            ImageHeight = BlendFileFilter.GetSizeOfMat().Height;
-            BlendFileFilter.CenterX = ImageWidth / 2;
-            BlendFileFilter.CenterY = ImageHeight / 2;
-            UpdateSource();
-            this.ImageFilters.Add(BlendFileFilter);
-            
-            
+            get => _primaryImageTreatment;
+            set
+            {
+                if (value != _primaryImageTreatment && value != null && SuitableImageTreatment(value))
+                {
+                    _primaryImageTreatment = value;
+                    _primaryImageTreatment.colorsValid = false;
+                    _primaryImageTreatment.StateReference = StateReference.Before;
+                    _primaryImageTreatment.parent = this;
+                }
+            }
+        }
+        protected ImageTreatment _secondaryImageTreatment;
+        [ProtoMember(20)]
+        public virtual ImageTreatment SecondaryImageTreatment
+        {
+            get => _secondaryImageTreatment;
+            set
+            {
+                if (value != _secondaryImageTreatment && value != null && SuitableImageTreatment(value))
+                {
+                    _secondaryImageTreatment = value;
+                    _secondaryImageTreatment.colorsValid = false;
+                    _secondaryImageTreatment.StateReference = StateReference.After;
+                    _secondaryImageTreatment.parent = this;
+                }
+            }
+        }
+        protected Calculation _primaryCalculation;
+        [ProtoMember(21)]
+        public virtual Calculation PrimaryCalculation
+        {
+            get => _primaryCalculation;
+            set
+            {
+                if (value != _primaryCalculation && value != null && SuitableCalculation(value))
+                {
+                    _primaryCalculation = value;
+                    _primaryCalculation.LastValid = false;
+                    if (_primaryCalculation is UncoupledCalculation)
+                    {
+                        ((UncoupledCalculation)_primaryCalculation).StateReference = StateReference.Before;
+                    }
+                    if (_primaryCalculation is CoupledCalculation)
+                    {
+                        _secondaryCalculation = new EmptyCalculation();
+                    }
+                }
+            }
+        }
+        protected Calculation _secondaryCalculation = new EmptyCalculation();
+        [ProtoMember(22)]
+        public virtual Calculation SecondaryCalculation
+        {
+            get => _secondaryCalculation;
+            set
+            {
+                if (value != _secondaryCalculation && value != null && SuitableCalculation(value) && !(PrimaryCalculation is CoupledCalculation))
+                {
+                    _secondaryCalculation = value;
+                    _secondaryCalculation.LastValid = false;
+                    if (_secondaryCalculation is UncoupledCalculation)
+                    {
+                        ((UncoupledCalculation)_secondaryCalculation).StateReference = StateReference.After;
+                    }
+                }
+            }
+        }
+        protected bool lastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
+        #endregion
+        #region internal vars
+        protected int charLength;
+        private DominoTransfer _last;
+        [ProtoMember(2)]
+        public DominoTransfer last
+        {
+            get => _last;
+            set
+            {
+
+                if (_last != value)
+                {
+                    _last = value;
+                    shapesValid = false;
+                }
+            }
+        }
+        [ProtoMember(1000)]
+        internal bool shapesValid;
+        #endregion
+        #region constructors
+        public IDominoProvider(string filepath)
+        {
+            Save(filepath);
         }
         protected IDominoProvider()
         {
-            this.ColorFilters = new ObservableCollection<ColorFilter>();
-            this.ImageFilters = new ObservableCollection<ImageFilter>();
-            this.ColorFilters.CollectionChanged +=
-                new NotifyCollectionChangedEventHandler((sender, e) => ColorFiltersChanged(sender,e));
-            this.ImageFilters.CollectionChanged +=
-               new NotifyCollectionChangedEventHandler((sender, e) => ImageFiltersChanged(sender, e));
-            background = Colors.Transparent;
-        }
-        protected IDominoProvider(int imageWidth, int imageHeight, Color background, 
-            IColorComparison comp, Dithering ditherMode, string colorpath, IterationInformation iterationInformation) : this()
-        {
-            ImageWidth = imageWidth;
-            ImageHeight = imageHeight;
-            this.background = background;
-            UpdateSource();
-            this.colorMode = comp;
-            this.ColorPath = colorpath;
-            this.IterationInformation = iterationInformation;
-            this.ditherMode = ditherMode;
+
         }
         #endregion
         #region public methods
@@ -311,46 +184,61 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="progressIndicator">Kann für Threading verwendet werden.</param>
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
-        public virtual DominoTransfer Generate(IProgress<string> progressIndicator = null)
+        public virtual DominoTransfer Generate(CancellationToken ct, IProgress<string> progressIndicator = null)
         {
-            Console.WriteLine("Regenerate");
             if (Editing) return last;
-            if (!sourceValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Updating source image");
-                UpdateSource();
-            }
-            if (!colorsValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Updating Color filters");
-                ApplyColorFilters();
-            }
-            if (!imageValid)
-            {
-                if (progressIndicator != null) progressIndicator.Report("Applying image filters");
-                ApplyImageFilters();
-            }
+            ct.ThrowIfCancellationRequested();
             if (!shapesValid)
             {
-                if (progressIndicator != null) progressIndicator.Report("Calculating domino shapes...");
-                GenerateShapes();
-                usedColorsValid = false;
+                RegenerateShapes();
+                shapesValid = true;
+                if (PrimaryImageTreatment != null)
+                    PrimaryImageTreatment.colorsValid = false;
+                if (SecondaryImageTreatment != null)
+                    SecondaryImageTreatment.colorsValid = false;
             }
-            if (!usedColorsValid)
+            last.colors = colors;
+
+            ct.ThrowIfCancellationRequested();
+            if (SecondaryImageTreatment != null && !SecondaryImageTreatment.colorsValid)
             {
-                if (progressIndicator != null) progressIndicator.Report("Reading pixels from image...");
-                ReadUsedColors();
-                lastValid = false;
+
+                SecondaryImageTreatment.parent = this;
+                SecondaryImageTreatment.FillDominos(last);
+                SecondaryCalculation.LastValid = false;
+                if (PrimaryCalculation is CoupledCalculation)
+                {
+                    PrimaryCalculation.LastValid = false;
+                }
+                SecondaryImageTreatment.colorsValid = true;
             }
-            if (!lastValid)
+            ct.ThrowIfCancellationRequested();
+            if (!PrimaryImageTreatment.colorsValid)
             {
-                if (progressIndicator != null) progressIndicator.Report("Calculating ideal colors...");
-                CalculateColors();
-                lastValid = true;
+                PrimaryImageTreatment.parent = this;
+                PrimaryImageTreatment.FillDominos(last);
+                PrimaryImageTreatment.colorsValid = true;
+                PrimaryCalculation.LastValid = false;
+            }
+            ct.ThrowIfCancellationRequested();
+            if (!PrimaryCalculation.LastValid)
+            {
+                PrimaryCalculation.Calculate(last, charLength);
+                PrimaryCalculation.LastValid = true;
+            }
+            ct.ThrowIfCancellationRequested();
+            if (!SecondaryCalculation.LastValid)
+            {
+                SecondaryCalculation.Calculate(last, charLength);
+                SecondaryCalculation.LastValid = true;
             }
             return last;
         }
-        /// <summary>
+        public DominoTransfer Generate()
+        {
+            return Generate(new CancellationToken());
+        }
+        // <summary>
         /// Liefert das HTML-Protokoll eines Objekts.
         /// Falls das Objekt keine Strukturdefinition besitzt, wird eine InvalidOperationException geworfen.
         /// </summary>
@@ -366,9 +254,9 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="path">Der Speicherort des Protokolls.</param>
         /// <param name="parameters">Die Parameter des Protokolls.</param>
-        public void SaveXLSFieldPlan(string path, ObjectProtocolParameters parameters)
+        public void SaveXLSFieldPlan(string path, string projectname, ObjectProtocolParameters parameters)
         {
-            parameters.path = path;
+            parameters.project = projectname;
             FileInfo file = new FileInfo(path);
             if (file.Exists) file.Delete();
             ExcelPackage pack = new ExcelPackage(file);
@@ -435,77 +323,16 @@ namespace DominoPlanner.Core
                     d.dominoes[i].Add(currentColors);
                 }
             }
-            d.counts = counts;
+            d.counts = Counts;
             d.rows = (o == Orientation.Horizontal) ? dominoes.GetLength(0) : dominoes.GetLength(1);
             d.columns = (o == Orientation.Horizontal) ? dominoes.GetLength(1) : dominoes.GetLength(0);
             return d;
         }
-        #endregion
-        #region internal methods
-        
-        private void ImageFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                var newitems = e.NewItems;
-                foreach (var item in newitems)
-                {
-                    ((ImageFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => imageValid = false);
-                }
-            }
-            imageValid = false;
-        }
-        private void ColorFiltersChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (color_filtered == null)
-            {
-                this.color_filtered = Serializer.DeepClone(colors);
-            }
-            // dann nur den neu hinzugekommenen Filter anwenden und mit einem Event versehen
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                var newitems = e.NewItems;
-                foreach (var item in newitems)
-                {
-                    ((ColorFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => ApplyColorFilters());
-                    ((ColorFilter)item).Apply(color_filtered);
-                }
-            }
-            else ApplyColorFilters();
-            lastValid = false;
-        }
-        internal void UpdateSource()
-        {
-            this.source = new Image<Emgu.CV.Structure.Bgra, byte>(ImageWidth, ImageHeight,
-                new Emgu.CV.Structure.Bgra(background.B, background.G, background.R, background.A)).Mat;
-            imageValid = false;
-            sourceValid = true;
-        }
-        internal abstract void GenerateShapes();
-
-        internal abstract void ReadUsedColors();
-
-        internal abstract void CalculateColors();
-
-        internal void ResetDitherColors(IDominoShape[] shapes)
-        {
-            foreach (var domino in shapes)
-            {
-                domino.ditherColor = domino.originalColor;
-                domino.color = 0;
-            }
-        }
-
-        /// <summary>
-        /// Berechnet das Basisfeld eines Objekts aus dessen Protokolldefinition. 
-        /// </summary>
-        /// <param name="o">Die Orientierung des gewünschten Basisfeldes</param>
-        /// <returns>int-Array mit den Indizes des Farben</returns>
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
         {
-            if (!hasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
+            if (!HasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
             if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
-            int[,] basefield = new int[last.dominoLength, last.dominoHeight];
+            int[,] basefield = new int[last.FieldPlanLength, last.FieldPlanHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)
             {
                 for (int j = 0; j < basefield.GetLength(1); j++)
@@ -523,36 +350,17 @@ namespace DominoPlanner.Core
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
             return basefield;
         }
-        public Mat overlayImage(Mat overlay)
+        public void Save(string filepath = "")
         {
-            if (overlay.NumberOfChannels != 4) return overlay;
-            Image<Emgu.CV.Structure.Bgra, byte> overlay_img = overlay.ToImage<Emgu.CV.Structure.Bgra, byte>();
-
-            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
-            Parallel.For(0, overlay_img.Height, (y) =>
-           {
-               for (int x = overlay_img.Width - 1; x >= 0 ; x--)
-               {
-                   double opacity = (double)(overlay_img.Data[y, x, 3]) / 255;
-
-                   for (int c = 2; c >= 0; c--)
-                   {
-                       overlay_img.Data[y, x, c] = (byte)(255 * (1 - opacity) + overlay_img.Data[y, x, c] * (opacity));
-                   }
-               }
-           });
-           
-            watch.Stop();
-            Console.WriteLine("Blend " + watch.ElapsedMilliseconds);
-            return overlay_img.Mat;
+            Workspace.Save(this, filepath);
         }
-    
-        /// <summary>
-        /// Spiegelt einen Array an der Nicht-Delta-Diagonale
-        /// </summary>
-        /// <typeparam name="T">Der Typ des Arrays</typeparam>
-        /// <param name="array">Der Array, der gespiegelt werden soll</param>
-        /// <returns></returns>
+        #endregion
+        #region events
+        public event EventHandler EditingChanged;
+        #endregion
+        #region abstracts
+        protected abstract void RegenerateShapes();
+        
         protected static T[,] TransposeArray<T>(T[,] array)
         {
             T[,] temp = new T[array.GetLength(1), array.GetLength(0)];
@@ -565,72 +373,287 @@ namespace DominoPlanner.Core
             }
             return temp;
         }
-        
-        internal void ApplyColorFilters()
+        protected virtual bool SuitableCalculation(Calculation calc)
         {
-            color_filtered = Serializer.DeepClone(colors);
-            foreach (ColorFilter filter in ColorFilters)
-            {
-                filter.Apply(color_filtered);
-            }
-            lastValid = false;
-            colorsValid = true;
+            return true;
         }
-        internal void ApplyImageFilters()
+        protected virtual bool SuitableImageTreatment(ImageTreatment treat)
         {
-            var image_filtered = source.ToImage<Emgu.CV.Structure.Bgra, byte>();
-            foreach (ImageFilter filter in ImageFilters)
-            {
-                filter.parent = this;
-                filter.Apply(image_filtered);
-            }
-            this.image_filtered = image_filtered.Mat;
-            lastValid = false;
-            imageValid = true;
-        }
-        public void Save(string filepath = "")
-        {
-            Workspace.Save(this, filepath);
-        }
-        [ProtoAfterDeserialization]
-        public void restoreShapes()
-        {
-            bool lastValidTemp = lastValid;
-            //if (!Editing)
-            //{
-                UpdateSource();
-                ApplyImageFilters();
-                ApplyColorFilters();
-                GenerateShapes();
-                ReadUsedColors();
-            //}
-            lastValid = lastValidTemp;
-        }
-        public abstract object Clone();
-
-        public void AfterDeserializationOperation()
-        {
-            restoreShapes();
+            return true;
         }
         #endregion
-        #region EVENTS
-        public event EventHandler EditingChanged;
+        #region private methods
+        [ProtoAfterDeserialization]
+        private void restoreShapes()
+        {
+            if (PrimaryCalculation == null)
+            {
+                PrimaryCalculation = CreatePrimaryCalculation();
+            }
+            if (PrimaryImageTreatment == null)
+            {
+                PrimaryImageTreatment = CreatePrimaryTreatment();
+            }
+            Generate();
+            last.colors = colors;
+            //CreatePrimaryTreatment();
+            //bool lastValidTemp = lastValid;
+            ////if (!Editing)
+            ////{
+            //PrimaryImageTreatment?.();
+            //SecondaryImageTreatment?.UpdateSource();
+
+            //ApplyImageFilters();
+            //ApplyColorFilters();
+            //GenerateShapes();
+            //ReadUsedColors();
+            ////}
+            //lastValid = lastValidTemp;
+        }
+        #endregion
+
+        #region compatibility properties
+        private Calculation TempCalculation;
+        private ImageTreatment TempImageTreatment;
+        internal Calculation CreatePrimaryCalculation()
+        {
+            if (TempCalculation == null)
+            {
+                if (this is FieldParameters)
+                {
+                    TempCalculation = new FieldCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+                }
+                else
+                {
+                    TempCalculation = new UncoupledCalculation(new CieDe2000Comparison(), new Dithering(), new NoColorRestriction());
+                }
+            }
+            return TempCalculation;
+        }
+        internal ImageTreatment CreatePrimaryTreatment()
+        {
+            if (TempImageTreatment == null)
+            {
+                if (this is FieldParameters)
+                {
+                    TempImageTreatment = new FieldReadout((FieldParameters)this, 10, 10, Emgu.CV.CvEnum.Inter.Cubic);
+                }
+                else
+                {
+                    TempImageTreatment = new NormalReadout(this, 10, 10, AverageMode.Average, true);
+                }
+            }
+            return TempImageTreatment;
+        }
+        
+        [ProtoMember(5)]
+        private IterationInformation IterationInformation
+        {
+            get
+            {
+                return ((NonEmptyCalculation)PrimaryCalculation)?.IterationInformation ?? new NoColorRestriction();
+                return new NoColorRestriction();
+            }
+            set
+            {
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
+                {
+                    calc.IterationInformation = value;
+                }
+                
+            }
+        }
+        
+        [ProtoMember(6)]
+        private byte TransparencySetting
+        {
+            get => ((NonEmptyCalculation)PrimaryCalculation)?.TransparencySetting ?? 0;
+            set
+            {
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
+                {
+                    calc.TransparencySetting = value;
+                }
+            }
+        }
+        
+        [ProtoMember(11)]
+        private string colorMode_surrogate
+        {
+            get
+            {
+                return ((NonEmptyCalculation)PrimaryCalculation)?.ColorMode.GetType().Name ?? "CieDe2000Comparison";
+            }
+            set
+            {
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
+                {
+                    calc.ColorMode = (IColorComparison)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+                }
+            }
+        }
+        
+        [ProtoMember(12)]
+        private ObservableCollection<ColorFilter> ColorFilters
+        {
+            get
+            {
+                return new ObservableCollection<ColorFilter>();
+            }
+            set
+            {
+                //
+            }
+        }
+        
+        [ProtoMember(13, OverwriteList = true)]
+        private ObservableCollection<ImageFilter> ImageFilters
+        {
+            get
+            {
+                return (PrimaryImageTreatment)?.ImageFilters ?? new ObservableCollection<ImageFilter>();
+            }
+            set
+            {
+                if (CreatePrimaryTreatment().ImageFilters != null)
+                    CreatePrimaryTreatment().ImageFilters = value;
+            }
+        }
+        
+        [ProtoMember(15)]
+        private int ImageWidth
+        {
+            get => 
+                PrimaryImageTreatment?.Width ?? 10;
+            set
+            {
+                CreatePrimaryTreatment().Width = value;
+            }
+        }
+        [ProtoMember(16)]
+        private int ImageHeight
+        {
+            get => PrimaryImageTreatment?.Height ?? 10;
+            set
+            {
+                CreatePrimaryTreatment().Height = value;
+            }
+        }
+        
+        [ProtoMember(17)]
+        private string ColorSerialized
+        {
+            get
+            {
+                return PrimaryImageTreatment?.Background.ToString() ?? Colors.Transparent.ToString();
+            }
+            set { CreatePrimaryTreatment().Background = (Color)ColorConverter.ConvertFromString(value); }
+        }
+        
+        [ProtoMember(18)]
+        private string DitheringSurrogate
+        {
+            get
+            {
+                return ((NonEmptyCalculation)PrimaryCalculation)?.Dithering.GetType().Name ?? new Dithering().GetType().Name;
+            }
+            set
+            {
+                if (CreatePrimaryCalculation() is NonEmptyCalculation calc)
+                {
+                    calc.Dithering =
+                        (Dithering)Activator.CreateInstance(Type.GetType($"DominoPlanner.Core.{value}"));
+                }
+            }
+        }
+        
+        #endregion
+        
+    }
+    [ProtoContract]
+    [ProtoInclude(100, typeof(StructureParameters))]
+    [ProtoInclude(101, typeof(CircularStructure))]
+    public abstract class GeneralShapesProvider : IDominoProvider
+    {
+        #region constructors
+        protected GeneralShapesProvider(string filePath, string imagePath, string colorPath, 
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, bool allowStretch, 
+            IterationInformation iterationInformation) : base(filePath)
+        {
+            ColorPath = colorPath;
+            PrimaryImageTreatment = new NormalReadout(this, imagePath, averageMode, allowStretch);
+            PrimaryCalculation = new UncoupledCalculation(colorMode, ditherMode, iterationInformation);
+        }
+
+        protected GeneralShapesProvider(int imageWidth, int imageHeight, Color background, string colorPath, 
+            IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, bool allowStretch, 
+            IterationInformation iterationInformation)
+        {
+            ColorPath = colorPath;
+            PrimaryImageTreatment = new NormalReadout(this, imageWidth, imageHeight, averageMode, allowStretch);
+            PrimaryImageTreatment.Background = background;
+            PrimaryCalculation = new UncoupledCalculation(colorMode, ditherMode, iterationInformation);
+        }
+        protected GeneralShapesProvider() { }
+        #endregion
+        #region overrides
+        protected override bool SuitableCalculation(Calculation calc)
+        {
+            return !(calc is FieldCalculation);
+        }
+        protected override bool SuitableImageTreatment(ImageTreatment treat)
+        {
+            return !(treat is FieldReadout);
+        }
+        #endregion
+        #region compatibility properties
+        
+        [ProtoMember(1)]
+        private AverageMode average
+        {
+            get
+            {
+                return ((NormalReadout)PrimaryImageTreatment)?.Average ?? AverageMode.Corner; 
+            }
+            set
+            {
+                ((NormalReadout)CreatePrimaryTreatment()).Average = value;
+            }
+        }
+        [ProtoMember(2)]
+        private bool allowStretch
+        {
+            get
+            {
+                return ((NormalReadout)PrimaryImageTreatment)?.AllowStretch ?? true;
+            }
+            set
+            {
+                ((NormalReadout)CreatePrimaryTreatment()).AllowStretch = value;
+            }
+        }
+        
         #endregion
     }
 
+    public enum StateReference
+    {
+        Before,
+        After
+    }
     public interface IWorkspaceLoadColorList : IWorkspaceLoadable
     {
-        int[] counts { get; }
+        int[] Counts { get; }
 
-        bool Editing { get; set; }
+        bool Editing { get; }
 
-        string ColorPath { get; set; }
+        string ColorPath { get;  }
 
-        bool hasProtocolDefinition { get; set; }
+        bool HasProtocolDefinition { get; }
     }
     public interface IWorkspaceLoadImageFilter : IWorkspaceLoadable
     {
-        ObservableCollection<ImageFilter> ImageFilters { get;}
+        ImageTreatment PrimaryImageTreatment { get; }
     }
     public interface IWorkspaceLoadable
     {
@@ -641,29 +664,28 @@ namespace DominoPlanner.Core
     public class IDominoProviderPreview : IWorkspaceLoadColorList
     {
         [ProtoMember(1)]
-        public int[] counts { get; set; }
+        public int[] Counts { get; private set; }
 
         [ProtoMember(4)]
-        public bool Editing { get; set; }
+        public bool Editing { get; private set; }
 
         [ProtoMember(7)]
-        public string ColorPath { get; set; }
+        public string ColorPath { get; private set; }
 
         [ProtoMember(3)]
-        public bool hasProtocolDefinition { get; set; }
-
-        public void AfterDeserializationOperation()
-        {
-        }
+        public bool HasProtocolDefinition { get; private set; }
     }
     [ProtoContract]
     public class IDominoProviderImageFilter : IWorkspaceLoadImageFilter
     {
-        [ProtoMember(13)]
-        public ObservableCollection<ImageFilter> ImageFilters { get; private set; }
-
-        public void AfterDeserializationOperation()
-        {
+        
+        private ImageTreatment _a;
+        [ProtoMember(19)]
+        public ImageTreatment PrimaryImageTreatment { get => _a;
+            private set
+            {
+                _a = value;
+            }
         }
     }
     public interface ICountTargetable
@@ -672,4 +694,3 @@ namespace DominoPlanner.Core
     }
 
 }
-

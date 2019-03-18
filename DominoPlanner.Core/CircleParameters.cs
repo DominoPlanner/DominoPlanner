@@ -24,7 +24,7 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (value > 4 && value < 5000)
+                if (value > 0 && value < 5000)
                 {
                     _circles = value;
                     shapesValid = false;
@@ -106,7 +106,7 @@ namespace DominoPlanner.Core
         {
             
             Circles = circles;
-            hasProtocolDefinition = true;
+            HasProtocolDefinition = true;
             r = new Random();
             DominoWidth = 8;
             DominoLength = 24;
@@ -115,15 +115,13 @@ namespace DominoPlanner.Core
             this.StartDiameter = 4 * DominoLength;
         }
         private CircleParameters() : base() { r = new Random(); }
-        internal override void GenerateShapes()
+        protected override void RegenerateShapes()
         {
             PathDomino[][] dominos = new PathDomino[Circles][];
             Parallel.For(0,  Circles,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
             (circlecount) =>
             {
-                
                 int diameter = StartDiameter + circlecount * (2 * DominoWidth + 2 * NormalDistance);
-
                 double domino_angle = Math.Asin((double)DominoLength / diameter) * 2;
                 double distance_angle = Math.Asin((double)TangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
@@ -153,12 +151,7 @@ namespace DominoPlanner.Core
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
 
             });
-            GenStructHelper g = new GenStructHelper();
-            g.HasProtocolDefinition = false;
-            g.dominoes = dominoes;
-            g.width = x_max - x_min;
-            g.height = y_max - y_min;
-            shapes = g;
+            last = new DominoTransfer(dominoes, colors);
             shapesValid = true;
         }
         private PathDomino GenerateDomino(int diameter, double angle)
@@ -167,11 +160,6 @@ namespace DominoPlanner.Core
             double y1 = diameter / 2d * Math.Sin(angle);
             return CreateDominoAtCoordinates(x1, y1, angle, 1, 1);
 
-        }
-
-        public override object Clone()
-        {
-            throw new NotImplementedException();
         }
     }
 }

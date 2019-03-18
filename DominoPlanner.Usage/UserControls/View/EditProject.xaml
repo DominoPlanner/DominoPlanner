@@ -27,7 +27,9 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125"/>
-                    <RowDefinition Height="125"/>
+
+                    <RowDefinition Height="200" MinHeight="150"/>
+                    <RowDefinition Height="3"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
@@ -36,6 +38,8 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -49,6 +53,16 @@
                     <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
                     <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount"/>
                     <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
+                    <TextBlock Grid.Column="0" Grid.Row="4" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Dimensions"/>
+                    <TextBlock Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}mm x {1}mm">
+                                <Binding Path="PhysicalLength"/>
+                                <Binding Path="PhysicalHeight"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
                 </Grid>
                 <Image Grid.Row="1" Source="{Binding ImageSource}">
                     <i:Interaction.Triggers>
@@ -63,7 +77,10 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </Image>
-                <Grid Grid.Row="2">
+                <GridSplitter Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="3" Background="#FFDDDDDD">
+
+                </GridSplitter>
+                <Grid Grid.Row="3" VerticalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
@@ -72,10 +89,10 @@
                     <Button Grid.Row="0" Margin="5" Content="Clear Selection" Command="{Binding ClearSelection}"/>
                     <Button Grid.Row="1" Margin="5" Content="Select stones in selected color" Command="{Binding SelectColor}">
                         <Button.ToolTip>
-                            <TextBlock> Select all stones in the selected Color in the list below. <LineBreak /> If some stones are selected this function only use the selected stones. </TextBlock>
+                            <TextBlock> Select all stones in the selected Color in the list below. <LineBreak /> If some stones are selected this function only use the selected stones.</TextBlock>
                         </Button.ToolTip>
                     </Button>
-                    <ListView Grid.Row="2" HorizontalAlignment="Stretch" ItemsSource="{Binding DominoList}" SelectedValue="{Binding SelectedColor}" Margin="5,5,5,5">
+                    <ListView Grid.Row="2" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding DominoList}" SelectedValue="{Binding SelectedColor}" Margin="5,5,5,5">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDoubleClick">
                                 <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
@@ -124,7 +141,7 @@
                 <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="2"/>
             </Grid>
         </Grid>
-        
+
         <Grid Grid.Row="1">
             <!--Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">

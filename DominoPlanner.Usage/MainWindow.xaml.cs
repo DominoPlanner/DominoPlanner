@@ -17,7 +17,10 @@ namespace DominoPlanner.Usage
         {
             if(DataContext is MainWindowViewModel mwvm)
             {
-                mwvm.CloseAllTabs();
+                if (!mwvm.CloseAllTabs())
+                {
+                    e.Cancel = true;
+                }
             }
         }
     }

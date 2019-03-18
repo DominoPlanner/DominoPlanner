@@ -5,64 +5,69 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="254" Width="300">
-    <Grid Margin="5" Width="300">
-        <Label Content="Structure Size:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
-        <Label Content="Dominoes" HorizontalAlignment="Left" Margin="223,5,0,0" VerticalAlignment="Top"/>
-        <xctk:IntegerUpDown Minimum="1" Value="{Binding StrucSize, Delay=200}" HorizontalAlignment="Left" Height="23" Margin="100,5,0,0" VerticalAlignment="Top" Width="120"/>
-        <ComboBox ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,35,10,0"></ComboBox>
-        <Grid Margin="34,65,34,0" Width="230">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="52"/>
-                <ColumnDefinition Width="52"/>
-                <ColumnDefinition Width="52"/>
-                <ColumnDefinition Width="70"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="52"/>
-                <RowDefinition Height="52"/>
-                <RowDefinition Height="52"/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="0">
-                <Image Height="51" Width="51"  VerticalAlignment="Bottom" HorizontalAlignment="Right" Stretch="None"
+             mc:Ignorable="d" d:DesignWidth="308" d:DesignHeight="240" Width="300">
+    <Grid>
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top">
+                <Label DockPanel.Dock="Left" Content="Structure Size:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <xctk:IntegerUpDown Minimum="1" Value="{Binding StrucSize, Delay=200}" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="120"/>
+                <Label DockPanel.Dock="Left" Content="Dominoes" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </DockPanel>
+            <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
+            <Grid Margin="0, 5, 0, 0" Grid.IsSharedSizeScope="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="47" SharedSizeGroup="A"/>
+                    <ColumnDefinition SharedSizeGroup="A"/>
+                    <ColumnDefinition SharedSizeGroup="A"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition SharedSizeGroup="A"/>
+                    <RowDefinition SharedSizeGroup="A"/>
+                    <RowDefinition SharedSizeGroup="A"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="1">
+                    <Image VerticalAlignment="Bottom" HorizontalAlignment="Right" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[0]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="1">
-                <Image Height="51" Width="51"  VerticalAlignment="Bottom" HorizontalAlignment="Center" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="2">
+                    <Image  VerticalAlignment="Bottom" HorizontalAlignment="Center" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[1]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="2">
-                <Image Height="51" Width="51"  VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="3">
+                    <Image VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[2]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="0">
-                <Image Height="51" Width="51"  VerticalAlignment="Center" HorizontalAlignment="Right" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="1">
+                    <Image  VerticalAlignment="Center" HorizontalAlignment="Right" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[3]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="1">
-                <Image Height="51" Width="51"  VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="2">
+                    <Image   VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[4]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="2">
-                <Image Height="51" Width="51"  VerticalAlignment="Center" HorizontalAlignment="Left" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="3">
+                    <Image   VerticalAlignment="Center" HorizontalAlignment="Left" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[5]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="0">
-                <Image Height="51" Width="51"  VerticalAlignment="Top" HorizontalAlignment="Right" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="1">
+                    <Image VerticalAlignment="Top" HorizontalAlignment="Right" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[6]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="1">
-                <Image Height="51" Width="51"  VerticalAlignment="Top" HorizontalAlignment="Center" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="2">
+                    <Image  VerticalAlignment="Top" HorizontalAlignment="Center" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[7]}"/>
-            </Border>
-            <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="2">
-                <Image Height="51" Width="51"  VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None"
+                </Border>
+                <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="3">
+                    <Image  VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None"
                                    Margin="1" Source="{Binding Path=description_imgs[8]}"/>
-            </Border>
+                </Border>
 
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sLength, Delay=200}" Visibility="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="20" Width="50"/>
-            <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Visibility="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="3" Height="20" Margin="0,16,10,16"/>
-        </Grid>
+                <xctk:IntegerUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength, Delay=200}" Visibility="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="26" Margin="0, 5, 0, 0" Width="55"/>
+                <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Visibility="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4" Height="26" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
+            </Grid>
+        </DockPanel>
     </Grid>
 </UserControl>

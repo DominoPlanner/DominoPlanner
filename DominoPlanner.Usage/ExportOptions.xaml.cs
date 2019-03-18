@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DominoPlanner.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,24 +16,24 @@ using System.Windows.Shapes;
 namespace DominoPlanner.Usage
 {
     /// <summary>
-    /// Interaktionslogik für RenameObject.xaml
+    /// Interaktionslogik für ExportOptions.xaml
     /// </summary>
-    public partial class RenameObject : Window
+    public partial class ExportOptions : Window
     {
-        public RenameObject(string filename)
+        public ExportOptions(IDominoProvider provider)
         {
             InitializeComponent();
-            var dc = new RenameObjectVM(filename);
+            var dc = new ExportOptionsVM(provider);
             DataContext = dc;
-            dc.PropertyChanged += Npvm_PropertyChanged;
+            dc.PropertyChanged += ExpVM_PropertyChanged;
         }
 
-        private void Npvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ExpVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("Close"))
             {
-                DialogResult = ((RenameObjectVM)DataContext).result;
-                Close();
+                this.DialogResult = ((ExportOptionsVM)DataContext).result;
+                this.Close();
             }
         }
     }

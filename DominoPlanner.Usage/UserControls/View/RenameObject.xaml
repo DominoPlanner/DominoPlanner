@@ -6,11 +6,8 @@
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         mc:Ignorable="d"
          Height="110" Width="300" ResizeMode="NoResize">
-    <Window.Resources>
-        <local:FilenameToTitleConverter x:Key="FilenameToTitleConverter" />
-    </Window.Resources>
     <Window.Title>
-        <Binding Path="OldName" Converter="{StaticResource FilenameToTitleConverter}"></Binding>
+        <Binding Path="OldName" StringFormat="Rename file: {0}"></Binding>
     </Window.Title>
     <Grid>
         <DockPanel Height="24" Margin="10,10,10,0" VerticalAlignment="Top">

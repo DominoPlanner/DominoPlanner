@@ -16,30 +16,56 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     public class DominoTransfer : ICloneable
     {
-        //[ProtoMember(2, IsPacked = true)]
-        //public int[] dominoes { get; set; }
         [ProtoMember(1)]
         public IDominoShape[] shapes;
-        [ProtoMember(3, AsReference = true)]
-        ColorRepository colors;
+        //[ProtoMember(3, AsReference = true)]
+        public ColorRepository colors;
         [ProtoMember(4, AsReference = true)]
         public IterationInformation iterationInfo {get; set;}
         public int length
         {
             get { return shapes.Length; }
         }
-        public int dominoLength
+        public int FieldPlanLength
         {
             get
             {
                 return shapes.Max(x => (x.position != null) ? x.position.x : 0) + 1;
             }
         }
-        public int dominoHeight
+        public int FieldPlanHeight
         {
             get
             {
                 return shapes.Max(y => (y.position != null) ? y.position.y : 0) + 1;
+            }
+        }
+        public int physicalLength
+        {
+            get
+            {
+                return shapes.Max(x => x.GetContainer().x2) + 1;
+            }
+        }
+        public int physicalHeight
+        {
+            get
+            {
+                return shapes.Max(y => y.GetContainer().y2) + 1;
+            }
+        }
+        public int physicalExpandedLength
+        {
+            get
+            {
+                return shapes.Max(x => x.GetContainer(expanded: true).x2) + 1;
+            }
+        }
+        public int physicalExpandedHeight
+        {
+            get
+            {
+                return shapes.Max(y => y.GetContainer(expanded: true).y2) + 1;
             }
         }
         public IDominoShape this[int index]
@@ -58,9 +84,8 @@ namespace DominoPlanner.Core
         {
             return GenerateImage(Colors.White, targetWidth, borders);
         }
-        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false)
+        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false, int xShift = 5, int yShift = 5)
         {
-
             double scalingFactor = 1;
             int width = shapes.Max(s => s.GetContainer().x2);
             int heigth = shapes.Max(s => s.GetContainer().y2);
@@ -73,7 +98,7 @@ namespace DominoPlanner.Core
                 scalingFactor = Math.Min((double)targetWidth / width, (double)targetWidth/heigth);
             }
             Image<Emgu.CV.Structure.Bgra, byte> bitmap
-                = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor), (int)(heigth * scalingFactor),
+                = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor) + 2 * xShift, (int)(heigth * scalingFactor) + 2 * yShift,
                 new Emgu.CV.Structure.Bgra() { Alpha = background.A, Blue = background.B, Green = background.G, Red = background.R });
             
 
@@ -84,13 +109,13 @@ namespace DominoPlanner.Core
                //    (byte)shapes[i].ditherColor.Green, (byte)shapes[i].ditherColor.Blue);
                if (shapes[i] is RectangleDomino)
                {
-                   DominoRectangle rect = shapes[i].GetContainer(scalingFactor);
+                   DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);
                    if (c.A != 0)
                    {
                        CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
                        {
-                           X = (int)rect.x,
-                           Y = (int)rect.y,
+                           X = (int)rect.x + xShift,
+                           Y = (int)rect.y + yShift,
                            Width = (int)rect.width,
                            Height = (int)rect.height
                        }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, c.A), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
@@ -99,8 +124,8 @@ namespace DominoPlanner.Core
                    {
                        CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
                        {
-                           X = (int)rect.x,
-                           Y = (int)rect.y,
+                           X = (int)rect.x + xShift,
+                           Y = (int)rect.y + yShift,
                            Width = (int)rect.width,
                            Height = (int)rect.height
                        }, new Emgu.CV.Structure.MCvScalar(0, 0, 0, 255), 1, Emgu.CV.CvEnum.LineType.AntiAlias);
@@ -112,12 +137,12 @@ namespace DominoPlanner.Core
                    DominoPath shape = shapes[i].GetPath(scalingFactor);
                    if (c.A != 0)
                    {
-                       bitmap.FillConvexPoly(shape.getSDPath(),
+                       bitmap.FillConvexPoly(shape.getSDPath(xShift, yShift),
                            new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
                    }
                    if (borders)
                    {
-                       bitmap.DrawPolyline(shape.getSDPath(), true, 
+                       bitmap.DrawPolyline(shape.getSDPath(xShift, yShift), true, 
                            new Emgu.CV.Structure.Bgra(0, 0, 0, 255), 1, Emgu.CV.CvEnum.LineType.AntiAlias);
                    }
                }

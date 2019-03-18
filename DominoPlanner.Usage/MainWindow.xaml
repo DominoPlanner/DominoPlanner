@@ -43,10 +43,13 @@
     </Window.InputBindings>
     <Grid>
         <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0" VerticalContentAlignment="Center">
-            <MenuItem Header="New">
-                <MenuItem.Icon>
-                    <Image Source="/Icons/new.ico"/>
-                </MenuItem.Icon>
+            <MenuItem>
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/new.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">New</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
                 <MenuItem Header="New Project" Command="{Binding NewProject}" InputGestureText="Alt+N">
                     <MenuItem.Icon>
                         <Image Source="/Icons/new.ico"/>
@@ -58,20 +61,32 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Add Existing Project" Command="{Binding AddExistingProject}">
-                <MenuItem.Icon>
-                    <Image Source="Icons/add.ico"/>
-                </MenuItem.Icon>
+            <MenuItem>
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/add.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Add Existing</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Add existing project" Command="{Binding AddExistingProject}">
+                    <MenuItem.Icon>
+                        <Image Source="/Icons/add.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Add existing Field/Structure" Command="{Binding AddExistingItem}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/add.ico"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
-            <MenuItem Header="Add Existing Item" Command="{Binding AddExistingItem}">
-                <MenuItem.Icon>
-                    <Image Source="Icons/add.ico"/>
-                </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem Header="Save">
-                <MenuItem.Icon>
-                    <Image Source="Icons/Save.ico"/>
-                </MenuItem.Icon>
+            
+            <MenuItem >
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/Save.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Save</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
                 <MenuItem Header="Save" Command="{Binding SaveCurrentOpen}" InputGestureText="Ctrl+S">
                     <MenuItem.Icon>
                         <Image Source="Icons/Save.ico"/>
@@ -83,17 +98,30 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Header="Undo" Command="{Binding SelectedTab.Content.UndoComm}" InputGestureText="Ctrl+Z" >
-                <MenuItem.Icon>
-                    <Image Source="Icons/edit_undo.ico"/>
-                </MenuItem.Icon>
+            <MenuItem Command="{Binding SelectedTab.Content.UndoComm}" InputGestureText="Ctrl+Z" >
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/edit_undo.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Undo</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
             </MenuItem>
-            <MenuItem Header="Redo" Command="{Binding SelectedTab.Content.RedoComm}" InputGestureText="Ctrl+Y">
-                <MenuItem.Icon>
-                    <Image Source="Icons/edit_redo.ico"/>
-                </MenuItem.Icon>
+            <MenuItem Command="{Binding SelectedTab.Content.RedoComm}" InputGestureText="Ctrl+Y">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/edit_redo.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Redo</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
             </MenuItem>
-            <MenuItem Header="Set Standards" Command="{Binding MenuSetStandard}" InputGestureText="Ctrl+R"/>
+            <MenuItem Command="{Binding MenuSetStandard}" InputGestureText="Ctrl+R">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/properties.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Set Standards</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
             <MenuItem Header="Edit">
                 <MenuItem.Style>
                     <Style TargetType="{x:Type MenuItem}">
@@ -149,13 +177,13 @@
             </MenuItem>
         </Menu>
         <Border  Margin="0,25,0,0" BorderBrush="Red" BorderThickness="0">
-        <Grid >
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" MinWidth="180"/>
+                <ColumnDefinition Width="200" MinWidth="100"/>
                 <ColumnDefinition Width="3" />
                 <ColumnDefinition Width="720*"/>
             </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" Margin="0,0,4.6,0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
+            <TreeView Grid.Column="0" Margin="0,0,0,0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
@@ -176,14 +204,14 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Image Grid.Column="0" Source="{Binding Img}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             </Grid>
                         </ContentControl>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-            <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#33F0F0F0" Grid.Column="1"/>
-            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,3,0">
+            <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#FFDDDDDD" Grid.Column="1"/>
+            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,5,0">
                 <TabControl.ItemTemplate>
                     <!-- this is the header template-->
                     <DataTemplate>

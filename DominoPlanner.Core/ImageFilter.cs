@@ -53,8 +53,6 @@ namespace DominoPlanner.Core
         {
             if (!mat_valid) UpdateMat();
             var image = to_blend.Clone();
-
-
             if (scale_x != 1 && scale_y != 1)
                 image = image.Resize((int)(image.Width * scale_x), (int)(image.Height * scale_y), Emgu.CV.CvEnum.Inter.Lanczos4);
             if (rotate_angle != 0)

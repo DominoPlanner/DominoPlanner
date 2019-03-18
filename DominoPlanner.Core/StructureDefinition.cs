@@ -37,17 +37,17 @@ namespace DominoPlanner.Core
                 return (Position == "Top") ? 0 : 2;
             }
         }
-        public GenStructHelper GenerateStructure(int sWidth, int sHeight)
+        public DominoTransfer GenerateStructure(int sWidth, int sHeight)
         {
-            GenStructHelper g = new GenStructHelper() // Initialize GenStructHelper with final size.
-            {
-                width = cells[0, 0].width + cells[1, 1].width * sWidth + cells[2, 2].width,
-                height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
-            };
-            g.dominoes = getNewShapes(sWidth, sHeight);
-            g.HasProtocolDefinition = hasProtocolDefinition;
-            int a = g.dominoes.Max(s => s.GetContainer().x2);
-            return g;
+            //GenStructHelper g = new GenStructHelper() // Initialize GenStructHelper with final size.
+            //{
+            //    width = cells[0, 0].width + cells[1, 1].width * sWidth + cells[2, 2].width,
+            //    height = cells[0, 0].height + cells[1, 1].height * sHeight + cells[2, 2].height
+            //};
+            return new DominoTransfer(getNewShapes(sWidth, sHeight), colors);
+            //g.HasProtocolDefinition = hasProtocolDefinition;
+            //int a = g.dominoes.Max(s => s.GetContainer().x2);
+            //return g;
         }
         public WriteableBitmap DrawPreview(int col, int row, int targetDimension)
         {
