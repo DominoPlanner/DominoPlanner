@@ -51,12 +51,14 @@ namespace DominoPlanner.Usage
             loadProjectList();
         }
 
-        internal void CloseAllTabs()
+        internal bool CloseAllTabs()
         {
             while (Tabs.Count > 0)
             {
-                RemoveItem(Tabs.First());
+                if (!RemoveItem(Tabs.First()))
+                    return false;
             }
+            return true;
         }
         private string UpdateReference(string absolutePath, string parentPath)
         {
