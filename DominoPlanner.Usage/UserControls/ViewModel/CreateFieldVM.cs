@@ -461,11 +461,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else if (e.PropertyName.Equals("Vertical"))
             {
+                fieldParameters.FieldPlanDirection = Core.Orientation.Vertical;
                 UpdateStoneSizes();
                 important = true;
             }
             else if (e.PropertyName.Equals("Horizontal"))
             {
+                fieldParameters.FieldPlanDirection = Core.Orientation.Horizontal;
                 UpdateStoneSizes();
                 important = true;
             }
@@ -508,7 +510,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             fsvm.FieldSize = fieldParameters.Height * fieldParameters.Length;
             fsvm.Length = fieldParameters.Length;
             fsvm.Height = fieldParameters.Height;
-
+            fsvm.Horizontal = fieldParameters.FieldPlanDirection == Core.Orientation.Horizontal;
             Sizes currentSize = new Sizes(fieldParameters.HorizontalDistance, fieldParameters.HorizontalSize, fieldParameters.VerticalSize, fieldParameters.VerticalDistance);
             bool found = false;
             foreach (StandardSize sSize in fsvm.field_templates)

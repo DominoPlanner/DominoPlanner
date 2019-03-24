@@ -145,6 +145,8 @@ namespace DominoPlanner.Core
                 }
             }
         }
+        [ProtoMember(23)]
+        public Orientation FieldPlanDirection { get; set; } = Orientation.Horizontal;
         protected bool lastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
         #endregion
         #region internal vars
@@ -265,6 +267,10 @@ namespace DominoPlanner.Core
             pack.Dispose();
             GC.Collect();
         }
+        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, bool reverse = false)
+        {
+            return GenerateProtocol(templateLength, FieldPlanDirection, reverse);
+        }
         /// <summary>
         /// Generiert das Protokoll eines Objekts.
         /// </summary>
@@ -364,11 +370,12 @@ namespace DominoPlanner.Core
         protected static T[,] TransposeArray<T>(T[,] array)
         {
             T[,] temp = new T[array.GetLength(1), array.GetLength(0)];
-            for (int i = 0; i < array.GetLength(0); i++)
+            for (int i = 0; i < array.GetLength(1); i++)
             {
-                for (int j = 0; j < array.GetLength(1); j++)
+                for (int j = 0; j < array.GetLength(0); j++)
                 {
-                    temp[i, j] = array[j, array.GetLength(0) - i - 1];
+                    //temp[i, j] = array[j, array.GetLength(0) - i - 1];
+                    temp[i, j] = array[j, i];
                 }
             }
             return temp;

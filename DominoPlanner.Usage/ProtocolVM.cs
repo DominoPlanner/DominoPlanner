@@ -29,7 +29,7 @@ namespace DominoPlanner.Usage
         public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
         {
             DominoProvider = dominoProvider;
-            dominoTransfer = DominoProvider.Generate(new System.Threading.CancellationToken());
+            dominoTransfer = DominoProvider.Generate();
             Titel = fieldName;
             Init();
         }
@@ -311,7 +311,21 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
+        public bool Orientation
+        {
+            get
+            {
+                return currentOPP.orientation == Core.Orientation.Vertical;
+            }
+            set
+            {
+                if (value != (currentOPP.orientation == Core.Orientation.Vertical))
+                {
+                    currentOPP.orientation = value ? Core.Orientation.Vertical : Core.Orientation.Horizontal;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
 
         #region Methods
@@ -326,7 +340,7 @@ namespace DominoPlanner.Usage
             DefaultBackColor = true;
             IntelligentTextColor = true;
             HideText = true;
-            currentOPP.orientation = Core.Orientation.Horizontal;
+            currentOPP.orientation = DominoProvider.FieldPlanDirection;
 
             CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 

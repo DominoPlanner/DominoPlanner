@@ -10,6 +10,7 @@
              d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" SizeChanged="UserControl_SizeChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
@@ -118,7 +119,14 @@
                                 <GridViewColumn Header="Sum" Width="80">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}" />
+                                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}">
+                                                <Label.Foreground>
+                                                    <MultiBinding Converter ="{StaticResource AmountToColorConverter}">
+                                                        <Binding Path="SumAll"/>
+                                                        <Binding Path="DominoColor.count"/>
+                                                    </MultiBinding>
+                                                </Label.Foreground>
+                                            </Label>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>

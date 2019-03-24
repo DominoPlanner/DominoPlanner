@@ -15,12 +15,12 @@
         <WebBrowser Grid.Column="0" local:BrowserBehavior.Html="{Binding CurrentProtocol}"/>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="123"/>
+                <RowDefinition Height="140"/>
                 <RowDefinition Height="107"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="125"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="119">
+            <GroupBox Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
                 <Grid>
                     <Label Content="Title:" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
                     <TextBox VerticalContentAlignment="Center" Height="25" Margin="35,5,5,0" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
@@ -31,6 +31,7 @@
                     <xctk:IntegerUpDown Focusable="False" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" Margin="6,54,0,0" VerticalAlignment="Top" Width="51"/>
                     <Label Content="Stones/Block" HorizontalAlignment="Left" Margin="62,51,0,0" VerticalAlignment="Top"/>
                     <CheckBox IsChecked="{Binding BuildReverse}" Margin="6,82,10,0" Height="18" VerticalAlignment="Top" Content="Build backwards"/>
+                    <CheckBox IsChecked="{Binding Orientation}" Margin="6, 100, 10, 0" Height="18">Transpose field plan</CheckBox>
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Property Settings" ToolTip="Selects additional information shown at the end of the document" Height="83" VerticalAlignment="Top">
