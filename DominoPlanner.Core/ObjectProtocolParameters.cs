@@ -20,13 +20,13 @@ namespace DominoPlanner.Core
         public string textRegex { get; set; }
         public ColorMode foreColorMode { get; set; }
         public ColorMode backColorMode { get; set; }
-        public bool reverse { get; set; }
+        public bool mirrorHorizontal { get; set; }
+        public bool mirrorVertical { get; set; }
         public Color fixedBackColor { get; set; }
         public Orientation orientation { get; set; }
         public String project { get; set; }
         public ObjectProtocolParameters()
         {
-            reverse = false;
             fixedBackColor = Colors.White;
             orientation = Orientation.Horizontal;
         }

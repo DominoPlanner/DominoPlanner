@@ -198,7 +198,7 @@ namespace DominoPlanner.Core
             last = new DominoTransfer(getNewShapes(Length, Height), colors);
             shapesValid = true;
         }
-        public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
+        public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
             current_width = last.FieldPlanLength;
@@ -212,6 +212,14 @@ namespace DominoPlanner.Core
                 }
             }
             if (o == Orientation.Vertical) result = TransposeArray(result);
+            if (MirrorX == true)
+            {
+                result = MirrorArrayX(result);
+            }
+            if (MirrorY == true)
+            {
+                result = MirrorArrayY(result);
+            }
             return result;
         }
         #endregion

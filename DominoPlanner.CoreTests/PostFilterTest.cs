@@ -174,7 +174,7 @@ namespace DominoPlanner.CoreTests
                 backColorMode = ColorMode.Normal,
                 foreColorMode = ColorMode.Intelligent,
                 orientation = Core.Orientation.Horizontal,
-                reverse = false,
+                //reverse = false,
                 summaryMode = SummaryMode.Large,
                 textFormat = "<font face=\"Verdana\">",
                 templateLength = 20,

@@ -14,11 +14,12 @@ namespace DominoPlanner.Usage
     class LiveBuildHelperVM : ModelBase
     {
         #region CTOR
-        public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize)
+        public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize, Core.Orientation orientation, bool MirrorX, bool MirrorY)
         {
             blockSize = pBlockSize;
             fParameters = pFParameters;
-            intField = fParameters.GetBaseField();
+            intField = fParameters.GetBaseField(orientation, MirrorX, MirrorY);
+            
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
             CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / blockSize)));
