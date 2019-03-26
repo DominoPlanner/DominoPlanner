@@ -76,7 +76,7 @@ namespace DominoPlanner.Core
                                 case ColorMode.Intelligent: html.Append(c.IntelligentBW().ToHTML()); break; // intelligent BW
                             }
                             html.Append("'>");
-                            html.Append(ParseRegex(obj.colors[obj.dominoes[i][j][k].Item1].name, obj.dominoes[i][j][k].Item2) + "</font></td>\n");
+                            html.Append(ParseFormatString(obj.colors[obj.dominoes[i][j][k].Item1].name, obj.dominoes[i][j][k].Item2) + "</font></td>\n");
 
                         }
                     }
@@ -147,10 +147,13 @@ namespace DominoPlanner.Core
             s.Append("</table></font>");
             return s.ToString();
         }
-        private string ParseRegex(string name, int count)
+        private string ParseFormatString(string name, int count)
         {
-            string s = "";
-            for (int i = 0; i < textRegex.Length; i++)
+            string s = textRegex;
+            s = s.Replace("%color%", name);
+            s = s.Replace("%count%", count.ToString());
+            return s;
+            /*for (int i = 0; i < textRegex.Length; i++)
             {
                 if (textRegex[i] == '%')
                 {
@@ -178,7 +181,7 @@ namespace DominoPlanner.Core
                     s += textRegex[i];
                 }
             }
-            return s;
+            return s;*/
         }
         internal ExcelPackage GenerateExcelFieldplan(ProtocolTransfer trans, ExcelPackage pack)
         {
@@ -237,7 +240,7 @@ namespace DominoPlanner.Core
                                 cell.Style.Font.Color.SetColor(f.ToSD());
                                 
 
-                                string parsed = ParseRegex(trans.colors[trans.dominoes[i][j][k].Item1].name, trans.dominoes[i][j][k].Item2);
+                                string parsed = ParseFormatString(trans.colors[trans.dominoes[i][j][k].Item1].name, trans.dominoes[i][j][k].Item2);
                                 // Bugfix für Warnung "Zahl als Text" in Excel
                                 if (parsed.Trim().All(char.IsDigit))
                                 {

@@ -6,117 +6,102 @@
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Protocol" MinHeight="600" MinWidth="800" Height="600" Width="800" Icon="Icons/DominoCalculator.ico">
+        Title="Protocol" MinHeight="700" MinWidth="800" Height="750" Width="800" Icon="Icons/DominoCalculator.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="205"/>
         </Grid.ColumnDefinitions>
         <WebBrowser Grid.Column="0" local:BrowserBehavior.Html="{Binding CurrentProtocol}"/>
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="160"/>
-                <RowDefinition Height="107"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="125"/>
-            </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
-                <Grid>
-                    <Label Content="Title:" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
-                    <TextBox VerticalContentAlignment="Center" Height="25" Margin="35,5,5,0" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="chkUseTemplate" Content="Display blocks (for template)" HorizontalAlignment="Left" Margin="6,34,0,0" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
+        <DockPanel Grid.Column="1">
+            <GroupBox DockPanel.Dock="Top" Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="2">
+                        <TextBlock DockPanel.Dock="Left" Text="Title:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBox DockPanel.Dock="Right" Margin="5, 0, 0, 0" VerticalContentAlignment="Center" Height="22" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
+                    </DockPanel>
+                    <CheckBox Margin="2" DockPanel.Dock="Top" x:Name="chkUseTemplate" Content="Display blocks (for template)" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
                               ToolTip="When activating this option, DominoPlanner will show blocks in the specified length.&#10;
                               This should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes
                               (e.g. you left out one domino)."/>
-                    <xctk:IntegerUpDown Focusable="False" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" Margin="6,54,0,0" VerticalAlignment="Top" Width="51"/>
-                    <Label Content="Stones/Block" HorizontalAlignment="Left" Margin="62,51,0,0" VerticalAlignment="Top"/>
-                    <CheckBox IsChecked="{Binding Orientation}" Margin="6,82,10,38" Height="18">Transpose field plan</CheckBox>
-                    <CheckBox IsChecked="{Binding MirrorX}" Margin="6,100,10,0" Height="18" VerticalAlignment="Top" Content="Mirror horizontally"/>
-                    <CheckBox IsChecked="{Binding MirrorY}" Margin="6,118,10,0" Height="18" VerticalAlignment="Top" Content="Mirror vertically"/>
-                    
-                </Grid>
+                    <DockPanel DockPanel.Dock="Top" Margin="2">
+                        <xctk:IntegerUpDown DockPanel.Dock="Right" Focusable="False" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" Height="22"/>
+                        <TextBlock DockPanel.Dock="Left" Text="Stones/Block" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="Hide color names" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="113"/>
+
+                </DockPanel>
             </GroupBox>
-            <GroupBox Grid.Row="1" Header="Property Settings" ToolTip="Selects additional information shown at the end of the document" Height="83" VerticalAlignment="Top">
-                <Grid>
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasNoProperties}" Content="No Properties" HorizontalAlignment="Left" Margin="10,6,0,0" VerticalAlignment="Top"/>
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasShortProperties}" Content="Short Properties" ToolTip="Shows Length, Height, and total amount of used dominoes" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasExtendedProperties}" Content="Detailed Properties" ToolTip="Shows a complete list of used colors" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
-                </Grid>
+            <GroupBox DockPanel.Dock="Top" Header="Property Settings" ToolTip="Selects additional information shown at the end of the document" VerticalAlignment="Top">
+                <StackPanel Margin="0, 2, 0, 0">
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasNoProperties}" Content="No Properties" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasShortProperties}" Content="Short Properties" ToolTip="Shows Length, Height, and total amount of used dominoes" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasExtendedProperties}" Content="Detailed Properties" ToolTip="Shows a complete list of used colors" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                </StackPanel>
             </GroupBox>
-            <CheckBox IsChecked="{Binding HideText}" Content="Hide color names" Grid.Row="1" HorizontalAlignment="Left" Margin="5,88,0,0" VerticalAlignment="Top" Height="15" Width="113"/>
-            <Expander Visibility="Hidden" Header="Detail Settings" Grid.Row="2" HorizontalAlignment="Stretch" Height="249" Margin="2,10,2,0" VerticalAlignment="Top" Grid.RowSpan="2" Panel.ZIndex="3">
-                <Border BorderThickness="1" BorderBrush="Black" Margin="0,0,0,2">
-                    <Grid Background="#FFE5E5E5" Margin="0,0,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="2*"/>
-                            <RowDefinition Height="3*"/>
-                        </Grid.RowDefinitions>
-                        <Grid Margin="2,6" Grid.Row="0" VerticalAlignment="Center" Height="18">
-                            <TextBlock>Cell string RegEx:</TextBlock>
-                            <TextBox HorizontalAlignment="Right" Width="97" Text="{Binding TextRegex}" ToolTip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
-                        </Grid>
-                        <Grid Margin="2,6" Grid.Row="1" VerticalAlignment="Center" Height="18">
-                            <TextBlock>Text Format:</TextBlock>
-                            <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
-                        </Grid>
-                        <!--Grid Margin="2,6" Grid.Row="2" VerticalAlignment="Center" Height="38">
-                            <TextBlock>Visible borders:</TextBlock>
-                            <Grid HorizontalAlignment="Right" Width="80" Margin="0,0,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <RadioButton Grid.Row="0" Margin="2" Content="Separate" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}"/>
-                                <RadioButton Grid.Row="1" Margin="2" Content="Collapsed" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}" />
-                            </Grid>
-                        </-->
-                        <Grid Margin="2,6" Grid.Row="2" VerticalAlignment="Center" >
-                            <TextBlock TextWrapping="Wrap" Text="Cell background color:" Margin="0,1,80,-1"/>
-                            <Grid HorizontalAlignment="Right" Width="93">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <RadioButton Grid.Row="0" Content="Default" Margin="2"  ToolTip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
-                                <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
-                            </Grid>
-                        </Grid>
-                        <Grid Margin="2,6" Grid.Row="3" VerticalAlignment="Center">
-                            <TextBlock TextWrapping="Wrap" Margin="0,0,146,0" Text="Text color:"></TextBlock>
-                            <Grid HorizontalAlignment="Right" Width="94">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <RadioButton Grid.Row="0" Content="Default" Margin="2"  ToolTip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
+            <GroupBox DockPanel.Dock="Top" Header="Transform field plan">
+                <StackPanel Margin="0, 2, 0, 0">
+                    <CheckBox Margin="2" IsChecked="{Binding Orientation}" Height="18">Transpose field plan</CheckBox>
+                    <CheckBox IsChecked="{Binding MirrorX}" Margin="2"  Height="18" VerticalAlignment="Top" Content="Mirror horizontally"/>
+                    <CheckBox IsChecked="{Binding MirrorY}" Margin="2" Height="18" VerticalAlignment="Top" Content="Mirror vertically"/>
+                </StackPanel>
+
+            </GroupBox>
+            <Expander DockPanel.Dock="Top" Visibility="Visible" Header="Advanced Settings" Grid.Row="2" HorizontalAlignment="Stretch" Margin="2,2,2,0" VerticalAlignment="Stretch" Grid.RowSpan="2" Panel.ZIndex="3">
+                <Border BorderThickness="0" BorderBrush="Black" Margin="0,0,0,2">
+                    <StackPanel>
+                        <DockPanel Margin="2" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center">Cell content:</TextBlock>
+                            <TextBox HorizontalAlignment="Right" Height="22" Width="120" Text="{Binding TextRegex, UpdateSourceTrigger=PropertyChanged}" ToolTip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
+                        </DockPanel>
+                        <DockPanel  Margin="2" VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center">Text Format:</TextBlock>
+                            <TextBox HorizontalAlignment="Right" Height="22" Width="120" Text="{Binding TextFormat, UpdateSourceTrigger=PropertyChanged}" ToolTip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
+                        </DockPanel>
+                        <!--<GroupBox Header="Border visibility">
+                        <StackPanel Margin="2">
+                            <RadioButton Margin="2" Content="Separate" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}"/>
+                            <RadioButton Margin="2" Content="Collapsed" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}" />
+                        </StackPanel>
+
+                        </GroupBox>-->
+                        <GroupBox Header="Cell background color" >
+                            <StackPanel VerticalAlignment="Center" Margin="2">
+                                <RadioButton Content="Default" Margin="2"  ToolTip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
+                                <RadioButton Content="Inverted" Margin="2" ToolTip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Text color">
+                            <StackPanel Margin="2">
+                                <RadioButton Content="Default" Margin="2"  ToolTip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
                                 <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip="Uses the inverted color as cell background" IsChecked="{Binding InvertedTextColor}"/>
                                 <RadioButton Grid.Row="2" Content="Intelligent" Margin="2" ToolTip="Uses the inverted color as cell background" IsChecked="{Binding IntelligentTextColor}"/>
-                            </Grid>
-                        </Grid>
-                    </Grid>
+
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
                 </Border>
             </Expander>
-            <Button Grid.Row="3" Margin="5,5,5,0" Command="{Binding ShowLiveBuildHelper}" Height="35" VerticalAlignment="Top" Panel.ZIndex="1">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/properties.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Label Content="Field Viewer"/>
-                </StackPanel>
-            </Button>
-            <Button Grid.Row="3" Margin="5,45,5,0" Command="{Binding SaveHTML}" Height="35" VerticalAlignment="Top" Panel.ZIndex="1">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/document_save.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Label Content="Save as HTML"/>
-                </StackPanel>
-            </Button>
-            <Button Grid.Row="3" Margin="5,85,5,0" Command="{Binding SaveExcel}" Height="35" VerticalAlignment="Top">
+
+            <Button VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="5" Command="{Binding SaveExcel}" Height="35">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/insert_table.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <Label Content="Save Excel File"/>
                 </StackPanel>
             </Button>
-        </Grid>
+            <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom" Command="{Binding ShowLiveBuildHelper}" Height="35"  Panel.ZIndex="1">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/properties.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <Label Content="Field Viewer"/>
+                </StackPanel>
+            </Button>
+
+            <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom"  Command="{Binding SaveHTML}" Height="35">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/document_save.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <Label Content="Save as HTML"/>
+                </StackPanel>
+            </Button>
+        </DockPanel>
     </Grid>
 </Window>
