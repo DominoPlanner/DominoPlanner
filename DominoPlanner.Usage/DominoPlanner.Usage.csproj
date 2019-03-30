@@ -176,6 +176,9 @@
     <Compile Include="UserControls\View\AddStructure.xaml.cs">
       <DependentUpon>AddStructure.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\View\ColorControl.xaml.cs">
+      <DependentUpon>ColorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\View\ColorListControl.xaml.cs">
       <DependentUpon>ColorListControl.xaml</DependentUpon>
     </Compile>
@@ -251,6 +254,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\View\AddStructure.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\ColorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

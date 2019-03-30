@@ -316,6 +316,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private ColumnConfig _colorColumnConfig;
+
+        public ColumnConfig ColorColumnConfig
+        {
+            get { return _colorColumnConfig; }
+            set { _colorColumnConfig = value; }
+        }
+
         #endregion
 
         #region Methods
@@ -375,6 +383,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void refreshList()
         {
+            // Setup Columns
+            ColorColumnConfig = new ColumnConfig();
+
+            var columns = new ObservableCollection<Column>();
+            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
+            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
+            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
+            columns.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField= "DominoColor.count" });
+            ColorColumnConfig.Columns = columns;
+            
             _DominoList.Clear();
             int counter = 0;
 
