@@ -25,10 +25,8 @@
                             <Image Source="{Binding ColorRestrictionFulfilled, Converter={StaticResource BoolToImageConverter}}"></Image>
                             <Popup Name="myPopup" IsOpen="{Binding PopupOpen}" StaysOpen="False">
                                 <parent:ColorControl Grid.Row="2" MaxHeight="250"
-                                         ClickCommand="{Binding MouseClickCommand}" 
                                          ColumnConfig="{Binding ColorColumnConfig}" 
-                                         Colors="{Binding Colors}" 
-                                         SelectedColor="{Binding SelectedColor}">
+                                         Colors="{Binding Colors}" >
                                 </parent:ColorControl>
                             </Popup>
                         </StackPanel>
