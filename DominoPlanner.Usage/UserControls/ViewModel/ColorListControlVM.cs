@@ -3,6 +3,7 @@ using DominoPlanner.Usage.HelperClass;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -378,6 +379,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+        private string _warningLabelText;
+
+        public string WarningLabelText
+        {
+            get { return _warningLabelText; }
+            set { _warningLabelText = value; RaisePropertyChanged(); }
+        }
+
 
         internal override void ResetContent()
         {
@@ -389,6 +398,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             string colorpath = dominoAssembly.colorPath;
             string thispath = Workspace.AbsolutePathFromReference(ref colorpath, dominoAssembly);
+            List<string> warningfiles = new List<string>();
+            
             foreach (DocumentNode project in dominoAssembly.children)
             {
                 try
@@ -396,7 +407,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, dominoAssembly);
                     if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(thispath))
                     {
-                        Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                        //Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                        warningfiles.Add(Path.GetFileNameWithoutExtension(project.relativePath));
                         continue;
                     }
                     for (int i = 0; i < counts2.Item2.Length; i++)
@@ -413,6 +425,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
                 }
+            }
+            for (int i = 0; i < warningfiles.Count; i++)
+            { 
+                warningfiles[i] = "\"" + warningfiles[i] + "\"";
+            }
+            if (warningfiles.Count == 1)
+            {
+                WarningLabelText = $"The file {warningfiles[0]} uses a different color table and is not shown in this view." ;
+            }
+            else if (warningfiles.Count > 1)
+            {
+                WarningLabelText = $"The files {string.Join(", ", warningfiles.ToArray())} use a different color table and are not shown in this view.";
+
             }
         }
 

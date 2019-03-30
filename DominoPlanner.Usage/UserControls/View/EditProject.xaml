@@ -90,49 +90,15 @@
                     <Button Grid.Row="0" Margin="5" Content="Clear Selection" Command="{Binding ClearSelection}"/>
                     <Button Grid.Row="1" Margin="5" Content="Select stones in selected color" Command="{Binding SelectColor}">
                         <Button.ToolTip>
-                            <TextBlock> Select all stones in the selected Color in the list below. <LineBreak /> If some stones are selected this function only use the selected stones.</TextBlock>
+                            <TextBlock> Select all stones in the color selected in the list below. <LineBreak /> If some stones are selected this function only applies to the selected stones.</TextBlock>
                         </Button.ToolTip>
                     </Button>
-                    <ListView Grid.Row="2" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding DominoList}" SelectedValue="{Binding SelectedColor}" Margin="5,5,5,5">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDoubleClick">
-                                <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="30">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Rectangle Height="24" Width="16" Fill="{Binding DominoColor.mediaColor, Converter={StaticResource ColorToBrushConverter}}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn DisplayMemberBinding="{Binding DominoColor.name}" Header="Name" Width="70"/>
-                                <GridViewColumn Header="Count" Width="80">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Label Content="{Binding DominoColor.count}" ContentStringFormat=" {0:##,0}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Sum" Width="80">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Label Content="{Binding SumAll}" ContentStringFormat=" {0:##,0}">
-                                                <Label.Foreground>
-                                                    <MultiBinding Converter ="{StaticResource AmountToColorConverter}">
-                                                        <Binding Path="SumAll"/>
-                                                        <Binding Path="DominoColor.count"/>
-                                                    </MultiBinding>
-                                                </Label.Foreground>
-                                            </Label>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                    <parent:ColorControl Grid.Row="2" 
+                                         ClickCommand="{Binding MouseClickCommand}" 
+                                         ColumnConfig="{Binding ColorColumnConfig}" 
+                                         Colors="{Binding DominoList}" 
+                                         SelectedColor="{Binding SelectedColor}">
+                    </parent:ColorControl>
                 </Grid>
             </Grid>
             <ScrollViewer x:Name="ScrollViewer" Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">

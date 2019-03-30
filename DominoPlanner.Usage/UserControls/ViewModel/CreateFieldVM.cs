@@ -28,8 +28,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             TransparencyValue = ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting;
 
             ReloadSizes();
-
+            FillColorList();
             refresh();
+            RefreshColorAmount();
             UnsavedChanges = false;
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
             EditClick = new RelayCommand(o => { fieldParameters.Editing = true; });
@@ -379,6 +380,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                     CurrentPlan = newBitmap;
+                    RefreshColorAmount();
                     cursor = null;
                 }));
             }
@@ -423,7 +425,42 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return false;
             }
         }
+        private void FillColorList()
+        {
+            OnlyOwnStonesVM.Colors = new System.Collections.ObjectModel.ObservableCollection<ColorListEntry>();
+            
+            int counter = 0;
+            foreach (DominoColor domino in CurrentProject.colors.RepresentionForCalculation.OfType<DominoColor>())
+            {
+                OnlyOwnStonesVM.Colors.Add(new ColorListEntry() { DominoColor = domino, SortIndex = CurrentProject.colors.Anzeigeindizes[counter] });
+                counter++;
+            }
 
+            if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
+            {
+                OnlyOwnStonesVM.Colors.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
+            }
+        }
+        private void RefreshColorAmount()
+        {
+            bool fulfilled = true;
+            for (int i = 0; i < OnlyOwnStonesVM.Colors.Count(); i++)
+            {
+                OnlyOwnStonesVM.Colors[i].ProjectCount.Clear();
+                if (CurrentProject.Counts.Length > i + 1)
+                {
+                    OnlyOwnStonesVM.Colors[i].ProjectCount.Add(CurrentProject.Counts[i + 1]);
+                    OnlyOwnStonesVM.Colors[i].Weight = (((UncoupledCalculation)CurrentProject.PrimaryCalculation).IterationInformation.weights[i + 1]);
+                    if (OnlyOwnStonesVM.Colors[i].SumAll > OnlyOwnStonesVM.Colors[i].DominoColor.count)
+                        fulfilled = false;
+                }
+                else
+                {
+                    OnlyOwnStonesVM.Colors[i].ProjectCount.Add(CurrentProject.Counts[0]);
+                }
+            }
+            OnlyOwnStonesVM.ColorRestrictionFulfilled = fulfilled;
+        }
         private void CreateFieldVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             bool important = false;
