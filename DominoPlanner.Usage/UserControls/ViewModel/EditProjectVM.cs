@@ -137,7 +137,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_UICursor != value)
                 {
                     _UICursor = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -151,7 +151,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_ImageSource != value)
                 {
                     _ImageSource = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }

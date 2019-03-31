@@ -129,7 +129,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_cursorState != value)
                 {
                     _cursorState = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_physicalLength != value)
                 {
                     _physicalLength = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -211,7 +211,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_DestinationImage != value)
                 {
                     _DestinationImage = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }

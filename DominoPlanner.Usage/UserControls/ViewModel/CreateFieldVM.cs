@@ -171,7 +171,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_CurrentPlan != value)
                 {
                     _CurrentPlan = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }

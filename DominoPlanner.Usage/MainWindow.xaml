@@ -184,7 +184,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Icons/open.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Currently open files</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Workspace</TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
                 <MenuItem.ItemContainerStyle>

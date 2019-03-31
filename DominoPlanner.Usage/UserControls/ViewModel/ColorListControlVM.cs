@@ -304,7 +304,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
                     }
                 }
-                RaisePropertyChanged();
+                TabPropertyChanged(ProducesUnsavedChanges: false);
             }
         }
         public override TabItemType tabType
@@ -375,7 +375,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _ShowProjects = value;
                     ShowProjectsChanged?.Invoke(this, EventArgs.Empty);
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -384,7 +384,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public string WarningLabelText
         {
             get { return _warningLabelText; }
-            set { _warningLabelText = value; RaisePropertyChanged(); }
+            set { _warningLabelText = value; TabPropertyChanged(ProducesUnsavedChanges: false); }
         }
 
 
