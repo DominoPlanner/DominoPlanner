@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage
 {
@@ -63,6 +65,18 @@ namespace DominoPlanner.Usage
                 return new SolidColorBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
 
             }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class PathToImageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return new Image() { Source = new BitmapImage(new Uri(ImageHelper.GetImageOfFile(value.ToString()), UriKind.RelativeOrAbsolute)) };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

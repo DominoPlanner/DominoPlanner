@@ -45,7 +45,7 @@ namespace DominoPlanner.Usage
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
-
+            FileListClickCommand = new RelayCommand(o => { OpenItemFromOpenedFiles(o); });
             Tabs = new ObservableCollection<TabItem>();
             Workspace.del = UpdateReference;
             loadProjectList();
@@ -161,6 +161,9 @@ namespace DominoPlanner.Usage
         private ICommand _SaveCurrentOpen;
         public ICommand SaveCurrentOpen { get { return _SaveCurrentOpen; } set { if (value != _SaveCurrentOpen) { _SaveCurrentOpen = value; } } }
 
+        private ICommand _FileListClickCommand;
+        public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand= value; } } }
+
         #endregion
 
         #region Methods
@@ -227,6 +230,22 @@ namespace DominoPlanner.Usage
         private void Item_IsClicked(object sender, EventArgs e)
         {
             OpenItem((ProjectComposite)sender);
+        }
+        private void OpenItemFromOpenedFiles(object param)
+        {
+            ProjectComposite comp = null;
+            foreach (ProjectListComposite p in Projects)
+            {
+                foreach (ProjectComposite pp in p.Children)
+                {
+                    if (Path.GetFullPath(Path.Combine(Path.GetDirectoryName(p.FilePath), pp.FilePath))
+                        == Path.GetFullPath(param.ToString())) comp = pp;
+                }
+            }
+            if (comp != null)
+            {
+                OpenItem(comp);
+            }
         }
 
         private void OpenItem(ProjectComposite toOpen)

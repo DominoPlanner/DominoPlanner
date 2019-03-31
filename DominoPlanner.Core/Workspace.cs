@@ -2,33 +2,51 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
 {
-    public class Workspace
+    public class Workspace : INotifyPropertyChanged
     {
-        public List<Tuple<String, IWorkspaceLoadable>> openedFiles;
+        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        private ObservableCollection<Tuple<string, IWorkspaceLoadable>> _openedFiles;
+
+        public ObservableCollection<Tuple<string, IWorkspaceLoadable>> openedFiles
+        {
+            get { return _openedFiles; }
+            set { _openedFiles = value; RaisePropertyChanged(); }
+        }
+        
         // threadsicheres Singleton
         private static readonly Lazy<Workspace> _mySingleton = new Lazy<Workspace>(() => new Workspace());
 
         private string FileInWork = "";
         private bool ReferenceReplaced = false;
         private Workspace() {
-            openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+            openedFiles = new ObservableCollection<Tuple<string, IWorkspaceLoadable>>();
         }
         public delegate string FileReplacementDelegate(string filename, string caller);
 
         public static FileReplacementDelegate del;
-        private static Workspace Instance
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static Workspace Instance
         {
             get
             {
                 return _mySingleton.Value;
             }
+
         }
         private static void Add(string absolutePath, IWorkspaceLoadable obj)
         {
@@ -45,7 +63,7 @@ namespace DominoPlanner.Core
         public static string AbsolutePathFromReference(ref string relativePath, IWorkspaceLoadable reference)
         {
             string absolutePath = "";
-            var referenceTuple = Instance.openedFiles.Find(x => x.Item2 == reference);
+            var referenceTuple = Instance.openedFiles.Where(x => x.Item2 == reference).FirstOrDefault();
             if (reference != null)
             {
                 string basepath = "";
@@ -225,7 +243,7 @@ namespace DominoPlanner.Core
         }
         public static void Clear()
         {
-            Instance.openedFiles = new List<Tuple<string, IWorkspaceLoadable>>();
+            Instance.openedFiles = new ObservableCollection<Tuple<string, IWorkspaceLoadable>>();
         }
         public static object Find<T>(string AbsolutePath)
         {
@@ -258,6 +276,31 @@ namespace DominoPlanner.Core
             }
 
             return relativePath;
+        }
+        
+    }
+    public static class ObservableCollectionExtensions
+    {
+        public static int RemoveAll<T>(
+        this ObservableCollection<T> coll, Func<T, bool> condition)
+        {
+            var itemsToRemove = coll.Where(condition).ToList();
+
+            foreach (var itemToRemove in itemsToRemove)
+            {
+                coll.Remove(itemToRemove);
+            }
+
+            return itemsToRemove.Count;
+        }
+        public static int FindIndex<T>(
+        this ObservableCollection<T> coll, Func<T, bool> condition)
+        {
+            for (int i = 0; i < coll.Count; i++)
+            {
+                if (condition.Invoke(coll[i])) return i;
+            }
+            return -1;
         }
     }
 }
