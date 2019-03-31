@@ -391,13 +391,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }));
             }
         }
-
-        CancellationToken ct;
+        CancellationTokenSource cs;
         private async void refresh()
         {
+            cs?.Cancel();
+            cs = new CancellationTokenSource();
             cursor = Cursors.Wait;
             refrshCounter++;
-            Func<DominoTransfer> function = new Func<DominoTransfer>(() => fieldParameters.Generate(ct, progress));
+            Func<DominoTransfer> function = new Func<DominoTransfer>(() =>
+            {
+                try
+                {
+                    return fieldParameters.Generate(cs.Token, progress);
+                }
+                catch
+                {
+
+                }
+                return fieldParameters.last;
+            });
             DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
             refrshCounter--;
             if(refrshCounter == 0)

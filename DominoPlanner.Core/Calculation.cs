@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DominoPlanner.Core
@@ -19,7 +20,7 @@ namespace DominoPlanner.Core
         [ProtoMember(1000)]
         internal bool LastValid;
 
-        public abstract void Calculate(DominoTransfer shapes, int charLength);
+        public abstract void Calculate(DominoTransfer shapes, int charLength, CancellationToken ct);
     }
     [ProtoContract]
     public class EmptyCalculation : Calculation
@@ -28,7 +29,7 @@ namespace DominoPlanner.Core
         {
             LastValid = true;
         }
-        public override void Calculate(DominoTransfer shapes, int charLength)
+        public override void Calculate(DominoTransfer shapes, int charLength, CancellationToken ct)
         {
             LastValid = true;
         }
@@ -165,7 +166,7 @@ namespace DominoPlanner.Core
     [ProtoContract]
     public class CoupledCalculation : NonEmptyCalculation
     {
-        public override void Calculate(DominoTransfer shapes, int charLength)
+        public override void Calculate(DominoTransfer shapes, int charLength, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
@@ -185,7 +186,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region overrides
-        public override void Calculate(DominoTransfer shapes, int charLength)
+        public override void Calculate(DominoTransfer shapes, int charLength, CancellationToken ct)
         {
             var colors = ApplyColorFilters(shapes.colors).RepresentionForCalculation;
             //if (!shapesValid) throw new InvalidOperationException("Current shapes are invalid!");
@@ -211,6 +212,7 @@ namespace DominoPlanner.Core
             }
             for (int iter = 0; iter < IterationInformation.maxNumberOfIterations; iter++)
             {
+                ct.ThrowIfCancellationRequested();
                 if (Dithering.weights.GetLength(0) + Dithering.weights.GetLength(1) > 2)
                 {
                     double extent_r = (Dithering.matrix_width - Dithering.start_first_row) * charLength;
@@ -223,6 +225,7 @@ namespace DominoPlanner.Core
                     }
                     for (int i = 0; i < list.Count; i++)
                     {
+                        if (i % 100 == 0) ct.ThrowIfCancellationRequested();
                         var originalColor = list[i].PrimaryDitherColor;
                         list[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
                         // Abweichung der beiden Farben bestimmen
@@ -279,6 +282,7 @@ namespace DominoPlanner.Core
                     var cs = new System.Threading.CancellationTokenSource();
                     Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = -1 , CancellationToken = cs.Token}, (i) =>
                     {
+                        ct.ThrowIfCancellationRequested();
                         try
                         {
                             shapes[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
@@ -324,7 +328,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region overrides
-        public override void Calculate(DominoTransfer shapes, int charLength)
+        public override void Calculate(DominoTransfer shapes, int charLength, CancellationToken ct)
         {
             int height = shapes.FieldPlanHeight;
             int length = shapes.FieldPlanLength;
@@ -336,7 +340,7 @@ namespace DominoPlanner.Core
                 ResetDitherColors(shapes);
                 IterationInformation.numberofiterations = iter;
                 Console.WriteLine($"Iteration {iter}");
-                Parallel.For(0, height, new ParallelOptions() { MaxDegreeOfParallelism = Dithering.maxDegreeOfParallelism }, (y) =>
+                Parallel.For(0, height, new ParallelOptions() { MaxDegreeOfParallelism = Dithering.maxDegreeOfParallelism, CancellationToken= ct }, (y) =>
                 {
                     for (int x = 0; x < length; x++)
                     {
@@ -347,6 +351,7 @@ namespace DominoPlanner.Core
                         DiffuseErrorField(x, y, error_r, error_g, error_b, shapes, length, height);
                     }
                 });
+                ct.ThrowIfCancellationRequested();
                 IterationInformation.EvaluateSolution(colors, shapes.shapes);
                 if (IterationInformation.colorRestrictionsFulfilled != false) break;
             }

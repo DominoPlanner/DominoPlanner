@@ -225,13 +225,13 @@ namespace DominoPlanner.Core
             ct.ThrowIfCancellationRequested();
             if (!PrimaryCalculation.LastValid)
             {
-                PrimaryCalculation.Calculate(last, charLength);
+                PrimaryCalculation.Calculate(last, charLength, ct);
                 PrimaryCalculation.LastValid = true;
             }
             ct.ThrowIfCancellationRequested();
             if (!SecondaryCalculation.LastValid)
             {
-                SecondaryCalculation.Calculate(last, charLength);
+                SecondaryCalculation.Calculate(last, charLength, ct);
                 SecondaryCalculation.LastValid = true;
             }
             return last;
