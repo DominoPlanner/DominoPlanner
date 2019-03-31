@@ -30,7 +30,7 @@
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Height="26" VerticalAlignment="Top">
                         <Label Content="Field Size [Dominoes]: " VerticalAlignment="Center"/>
-                        <xctk:IntegerUpDown Value="{Binding FieldSize, Delay=200}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
+                        <xctk:IntegerUpDown Value="{Binding FieldSize, Delay=400}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
                     </DockPanel>
 
                     <Grid Grid.Row="2" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Width="268">

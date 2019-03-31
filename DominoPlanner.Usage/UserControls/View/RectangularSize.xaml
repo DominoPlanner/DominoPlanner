@@ -10,7 +10,7 @@
         <DockPanel>
             <DockPanel DockPanel.Dock="Top">
                 <Label DockPanel.Dock="Left" Content="Structure Size:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <xctk:IntegerUpDown Minimum="1" Value="{Binding StrucSize, Delay=200}" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="120"/>
+                <xctk:IntegerUpDown Minimum="1" Value="{Binding StrucSize, Delay=300}" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="120"/>
                 <Label DockPanel.Dock="Left" Content="Dominoes" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </DockPanel>
             <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
