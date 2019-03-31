@@ -81,10 +81,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         protected override void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             base.RaisePropertyChanged(propertyName);
+            TabPropertyChanged(propertyName);
         }
         protected void TabPropertyChanged([CallerMemberName] string propertyName = null, bool ProducesUnsavedChanges = true)
         {
-            this.RaisePropertyChanged(propertyName);
+            base.RaisePropertyChanged(propertyName);
             if (ProducesUnsavedChanges)
                 UnsavedChanges = true;
 

@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_cursorState != value)
                 {
                     _cursorState = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -127,6 +127,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            bool changed = false;
             if (e.PropertyName.Equals("OnlyUse"))
             {
                 if (OnlyOwnStonesVM.OnlyUse)
@@ -142,14 +143,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new NoColorRestriction();
                 }
-                refresh();
+                changed = true;
             }
             else if (e.PropertyName.Equals("Iterations"))
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
-                    refresh();
+                    changed = true;
                 }
             }
             else if (e.PropertyName.Equals("Weight"))
@@ -157,8 +158,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((IterativeColorRestriction)((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
-                    refresh();
+                    changed = true;
                 }
+            }
+            if (changed)
+            {
+                refresh();
+                UnsavedChanges = true;
             }
         }
 

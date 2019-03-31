@@ -460,6 +460,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            bool changed = false;
             if (e.PropertyName.Equals("OnlyUse"))
             {
                 if (OnlyOwnStonesVM.OnlyUse)
@@ -475,14 +476,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     ((UncoupledCalculation)structureParameters.PrimaryCalculation).IterationInformation = new NoColorRestriction();
                 }
-                Refresh();
+                changed = true;
             }
             else if (e.PropertyName.Equals("Iterations"))
             {
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((UncoupledCalculation)structureParameters.PrimaryCalculation).IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
-                    Refresh();
+                    changed = true;
                 }
             }
             else if (e.PropertyName.Equals("Weight"))
@@ -490,8 +491,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (OnlyOwnStonesVM.OnlyUse)
                 {
                     ((IterativeColorRestriction)((UncoupledCalculation)structureParameters.PrimaryCalculation).IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
-                    Refresh();
+                    changed = true;
                 }
+            }
+            if (changed)
+            {
+                Refresh();
+                UnsavedChanges = true;
             }
         }
         private void FillColorList()

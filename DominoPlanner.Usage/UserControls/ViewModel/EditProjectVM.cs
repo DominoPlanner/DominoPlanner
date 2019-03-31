@@ -225,7 +225,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedColor != value)
                 {
                     _SelectedColor = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
