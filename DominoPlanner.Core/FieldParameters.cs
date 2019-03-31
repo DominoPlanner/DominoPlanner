@@ -225,7 +225,7 @@ namespace DominoPlanner.Core
         #endregion
         #region compatibility properties
         
-        [ProtoMember(6)]
+        /*[ProtoMember(6)]
         private Inter resizeMode
         {
             get
@@ -236,7 +236,7 @@ namespace DominoPlanner.Core
             {
                 ((FieldReadout)CreatePrimaryTreatment()).ResizeMode = value;
             }
-        }
+        }*/
         
         #endregion
     }

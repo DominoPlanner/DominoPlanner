@@ -159,7 +159,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_physicalHeight != value)
                 {
                     _physicalHeight = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }

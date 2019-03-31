@@ -412,14 +412,14 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
-            if (PrimaryCalculation == null)
+            /*if (PrimaryCalculation == null)
             {
                 PrimaryCalculation = CreatePrimaryCalculation();
             }
             if (PrimaryImageTreatment == null)
             {
                 PrimaryImageTreatment = CreatePrimaryTreatment();
-            }
+            }*/
             Generate();
             last.colors = colors;
             //CreatePrimaryTreatment();
@@ -439,7 +439,7 @@ namespace DominoPlanner.Core
         #endregion
 
         #region compatibility properties
-        private Calculation TempCalculation;
+        /*private Calculation TempCalculation;
         private ImageTreatment TempImageTreatment;
         internal Calculation CreatePrimaryCalculation()
         {
@@ -592,7 +592,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        
+        */
         #endregion
         
     }
@@ -633,7 +633,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
-        
+        /*
         [ProtoMember(1)]
         private AverageMode average
         {
@@ -658,7 +658,7 @@ namespace DominoPlanner.Core
                 ((NormalReadout)CreatePrimaryTreatment()).AllowStretch = value;
             }
         }
-        
+        */
         #endregion
     }
 
