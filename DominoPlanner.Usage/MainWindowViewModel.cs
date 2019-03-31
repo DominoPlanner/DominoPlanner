@@ -294,7 +294,7 @@ namespace DominoPlanner.Usage
             }
             if (selTab != null) // && !tryAgain
             {
-                selTab.CloseIt += MainWindowViewModel_CloseIt;
+                selTab.CloseIt = MainWindowViewModel_CloseIt;
                 if (selTab.Content.CurrentProject != null)
                 {
                     selTab.Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
@@ -317,12 +317,9 @@ namespace DominoPlanner.Usage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindowViewModel_CloseIt(object sender, EventArgs e)
+        private bool MainWindowViewModel_CloseIt(TabItem tabItem)
         {
-            if (sender is TabItem tabItem)
-            {
-                RemoveItem(tabItem);
-            }
+            return RemoveItem(tabItem);
         }
         private bool RemoveProjectComposite(ProjectComposite comp)
         {
@@ -532,7 +529,7 @@ namespace DominoPlanner.Usage
                     newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
                     return newItem;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     NotFindRemove(parentProject, projectTransfer);
                     return null;
@@ -731,7 +728,9 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region EventHandler
-        public event EventHandler CloseIt;
+        public delegate bool CloseDelegate(TabItem TI);
+
+        public CloseDelegate CloseIt;
         #endregion
 
         #region prope
@@ -829,8 +828,10 @@ namespace DominoPlanner.Usage
         #region METHODS
         private void CloseThis()
         {
-            Content?.Close();
-            CloseIt?.Invoke(this, EventArgs.Empty);
+            if (CloseIt?.Invoke(this) == true)
+            {
+                Content?.Close();
+            }
         }
         #endregion
 
