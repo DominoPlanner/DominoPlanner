@@ -73,7 +73,7 @@ namespace DominoPlanner.Usage
             {
                 return Workspace.MakeRelativePath(parentPath, ofd.FileName);
             }
-            
+
             return "";
         }
         private void CurrentProject_EditingChanged(object sender, EventArgs e)
@@ -81,7 +81,7 @@ namespace DominoPlanner.Usage
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
             //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
             tabItem.Content.Save();
-            
+
             tabItem.ResetContent();
         }
         #endregion
@@ -162,7 +162,7 @@ namespace DominoPlanner.Usage
         public ICommand SaveCurrentOpen { get { return _SaveCurrentOpen; } set { if (value != _SaveCurrentOpen) { _SaveCurrentOpen = value; } } }
 
         private ICommand _FileListClickCommand;
-        public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand= value; } } }
+        public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand = value; } } }
 
         #endregion
 
@@ -178,6 +178,11 @@ namespace DominoPlanner.Usage
             ((ProjectComposite)((System.Windows.Controls.MenuItem)sender).DataContext).IsSelected = true;
             NewFieldStructure();
         }
+        private void OpenMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            OpenItem((ProjectComposite)((System.Windows.Controls.MenuItem)sender).DataContext);
+        }
+    
         /// <summary>
         /// Remove selected Project
         /// </summary>
@@ -527,6 +532,8 @@ namespace DominoPlanner.Usage
                     newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
                     newItem.conMenu.renameMI.Click += parentProject.RenameMI_Object_Click;
                     newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
+
+                    newItem.conMenu.openMI.Click += OpenMI_Click;
                     return newItem;
                 }
                 catch (Exception)
