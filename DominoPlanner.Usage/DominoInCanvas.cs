@@ -10,7 +10,6 @@ namespace DominoPlanner.Usage
     {
         public int idx;
         public System.Windows.Point[] canvasPoints = new System.Windows.Point[4];
-
         public ColorRepository colorRepository;
         public IDominoShape domino;
 
