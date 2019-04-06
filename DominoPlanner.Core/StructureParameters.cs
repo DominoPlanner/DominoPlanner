@@ -94,7 +94,7 @@ namespace DominoPlanner.Core
                 // Höhe 0 nur erlaubt, wenn in oberster und unterster Reihe Steine sind
                 bool hasinTopBottom = (cells == null || cells[0, 0].Count + cells[1, 0].Count + cells[2, 0].Count +
                     cells[0, 2].Count + cells[1, 2].Count + cells[2, 2].Count > 0);
-                if (hasinTopBottom ? value >= 0 : value > 0 && value != _length)
+                if (hasinTopBottom ? value >= 0 : value > 0 && value != _height)
                 {
                     _height = value;
                     shapesValid = false;

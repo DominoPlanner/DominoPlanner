@@ -63,9 +63,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (currentStructure.Length != value)
                 {
+                    PropertyValueChanged(this, value);
                     currentStructure.Length = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -77,9 +77,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (currentStructure.Height != value)
                 {
+                    PropertyValueChanged(this, value);
                     currentStructure.Height = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -90,13 +90,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _structure_index; }
             set
             {
-                if (_structure_index != value)
+                if (_structure_index != value && value >= 0)
                 {
+                    var temp_struct_index = _structure_index;
+                    // On load, Undo should not be triggered
+                    if (_structure_index != -1)
+                    {
+                        PropertyValueChanged(this, value);
+                    }
                     _structure_index = value;
                     SelectedStructureElement = structures.ElementAt(_structure_index);
                     RaisePropertyChanged();
                     RefreshDescriptionImages();
-                    RefreshTargetSize();
+                    if (temp_struct_index == -1)
+                    {
+                        Refresh();
+                    }
+                    else
+                    {
+                        RefreshTargetSize();
+                    }
                 }
             }
         }

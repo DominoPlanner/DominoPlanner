@@ -20,9 +20,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircularStructure.DominoWidth != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircularStructure.DominoWidth = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -33,9 +33,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircularStructure.DominoLength != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircularStructure.DominoLength = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -46,9 +46,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircularStructure.TangentialDistance != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircularStructure.TangentialDistance = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -59,9 +59,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircularStructure.NormalDistance != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircularStructure.NormalDistance = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -83,9 +83,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircleParameters.Circles != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircleParameters.Circles = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -96,9 +96,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircleParameters.ForceDivisibility != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircleParameters.ForceDivisibility = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -109,9 +109,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircleParameters.AngleShiftFactor != value)
                 {
+                    PropertyValueChanged(this, value);
                     CircleParameters.AngleShiftFactor = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -122,9 +122,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CircleParameters.RandomShiftFactor != value)
                 {
+                    PropertyValueChanged(this, value);
                     AngleShiftFactor = value ? null : (double?)0.05;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -147,9 +147,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.QuarterRotations != value * 4)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.QuarterRotations = value * 4;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -160,9 +160,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.ShiftFactor != value)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.ShiftFactor = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -173,9 +173,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.NumberOfArms != value)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.NumberOfArms = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -186,9 +186,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.NumberOfGroups != value)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.NumberOfGroups = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -199,9 +199,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.NormalGroupDistance != value)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.NormalGroupDistance = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -212,9 +212,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (SpiralParameters.CloseEnds != value)
                 {
+                    PropertyValueChanged(this, value);
                     SpiralParameters.CloseEnds = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }

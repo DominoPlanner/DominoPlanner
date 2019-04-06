@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -14,6 +15,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     
     public class IterativeColorRestrictionVM : IterationInformationVM
     {
+        
         public IterativeColorRestrictionVM(IterativeColorRestriction model) : base(model)
         {
 
@@ -29,9 +31,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (IterativeColorRestriction.iterationWeight != value)
                 {
+                    PropertyValueChanged(this, value);
                     IterativeColorRestriction.iterationWeight = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -42,9 +44,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (IterativeColorRestriction.maxNumberOfIterations != value)
                 {
+                    PropertyValueChanged(this, value);
                     IterativeColorRestriction.maxNumberOfIterations = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -58,8 +60,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
    public  class IterationInformationVM : ModelBase
     {
-        public Action Refresh;
-
+        public Action<object, object, string, bool, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+        {
+            ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction);
+        }
         public IterationInformation currentModel;
         public IterationInformationVM(IterationInformation model)
         {

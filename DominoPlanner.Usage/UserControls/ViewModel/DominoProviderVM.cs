@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,10 +22,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             CurrentProject = dominoProvider;
             CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation);
-            CalculationVM.Refresh = Refresh;
             ImageTreatmentVM = ImageTreatmentVM.ImageTreatmentVMFactory(CurrentProject.PrimaryImageTreatment);
-            ImageTreatmentVM.Refresh = Refresh;
-
+            
             FillColorList();
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
@@ -46,6 +45,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        private Stack<PostFilter> undoStack = new Stack<PostFilter>();
+        private Stack<PostFilter> redoStack = new Stack<PostFilter>();
         public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
@@ -70,6 +71,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (value != _imageTreatmentVM)
                 {
                     _imageTreatmentVM = value;
+                    _imageTreatmentVM.ValueChanged = PropertyValueChanged;
                     RaisePropertyChanged();
                 }
             }
@@ -83,6 +85,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (value != _calculationVM)
                 {
                     _calculationVM = value;
+                    _calculationVM.ValueChanged = PropertyValueChanged;
                     RaisePropertyChanged();
                 }
             }
@@ -208,8 +211,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (_draw_borders != value)
                 {
+                    PropertyValueChanged(this, value, producesUnsavedChanges: false);
                     _draw_borders = value;
-                    Refresh();
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
@@ -222,8 +225,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (_collapsed != value)
                 {
+                    PropertyValueChanged(this, value, producesUnsavedChanges: false);
                     _collapsed = value;
-                    Refresh();
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
@@ -249,9 +252,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (_backgroundColor != value)
                 {
+                    PropertyValueChanged(this, value, producesUnsavedChanges: false);
                     _backgroundColor = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
-                    Refresh();
                 }
             }
         }
@@ -280,12 +283,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (__dominoCount != value)
                 {
-                    __dominoCount = value;
                     if (CurrentProject is ICountTargetable t)
                     {
-                        t.TargetCount = __dominoCount;
-                        Refresh();
+                        PropertyValueChanged(this, value, producesUnsavedChanges: false);
+                        t.TargetCount = value;
                     }
+                    __dominoCount = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
@@ -407,12 +410,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region Methods
         public override void Undo()
         {
-            throw new NotImplementedException();
+            undostate = true;
+            if (undoStack.Count != 0)
+            {
+                PostFilter undoFilter = undoStack.Pop();
+                redoStack.Push(undoFilter);
+                undoFilter.Undo();
+                if (undoStack.Count == 0) UnsavedChanges = false;
+            }
+            undostate = false;
         }
 
         public override void Redo()
         {
-            throw new NotImplementedException();
+            undostate = true;
+            if (redoStack.Count != 0)
+            {
+                PostFilter redoFilter = redoStack.Pop();
+                undoStack.Push(redoFilter);
+                redoFilter.Apply();
+            }
+            undostate = false;
         }
 
         public override bool Save()
@@ -475,12 +493,53 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void RefreshTargetSize()
         {
+            undostate = true;
             if (DominoCount > 0)
                 DominoCount = DominoCount + 1;
             else
-            {
                 Refresh();
+            
+            undostate = false;
+        }
+        private bool _undostate;
+
+        public bool undostate
+        {
+            get { return _undostate; }
+            set { _undostate = value; }
+        }
+
+        public void PropertyValueChanged(object sender, object value_new,
+            [CallerMemberName] string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+        {
+            if (!undostate)
+            {
+                undostate = true;
+                if (producesUnsavedChanges)
+                    UnsavedChanges = true;
+                var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
+                if (undoStack.Count != 0)
+                {
+                    var lastOnStack = undoStack.Peek();
+                    if (lastOnStack is PropertyChangedOperation op)
+                    {
+                        if (op.sender == sender && op.membername == membername)
+                        {
+                            // property has been changed multiple times in a row
+                            if (!op.value_old.Equals(value_new))
+                            {
+                                op.value_new = value_new;
+                                undoStack.Pop();
+                                filter = op;
+                            }
+                        }
+                    }
+                }
+                redoStack = new Stack<PostFilter>();
+                undoStack.Push(filter);
+                filter.Apply();
             }
+            undostate = false;
         }
         #endregion
 
@@ -492,6 +551,36 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
         #endregion
 
+    }
+    public class PropertyChangedOperation : PostFilter
+    {
+        public object sender;
+        public object value_new;
+        public object value_old;
+        public string membername;
+        public Action PostAction;
+        public System.Reflection.PropertyInfo ps;
+        public PropertyChangedOperation(object sender, object value_new, string membername, Action PostAction)
+        {
+            this.sender = sender;
+            this.value_new = value_new;
+            this.membername = membername;
+            this.PostAction = PostAction;
+            ps = sender.GetType().GetProperty(membername, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            value_old = ps.GetValue(sender);
+        }
+
+        public override void Apply()
+        {
+            ps.SetValue(sender, value_new);
+            PostAction?.Invoke();
+        }
+
+        public override void Undo()
+        {
+            ps.SetValue(sender, value_old);
+            PostAction?.Invoke();
+        }
     }
 
 }

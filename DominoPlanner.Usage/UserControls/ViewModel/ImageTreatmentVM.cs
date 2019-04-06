@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -12,7 +13,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 {
     public class ImageTreatmentVM : ModelBase
     {
-        public Action Refresh;
+        public Action<object, object, string, bool, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+        {
+            ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction);
+        }
         protected ImageTreatment CurrentModel;
         public ImageTreatmentVM(ImageTreatment model)
         {
@@ -37,9 +43,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CurrentModel.Width != value)
                 {
+                    PropertyValueChanged(this, value);
                     CurrentModel.Width = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -50,9 +56,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CurrentModel.Height != value)
                 {
+                    PropertyValueChanged(this, value);
                     CurrentModel.Height = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -63,9 +69,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CurrentModel.Background != value)
                 {
+                    PropertyValueChanged(this, value);
                     CurrentModel.Background = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -76,9 +82,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (CurrentModel.ImageFilters != value)
                 {
+                    PropertyValueChanged(this, value);
                     CurrentModel.ImageFilters = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -100,9 +106,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (NRModel.Average != value)
                 {
+                    PropertyValueChanged(this, value);
                     NRModel.Average = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -113,9 +119,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (NRModel.AllowStretch != value)
                 {
+                    PropertyValueChanged(this, value);
                     NRModel.AllowStretch = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -133,9 +139,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (FRModel.ResizeMode != value)
                 {
+                    PropertyValueChanged(this, value);
                     FRModel.ResizeMode = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }

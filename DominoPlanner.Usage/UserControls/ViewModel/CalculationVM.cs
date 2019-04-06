@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,8 +13,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 {
     public class CalculationVM : ModelBase
     {
-        public Action Refresh;
-
+        public Action<object, object, string, bool, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+        {
+            ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction);
+        }
 
         internal Calculation currentModel;
         public CalculationVM(Calculation model)
@@ -46,7 +51,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public NonEmptyCalculationVM(NonEmptyCalculation model) : base(model)
         {
             IterationInformationVM = IterationInformationVM.IterationInformationVMFactory(model.IterationInformation);
-            IterationInformationVM.Refresh = Refresh;
         }
         private NonEmptyCalculation NEModel
         {
@@ -62,9 +66,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (value != NEModel.ColorMode)
                 {
+                    PropertyValueChanged(this, value);
                     NEModel.ColorMode = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -75,9 +79,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (value != NEModel.Dithering)
                 {
+                    PropertyValueChanged(this, value);
                     NEModel.Dithering = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -88,10 +92,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (value != NEModel.IterationInformation)
                 {
+                    PropertyValueChanged(this, value);
                     NEModel.IterationInformation = value;
                     IterationInformationVM = IterationInformationVM.IterationInformationVMFactory(value);
-                    IterationInformationVM.Refresh = Refresh;
-                    Refresh();
+                    IterationInformationVM.ValueChanged = PropertyValueChanged;
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -117,9 +122,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (value != NEModel.TransparencySetting)
                 {
+                    PropertyValueChanged(this, value);
                     NEModel.TransparencySetting = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
@@ -130,9 +135,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (value != NEModel.ColorFilters)
                 {
+                    PropertyValueChanged(this, value);
                     NEModel.ColorFilters = value;
                     RaisePropertyChanged();
-                    Refresh();
                 }
             }
         }
