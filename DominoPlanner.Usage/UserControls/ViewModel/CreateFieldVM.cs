@@ -246,7 +246,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             UpdateStoneSizes();
             ReloadSizes();
-            Refresh();
+            if (sender != null || e != null) Refresh();
         }
         
         private void ReloadSizes()
