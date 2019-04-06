@@ -14,14 +14,11 @@
         <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
             <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
-            <View:CreateField HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CreateStructureVM}">
-            <View:CreateStructure HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:EditProjectVM}">
             <View:EditProject HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DominoProviderVM}">
+            <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
         <local:PathToImageConverter x:Key="PathToImageConverter"/>
     </Window.Resources>

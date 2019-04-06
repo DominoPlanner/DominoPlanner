@@ -122,7 +122,7 @@ namespace DominoPlanner.Core
             }
         }
         [ProtoMember(5)]
-        public ObservableCollection<ColorFilter> ColorFilters { get; private set; }
+        public ObservableCollection<ColorFilter> ColorFilters { get; set; }
         #endregion
         #region constructors
         public NonEmptyCalculation()
@@ -282,9 +282,10 @@ namespace DominoPlanner.Core
                     var cs = new System.Threading.CancellationTokenSource();
                     Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = -1 , CancellationToken = cs.Token}, (i) =>
                     {
-                        ct.ThrowIfCancellationRequested();
+                        
                         try
                         {
+                            ct.ThrowIfCancellationRequested();
                             shapes[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
                         }
                         catch

@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+    xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.FieldSize"
              xmlns:intr="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" d:DesignWidth="374" Height="205">
+    <UserControl.Resources>
+        <parent:LockedToImageConverter x:Key="LockedToImageConverter"/>
+        <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
+    </UserControl.Resources>
     <Grid>
         <DockPanel>
             <GroupBox DockPanel.Dock="Top">
@@ -30,7 +35,7 @@
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Height="26" VerticalAlignment="Top">
                         <Label Content="Field Size [Dominoes]: " VerticalAlignment="Center"/>
-                        <xctk:IntegerUpDown Value="{Binding FieldSize, Delay=400}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
+                        <xctk:IntegerUpDown Value="{Binding DominoCount, Delay=400}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
                     </DockPanel>
 
                     <Grid Grid.Row="2" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Width="268">
@@ -44,7 +49,7 @@
                         <!--Length and Height Setters-->
                         <Label Content="Length:" Grid.Column="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="50"/>
                         <xctk:IntegerUpDown Value="{Binding Length, Delay=200}" IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
-                        <Image Source="{Binding BindUnbind}"  IsEnabled="{Binding EditState}" Margin="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Image Source="{Binding BindSize, Converter={StaticResource LockedToImageConverter}}"  IsEnabled="{Binding EditState}" Margin="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <intr:Interaction.Triggers>
                                 <intr:EventTrigger EventName="MouseUp">
                                     <intr:InvokeCommandAction Command="{Binding Click_Binding}"/>
@@ -57,7 +62,7 @@
                     <DockPanel Grid.Row="4">
                         <Label Content="Falldown direction: "  HorizontalAlignment="Left" VerticalAlignment="Center" Height="27"/>
                         <RadioButton Content="Horizontal" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Horizontal}"/>
-                        <RadioButton Content="Vertical" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Vertical}" Margin="5, 0, 0, 0"/>
+                        <RadioButton Content="Vertical" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5, 0, 0, 0" IsChecked="{Binding Horizontal, Converter={StaticResource BoolInverterConverter}}"/>
                     </DockPanel>
                 </Grid>
             </GroupBox>

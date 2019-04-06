@@ -197,7 +197,7 @@ namespace DominoPlanner.Core
         private StructureParameters() : base() { }
         #endregion
         #region private helper methods
-        protected override void RegenerateShapes()
+        public override void RegenerateShapes()
         {
             last = GenerateStructure(Length, Height);
             shapesValid = true;

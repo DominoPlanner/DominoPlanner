@@ -360,7 +360,7 @@ namespace DominoPlanner.Core
         public event EventHandler EditingChanged;
         #endregion
         #region abstracts
-        protected abstract void RegenerateShapes();
+        public abstract void RegenerateShapes();
         
         protected static T[,] TransposeArray<T>(T[,] array)
         {

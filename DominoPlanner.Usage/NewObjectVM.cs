@@ -2,9 +2,13 @@
 using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
+using Emgu.CV;
+using Microsoft.Win32;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
@@ -14,87 +18,79 @@ namespace DominoPlanner.Usage
         #region CTOR
         public NewObjectVM(string folderpath, DominoAssembly parentProject)
         {
+
             this.parentProject = parentProject;
-            _ProjectPath = folderpath;
+            FillObjects();
+            ProjectPath = folderpath;
             CreateIt = new RelayCommand(o => { mCreateIt(); });
-            selectedType = 7;
-            selectedType = 0;
+            SelectedType = 0;
         }
         #endregion
 
         #region fields
-        public string internPictureName { get; private set; }
-        public int ObjectID { get; private set; }
         private DominoAssembly parentProject;
         #endregion
-
+        
         #region prop
-        private DocumentNode resultNode;
-        public DocumentNode ResultNode
+        public DocumentNode ResultNode { get; private set; }
+        public string ProjectPath { get; private set; }
+        public string ObjectPath { get { return string.Format("{0}\\Planner Files\\{1}{2}", ProjectPath, _filename, _endung); } }
+
+        private ObservableCollection<NewObjectEntry> _ViewModels;
+        public ObservableCollection<NewObjectEntry> ViewModels
         {
-            get { return resultNode; }
+            get => _ViewModels;
+            set
+            {
+                if (_ViewModels != value)
+                {
+                    _ViewModels = value;
+                    RaisePropertyChanged();
+                }
+            }
         }
-        private string _ProjectPath;
-        public string ProjectPath { get { return _ProjectPath; } }
-        public string ObjectPath { get { return string.Format("{0}\\Planner Files\\{1}{2}", _ProjectPath, _filename, _endung); } }
-
-        string picturePath;
-
-        private int _selectedType;
-        public int selectedType
+        private DominoProviderVM _CurrentViewModel;
+        public DominoProviderVM CurrentViewModel
+        {
+            get => _CurrentViewModel;
+            set
+            {
+                if (_CurrentViewModel != value)
+                {
+                    _CurrentViewModel = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private ImageInformation _CurrentImageInformation;
+        public ImageInformation CurrentImageInformation
+        {
+            get => _CurrentImageInformation;
+            set
+            {
+                if (_CurrentImageInformation != value)
+                {
+                    _CurrentImageInformation = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private int _selectedType = -1;
+        public int SelectedType
         {
             get { return _selectedType; }
             set
             {
                 if (_selectedType != value)
                 {
-                    switch (_selectedType)
-                    {
-                        case 0:
-                            if(CurrentViewModel is AddFieldVM addField)
-                            {
-                                picturePath = addField.sPath;
-                            }
-                            break;
-                        case 1:
-                        case 2:
-                            if(CurrentViewModel is AddStructureVM addStructureVM)
-                            {
-                                picturePath = addStructureVM.sPath;
-                            }
-                            break;
-                    }
                     _selectedType = value;
-                    switch (value)
-                    {
-                        case 0:
-                            endung = ".dobject";
-                            CurrentViewModel = new AddFieldVM();
-                            ((AddFieldVM)CurrentViewModel).sPath = picturePath;
-                            break;
-                        /*case 1:
-                            endung = ".dobject";
-                            CurrentViewModel = new FieldSizeVM(false);
-                            break;*/
-                        case 1:
-                            endung = ".dobject";
-                            CurrentViewModel = new AddStructureVM(StructureType.Rectangular);
-                            if(picturePath != null)
-                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
-                            break;
-                        case 2:
-                            endung = ".dobject";
-                            CurrentViewModel = new AddStructureVM(StructureType.Round);
-                            if(picturePath != null)
-                                ((AddStructureVM)CurrentViewModel).sPath = picturePath;
-                            break;
-                        default: break;
-                    }
+                    CurrentViewModel = ViewModels[value].Provider;
+                    CurrentImageInformation = ViewModels[value].ImageInformation;
+                    CurrentImageInformation.UpdateProvider(CurrentViewModel);
                     RaisePropertyChanged();
                 }
             }
         }
-
         private string _filename;
         public string filename
         {
@@ -109,7 +105,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private string _endung;
+        private string _endung = ".dobject";
         public string endung
         {
             get { return _endung; }
@@ -122,21 +118,6 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
-        private ModelBase _CurrentViewModel;
-        public ModelBase CurrentViewModel
-        {
-            get { return _CurrentViewModel; }
-            set
-            {
-                if (_CurrentViewModel != value)
-                {
-                    _CurrentViewModel = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         private bool _Close;
         public bool Close
         {
@@ -161,8 +142,64 @@ namespace DominoPlanner.Usage
         private ICommand _CreateIt;
         public ICommand CreateIt { get { return _CreateIt; } set { if (value != _CreateIt) { _CreateIt = value; } } }
 
+        
         #endregion
         #region Methods
+
+        private void FillObjects()
+        {
+            ViewModels = new ObservableCollection<NewObjectEntry>();
+            CurrentImageInformation = new SingleImageInformation();
+            string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject);
+            ViewModels.Add(new NewObjectEntry()
+            {
+                Name = "Field",
+                Description = "Add a field based on an image",
+                Icon = "/Icons/insert_table.ico",
+                ImageInformation = CurrentImageInformation,
+                Provider = new CreateFieldVM(
+                    new FieldParameters(50, 50, System.Windows.Media.Colors.Transparent, AbsoluteColorPath,
+                    8, 8, 24, 8, 5000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
+                { BindSize = true }
+            });
+            ViewModels.Add(new NewObjectEntry()
+            {
+                Name = "Structure",
+                Description = "Add a structure (e.g. Wall) based on an image",
+                Icon = "/icons/insert_table.ico",
+                ImageInformation = CurrentImageInformation,
+                Provider = new CreateRectangularStructureVM(
+                    new StructureParameters(5, 5, System.Windows.Media.Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
+                    2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
+            });
+            ViewModels.Add(new NewObjectEntry()
+            {
+                Name = "Circle",
+                Description = "Add a circle bomb based on an image",
+                Icon = "/Icons/insert_table.ico",
+                ImageInformation = CurrentImageInformation,
+                Provider = new CreateCircleVM(
+                    new CircleParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
+                    AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
+            });
+            ViewModels.Add(new NewObjectEntry()
+            {
+                Name = "Spiral",
+                Description = "Add a spiral based on an image",
+                Icon = "/Icons/insert_table.ico",
+                ImageInformation = CurrentImageInformation,
+                Provider = new CreateSpiralVM(
+                    new SpiralParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
+                    AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), false)
+            });
+        }
+        private bool FinalizeProvider(string filepath)
+        {
+            CurrentViewModel.CurrentProject.Save(filepath);
+            string colorlist = parentProject.colorPath;
+            CurrentViewModel.CurrentProject.ColorPath = $@"..\{colorlist}";
+            return CurrentImageInformation.FinalizeProvider(CurrentViewModel.CurrentProject, filepath);
+        }
         private void mCreateIt()
         {
             try
@@ -180,115 +217,27 @@ namespace DominoPlanner.Usage
                     Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
                     return;
                 }
-                string colorlist = parentProject.colorPath;
-                string relResultPath = Path.Combine("Planner Files", string.Format("{0}.DObject", filename));
-                string relColorList = $@"..\{colorlist}";
-                string resultPath = Path.Combine(ProjectPath, relResultPath);
-
-                switch (_selectedType)
+                string resultPath = Path.Combine(ProjectPath, Path.Combine("Planner Files", string.Format("{0}.DObject", filename)));
+                try
                 {
-                    case 0:
-                        if (CurrentViewModel is AddFieldVM addField)
-                        {
-                            picturePath = addField.sPath;
-                        }
-                        break;
-                    case 1:
-                    case 2:
-                        if (CurrentViewModel is AddStructureVM addStructureVM)
-                        {
-                            picturePath = addStructureVM.sPath;
-                        }
-                        break;
-                }
+                    bool finalizeResult = FinalizeProvider(resultPath);
 
-                if (selectedType >= 0 && selectedType <= 2)
+                    if (!finalizeResult)
+                    {
+                        throw new OperationCanceledException("Finalize failed");
+                    }
+                }
+                catch (Exception ex)
                 {
-                    // project with image
-                    string originalImagePath = picturePath;
-                    
-                    if (string.IsNullOrEmpty(originalImagePath) || string.IsNullOrWhiteSpace(originalImagePath))
-                    {
-                        Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error);
-                        return;
-                    }
-
-                    internPictureName = string.Format("{0}{1}", filename, Path.GetExtension(originalImagePath));
-                    int counter = 1;
-                    while (File.Exists(Path.Combine(_ProjectPath, "Source Image", internPictureName)))
-                    {
-                        internPictureName = $"{filename} ({counter}){Path.GetExtension(originalImagePath)}";
-                        counter++;
-                    }
-                    try
-                    {
-                        File.Copy(originalImagePath, Path.Combine(_ProjectPath, "Source Image", internPictureName));
-                    }
-                    catch (IOException es)
-                    {
-                        Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning);
-                        return;
-                    }
-                    string relPicturePath = $@"..\Source Image\{internPictureName}";
-                    try
-                    {
-                        switch (selectedType)
-                        {
-                            case 0: //Field with Picture
-                                var fieldVM = ((AddFieldVM)CurrentViewModel).fieldSizeVM;
-                                FieldParameters p = new FieldParameters(resultPath, relPicturePath, relColorList,
-                                    fieldVM.SelectedItem.Sizes.a, fieldVM.SelectedItem.Sizes.b, fieldVM.SelectedItem.Sizes.c,
-                                    fieldVM.SelectedItem.Sizes.d, fieldVM.FieldSize, Emgu.CV.CvEnum.Inter.Lanczos4,
-                                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), new NoColorRestriction());
-                                p.Generate(new System.Threading.CancellationToken());
-                                p.Save();
-                                resultNode = new FieldNode(relResultPath, parentProject);
-                                break;
-                            case 1: //Rectangular Structure
-                                var structureVM = ((RectangularSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel);
-                                StructureParameters sp = new StructureParameters(resultPath, relPicturePath,
-                                    structureVM.SelectedStructureElement, structureVM.StrucSize, relColorList,
-                                    ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                                sp.Generate(new System.Threading.CancellationToken());
-                                sp.Save();
-                                resultNode = new StructureNode(relResultPath, parentProject);
-                                break;
-                            case 2: //Round Structure
-                                RoundSizeVM rsvm = (RoundSizeVM)((AddStructureVM)CurrentViewModel).CurrentViewModel;
-                                CircularStructure circularStructure;
-                                if (rsvm.TypeSelected.Equals("Spiral"))
-                                {
-                                    circularStructure = new SpiralParameters(resultPath, relPicturePath, rsvm.Amount,
-                                        relColorList, ColorDetectionMode.CieDe2000Comparison, new Dithering(),
-                                        AverageMode.Corner, new NoColorRestriction());
-                                    circularStructure.Generate(new System.Threading.CancellationToken());
-                                    circularStructure.Save();
-                                    resultNode = new SpiralNode(relResultPath, parentProject);
-                                }
-                                else
-                                {
-                                    circularStructure = new CircleParameters(resultPath, relPicturePath, rsvm.Amount, relColorList,
-                                        ColorDetectionMode.CieDe2000Comparison, new Dithering(), AverageMode.Corner, new NoColorRestriction());
-                                    circularStructure.Generate(new System.Threading.CancellationToken());
-                                    circularStructure.Save();
-                                    resultNode = new CircleNode(relResultPath, parentProject);
-                                }
-                                break;
-                            default: break;
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        File.Delete(Workspace.AbsolutePathFromReference(ref relResultPath, parentProject));
-                        File.Delete(Path.Combine(_ProjectPath, "Source Image", internPictureName));
-                        resultNode = null;
-                        Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
-                    }
-                    parentProject.Save();
+                    File.Delete(Workspace.AbsolutePathFromReference(ref resultPath, parentProject));
+                    CurrentImageInformation.RevertChangesToFileSystem();
+                    ResultNode = null;
+                    Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
                 }
-                
-
+                CurrentViewModel.CurrentProject.Save();
                 Close = true;
+                ResultNode = (DocumentNode)IDominoWrapper.CreateNodeFromPath(parentProject, resultPath);
+                parentProject.Save();
             }
             catch (Exception es)
             {
@@ -296,5 +245,128 @@ namespace DominoPlanner.Usage
             }
         }
         #endregion
+    }
+    public class ImageInformation : ModelBase
+    {
+        public virtual void UpdateProvider(DominoProviderVM provider) { }
+        public virtual bool FinalizeProvider(IDominoProvider provider, string filename)
+        { return true; }
+        public virtual void RevertChangesToFileSystem() { }
+    }
+    public class NoImageInformation : ImageInformation
+    {
+
+    }
+    public class SingleImageInformation : ImageInformation
+    {
+        public SingleImageInformation()
+        {
+            LoadNewImage = new RelayCommand(x => SetNewImage((DominoProviderVM)x));
+        }
+        private string DefaultPictureName { get; set; } = "/Icons/add.ico";
+        private string internPictureName;
+
+        public string InternPictureName
+        {
+            get { return internPictureName; }
+            set
+            {
+                internPictureName = value;
+                RaisePropertyChanged();
+            }
+        }
+        private string finalImagePath;
+        
+        #region Command
+        private ICommand _LoadNewImage;
+        public ICommand LoadNewImage { get { return _LoadNewImage; } set { if (value != _LoadNewImage) { _LoadNewImage = value; } } }
+        #endregion
+
+        #region Methods
+
+        private void SetNewImage(DominoProviderVM provider)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                InternPictureName = openFileDialog.FileName;
+            }
+            UpdateProvider(provider);
+        }
+        public override void UpdateProvider(DominoProviderVM provider)
+        {
+            if (!string.IsNullOrEmpty(InternPictureName))
+            {
+                provider.CurrentProject.PrimaryImageTreatment = new NormalReadout(provider.CurrentProject, InternPictureName, AverageMode.Corner, true);
+                if (provider.DominoCount > 0)
+                {
+                    provider.DominoCount = provider.DominoCount + 1; // if equal, setter would reject changes
+                }
+            }
+
+        }
+        public override bool FinalizeProvider(IDominoProvider provider, string savepath)
+        {
+            finalImagePath = InternPictureName;
+
+            if (string.IsNullOrEmpty(finalImagePath) || string.IsNullOrWhiteSpace(finalImagePath))
+            {
+                Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error);
+                InternPictureName = finalImagePath;
+                return false;
+            }
+
+            finalImagePath = string.Format("{0}{1}", Path.GetFileName(savepath), Path.GetExtension(finalImagePath));
+            int counter = 1;
+            while (File.Exists(Path.Combine(Path.GetDirectoryName(savepath), @"..\Source Image", finalImagePath)))
+            {
+                finalImagePath = $"{Path.GetFileName(savepath)} ({counter}){Path.GetExtension(finalImagePath)}";
+                counter++;
+            }
+            try
+            {
+                File.Copy(InternPictureName, Path.Combine(Path.GetDirectoryName(savepath), @"..\Source Image", finalImagePath));
+            }
+            catch (IOException)
+            {
+                Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning);
+                InternPictureName = finalImagePath;
+                return false;
+            }
+            string relPicturePath = $@"..\Source Image\{finalImagePath}";
+            if (provider is FieldParameters f)
+            {
+                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, Emgu.CV.CvEnum.Inter.Lanczos4);
+            }
+            else
+            {
+                provider.PrimaryImageTreatment = new NormalReadout(provider, relPicturePath, AverageMode.Corner, true);
+            }
+            return true;
+        }
+        public override void RevertChangesToFileSystem()
+        {
+            File.Delete(finalImagePath);
+        }
+        #endregion
+    }
+    public class NewObjectEntry
+    {
+        public ImageInformation ImageInformation { get; set; }
+        public DominoProviderVM Provider { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Icon { get; set; }
+    }
+    public class ImageSelector : DataTemplateSelector
+    {
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            if (string.IsNullOrEmpty(item?.ToString()))
+                return EmptyImageTemplate;
+            return ImageTemplate;
+        }
+        public DataTemplate EmptyImageTemplate { get; set; }
+        public DataTemplate ImageTemplate { get; set; }
     }
 }

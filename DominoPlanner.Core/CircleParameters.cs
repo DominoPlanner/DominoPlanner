@@ -50,15 +50,20 @@ namespace DominoPlanner.Core
 
             }
         }
+        [ProtoMember(3)]
         double? _angle_shift_factor = 0.05;
         
-        [ProtoMember(3)]
+        public bool RandomShiftFactor
+        {
+            get { return _angle_shift_factor == null; }
+        }
+        
         public double? AngleShiftFactor
         {
             get
             {
                 if (_angle_shift_factor != null)
-                    return _angle_shift_factor;
+                    return (double)_angle_shift_factor;
                 else
                     return r.NextDouble() * 3.141 * 2;
             }
@@ -82,6 +87,7 @@ namespace DominoPlanner.Core
                 if (value >= 1)
                 {
                     _force_divisibilty = value;
+                    shapesValid = false;
                 }
             }
         }
@@ -115,7 +121,7 @@ namespace DominoPlanner.Core
             this.StartDiameter = 4 * DominoLength;
         }
         private CircleParameters() : base() { r = new Random(); }
-        protected override void RegenerateShapes()
+        public override void RegenerateShapes()
         {
             PathDomino[][] dominos = new PathDomino[Circles][];
             Parallel.For(0,  Circles,  new ParallelOptions() { MaxDegreeOfParallelism = -1 },
@@ -125,7 +131,7 @@ namespace DominoPlanner.Core
                 double domino_angle = Math.Asin((double)DominoLength / diameter) * 2;
                 double distance_angle = Math.Asin((double)TangentialDistance / diameter) * 2;
                 int current_domino_count = (int)Math.Floor(2 * Math.PI / ((double)domino_angle + distance_angle));
-                current_domino_count = (int)Math.Round((double)current_domino_count / _force_divisibilty) * _force_divisibilty;
+                current_domino_count = (int)Math.Floor((double)current_domino_count / _force_divisibilty) * _force_divisibilty;
                 // equally space the distance between all dominoes
                 distance_angle = (2 * Math.PI - (domino_angle * current_domino_count)) / current_domino_count;
                 // calculate dominoes

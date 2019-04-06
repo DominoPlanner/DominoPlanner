@@ -28,7 +28,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region prope
         private IDominoProvider _CurrentProject;
-        public IDominoProvider CurrentProject
+        public virtual IDominoProvider CurrentProject
         {
             get { return _CurrentProject; }
             set

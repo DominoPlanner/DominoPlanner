@@ -157,24 +157,26 @@
     </Compile>
     <Compile Include="SetStandardVM.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="UserControls\ViewModel\AddFieldVM.cs" />
-    <Compile Include="UserControls\ViewModel\AddStructureVM.cs" />
+    <Compile Include="UserControls\ViewModel\CalculationVM.cs" />
     <Compile Include="UserControls\ViewModel\ColorListControlVM.cs" />
+    <Compile Include="UserControls\ViewModel\CreateCircularStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\CreateFieldVM.cs" />
+    <Compile Include="UserControls\ViewModel\CreateRectangularStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\CreateStructureVM.cs" />
+    <Compile Include="UserControls\ViewModel\DominoProviderVM.cs" />
     <Compile Include="UserControls\ViewModel\EditProjectVM.cs" />
-    <Compile Include="UserControls\ViewModel\FieldSizeVM.cs" />
-    <Compile Include="UserControls\ViewModel\OnlyOwnStonesVM.cs" />
-    <Compile Include="UserControls\ViewModel\RectangularSizeVM.cs" />
+    <Compile Include="UserControls\ViewModel\ImageTreatmentVM.cs" />
+    <Compile Include="UserControls\ViewModel\IterationInformationVM.cs" />
     <Compile Include="UserControls\ViewModel\RenameObjectVM.cs" />
-    <Compile Include="UserControls\ViewModel\RoundSizeVM.cs" />
-    <Compile Include="UserControls\ViewModel\StructureViewModel.cs" />
     <Compile Include="UserControls\ViewModel\TabBaseVM.cs" />
-    <Compile Include="UserControls\View\AddField.xaml.cs">
-      <DependentUpon>AddField.xaml</DependentUpon>
+    <Compile Include="UserControls\View\BasicSettings.xaml.cs">
+      <DependentUpon>BasicSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\View\AddStructure.xaml.cs">
-      <DependentUpon>AddStructure.xaml</DependentUpon>
+    <Compile Include="UserControls\View\CalculationV.xaml.cs">
+      <DependentUpon>CalculationV.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\View\CircleSize.xaml.cs">
+      <DependentUpon>CircleSize.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\ColorControl.xaml.cs">
       <DependentUpon>ColorControl.xaml</DependentUpon>
@@ -182,20 +184,17 @@
     <Compile Include="UserControls\View\ColorListControl.xaml.cs">
       <DependentUpon>ColorListControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\View\CreateField.xaml.cs">
-      <DependentUpon>CreateField.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\View\CreateStructure.xaml.cs">
-      <DependentUpon>CreateStructure.xaml</DependentUpon>
+    <Compile Include="UserControls\View\DominoDimensionsV.xaml.cs">
+      <DependentUpon>DominoDimensionsV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\EditProject.xaml.cs">
       <DependentUpon>EditProject.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\View\FieldReadoutV.xaml.cs">
+      <DependentUpon>FieldReadoutV.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\View\FieldSize.xaml.cs">
       <DependentUpon>FieldSize.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\View\OnlyOwnStonesV.xaml.cs">
-      <DependentUpon>OnlyOwnStonesV.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\View\RectangularSize.xaml.cs">
       <DependentUpon>RectangularSize.xaml</DependentUpon>
@@ -206,8 +205,11 @@
     <Compile Include="UserControls\View\RenderOptions.xaml.cs">
       <DependentUpon>RenderOptions.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\View\RoundSize.xaml.cs">
-      <DependentUpon>RoundSize.xaml</DependentUpon>
+    <Compile Include="UserControls\View\SpiralSize.xaml.cs">
+      <DependentUpon>SpiralSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\View\StructureReadoutV.xaml.cs">
+      <DependentUpon>StructureReadoutV.xaml</DependentUpon>
     </Compile>
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
@@ -249,11 +251,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\AddField.xaml">
+    <Page Include="UserControls\View\BasicSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\AddStructure.xaml">
+    <Page Include="UserControls\View\CalculationV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\CircleSize.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -265,11 +271,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\CreateField.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\View\CreateStructure.xaml">
+    <Page Include="UserControls\View\DominoDimensionsV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -277,11 +279,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\FieldSize.xaml">
+    <Page Include="UserControls\View\FieldReadoutV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\OnlyOwnStonesV.xaml">
+    <Page Include="UserControls\View\FieldSize.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -297,7 +299,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\View\RoundSize.xaml">
+    <Page Include="UserControls\View\SpiralSize.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\View\StructureReadoutV.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

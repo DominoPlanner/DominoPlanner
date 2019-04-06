@@ -287,7 +287,7 @@ namespace DominoPlanner.Usage
                         selTab = new TabItem(toOpen);
                         Tabs.Add(selTab);
                     }
-                    catch (FileNotFoundException ex)
+                    catch (FileNotFoundException)
                     {
                         DocumentNode dn = (DocumentNode)toOpen.Project.documentNode;
                         dn.parent.children.Remove(dn);
@@ -398,7 +398,7 @@ namespace DominoPlanner.Usage
                     string colorPath = mainnode.obj.colorPath;
                     bool colorpathExists = File.Exists(Workspace.AbsolutePathFromReference(ref colorPath, mainnode.obj));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     string colorpath = Path.Combine(newProject.path, "Planner Files");
                     var colorres = Directory.EnumerateFiles(colorpath, "*.DColor");
@@ -569,7 +569,8 @@ namespace DominoPlanner.Usage
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
             new NewObject(novm).ShowDialog();
             if (!novm.Close || novm.ResultNode == null) return;
-            ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
+            ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, 
+                new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", ImageHelper.GetImageOfFile(novm.ObjectPath)), novm.ResultNode));
             OpenItem(compo);
         }
 
@@ -702,14 +703,16 @@ namespace DominoPlanner.Usage
                         switch (documentNode)
                         {
                             case FieldNode fieldNode:
-                                Content = new CreateFieldVM(fieldNode);
+                                Content = new CreateFieldVM((FieldParameters)fieldNode.obj, true);
                                 break;
                             case StructureNode structureNode:
-                                Content = new CreateStructureVM(structureNode.obj, true);
+                                Content = new CreateRectangularStructureVM((StructureParameters)structureNode.obj, true);
                                 break;
                             case SpiralNode spiralNode:
+                                Content = new CreateSpiralVM((SpiralParameters)spiralNode.obj, true);
+                                break;
                             case CircleNode circleNode:
-                                Content = new CreateStructureVM(documentNode.obj, false);
+                                Content = new CreateCircleVM((CircleParameters)circleNode.obj, true);
                                 break;
                             default:
                                 break;

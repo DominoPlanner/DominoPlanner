@@ -64,14 +64,18 @@ namespace DominoPlanner.Core
         {
             string absolutePath = "";
             var referenceTuple = Instance.openedFiles.Where(x => x.Item2 == reference).FirstOrDefault();
-            if (reference != null)
+            if (new Uri(relativePath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
+            {
+                absolutePath = relativePath;
+            }
+            else if (reference != null)
             {
                 string basepath = "";
                 if (referenceTuple != null)
                 {
                      basepath = referenceTuple.Item1;
                 }
-                else if (Instance.FileInWork != null)
+                else if (!String.IsNullOrEmpty(Instance.FileInWork))
                 {
                     basepath = Instance.FileInWork;
                 }
@@ -92,10 +96,6 @@ namespace DominoPlanner.Core
                         throw new FileNotFoundException("File not found, update failed", absolutePath);
                     }
                 }
-            }
-            else if (new Uri(relativePath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
-            {
-                absolutePath = relativePath;
             }
             
             else

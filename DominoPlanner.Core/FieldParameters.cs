@@ -184,16 +184,16 @@ namespace DominoPlanner.Core
             HorizontalSize = horizontalSize;
             VerticalSize = verticalSize;
             VerticalDistance = verticalDistance;
-            TargetCount = targetSize;
             PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode);
             PrimaryImageTreatment.Background = background;
+            TargetCount = targetSize;
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
         }
         private FieldParameters() { }
         #endregion
         #region overrides
-        protected override void RegenerateShapes()
+        public override void RegenerateShapes()
         {
             last = new DominoTransfer(getNewShapes(Length, Height), colors);
             shapesValid = true;

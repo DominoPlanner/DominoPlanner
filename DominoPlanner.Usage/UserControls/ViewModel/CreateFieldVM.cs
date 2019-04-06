@@ -2,6 +2,7 @@
 using DominoPlanner.Usage.HelperClass;
 using Emgu.CV.CvEnum;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,78 +12,44 @@ using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-    class CreateFieldVM : TabBaseVM
+    class CreateFieldVM : DominoProviderVM
     {
         #region CTOR
-        public CreateFieldVM(FieldNode dominoProvider) : base()
+        public CreateFieldVM(FieldParameters dominoProvider, bool? AllowRegenerate) : base(dominoProvider, AllowRegenerate)
         {
-            name = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
-            CurrentProject = dominoProvider.obj;
-            
-            fsvm = new FieldSizeVM(true);
-            OnlyOwnStonesVM = new OnlyOwnStonesVM(((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation);
-
-            iResizeMode = (int)((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode;
-            iColorApproxMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode.colorComparisonMode;
-            iDiffusionMode = (int)((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering.Mode;
-            TransparencyValue = ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting;
-
+            // Regeneration kurz sperren, dann wieder auf Ursprungswert setzen
+            AllowRegeneration = false;
+            field_templates = new List<StandardSize>();
+            field_templates.Add(new StandardSize("8mm", new Sizes(8, 8, 24, 8)));
+            field_templates.Add(new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)));
+            field_templates.Add(new StandardSize("User Size", new Sizes(10, 10, 10, 10)));
+            Click_Binding = new RelayCommand((x) => BindSize = !BindSize);  
             ReloadSizes();
-            FillColorList();
-            refresh();
-            RefreshColorAmount();
+            Collapsible = System.Windows.Visibility.Visible;
+            AllowRegeneration = AllowRegenerate;
+            Refresh();
+            if (fieldParameters.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
-            BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
-            EditClick = new RelayCommand(o => { fieldParameters.Editing = true; });
+            SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
         }
         #endregion
 
         #region fields
-        string name;
-        int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters
         {
             get { return CurrentProject as FieldParameters; }
             set
             {
-                if(CurrentProject != value)
+                if (CurrentProject != value)
                 {
                     CurrentProject = value;
                 }
             }
         }
-        private DominoTransfer _dominoTransfer;
-
-        public DominoTransfer dominoTransfer
-        {
-            get { return _dominoTransfer; }
-            set
-            {
-                _dominoTransfer = value;
-                refreshPlanPic();
-
-                fsvm.PhysicalLength = dominoTransfer.physicalLength;
-                fsvm.PhysicalHeight = dominoTransfer.physicalHeight;
-            }
-        }
         #endregion
 
         #region prope
-        private Cursor _cursorState;
-        public Cursor cursor
-        {
-            get { return _cursorState; }
-            set
-            {
-                if (_cursorState != value)
-                {
-                    _cursorState = value;
-                    TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }
-        
         public override TabItemType tabType
         {
             get
@@ -90,331 +57,138 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return TabItemType.CreateField;
             }
         }
-
-        private FieldSizeVM _fsvm;
-        public FieldSizeVM fsvm
+        private FieldParameters FieldParameters
         {
-            get { return _fsvm; }
+            get => CurrentProject as FieldParameters;
+        }
+        private bool _EditState = true;
+        public bool EditState
+        {
+            get { return _EditState; }
             set
             {
-                if (_fsvm != value)
+                if (_EditState != value)
                 {
-                    _fsvm = value;
+                    _EditState = value;
                     RaisePropertyChanged();
                 }
             }
         }
-        
-        private OnlyOwnStonesVM _onlyOwnStonesVM;
-
-        public OnlyOwnStonesVM OnlyOwnStonesVM
+        public int Length
         {
-            get { return _onlyOwnStonesVM; }
+            get { return FieldParameters.Length; }
             set
             {
-                if (_onlyOwnStonesVM != value)
+                if (FieldParameters.Length != value)
                 {
-                    if (_onlyOwnStonesVM != null)
+                    FieldParameters.Length = value;
+                    if (BindSize)
                     {
-                        _onlyOwnStonesVM.PropertyChanged -= _onlyOwnStonesVM_PropertyChanged;
-                    }
-                    _onlyOwnStonesVM = value;
-                    RaisePropertyChanged();
-                    _onlyOwnStonesVM.PropertyChanged += _onlyOwnStonesVM_PropertyChanged;
-                }
-            }
-        }
-
-        private void _onlyOwnStonesVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            bool changed = false;
-            if (e.PropertyName.Equals("OnlyUse"))
-            {
-                if (OnlyOwnStonesVM.OnlyUse)
-                {
-                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new IterativeColorRestriction(OnlyOwnStonesVM.Iterations, OnlyOwnStonesVM.Weight);
-                    if (OnlyOwnStonesVM.Iterations == 0)
-                    {
-                        OnlyOwnStonesVM.Iterations = 2;
-                        OnlyOwnStonesVM.Weight = 0.1;
-                    }
-                }
-                else
-                {
-                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation = new NoColorRestriction();
-                }
-                changed = true;
-            }
-            else if (e.PropertyName.Equals("Iterations"))
-            {
-                if (OnlyOwnStonesVM.OnlyUse)
-                {
-                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation.maxNumberOfIterations = OnlyOwnStonesVM.Iterations;
-                    changed = true;
-                }
-            }
-            else if (e.PropertyName.Equals("Weight"))
-            {
-                if (OnlyOwnStonesVM.OnlyUse)
-                {
-                    ((IterativeColorRestriction)((UncoupledCalculation)fieldParameters.PrimaryCalculation).IterationInformation).iterationWeight = OnlyOwnStonesVM.Weight;
-                    changed = true;
-                }
-            }
-            if (changed)
-            {
-                refresh();
-                UnsavedChanges = true;
-            }
-        }
-
-        private WriteableBitmap _CurrentPlan;
-        public WriteableBitmap CurrentPlan
-        {
-            get { return _CurrentPlan; }
-            set
-            {
-                if (_CurrentPlan != value)
-                {
-                    _CurrentPlan = value;
-                    TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }
-
-        private string _sResizeMode;
-        public string sResizeMode
-        {
-            get { return _sResizeMode; }
-            set
-            {
-                if (_sResizeMode != value)
-                {
-                    _sResizeMode = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private string _sColorApproxMode;
-        public string sColorApproxMode
-        {
-            get { return _sColorApproxMode; }
-            set
-            {
-                if (_sColorApproxMode != value)
-                {
-                    _sColorApproxMode = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private string _sDiffusionMode;
-        public string sDiffusionMode
-        {
-            get { return _sDiffusionMode; }
-            set
-            {
-                if (_sDiffusionMode != value)
-                {
-                    _sDiffusionMode = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _iResizeMode;
-        public int iResizeMode
-        {
-            get { return _iResizeMode; }
-            set
-            {
-                if (_iResizeMode != value || _sResizeMode == null)
-                {
-                    _iResizeMode = value;
-                    ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode = (Inter)value;
-                    sResizeMode = ((FieldReadout)fieldParameters.PrimaryImageTreatment).ResizeMode.ToString();
-                    RaisePropertyChanged();
-                    refresh();
-                }
-            }
-        }
-
-        private int _iColorApproxMode;
-        public int iColorApproxMode
-        {
-            get { return _iColorApproxMode; }
-            set
-            {
-                if (_iColorApproxMode != value || sColorApproxMode == null)
-                {
-                    _iColorApproxMode = value;
-                    switch (value)
-                    {
-                        case 0:
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie1976Comparison;
-                            sColorApproxMode = "CIE-76 (ISO 12647)";
-                            break;
-                        case 1:
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CmcComparison;
-                            sColorApproxMode = "CMC (l:c)";
-                            break;
-                        case 2:
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.Cie94Comparison;
-                            sColorApproxMode = "CIE-94 (DIN 99)";
-                            break;
-                        case 3:
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).ColorMode = ColorDetectionMode.CieDe2000Comparison;
-                            sColorApproxMode = "CIE-E-2000";
-                            break;
-                        default:
-                            break;
+                        double fieldWidth = Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
+                        double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
+                        fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
                     }
                     RaisePropertyChanged();
-                    refresh();
+                    Refresh();
                 }
             }
         }
 
-        private byte _TransparencyValue;
-        public byte TransparencyValue
+        public int Height
         {
-            get { return _TransparencyValue; }
+            get { return FieldParameters.Height; }
             set
             {
-                if (_TransparencyValue != value)
+                if (FieldParameters.Height != value)
                 {
-                    _TransparencyValue = value;
-                    ((UncoupledCalculation)fieldParameters.PrimaryCalculation).TransparencySetting = _TransparencyValue;
-                    refresh();
-                    RaisePropertyChanged();
-                }
-            }
-        }
-        private bool _draw_borders;
-        public bool draw_borders
-        {
-            get { return _draw_borders; }
-            set
-            {
-                if (_draw_borders != value)
-                {
-                    _draw_borders = value;
-                    refresh();
-                    RaisePropertyChanged();
-                }
-            }
-        }
-        private bool _collapsed;
-        public bool Collapsed
-        {
-            get { return _collapsed; }
-            set
-            {
-                if (_collapsed != value)
-                {
-                    _collapsed = value;
-                    refresh();
-                    RaisePropertyChanged();
-                }
-            }
-        }
-        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
-        public System.Windows.Media.Color backgroundColor
-        {
-            get { return _backgroundColor; }
-            set
-            {
-                if (_backgroundColor != value)
-                {
-                    _backgroundColor = value;
-                    RaisePropertyChanged();
-                    refresh();
-                }
-            }
-        }
-
-        private int _iDiffusionMode = 1;
-        public int iDiffusionMode
-        {
-            get { return _iDiffusionMode; }
-            set
-            {
-                if (_iDiffusionMode != value || _sDiffusionMode == null)
-                {
-                    _iDiffusionMode = value;
-                    switch ((DitherMode)value)
+                    fieldParameters.Height = value;
+                    if (BindSize)
                     {
-                        case DitherMode.NoDithering:
-                            sDiffusionMode = "NoDiffusion";
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new Dithering();
-                            break;
-                        case DitherMode.FloydSteinberg:
-                            sDiffusionMode = "Floyd/Steinberg Dithering";
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new FloydSteinbergDithering();
-                            break;
-                        case DitherMode.JarvisJudiceNinke:
-                            sDiffusionMode = "Jarvis/Judice/Ninke Dithering";
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering = new JarvisJudiceNinkeDithering();
-                            break;
-                        case DitherMode.Stucki:
-                            sDiffusionMode = "Stucki Dithering";
-                            ((UncoupledCalculation)fieldParameters.PrimaryCalculation).Dithering= new StuckiDithering();
-                            break;
-                        default:
-                            break;
+                        double fieldHeight = Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
+                        double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
+                        fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
                     }
                     RaisePropertyChanged();
-                    refresh();
+                    Refresh();
                 }
             }
         }
 
-        public System.Windows.Threading.Dispatcher dispatcher;
-        private void refreshPlanPic()
+
+        private List<StandardSize> _field_templates;
+        public List<StandardSize> field_templates
         {
-            System.Diagnostics.Debug.WriteLine(progress.ToString());
-            if (dispatcher == null)
+            get { return _field_templates; }
+            set
             {
-                CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                cursor = null;
-            }
-            else
-            {
-                dispatcher.BeginInvoke((Action)(() =>
+                if (_field_templates != value)
                 {
-                    WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                    CurrentPlan = newBitmap;
-                    RefreshColorAmount();
-                    cursor = null;
-                }));
+                    _field_templates = value;
+                    RaisePropertyChanged();
+                }
             }
         }
-        CancellationTokenSource cs;
-        private async void refresh()
-        {
-            cs?.Cancel();
-            cs = new CancellationTokenSource();
-            cursor = Cursors.Wait;
-            refrshCounter++;
-            Func<DominoTransfer> function = new Func<DominoTransfer>(() =>
-            {
-                try
-                {
-                    return fieldParameters.Generate(cs.Token, progress);
-                }
-                catch
-                {
 
+
+        private bool _CanChange;
+        public bool CanChange
+        {
+            get { return _CanChange; }
+            set
+            {
+                if (_CanChange != value)
+                {
+                    _CanChange = value;
+                    RaisePropertyChanged();
                 }
-                return fieldParameters.last;
-            });
-            DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
-            refrshCounter--;
-            if(refrshCounter == 0)
-            {   
-                dominoTransfer = dt;
+            }
+        }
+
+        private StandardSize _SelectedItem;
+        public StandardSize SelectedItem
+        {
+            get { return _SelectedItem; }
+            set
+            {
+                if (_SelectedItem != value)
+                {
+                    _SelectedItem = value;
+                    if (SelectedItem.Name.Equals("User Size"))
+                        CanChange = true;
+                    else
+                        CanChange = false;
+                    SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
+                    SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
+                    Sizes_PropertyChanged(null, null);
+                    RefreshTargetSize();
+                }
+            }
+        }
+
+        private bool _BindSize = true;
+        public bool BindSize
+        {
+            get { return _BindSize; }
+            set
+            {
+                if (_BindSize != value)
+                {
+                    _BindSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public bool Horizontal
+        {
+            get { return CurrentProject.FieldPlanDirection == Core.Orientation.Horizontal; }
+            set
+            {
+                if ((CurrentProject.FieldPlanDirection == Core.Orientation.Horizontal) != value)
+                {
+                    CurrentProject.FieldPlanDirection = value ? Core.Orientation.Horizontal : Core.Orientation.Vertical;
+                    UpdateStoneSizes();
+                    RefreshTargetSize();
+                }
             }
         }
         #endregion
@@ -443,138 +217,49 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return false;
             }
         }
-        private void FillColorList()
+        protected override void PostCalculationUpdate()
         {
-            OnlyOwnStonesVM.Colors = new System.Collections.ObjectModel.ObservableCollection<ColorListEntry>();
-            
-            int counter = 0;
-            foreach (DominoColor domino in CurrentProject.colors.RepresentionForCalculation.OfType<DominoColor>())
-            {
-                OnlyOwnStonesVM.Colors.Add(new ColorListEntry() { DominoColor = domino, SortIndex = CurrentProject.colors.Anzeigeindizes[counter] });
-                counter++;
-            }
-
-            if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
-            {
-                OnlyOwnStonesVM.Colors.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
-            }
+            TabPropertyChanged("Length", ProducesUnsavedChanges: false);
+            TabPropertyChanged("Height", ProducesUnsavedChanges: false);
+            TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
         }
-        private void RefreshColorAmount()
-        {
-            bool fulfilled = true;
-            for (int i = 0; i < OnlyOwnStonesVM.Colors.Count(); i++)
-            {
-                OnlyOwnStonesVM.Colors[i].ProjectCount.Clear();
-                if (CurrentProject.Counts.Length > i + 1)
-                {
-                    OnlyOwnStonesVM.Colors[i].ProjectCount.Add(CurrentProject.Counts[i + 1]);
-                    OnlyOwnStonesVM.Colors[i].Weight = (((UncoupledCalculation)CurrentProject.PrimaryCalculation).IterationInformation.weights[i + 1]);
-                    if (OnlyOwnStonesVM.Colors[i].SumAll > OnlyOwnStonesVM.Colors[i].DominoColor.count)
-                        fulfilled = false;
-                }
-                else
-                {
-                    OnlyOwnStonesVM.Colors[i].ProjectCount.Add(CurrentProject.Counts[0]);
-                }
-            }
-            OnlyOwnStonesVM.ColorRestrictionFulfilled = fulfilled;
-        }
-        private void CreateFieldVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            bool important = false;
-            if (e.PropertyName.Equals("FieldSize") || e.PropertyName.Equals("BindSize"))
-            {
-                fieldParameters.TargetCount = fsvm.FieldSize;
-                important = true;
-            }
-            else if (e.PropertyName.Equals("Length"))
-            {
-                fieldParameters.Length = (int)fsvm.Length;
-                if (fsvm.BindSize)
-                {
-                    double fieldWidth = fsvm.Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
-                    double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
-                    fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
-                }
-                important = true;
-            }
-            else if (e.PropertyName.Equals("Height"))
-            {
-                fieldParameters.Height = (int)fsvm.Height;
-                if (fsvm.BindSize)
-                {
-                    double fieldHeight = fsvm.Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
-                    double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
-                    fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
-                }
-                important = true;
-            }
-            else if (e.PropertyName.Equals("SelectedItem"))
-            {
-                UpdateStoneSizes();
-                important = true;
-            }
-            else if (e.PropertyName.Equals("Vertical"))
-            {
-                fieldParameters.FieldPlanDirection = Core.Orientation.Vertical;
-                UpdateStoneSizes();
-                important = true;
-            }
-            else if (e.PropertyName.Equals("Horizontal"))
-            {
-                fieldParameters.FieldPlanDirection = Core.Orientation.Horizontal;
-                UpdateStoneSizes();
-                important = true;
-            }
-
-            if (important)
-            {
-                refresh();
-                ReloadSizes();
-            }
-        }
-
         private void UpdateStoneSizes()
         {
-            if (fsvm.Vertical)
+            if (!Horizontal)
             {
-                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.d;
-                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.a;
+                fieldParameters.HorizontalDistance = SelectedItem.Sizes.d;
+                fieldParameters.HorizontalSize = SelectedItem.Sizes.c;
+                fieldParameters.VerticalSize = SelectedItem.Sizes.b;
+                fieldParameters.VerticalDistance = SelectedItem.Sizes.a;
             }
             else
             {
-                fieldParameters.HorizontalDistance = fsvm.SelectedItem.Sizes.a;
-                fieldParameters.HorizontalSize = fsvm.SelectedItem.Sizes.b;
-                fieldParameters.VerticalSize = fsvm.SelectedItem.Sizes.c;
-                fieldParameters.VerticalDistance = fsvm.SelectedItem.Sizes.d;
+                fieldParameters.HorizontalDistance = SelectedItem.Sizes.a;
+                fieldParameters.HorizontalSize = SelectedItem.Sizes.b;
+                fieldParameters.VerticalSize = SelectedItem.Sizes.c;
+                fieldParameters.VerticalDistance = SelectedItem.Sizes.d;
             }
+            ReloadSizes();
         }
-
+        
         private void Sizes_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             UpdateStoneSizes();
-            refresh();
             ReloadSizes();
+            Refresh();
         }
-
+        
         private void ReloadSizes()
         {
-            fsvm.PropertyChanged -= CreateFieldVM_PropertyChanged;
-            fsvm.FieldSize = fieldParameters.Height * fieldParameters.Length;
-            fsvm.Length = fieldParameters.Length;
-            fsvm.Height = fieldParameters.Height;
-            fsvm.Horizontal = fieldParameters.FieldPlanDirection == Core.Orientation.Horizontal;
             Sizes currentSize = new Sizes(fieldParameters.HorizontalDistance, fieldParameters.HorizontalSize, fieldParameters.VerticalSize, fieldParameters.VerticalDistance);
             bool found = false;
-            foreach (StandardSize sSize in fsvm.field_templates)
+            foreach (StandardSize sSize in field_templates)
             {
-                if (fsvm.Horizontal)
+                if (Horizontal)
                 {
                     if (sSize.Sizes.a == currentSize.a && sSize.Sizes.b == currentSize.b && sSize.Sizes.c == currentSize.c && sSize.Sizes.d == currentSize.d)
                     {
-                        fsvm.SelectedItem = sSize;
+                        SelectedItem = sSize;
                         found = true;
                         break;
                     }
@@ -583,7 +268,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (sSize.Sizes.a == currentSize.d && sSize.Sizes.b == currentSize.c && sSize.Sizes.c == currentSize.b && sSize.Sizes.d == currentSize.a)
                     {
-                        fsvm.SelectedItem = sSize;
+                        SelectedItem = sSize;
                         found = true;
                         break;
                     }
@@ -592,38 +277,137 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             if (!found)
             {
-                fsvm.field_templates.Last<StandardSize>().Sizes = currentSize;
-                fsvm.SelectedItem = fsvm.field_templates.Last<StandardSize>();
+                field_templates.Last<StandardSize>().Sizes = currentSize;
+                SelectedItem = field_templates.Last<StandardSize>();
             }
             else
             {
-                if (fsvm.SelectedItem.Name.Equals("User Size"))
+                if (SelectedItem.Name.Equals("User Size"))
                 {
-                    fsvm.SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
-                    fsvm.SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
+                    SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
+                    SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
                 }
-                else
-                    fsvm.SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
+                else SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
             }
-
-            this.fsvm.PropertyChanged += CreateFieldVM_PropertyChanged;
             UnsavedChanges = true;
-        }
-
-        private void OpenBuildTools()
-        {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(fieldParameters, name);
-            protocolV.ShowDialog();
         }
         #endregion
 
-        #region Commands
-		private ICommand _EditClick;
-        public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
+        private ICommand _Click_Binding;
+        public ICommand Click_Binding { get { return _Click_Binding; } set { if (value != _Click_Binding) { _Click_Binding = value; } } }
+        
+        
+    }
 
-        private ICommand _BuildtoolsClick;
-        public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
+    class StandardSize : ModelBase
+    {
+        public StandardSize(string name, Sizes sizes)
+        {
+            this.Name = name;
+            this.Sizes = sizes;
+        }
+
+        #region prop
+        private string _Name;
+        public string Name
+        {
+            get { return _Name; }
+            set
+            {
+                if (_Name != value)
+                {
+                    _Name = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private Sizes _sizes;
+        public Sizes Sizes
+        {
+            get { return _sizes; }
+            set
+            {
+                if (_sizes != value)
+                {
+                    _sizes = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+    class Sizes : ModelBase
+    {
+        public Sizes(int a, int b, int c, int d)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+        }
+
+        #region prop
+        private int _a;
+        public int a
+        {
+            get { return _a; }
+            set
+            {
+                if (_a != value)
+                {
+                    _a = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _b;
+        public int b
+        {
+            get { return _b; }
+            set
+            {
+                if (_b != value)
+                {
+                    _b = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _c;
+        public int c
+        {
+            get { return _c; }
+            set
+            {
+                if (_c != value)
+                {
+                    _c = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _d;
+        public int d
+        {
+            get { return _d; }
+            set
+            {
+                if (_d != value)
+                {
+                    _d = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
     }
 }

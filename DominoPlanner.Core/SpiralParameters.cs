@@ -301,7 +301,7 @@ namespace DominoPlanner.Core
         private SpiralParameters() : base() { }
         #endregion
         #region private methods
-        protected override void RegenerateShapes()
+        public override void RegenerateShapes()
         {
             Point endpoint = getPoint(ThetaMax, nGroup * (DominoLength + NormalDistance) / a);
             double end_radius = Math.Sqrt(endpoint.X * endpoint.X + endpoint.Y * endpoint.Y);
