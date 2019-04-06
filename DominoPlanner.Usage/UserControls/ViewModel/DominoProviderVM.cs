@@ -23,12 +23,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             CurrentProject = dominoProvider;
             CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation);
             ImageTreatmentVM = ImageTreatmentVM.ImageTreatmentVMFactory(CurrentProject.PrimaryImageTreatment);
-            
+
             FillColorList();
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
 
-            EditClick = new RelayCommand(o => { CurrentProject.Editing = true; });
+            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
             ColorColumnConfig = new ColumnConfig();
 
@@ -45,8 +45,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
-        private Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        private Stack<PostFilter> redoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
@@ -61,6 +61,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private DominoTransfer _dominoTransfer;
 
         public bool? AllowRegeneration { get; set; } = false;
+
+        public bool Editing
+        {
+            get { return CurrentProject.Editing; }
+            set
+            {
+                EditingActivatedOperation op = new EditingActivatedOperation(this);
+                op.Apply();
+                undoStack.Push(op);
+            }
+        }
 
         private ImageTreatmentVM _imageTreatmentVM;
         public ImageTreatmentVM ImageTreatmentVM
@@ -258,7 +269,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        
+
 
         private int __dominoCount;
         // wird nach der Berechnung aktualisiert
@@ -393,7 +404,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             CurrentProject.RegenerateShapes();
                         }
-                        catch {  }
+                        catch { }
                         return CurrentProject.last;
                     });
                     DominoTransfer dt = await Task.Factory.StartNew(function);
@@ -498,7 +509,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoCount = DominoCount + 1;
             else
                 Refresh();
-            
+
             undostate = false;
         }
         private bool _undostate;
@@ -582,6 +593,58 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PostAction?.Invoke();
         }
     }
+    public class EditingActivatedOperation : PostFilter
+    {
+        DominoProviderVM model;
+        public EditingActivatedOperation(DominoProviderVM vm)
+        {
+            model = vm;
+        }
+        public override void Apply()
+        {
+            model.CurrentProject.Editing = true;
+        }
+
+        public override void Undo()
+        {
+            model.CurrentProject.Editing = false;
+        }
+    }
+    public class EditingDeactivatedOperation : PostFilter
+    {
+        EditProjectVM model;
+        private int current_width;
+        private int current_height;
+        private DominoTransfer last;
+        public EditingDeactivatedOperation(EditProjectVM editProjectVM)
+        {
+            model = editProjectVM;   
+        }
+
+        public override void Apply()
+        {
+            
+            last = (DominoTransfer)model.CurrentProject.last.Clone();
+            if (model.CurrentProject is IRowColumnAddableDeletable rowc)
+            {
+                current_width = rowc.current_width;
+                current_height = rowc.current_height;
+            }
+            model.CurrentProject.Editing = false;
+        }
+
+        public override void Undo()
+        {
+            model.CurrentProject.last = last;
+            model.CurrentProject.Editing = true;
+            if (model.CurrentProject is IRowColumnAddableDeletable rowc)
+            {
+                rowc.current_width = current_width;
+                rowc.current_height = current_height;
+            }
+        }
+    }
+
 
 }
 

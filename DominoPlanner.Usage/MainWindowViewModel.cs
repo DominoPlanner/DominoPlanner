@@ -76,13 +76,35 @@ namespace DominoPlanner.Usage
 
             return "";
         }
-        private void CurrentProject_EditingChanged(object sender, EventArgs e)
+        private void CurrentProject_EditingChanged(object sender, EventArgs args)
         {
             TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
             //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
+            Stack<PostFilter> undoStack = new Stack<PostFilter>();
+            Stack<PostFilter> redoStack = new Stack<PostFilter>();
+            if (tabItem.Content is DominoProviderVM vm)
+            {
+                undoStack = vm.undoStack;
+                redoStack = vm.redoStack;
+            }
+            else if (tabItem.Content is EditProjectVM ep)
+            {
+                undoStack = ep.undoStack;
+                redoStack = ep.redoStack;
+            }
             tabItem.Content.Save();
 
             tabItem.ResetContent();
+            if (tabItem.Content is DominoProviderVM vm2)
+            {
+                vm2.undoStack = undoStack;
+                vm2.redoStack = redoStack;
+            }
+            else if (tabItem.Content is EditProjectVM ep2)
+            {
+                ep2.redoStack = redoStack;
+                ep2.undoStack = undoStack;
+            }
         }
         #endregion
 

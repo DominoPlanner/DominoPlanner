@@ -14,7 +14,7 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-    class EditProjectVM : TabBaseVM
+    public class EditProjectVM : TabBaseVM
     {
         #region CTOR
         public EditProjectVM(DocumentNode dominoProvider) : base()
@@ -40,7 +40,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             refreshList();
             selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
-            RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
+            RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
@@ -79,8 +79,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
 
-        private Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        private Stack<PostFilter> redoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
 
         #region events
@@ -88,6 +88,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
+        public bool Editing
+        {
+            get { return CurrentProject.Editing; }
+            set
+            {
+                EditingDeactivatedOperation op = new EditingDeactivatedOperation(this);
+                op.Apply();
+                undoStack.Push(op);
+            }
+        }
+
         private Visibility _HaveBuildtools;
         public Visibility HaveBuildtools
         {
@@ -362,7 +373,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
             RaisePropertyChanged("DominoList");
         }
-        private void UpdateUIElements()
+        public void UpdateUIElements()
         {
             RefreshColorAmount();
             DominoProject.InvalidateVisual();
