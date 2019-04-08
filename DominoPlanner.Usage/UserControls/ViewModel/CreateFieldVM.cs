@@ -30,7 +30,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Refresh();
             if (fieldParameters.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
-            SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
         }
         #endregion
 
@@ -113,7 +112,66 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
+        public int HorizontalDistance
+        {
+            get { return Horizontal ? FieldParameters.HorizontalDistance : FieldParameters.VerticalDistance; }
+            set
+            {
+                if ((Horizontal ? FieldParameters.HorizontalDistance : FieldParameters.VerticalDistance) != value)
+                {
+                    PropertyValueChanged(this, value);
+                    if (Horizontal)
+                        FieldParameters.HorizontalDistance = value;
+                    else FieldParameters.VerticalDistance = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public int HorizontalSize
+        {
+            get { return Horizontal ? FieldParameters.HorizontalSize : FieldParameters.VerticalSize; }
+            set
+            {
+                if ((Horizontal ? FieldParameters.HorizontalSize : FieldParameters.VerticalSize) != value)
+                {
+                    PropertyValueChanged(this, value);
+                    if (Horizontal)
+                        FieldParameters.HorizontalSize = value;
+                    else FieldParameters.VerticalSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public int VerticalSize
+        {
+            get { return !Horizontal ? FieldParameters.HorizontalSize : FieldParameters.VerticalSize; }
+            set
+            {
+                if ((!Horizontal ? FieldParameters.HorizontalSize : FieldParameters.VerticalSize) != value)
+                {
+                    PropertyValueChanged(this, value);
+                    if (!Horizontal)
+                        FieldParameters.HorizontalSize = value;
+                    else FieldParameters.VerticalSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public int VerticalDistance
+        {
+            get { return !Horizontal ? FieldParameters.HorizontalDistance : FieldParameters.VerticalDistance; }
+            set
+            {
+                if ((!Horizontal ? FieldParameters.HorizontalDistance : FieldParameters.VerticalDistance) != value)
+                {
+                    PropertyValueChanged(this, value);
+                    if (!Horizontal)
+                        FieldParameters.HorizontalDistance = value;
+                    else FieldParameters.VerticalDistance = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         private List<StandardSize> _field_templates;
         public List<StandardSize> field_templates
@@ -153,26 +211,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedItem != value)
                 {
                     var tempSelItem = _SelectedItem;
+                    if (_SelectedItem?.Name=="User Size")
+                    {
+                        _SelectedItem.Sizes.a = HorizontalDistance;
+                        _SelectedItem.Sizes.b = HorizontalSize;
+                        _SelectedItem.Sizes.c = VerticalSize;
+                        _SelectedItem.Sizes.d = VerticalDistance;
+                    }
+                    
                     if (_SelectedItem != null)
                     {
-                        PropertyValueChanged(this, value);
+                        PropertyValueChanged(this, value, PostAction: () => { UpdateSizes(); RefreshTargetSize(); Refresh(); });
                     }
                     _SelectedItem = value;
                     if (SelectedItem.Name.Equals("User Size"))
                         CanChange = true;
                     else
                         CanChange = false;
-                    SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
-                    SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
-                    Sizes_PropertyChanged(null, null);
                     RaisePropertyChanged();
                     if (tempSelItem == null)
                     {
                         Refresh();
-                    }
-                    else
-                    {
-                        RefreshTargetSize();
                     }
                 }
             }
@@ -201,7 +260,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     PropertyValueChanged(this, value);
                     CurrentProject.FieldPlanDirection = value ? Core.Orientation.Horizontal : Core.Orientation.Vertical;
-                    UpdateStoneSizes();
                     RaisePropertyChanged();
                     RefreshTargetSize();
                 }
@@ -230,71 +288,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             TabPropertyChanged("Height", ProducesUnsavedChanges: false);
             TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
         }
-        private void UpdateStoneSizes()
+        private void UpdateSizes()
         {
-            if (!Horizontal)
-            {
-                fieldParameters.HorizontalDistance = SelectedItem.Sizes.d;
-                fieldParameters.HorizontalSize = SelectedItem.Sizes.c;
-                fieldParameters.VerticalSize = SelectedItem.Sizes.b;
-                fieldParameters.VerticalDistance = SelectedItem.Sizes.a;
-            }
-            else
-            {
-                fieldParameters.HorizontalDistance = SelectedItem.Sizes.a;
-                fieldParameters.HorizontalSize = SelectedItem.Sizes.b;
-                fieldParameters.VerticalSize = SelectedItem.Sizes.c;
-                fieldParameters.VerticalDistance = SelectedItem.Sizes.d;
-            }
-            ReloadSizes();
+            HorizontalDistance = SelectedItem.Sizes.a;
+            HorizontalSize = SelectedItem.Sizes.b;
+            VerticalSize = SelectedItem.Sizes.c;
+            VerticalDistance = SelectedItem.Sizes.d;
+
         }
-        
-        private void Sizes_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            UpdateStoneSizes();
-            ReloadSizes();
-            if (sender != null || e != null) Refresh();
-        }
-        
+
         private void ReloadSizes()
         {
-            Sizes currentSize = new Sizes(fieldParameters.HorizontalDistance, fieldParameters.HorizontalSize, fieldParameters.VerticalSize, fieldParameters.VerticalDistance);
+            Sizes currentSize = new Sizes(HorizontalDistance, HorizontalSize, VerticalSize, VerticalDistance);
             bool found = false;
             foreach (StandardSize sSize in field_templates)
             {
-                if (Horizontal)
+                if (sSize.Sizes.a == currentSize.a && sSize.Sizes.b == currentSize.b && sSize.Sizes.c == currentSize.c && sSize.Sizes.d == currentSize.d)
                 {
-                    if (sSize.Sizes.a == currentSize.a && sSize.Sizes.b == currentSize.b && sSize.Sizes.c == currentSize.c && sSize.Sizes.d == currentSize.d)
-                    {
-                        SelectedItem = sSize;
-                        found = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    if (sSize.Sizes.a == currentSize.d && sSize.Sizes.b == currentSize.c && sSize.Sizes.c == currentSize.b && sSize.Sizes.d == currentSize.a)
-                    {
-                        SelectedItem = sSize;
-                        found = true;
-                        break;
-                    }
+                    SelectedItem = sSize;
+                    found = true;
+                    break;
                 }
             }
-
             if (!found)
             {
                 field_templates.Last<StandardSize>().Sizes = currentSize;
                 SelectedItem = field_templates.Last<StandardSize>();
-            }
-            else
-            {
-                if (SelectedItem.Name.Equals("User Size"))
-                {
-                    SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
-                    SelectedItem.Sizes.PropertyChanged += Sizes_PropertyChanged;
-                }
-                else SelectedItem.Sizes.PropertyChanged -= Sizes_PropertyChanged;
             }
             UnsavedChanges = true;
         }
@@ -315,33 +334,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         #region prop
-        private string _Name;
-        public string Name
-        {
-            get { return _Name; }
-            set
-            {
-                if (_Name != value)
-                {
-                    _Name = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private Sizes _sizes;
-        public Sizes Sizes
-        {
-            get { return _sizes; }
-            set
-            {
-                if (_sizes != value)
-                {
-                    _sizes = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
+        public string Name { get; set; }
+        
+        public Sizes Sizes { get; set; }
         #endregion
 
         public override string ToString()
@@ -360,61 +355,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         #region prop
-        private int _a;
-        public int a
-        {
-            get { return _a; }
-            set
-            {
-                if (_a != value)
-                {
-                    _a = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _b;
-        public int b
-        {
-            get { return _b; }
-            set
-            {
-                if (_b != value)
-                {
-                    _b = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _c;
-        public int c
-        {
-            get { return _c; }
-            set
-            {
-                if (_c != value)
-                {
-                    _c = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _d;
-        public int d
-        {
-            get { return _d; }
-            set
-            {
-                if (_d != value)
-                {
-                    _d = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
+        public int a;
+        public int b;
+        public int c;
+        public int d;
         #endregion
     }
 }

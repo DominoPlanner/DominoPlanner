@@ -525,32 +525,38 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (!undostate)
             {
-                undostate = true;
-                if (producesUnsavedChanges)
-                    UnsavedChanges = true;
-                var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
-                if (undoStack.Count != 0)
+                try
                 {
-                    var lastOnStack = undoStack.Peek();
-                    if (lastOnStack is PropertyChangedOperation op)
+                    undostate = true;
+                    if (producesUnsavedChanges)
+                        UnsavedChanges = true;
+                    var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
+                    if (undoStack.Count != 0)
                     {
-                        if (op.sender == sender && op.membername == membername)
+                        var lastOnStack = undoStack.Peek();
+                        if (lastOnStack is PropertyChangedOperation op)
                         {
-                            // property has been changed multiple times in a row
-                            if (!op.value_old.Equals(value_new))
+                            if (op.sender == sender && op.membername == membername)
                             {
-                                op.value_new = value_new;
-                                undoStack.Pop();
-                                filter = op;
+                                // property has been changed multiple times in a row
+                                if (!op.value_old.Equals(value_new))
+                                {
+                                    op.value_new = value_new;
+                                    undoStack.Pop();
+                                    filter = op;
+                                }
                             }
                         }
                     }
+                    redoStack = new Stack<PostFilter>();
+                    undoStack.Push(filter);
+                    filter.Apply();
                 }
-                redoStack = new Stack<PostFilter>();
-                undoStack.Push(filter);
-                filter.Apply();
+                finally
+                {
+                    undostate = false;
+                }
             }
-            undostate = false;
         }
         #endregion
 

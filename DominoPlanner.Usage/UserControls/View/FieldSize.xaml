@@ -7,7 +7,7 @@
     xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.FieldSize"
              xmlns:intr="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             mc:Ignorable="d" d:DesignWidth="374" Height="205">
+             mc:Ignorable="d" d:DesignWidth="300" Height="205">
     <UserControl.Resources>
         <parent:LockedToImageConverter x:Key="LockedToImageConverter"/>
         <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
@@ -77,24 +77,24 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="5*" />
                             <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="4.5*" />
+                            <ColumnDefinition Width="5*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="24" />
+                            <RowDefinition Height="26" />
                             <RowDefinition Height="2" />
-                            <RowDefinition Height="24" />
+                            <RowDefinition Height="26" />
                         </Grid.RowDefinitions>
 
                         <!--Field Distances and Dimensions-->
-                        <Label Content="Horizontal Distance:" Grid.Row="2" HorizontalAlignment="Right"/>
-                        <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.a}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" />
-                        <Label Content="Horizontal Size:" Grid.Row="0" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="1" Value="{Binding SelectedItem.Sizes.b}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
-                        <Label Content="Vertical Size:" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="1" Value="{Binding SelectedItem.Sizes.c}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,0,0" />
-                        <Label Content="Vertical Distance:" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="0" Value="{Binding SelectedItem.Sizes.d}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0" />
+                        <Label Content="Dist. inside line:" Grid.Row="2" HorizontalAlignment="Right"/>
+                        <xctk:IntegerUpDown Minimum="0" Value="{Binding HorizontalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" />
+                        <Label Content="Domino width:" Grid.Row="0" HorizontalAlignment="Right" />
+                        <xctk:IntegerUpDown Minimum="1" Value="{Binding HorizontalSize}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
+                        <Label Content="Domino depth:" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" />
+                        <xctk:IntegerUpDown Minimum="1" Value="{Binding VerticalSize}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,0,0" />
+                        <Label Content="Dist. btw. lines:" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" />
+                        <xctk:IntegerUpDown Minimum="0" Value="{Binding VerticalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0" />
                     </Grid>
                 </Grid>
             </GroupBox>
