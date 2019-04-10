@@ -719,6 +719,8 @@ namespace DominoPlanner.Usage
                     if (documentNode.obj.Editing)
                     {
                         Content = new EditProjectVM(documentNode);
+                        (Content as EditProjectVM).assemblyname =
+                                OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;
                     }
                     else
                     {
@@ -739,6 +741,9 @@ namespace DominoPlanner.Usage
                             default:
                                 break;
                         }
+                        (Content as DominoProviderVM).name = System.IO.Path.GetFileNameWithoutExtension(documentNode.relativePath);
+                        (Content as DominoProviderVM).assemblyname =
+                            OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;   //(Content as DominoProviderVM).assemblyname 
                     }
                 }
             }

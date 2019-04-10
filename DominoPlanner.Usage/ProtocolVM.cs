@@ -26,11 +26,12 @@ namespace DominoPlanner.Usage
             Init();
         }
 
-        public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
+        public ProtocolVM(IDominoProvider dominoProvider, string fieldName, string assemblyname = "")
         {
             DominoProvider = dominoProvider;
             dominoTransfer = DominoProvider.Generate();
             Titel = fieldName;
+            currentOPP.project = assemblyname;
             Init();
         }
         #endregion
@@ -382,7 +383,7 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, "", currentOPP); // Jojo hier Projektname einfügen
+                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP); // Jojo hier Projektname einfügen
                     Process.Start(dlg.FileName);
                 }
                 catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }

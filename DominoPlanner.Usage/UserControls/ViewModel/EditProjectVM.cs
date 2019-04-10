@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private System.Windows.Point SelectionStartPoint;
         private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
-
+        public string assemblyname;
         public Stack<PostFilter> undoStack = new Stack<PostFilter>();
         public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
@@ -820,7 +820,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, ProjectName);
+            protocolV.DataContext = new ProtocolVM(CurrentProject, ProjectName, assemblyname);
             protocolV.ShowDialog();
         }
 

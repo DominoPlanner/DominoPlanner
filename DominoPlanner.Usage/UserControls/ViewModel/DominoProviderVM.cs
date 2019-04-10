@@ -56,7 +56,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set { if (value != _OpenPopup) { _OpenPopup = value; } }
         }
 
-        string name;
+        public string name;
+        public string assemblyname;
         int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private DominoTransfer _dominoTransfer;
@@ -500,7 +501,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         protected void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, name);
+            protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
             protocolV.ShowDialog();
         }
         public void RefreshTargetSize()
