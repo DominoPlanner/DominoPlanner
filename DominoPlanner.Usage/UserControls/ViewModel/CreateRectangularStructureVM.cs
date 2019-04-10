@@ -30,6 +30,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 structure_index = 0;
             }
             UnsavedChanges = false;
+            TargetSizeAffectedProperties = new string[] { "sLength", "sHeight" };
         }
         #endregion
 
@@ -96,20 +97,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     // On load, Undo should not be triggered
                     if (_structure_index != -1)
                     {
-                        PropertyValueChanged(this, value);
+                        PropertyValueChanged(this, value, ChangesSize: true);
                     }
                     _structure_index = value;
                     SelectedStructureElement = structures.ElementAt(_structure_index);
                     RaisePropertyChanged();
                     RefreshDescriptionImages();
-                    if (temp_struct_index == -1)
-                    {
-                        Refresh();
-                    }
-                    else
+                    if (temp_struct_index != -1)
                     {
                         RefreshTargetSize();
                     }
+                    Refresh();
                 }
             }
         }

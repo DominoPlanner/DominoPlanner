@@ -30,6 +30,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Refresh();
             if (fieldParameters.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
+            TargetSizeAffectedProperties = new string[] {"Length", "Height" };
         }
         #endregion
 
@@ -80,14 +81,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (FieldParameters.Length != value)
                 {
-                    PropertyValueChanged(this, value);
+                    PropertyValueChanged(this, value, PostAction: () => {
+                        if (BindSize)
+                        {
+                            double fieldWidth = Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
+                            double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
+                            fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
+                        }
+                        Refresh();
+                    }, PostUndoAction: () => Refresh(), ChangesSize: true );
                     FieldParameters.Length = value;
-                    if (BindSize)
-                    {
-                        double fieldWidth = Length * (fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize);
-                        double stoneHeightWidhSpace = fieldParameters.VerticalDistance + fieldParameters.VerticalSize;
-                        fieldParameters.Height = (int)(fieldWidth / (double)fieldParameters.PrimaryImageTreatment.Width * fieldParameters.PrimaryImageTreatment.Height / stoneHeightWidhSpace);
-                    }
+                    
                     RaisePropertyChanged();
                 }
             }
@@ -100,14 +104,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (FieldParameters.Height != value)
                 {
-                    PropertyValueChanged(this, value);
+                    PropertyValueChanged(this, value, PostAction: () => {
+                        if (BindSize)
+                        {
+                            double fieldHeight = Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
+                            double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
+                            fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
+                        }
+                        Refresh();
+                    }, PostUndoAction: () => Refresh(), ChangesSize: true);
                     fieldParameters.Height = value;
-                    if (BindSize)
-                    {
-                        double fieldHeight = Height * (fieldParameters.VerticalDistance + fieldParameters.VerticalSize);
-                        double stoneWidthWidthSpace = fieldParameters.HorizontalDistance + fieldParameters.HorizontalSize;
-                        fieldParameters.Length = (int)(fieldHeight / (double)fieldParameters.PrimaryImageTreatment.Height * fieldParameters.PrimaryImageTreatment.Width / stoneWidthWidthSpace);
-                    }
+                    
                     RaisePropertyChanged();
                 }
             }
@@ -221,7 +228,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     
                     if (_SelectedItem != null)
                     {
-                        PropertyValueChanged(this, value, PostAction: () => { UpdateSizes(); RefreshTargetSize(); Refresh(); });
+                        PropertyValueChanged(this, value, PostAction: () => { UpdateSizes(); RefreshTargetSize(); Refresh(); },
+                            PostUndoAction: () => { UpdateSizes(); Refresh(); }, ChangesSize: true);
                     }
                     _SelectedItem = value;
                     if (SelectedItem.Name.Equals("User Size"))
@@ -229,10 +237,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     else
                         CanChange = false;
                     RaisePropertyChanged();
-                    if (tempSelItem == null)
-                    {
-                        Refresh();
-                    }
                 }
             }
         }
@@ -258,10 +262,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if ((CurrentProject.FieldPlanDirection == Core.Orientation.Horizontal) != value)
                 {
-                    PropertyValueChanged(this, value);
+                    PropertyValueChanged(this, value, ChangesSize: true, PostAction: () => { UpdateSizes(); RefreshTargetSize(); Refresh(); },
+                    PostUndoAction: () => { UpdateSizes(); Refresh(); });
                     CurrentProject.FieldPlanDirection = value ? Core.Orientation.Horizontal : Core.Orientation.Vertical;
                     RaisePropertyChanged();
-                    RefreshTargetSize();
                 }
             }
         }

@@ -45,6 +45,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
+        public string[] TargetSizeAffectedProperties;
         public Stack<PostFilter> undoStack = new Stack<PostFilter>();
         public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
@@ -296,7 +297,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (CurrentProject is ICountTargetable t)
                     {
-                        PropertyValueChanged(this, value, producesUnsavedChanges: false);
+                        PropertyValueChanged(this, value, producesUnsavedChanges: false, ChangesSize: true);
                         t.TargetCount = value;
                     }
                     __dominoCount = value;
@@ -504,13 +505,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void RefreshTargetSize()
         {
+            bool oldUndoState = undostate;
             undostate = true;
             if (DominoCount > 0)
                 DominoCount = DominoCount + 1;
-            else
-                Refresh();
-
-            undostate = false;
+            undostate= oldUndoState;
         }
         private bool _undostate;
 
@@ -521,7 +520,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         public void PropertyValueChanged(object sender, object value_new,
-            [CallerMemberName] string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+            [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
         {
             if (!undostate)
             {
@@ -530,27 +529,36 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     undostate = true;
                     if (producesUnsavedChanges)
                         UnsavedChanges = true;
-                    var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
-                    if (undoStack.Count != 0)
+                    if (ChangesSize)
                     {
-                        var lastOnStack = undoStack.Peek();
-                        if (lastOnStack is PropertyChangedOperation op)
+                        var filter = new TargetSizeChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()), PostUndoAction ?? PostAction ?? (() => Refresh()), TargetSizeAffectedProperties);
+                        undoStack.Push(filter);
+                        filter.Apply();
+                    }
+                    else
+                    {
+                        var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
+                        if (undoStack.Count != 0)
                         {
-                            if (op.sender == sender && op.membername == membername)
+                            var lastOnStack = undoStack.Peek();
+                            if (lastOnStack is PropertyChangedOperation op)
                             {
-                                // property has been changed multiple times in a row
-                                if (!op.value_old.Equals(value_new))
+                                if (op.sender == sender && op.membername == membername)
                                 {
-                                    op.value_new = value_new;
-                                    undoStack.Pop();
-                                    filter = op;
+                                    // property has been changed multiple times in a row
+                                    if (!op.value_old.Equals(value_new))
+                                    {
+                                        op.value_new = value_new;
+                                        undoStack.Pop();
+                                        filter = op;
+                                    }
                                 }
                             }
                         }
+                        undoStack.Push(filter);
+                        filter.Apply();
                     }
                     redoStack = new Stack<PostFilter>();
-                    undoStack.Push(filter);
-                    filter.Apply();
                 }
                 finally
                 {
@@ -579,9 +587,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public System.Reflection.PropertyInfo ps;
         public PropertyChangedOperation(object sender, object value_new, string membername, Action PostAction)
         {
+            this.membername = membername;
             this.sender = sender;
             this.value_new = value_new;
-            this.membername = membername;
             this.PostAction = PostAction;
             ps = sender.GetType().GetProperty(membername, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
             value_old = ps.GetValue(sender);
@@ -597,6 +605,44 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ps.SetValue(sender, value_old);
             PostAction?.Invoke();
+        }
+    }
+    public class TargetSizeChangedOperation : PropertyChangedOperation
+    {
+        public Action UndoAction;
+        public object[] oldAffectedValues;
+        public System.Reflection.PropertyInfo[] affectedProperties;
+        public TargetSizeChangedOperation(object sender, object value_new, string membername, Action PostAction, Action UndoAction, string[] affectedNames) : base(sender, value_new, membername, PostAction)
+        {
+            if (affectedNames != null)
+            {
+                this.UndoAction = UndoAction;
+                affectedProperties = new System.Reflection.PropertyInfo[affectedNames.Length];
+                oldAffectedValues = new object[affectedNames.Length];
+                for (int i = 0; i < affectedNames.Length; i++)
+                { 
+                    affectedProperties[i] = sender.GetType().GetProperty(affectedNames[i], System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+                    oldAffectedValues[i] = affectedProperties[i].GetValue(sender);
+                }
+            }
+        }
+        public override void Apply()
+        {
+            ps.SetValue(sender, value_new);
+            PostAction?.Invoke();
+        }
+        public override void Undo()
+        {
+            ps.SetValue(sender, value_old);
+            if (affectedProperties != null)
+            {
+                for (int i = 0; i < affectedProperties.Length; i++)
+                {
+                    affectedProperties[i].SetValue(sender, oldAffectedValues[i]);
+                }
+            }
+            UndoAction?.Invoke();
         }
     }
     public class EditingActivatedOperation : PostFilter

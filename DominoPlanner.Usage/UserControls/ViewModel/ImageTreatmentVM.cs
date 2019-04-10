@@ -13,11 +13,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 {
     public class ImageTreatmentVM : ModelBase
     {
-        public Action<object, object, string, bool, Action> ValueChanged;
+        public Action<object, object, string, bool, Action, bool, Action> ValueChanged;
         protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
-        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null)
+        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
         {
-            ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction);
+            ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction, ChangesSize, PostUndoAction);
         }
         protected ImageTreatment CurrentModel;
         public ImageTreatmentVM(ImageTreatment model)
