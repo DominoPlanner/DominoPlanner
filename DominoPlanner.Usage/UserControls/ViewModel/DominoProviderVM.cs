@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-    public class DominoProviderVM : TabBaseVM
+    public class DominoProviderVM : DominoProviderTabItem
     {
         #region CTOR
         public DominoProviderVM(IDominoProvider dominoProvider, bool? AllowRegenerate) : base()
@@ -46,8 +46,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         public string[] TargetSizeAffectedProperties;
-        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
@@ -55,25 +53,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get => _OpenPopup;
             set { if (value != _OpenPopup) { _OpenPopup = value; } }
         }
-
-        public string name;
-        public string assemblyname;
         int refrshCounter = 0;
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private DominoTransfer _dominoTransfer;
 
         public bool? AllowRegeneration { get; set; } = false;
 
-        public bool Editing
-        {
-            get { return CurrentProject.Editing; }
-            set
-            {
-                EditingActivatedOperation op = new EditingActivatedOperation(this);
-                op.Apply();
-                undoStack.Push(op);
-            }
-        }
 
         private ImageTreatmentVM _imageTreatmentVM;
         public ImageTreatmentVM ImageTreatmentVM
@@ -119,69 +104,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
-        private IDominoProvider _CurrentProject;
-        public override IDominoProvider CurrentProject
-        {
-            get { return _CurrentProject; }
-            set
-            {
-                if (_CurrentProject != value)
-                {
-                    _CurrentProject = value;
-                    if (CurrentProject != null)
-                    {
-                        if (CurrentProject.HasProtocolDefinition)
-                            VisibleFieldplan = Visibility.Visible;
-                        else
-                            VisibleFieldplan = Visibility.Hidden;
-                    }
-                }
-            }
-        }
-        private Visibility _VisibleFieldplan;
-        public Visibility VisibleFieldplan
-        {
-            get { return _VisibleFieldplan; }
-            set
-            {
-                if (_VisibleFieldplan != value)
-                {
-                    _VisibleFieldplan = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _physicalLength;
-        public int PhysicalLength
-        {
-            get
-            {
-                return _physicalLength;
-            }
-            set
-            {
-                if (_physicalLength != value)
-                {
-                    _physicalLength = value;
-                    TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }
-
-        private int _physicalHeight;
-        public int PhysicalHeight
-        {
-            get { return _physicalHeight; }
-            set
-            {
-                if (_physicalHeight != value)
-                {
-                    _physicalHeight = value;
-                    TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }
         private Cursor _cursorState;
         public Cursor cursor
         {
@@ -230,6 +152,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+
         private bool _collapsed;
         public bool Collapsed
         {
@@ -240,19 +163,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     PropertyValueChanged(this, value, producesUnsavedChanges: false);
                     _collapsed = value;
-                    TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }
-        private Visibility _collapsible;
-        public virtual Visibility Collapsible
-        {
-            get => _collapsible;
-            set
-            {
-                if (_collapsible != value)
-                {
-                    _collapsible = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
@@ -421,44 +331,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
-        public override void Undo()
-        {
-            undostate = true;
-            if (undoStack.Count != 0)
-            {
-                PostFilter undoFilter = undoStack.Pop();
-                redoStack.Push(undoFilter);
-                undoFilter.Undo();
-                if (undoStack.Count == 0) UnsavedChanges = false;
-            }
-            undostate = false;
-        }
+        
 
-        public override void Redo()
-        {
-            undostate = true;
-            if (redoStack.Count != 0)
-            {
-                PostFilter redoFilter = redoStack.Pop();
-                undoStack.Push(redoFilter);
-                redoFilter.Apply();
-            }
-            undostate = false;
-        }
-
-        public override bool Save()
-        {
-            try
-            {
-                CurrentProject.Save();
-                UnsavedChanges = false;
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        
         protected void FillColorList()
         {
             UsedColors = new ObservableCollection<ColorListEntry>();
@@ -511,13 +386,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (DominoCount > 0)
                 DominoCount = DominoCount + 1;
             undostate= oldUndoState;
-        }
-        private bool _undostate;
-
-        public bool undostate
-        {
-            get { return _undostate; }
-            set { _undostate = value; }
         }
 
         public void PropertyValueChanged(object sender, object value_new,
@@ -573,9 +441,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _EditClick;
         public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
 
-        private ICommand _BuildtoolsClick;
-        public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
-        #endregion
+    #endregion
 
     }
     public class PropertyChangedOperation : PostFilter

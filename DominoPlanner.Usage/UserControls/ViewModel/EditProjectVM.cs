@@ -14,16 +14,15 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-    public class EditProjectVM : TabBaseVM
+    public class EditProjectVM : DominoProviderTabItem
     {
         #region CTOR
         public EditProjectVM(DocumentNode dominoProvider) : base()
         {
-            ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
+            name = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
             HaveBuildtools = dominoProvider.obj.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
-
-            IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
+            
             string relativePath = dominoProvider.relativePath;
             string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
@@ -41,7 +40,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
-            BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
+            
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
             ClearSelection = new RelayCommand(o => { ClearFullSelection(); });
@@ -78,9 +77,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private System.Windows.Point SelectionStartPoint;
         private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
-        public string assemblyname;
-        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
 
         #region events
@@ -88,17 +84,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
-        public bool Editing
-        {
-            get { return CurrentProject.Editing; }
-            set
-            {
-                EditingDeactivatedOperation op = new EditingDeactivatedOperation(this);
-                op.Apply();
-                undoStack.Push(op);
-            }
-        }
-
+        
         private Visibility _HaveBuildtools;
         public Visibility HaveBuildtools
         {
@@ -108,19 +94,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_HaveBuildtools != value)
                 {
                     _HaveBuildtools = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-        private Visibility _IsExpandible;
-        public Visibility IsExpandible
-        {
-            get { return _IsExpandible; }
-            set
-            {
-                if (_IsExpandible != value)
-                {
-                    _IsExpandible = value;
                     RaisePropertyChanged();
                 }
             }
@@ -241,37 +214,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private int _physicalLength;
-        public int PhysicalLength
-        {
-            get
-            {
-                return _physicalLength;
-            }
-            set
-            {
-                if (_physicalLength != value)
-                {
-                    _physicalLength = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _physicalHeight;
-        public int PhysicalHeight
-        {
-            get { return _physicalHeight; }
-            set
-            {
-                if (_physicalHeight != value)
-                {
-                    _physicalHeight = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         private string _ProjectName;
         public string ProjectName
         {
@@ -805,25 +747,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RemoveFromSelectedDominoes(dic);
             }
         }
-
-        public override bool Save()
-        {
-            try
-            {
-                CurrentProject.Save();
-                UnsavedChanges = false;
-                return true;
-            }
-            catch (Exception) { return false; }
-        }
-
-        private void OpenBuildTools()
-        {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, ProjectName, assemblyname);
-            protocolV.ShowDialog();
-        }
-
         private void SelectAllStonesWithColor()
         {
             if (SelectedColor == null) return;
@@ -1049,9 +972,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _RestoreBasicSettings;
         public ICommand RestoreBasicSettings { get { return _RestoreBasicSettings; } set { if (value != _RestoreBasicSettings) { _RestoreBasicSettings = value; } } }
 
-        private ICommand _BuildtoolsClick;
-        public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
-
+        
         private ICommand _MouseClickCommand;
         public ICommand MouseClickCommand { get { return _MouseClickCommand; } set { if (value != _MouseClickCommand) { _MouseClickCommand = value; } } }
 

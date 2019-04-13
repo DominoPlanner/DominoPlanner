@@ -47,7 +47,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Name"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectName}"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding name}"/>
                     <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Rows"/>
                     <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
                     <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Stones/Row"/>
@@ -129,13 +129,13 @@
                     <Label Content="Basic Settings" />
                 </StackPanel>
             </Button>
-            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Visibility="{Binding HaveBuildtools}" Command="{Binding BuildtoolsClick}">
+            <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Visibility="{Binding VisibleFieldplan}" Command="{Binding BuildtoolsClick}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/file_export.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
                     <Label Content="Buildtools" />
                 </StackPanel>
             </Button>
-            <CheckBox Grid.Row="2" Margin="255, 5, 0, 5" VerticalAlignment="Center" Content="Hide spaces" Visibility="{Binding IsExpandible}" IsChecked="{Binding Expanded}"/>
+            <CheckBox Grid.Row="2" Margin="255, 5, 0, 5" VerticalAlignment="Center" Content="Hide spaces" Visibility="{Binding Collapsible}" IsChecked="{Binding Expanded}"/>
         </Grid>
     </Grid>
 </UserControl>

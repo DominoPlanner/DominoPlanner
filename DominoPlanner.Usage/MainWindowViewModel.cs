@@ -82,28 +82,18 @@ namespace DominoPlanner.Usage
             //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
             Stack<PostFilter> undoStack = new Stack<PostFilter>();
             Stack<PostFilter> redoStack = new Stack<PostFilter>();
-            if (tabItem.Content is DominoProviderVM vm)
+            if (tabItem.Content is DominoProviderTabItem vm)
             {
                 undoStack = vm.undoStack;
                 redoStack = vm.redoStack;
             }
-            else if (tabItem.Content is EditProjectVM ep)
-            {
-                undoStack = ep.undoStack;
-                redoStack = ep.redoStack;
-            }
             tabItem.Content.Save();
 
             tabItem.ResetContent();
-            if (tabItem.Content is DominoProviderVM vm2)
+            if (tabItem.Content is DominoProviderTabItem vm2)
             {
                 vm2.undoStack = undoStack;
                 vm2.redoStack = redoStack;
-            }
-            else if (tabItem.Content is EditProjectVM ep2)
-            {
-                ep2.redoStack = redoStack;
-                ep2.undoStack = undoStack;
             }
         }
         #endregion
@@ -719,8 +709,6 @@ namespace DominoPlanner.Usage
                     if (documentNode.obj.Editing)
                     {
                         Content = new EditProjectVM(documentNode);
-                        (Content as EditProjectVM).assemblyname =
-                                OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;
                     }
                     else
                     {
@@ -741,10 +729,12 @@ namespace DominoPlanner.Usage
                             default:
                                 break;
                         }
-                        (Content as DominoProviderVM).name = System.IO.Path.GetFileNameWithoutExtension(documentNode.relativePath);
-                        (Content as DominoProviderVM).assemblyname =
-                            OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;   //(Content as DominoProviderVM).assemblyname 
                     }
+
+                        (Content as DominoProviderTabItem).assemblyname =
+                                OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;
+
+                    (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(documentNode.relativePath);
                 }
             }
             Content.UnsavedChanges = false;
@@ -875,6 +865,169 @@ namespace DominoPlanner.Usage
         #region Command
         private ICommand _Close;
         public ICommand Close { get { return _Close; } set { if (value != _Close) { _Close = value; } } }
+        #endregion
+    }
+    public abstract class DominoProviderTabItem : TabBaseVM
+    {
+        #region fields
+
+        public string name { get; set; }
+        public string assemblyname { get; set; }
+
+        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
+        #endregion
+        #region properties
+        private IDominoProvider _CurrentProject;
+        public override IDominoProvider CurrentProject
+        {
+            get { return _CurrentProject; }
+            set
+            {
+                if (_CurrentProject != value)
+                {
+                    _CurrentProject = value;
+                    TabPropertyChanged("VisibleFieldplan");
+                    TabPropertyChanged("Collapsible");
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        
+        public Visibility VisibleFieldplan
+        {
+            get
+            {
+                if (CurrentProject?.HasProtocolDefinition == true)
+                    return Visibility.Visible;
+                else return Visibility.Collapsed;
+            }
+        }
+
+        private int _physicalLength;
+        public int PhysicalLength
+        {
+            get
+            {
+                return _physicalLength;
+            }
+            set
+            {
+                if (_physicalLength != value)
+                {
+                    _physicalLength = value;
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
+                }
+            }
+        }
+
+        private int _physicalHeight;
+        public int PhysicalHeight
+        {
+            get { return _physicalHeight; }
+            set
+            {
+                if (_physicalHeight != value)
+                {
+                    _physicalHeight = value;
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
+                }
+            }
+        }
+        public virtual Visibility Collapsible
+        {
+            get
+            {
+                if (CurrentProject != null && CurrentProject is FieldParameters)
+                {
+                    return Visibility.Visible;
+                }
+                else return Visibility.Collapsed;
+            }
+        }
+
+        private bool _undostate;
+
+        public bool undostate
+        {
+            get { return _undostate; }
+            set { _undostate = value; }
+        }
+        public bool Editing
+        {
+            get { return CurrentProject.Editing; }
+            set
+            {
+                if (this is EditProjectVM vm)
+                {
+                    EditingDeactivatedOperation op = new EditingDeactivatedOperation(vm);
+                    op.Apply();
+                    undoStack.Push(op);
+                }
+                else if (this is DominoProviderVM vm2)
+                {
+                    EditingActivatedOperation op = new EditingActivatedOperation(vm2);
+                    op.Apply();
+                    undoStack.Push(op);
+                }
+            }
+        }
+
+        #endregion
+        #region methods
+        public override void Undo()
+        {
+            undostate = true;
+            if (undoStack.Count != 0)
+            {
+                PostFilter undoFilter = undoStack.Pop();
+                redoStack.Push(undoFilter);
+                undoFilter.Undo();
+                if (undoStack.Count == 0) UnsavedChanges = false;
+            }
+            undostate = false;
+        }
+
+        public override void Redo()
+        {
+            undostate = true;
+            if (redoStack.Count != 0)
+            {
+                PostFilter redoFilter = redoStack.Pop();
+                undoStack.Push(redoFilter);
+                redoFilter.Apply();
+            }
+            undostate = false;
+        }
+        private void OpenBuildTools()
+        {
+            ProtocolV protocolV = new ProtocolV();
+            protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
+            protocolV.ShowDialog();
+        }
+        public override bool Save()
+        {
+            try
+            {
+                CurrentProject.Save();
+                UnsavedChanges = false;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        public DominoProviderTabItem()
+        {
+            BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
+        }
+
+        #endregion
+        #region commands
+        private ICommand _BuildtoolsClick;
+        public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
+
         #endregion
     }
 }

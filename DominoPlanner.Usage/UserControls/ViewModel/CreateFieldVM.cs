@@ -25,7 +25,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             field_templates.Add(new StandardSize("User Size", new Sizes(10, 10, 10, 10)));
             Click_Binding = new RelayCommand((x) => BindSize = !BindSize);  
             ReloadSizes();
-            Collapsible = System.Windows.Visibility.Visible;
             AllowRegeneration = AllowRegenerate;
             Refresh();
             if (fieldParameters.Counts != null) RefreshColorAmount();

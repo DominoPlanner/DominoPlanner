@@ -17,11 +17,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public CreateStructureVM(GeneralShapesProvider dominoProvider, bool? AllowRegenerate) : base(dominoProvider, AllowRegenerate)
         {
             _draw_borders = true;
-            Collapsible = Visibility.Collapsed;
-            if (CurrentProject.HasProtocolDefinition)
-                VisibleFieldplan = Visibility.Visible;
-            else
-                VisibleFieldplan = Visibility.Hidden;
             if (CurrentProject.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
         }

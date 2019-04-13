@@ -61,7 +61,7 @@
                     <GroupBox Header="Preview options">
                         <local:RenderOptions ShowImageSize="Collapsed"
                                              BackgroundColor="{Binding backgroundColor}"
-                                             Collapsible="{Binding Collapsible}"
+                                             Collapsible="{Binding Collapsible, Mode=OneWay}"
                                              Collapse="{Binding Collapsed}"
                                              DrawBorders="{Binding draw_borders}"
                                              ></local:RenderOptions>
