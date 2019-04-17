@@ -32,17 +32,17 @@
         <local:ImageSelector x:Key="ImageSelector" EmptyImageTemplate="{StaticResource EmptyImageTemplate}"
                              ImageTemplate="{StaticResource ImageTemplate}"/>
         <DataTemplate DataType="{x:Type local:SingleImageInformation}">
-            <DockPanel>
+            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={}Image Source: {0}}" 
                            Margin="5" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
                 <Border DockPanel.Dock="Bottom" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch">
                     <ContentControl ContentTemplateSelector="{StaticResource ImageSelector}" Content="{Binding InternPictureName}">
+                    </ContentControl>
                         <intr:Interaction.Triggers>
                             <intr:EventTrigger EventName="MouseDown">
                                 <intr:InvokeCommandAction Command="{Binding LoadNewImage}" CommandParameter="{Binding DataContext.CurrentViewModel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
                             </intr:EventTrigger>
                         </intr:Interaction.Triggers>
-                    </ContentControl>
                 </Border>
             </DockPanel>
         </DataTemplate>
