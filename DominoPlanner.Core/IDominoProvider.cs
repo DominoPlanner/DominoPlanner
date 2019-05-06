@@ -314,8 +314,8 @@ namespace DominoPlanner.Core
                 }
             }
             d.counts = Counts;
-            d.rows = (o == Orientation.Horizontal) ? dominoes.GetLength(0) : dominoes.GetLength(1);
-            d.columns = (o == Orientation.Horizontal) ? dominoes.GetLength(1) : dominoes.GetLength(0);
+            d.rows = (o == Orientation.Horizontal) ? dominoes.GetLength(1) : dominoes.GetLength(0);
+            d.columns = (o == Orientation.Horizontal) ? dominoes.GetLength(0) : dominoes.GetLength(1);
             return d;
         }
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
