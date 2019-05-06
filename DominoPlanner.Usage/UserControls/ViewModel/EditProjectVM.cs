@@ -500,6 +500,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             redoFilter.Apply();
 
             //if (!(redoFilter is SetColorOperation || redoFilter is PasteFilter))
+            if (!(redoFilter is EditingDeactivatedOperation))
             {
                 ClearCanvas();
                 RefreshCanvas();
