@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.LiveBuildHelperV"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        mc:Ignorable="d" Title="FieldBlockViewer" Height="600" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Icons/DominoCalculator.ico">
+        mc:Ignorable="d" Title="FieldBlockViewer" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Icons/DominoCalculator.ico">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="MouseDown">
             <i:InvokeCommandAction Command="{Binding MouseDown}"/>
@@ -61,7 +61,7 @@
 
             </Button>
         </Grid>
-        <ContentControl Grid.Row="1" Content="{Binding currentBlock}">
+        <ContentControl Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SizeChanged">
                     <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
