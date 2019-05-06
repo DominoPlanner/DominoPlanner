@@ -512,55 +512,99 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UndoAction?.Invoke();
         }
     }
-    public class EditingActivatedOperation : PostFilter
+    public abstract class EditingChangedOperation : PostFilter
     {
-        DominoProviderVM model;
-        public EditingActivatedOperation(DominoProviderVM vm)
+        public DominoProviderTabItem OldViewModel { get; set; }
+        public DominoProviderTabItem NewViewModel { get; set; }
+
+        public virtual bool NewEditingValue { get; }
+
+        
+
+        public EditingChangedOperation(DominoProviderTabItem model)
         {
-            model = vm;
-        }
-        public override void Apply()
-        {
-            model.CurrentProject.Editing = true;
+            OldViewModel = model;
         }
 
+        public override void Apply()
+        {
+            OldViewModel.CurrentProject.Editing = NewEditingValue;
+            if (NewViewModel == null)
+            {
+                NewViewModel = OldViewModel.GetNewViewModel(OldViewModel);
+            }
+            NewViewModel.undoStack = OldViewModel.undoStack;
+            NewViewModel.redoStack = OldViewModel.redoStack;
+            NewViewModel.GetNewViewModel = OldViewModel.GetNewViewModel;
+            NewViewModel.RegisterNewViewModel = OldViewModel.RegisterNewViewModel;
+            OldViewModel.RegisterNewViewModel(OldViewModel, NewViewModel);
+            NewViewModel.Save();
+        }
         public override void Undo()
         {
-            model.CurrentProject.Editing = false;
+            OldViewModel.CurrentProject.Editing = !NewEditingValue;
+            OldViewModel.undoStack = NewViewModel.undoStack;
+            OldViewModel.redoStack = NewViewModel.redoStack;
+            NewViewModel.RegisterNewViewModel(NewViewModel, OldViewModel);
+            OldViewModel.Save();
         }
     }
-    public class EditingDeactivatedOperation : PostFilter
+    public class EditingActivatedOperation : EditingChangedOperation
     {
-        EditProjectVM model;
+        public override bool NewEditingValue => true;
+        public EditingActivatedOperation(DominoProviderVM vm) : base(vm) { }
+        public override void Apply()
+        {
+            base.Apply();
+            ((EditProjectVM)NewViewModel).RefreshCanvas();
+        }
+        public override void Undo()
+        {
+
+            //((DominoProviderVM)OldViewModel).CurrentProject.shapesValid = false;
+            ((EditProjectVM)NewViewModel).cleanEvents();
+            base.Undo();
+
+            //((DominoProviderVM)OldViewModel).Refresh();
+        }
+    }
+    public class EditingDeactivatedOperation : EditingChangedOperation
+    {
+        public override bool NewEditingValue => false;
+        public EditProjectVM cmodel { get => (EditProjectVM)OldViewModel; }
         private int current_width;
         private int current_height;
         private DominoTransfer last;
-        public EditingDeactivatedOperation(EditProjectVM editProjectVM)
+        public EditingDeactivatedOperation(EditProjectVM editProjectVM) : base(editProjectVM)
         {
-            model = editProjectVM;   
         }
 
         public override void Apply()
         {
-            
-            last = (DominoTransfer)model.CurrentProject.last.Clone();
-            if (model.CurrentProject is IRowColumnAddableDeletable rowc)
+
+            last = (DominoTransfer)cmodel.CurrentProject.last.Clone();
+            if (cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
                 current_width = rowc.current_width;
                 current_height = rowc.current_height;
             }
-            model.CurrentProject.Editing = false;
+            ((EditProjectVM)OldViewModel).cleanEvents();
+            base.Apply();
+            //((DominoProviderVM)OldViewModel).Refresh();
+
         }
 
         public override void Undo()
         {
-            model.CurrentProject.last = last;
-            model.CurrentProject.Editing = true;
-            if (model.CurrentProject is IRowColumnAddableDeletable rowc)
+            cmodel.CurrentProject.last = last;
+            if (cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
                 rowc.current_width = current_width;
                 rowc.current_height = current_height;
             }
+            base.Undo();
+            cmodel.RefreshCanvas();
+
         }
     }
 

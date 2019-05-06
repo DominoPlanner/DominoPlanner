@@ -76,25 +76,20 @@ namespace DominoPlanner.Usage
 
             return "";
         }
-        private void CurrentProject_EditingChanged(object sender, EventArgs args)
+        private void RegisterNewViewModel(DominoProviderTabItem oldViewModel, DominoProviderTabItem newViewModel)
         {
-            TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
-            //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
-            Stack<PostFilter> undoStack = new Stack<PostFilter>();
-            Stack<PostFilter> redoStack = new Stack<PostFilter>();
-            if (tabItem.Content is DominoProviderTabItem vm)
-            {
-                undoStack = vm.undoStack;
-                redoStack = vm.redoStack;
-            }
-            tabItem.Content.Save();
-
-            tabItem.ResetContent();
-            if (tabItem.Content is DominoProviderTabItem vm2)
-            {
-                vm2.undoStack = undoStack;
-                vm2.redoStack = redoStack;
-            }
+            TabItem tabItem = Tabs.Where(x => x.Content == oldViewModel).FirstOrDefault();
+            tabItem.Content = newViewModel;
+        }
+        private void RegisterReplacementViewModel(DominoProviderTabItem oldVM, DominoProviderTabItem newVM)
+        {
+            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            tabItem.Content = newVM;
+        }
+        private DominoProviderTabItem GetNewViewModel(DominoProviderTabItem oldVM)
+        {
+            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            return TabItem.ViewModelGenerator(tabItem.ProjectComp);
         }
         #endregion
 
@@ -314,8 +309,9 @@ namespace DominoPlanner.Usage
                 selTab.CloseIt = MainWindowViewModel_CloseIt;
                 if (selTab.Content.CurrentProject != null)
                 {
-                    selTab.Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
-                }
+                    ((DominoProviderTabItem)selTab.Content).GetNewViewModel = GetNewViewModel;
+                    ((DominoProviderTabItem)selTab.Content).RegisterNewViewModel = RegisterNewViewModel;
+                        }
                 SelectedTab = selTab;
             } 
         }
@@ -695,6 +691,44 @@ namespace DominoPlanner.Usage
             ProjectComp = project;
             ResetContent();
         }
+        public static DominoProviderTabItem ViewModelGenerator(ProjectComposite project)
+        {
+            DominoProviderTabItem Content = null;
+            if (((DocumentNode)project.Project.documentNode).obj != null)
+            {
+                DocumentNode dn = ((DocumentNode)project.Project.documentNode);
+                if (((DocumentNode)project.Project.documentNode).obj.Editing)
+                {
+                    Content = new EditProjectVM((DocumentNode)project.Project.documentNode);
+                }
+                else
+                {
+                    switch (dn)
+                    {
+                        case FieldNode fieldNode:
+                            Content = new CreateFieldVM((FieldParameters)fieldNode.obj, true);
+                            break;
+                        case StructureNode structureNode:
+                            Content = new CreateRectangularStructureVM((StructureParameters)structureNode.obj, true);
+                            break;
+                        case SpiralNode spiralNode:
+                            Content = new CreateSpiralVM((SpiralParameters)spiralNode.obj, true);
+                            break;
+                        case CircleNode circleNode:
+                            Content = new CreateCircleVM((CircleParameters)circleNode.obj, true);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                (Content as DominoProviderTabItem).assemblyname =
+                            OpenProjectSerializer.GetOpenProjects().Where(x => x.id == project.ParentProjectID).First().name;
+
+                (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(dn.relativePath);
+            }
+            return Content;
+        }
 
         internal void ResetContent()
         {
@@ -704,38 +738,7 @@ namespace DominoPlanner.Usage
             }
             if (ProjectComp.Project.documentNode is DocumentNode documentNode)
             {
-                if (documentNode.obj != null)
-                {
-                    if (documentNode.obj.Editing)
-                    {
-                        Content = new EditProjectVM(documentNode);
-                    }
-                    else
-                    {
-                        switch (documentNode)
-                        {
-                            case FieldNode fieldNode:
-                                Content = new CreateFieldVM((FieldParameters)fieldNode.obj, true);
-                                break;
-                            case StructureNode structureNode:
-                                Content = new CreateRectangularStructureVM((StructureParameters)structureNode.obj, true);
-                                break;
-                            case SpiralNode spiralNode:
-                                Content = new CreateSpiralVM((SpiralParameters)spiralNode.obj, true);
-                                break;
-                            case CircleNode circleNode:
-                                Content = new CreateCircleVM((CircleParameters)circleNode.obj, true);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                        (Content as DominoProviderTabItem).assemblyname =
-                                OpenProjectSerializer.GetOpenProjects().Where(x => x.id == ProjectComp.ParentProjectID).First().name;
-
-                    (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(documentNode.relativePath);
-                }
+                Content = ViewModelGenerator(ProjectComp);
             }
             Content.UnsavedChanges = false;
         }
@@ -887,9 +890,9 @@ namespace DominoPlanner.Usage
                 if (_CurrentProject != value)
                 {
                     _CurrentProject = value;
-                    TabPropertyChanged("VisibleFieldplan");
-                    TabPropertyChanged("Collapsible");
-                    RaisePropertyChanged();
+                    TabPropertyChanged("VisibleFieldplan", ProducesUnsavedChanges: false);
+                    TabPropertyChanged("Collapsible", ProducesUnsavedChanges: false);
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -953,6 +956,8 @@ namespace DominoPlanner.Usage
             get { return _undostate; }
             set { _undostate = value; }
         }
+        public Func<DominoProviderTabItem, DominoProviderTabItem> GetNewViewModel;
+        public Action<DominoProviderTabItem, DominoProviderTabItem> RegisterNewViewModel;
         public bool Editing
         {
             get { return CurrentProject.Editing; }

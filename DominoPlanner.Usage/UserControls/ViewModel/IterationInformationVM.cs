@@ -62,7 +62,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     {
         public Action<object, object, string, bool, Action, bool, Action> ValueChanged;
         protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
-        string membername = "", bool producesUnsavedChanges = false, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
+        string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
         {
             ValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction, ChangesSize, PostUndoAction);
         }

@@ -66,8 +66,6 @@ namespace DominoPlanner.Core
                     {
                         (this as IRowColumnAddableDeletable).ResetSize();
                     }
-                    EditingChanged?.Invoke(this, EventArgs.Empty);
-                    
                 }
             }
         }
@@ -356,7 +354,6 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region events
-        public event EventHandler EditingChanged;
         #endregion
         #region abstracts
         public abstract void RegenerateShapes();

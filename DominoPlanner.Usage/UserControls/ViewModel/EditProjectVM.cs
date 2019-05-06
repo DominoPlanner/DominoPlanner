@@ -162,7 +162,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         _DominoProject.SizeChanged -= _DominoProject_SizeChanged;
                     }
                     _DominoProject = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                     _DominoProject.SizeChanged += _DominoProject_SizeChanged;
 
                     _DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -344,6 +344,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+        public void cleanEvents()
+        {
+            foreach (DominoInCanvas dic in DominoProject.Stones)
+            {
+                dic.DisposeStone();
+            }
+        }
         private void refreshList()
         {
             // Setup Columns
@@ -478,9 +485,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PostFilter undoFilter = undoStack.Pop();
             redoStack.Push(undoFilter);
             undoFilter.Undo();
-
-            ClearCanvas();
-            RefreshCanvas();
+            if (!(undoFilter is EditingActivatedOperation))
+            {
+                ClearCanvas();
+                RefreshCanvas();
+                if (undoStack.Count == 0) UnsavedChanges = false;
+            }
         }
         public override void Redo()
         {
