@@ -184,21 +184,21 @@ namespace DominoPlanner.Core
             HorizontalSize = horizontalSize;
             VerticalSize = verticalSize;
             VerticalDistance = verticalDistance;
-            TargetCount = targetSize;
             PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode);
             PrimaryImageTreatment.Background = background;
+            TargetCount = targetSize;
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
         }
         private FieldParameters() { }
         #endregion
         #region overrides
-        protected override void RegenerateShapes()
+        public override void RegenerateShapes()
         {
             last = new DominoTransfer(getNewShapes(Length, Height), colors);
             shapesValid = true;
         }
-        public override int[,] GetBaseField(Orientation o = Orientation.Horizontal)
+        public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
             current_width = last.FieldPlanLength;
@@ -212,12 +212,20 @@ namespace DominoPlanner.Core
                 }
             }
             if (o == Orientation.Vertical) result = TransposeArray(result);
+            if (MirrorX == true)
+            {
+                result = MirrorArrayX(result);
+            }
+            if (MirrorY == true)
+            {
+                result = MirrorArrayY(result);
+            }
             return result;
         }
         #endregion
         #region compatibility properties
         
-        [ProtoMember(6)]
+        /*[ProtoMember(6)]
         private Inter resizeMode
         {
             get
@@ -228,7 +236,7 @@ namespace DominoPlanner.Core
             {
                 ((FieldReadout)CreatePrimaryTreatment()).ResizeMode = value;
             }
-        }
+        }*/
         
         #endregion
     }

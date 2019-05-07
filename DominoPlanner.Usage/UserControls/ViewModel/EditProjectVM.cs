@@ -14,16 +14,15 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-    class EditProjectVM : TabBaseVM
+    public class EditProjectVM : DominoProviderTabItem
     {
         #region CTOR
         public EditProjectVM(DocumentNode dominoProvider) : base()
         {
-            ProjectName = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
+            name = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
             HaveBuildtools = dominoProvider.obj.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
-
-            IsExpandible = dominoProvider is FieldNode ? Visibility.Visible : Visibility.Hidden;
+            
             string relativePath = dominoProvider.relativePath;
             string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider.parent);
             ImageSource = ImageHelper.GetImageOfFile(filepath);
@@ -38,10 +37,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
             refreshList();
-
+            selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
-            RestoreBasicSettings = new RelayCommand(o => { CurrentProject.Editing = false; });
-            BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
+            RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
+            
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
             ClearSelection = new RelayCommand(o => { ClearFullSelection(); });
@@ -72,14 +71,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private double largestY = 0;
         private List<DominoInCanvas> selectedDominoes;
         private List<DominoInCanvas> possibleToPaste = new List<DominoInCanvas>();
+        private int[] selectedColors;
         private DominoInCanvas[] copyedDominoes;
         private int startindex;
         private System.Windows.Point SelectionStartPoint;
         private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
-
-        private Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        private Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
 
         #region events
@@ -87,6 +84,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
+        
         private Visibility _HaveBuildtools;
         public Visibility HaveBuildtools
         {
@@ -100,19 +98,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private Visibility _IsExpandible;
-        public Visibility IsExpandible
-        {
-            get { return _IsExpandible; }
-            set
-            {
-                if (_IsExpandible != value)
-                {
-                    _IsExpandible = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
         private bool _Expanded;
         public bool Expanded
         {
@@ -122,7 +107,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_Expanded != value)
                 {
                     _Expanded = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                     RefreshCanvas();
                     UpdateUIElements();
                 }
@@ -137,7 +122,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_UICursor != value)
                 {
                     _UICursor = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -151,7 +136,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_ImageSource != value)
                 {
                     _ImageSource = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -177,7 +162,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         _DominoProject.SizeChanged -= _DominoProject_SizeChanged;
                     }
                     _DominoProject = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                     _DominoProject.SizeChanged += _DominoProject_SizeChanged;
 
                     _DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -225,41 +210,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedColor != value)
                 {
                     _SelectedColor = value;
-                    RaisePropertyChanged();
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
-        private int _physicalLength;
-        public int PhysicalLength
-        {
-            get
-            {
-                return _physicalLength;
-            }
-            set
-            {
-                if (_physicalLength != value)
-                {
-                    _physicalLength = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _physicalHeight;
-        public int PhysicalHeight
-        {
-            get { return _physicalHeight; }
-            set
-            {
-                if (_physicalHeight != value)
-                {
-                    _physicalHeight = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
         private string _ProjectName;
         public string ProjectName
         {
@@ -316,6 +270,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private ColumnConfig _colorColumnConfig;
+
+        public ColumnConfig ColorColumnConfig
+        {
+            get { return _colorColumnConfig; }
+            set { _colorColumnConfig = value; }
+        }
+
         #endregion
 
         #region Methods
@@ -353,7 +315,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
             RaisePropertyChanged("DominoList");
         }
-        private void UpdateUIElements()
+        public void UpdateUIElements()
         {
             RefreshColorAmount();
             DominoProject.InvalidateVisual();
@@ -362,19 +324,46 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             for (int i = 0; i < _DominoList.Count(); i++)
             {
-                _DominoList[i].ProjectCount.Clear();
+                if (_DominoList[i].ProjectCount.Count != 2)
+                {
+                    _DominoList[i].ProjectCount.Clear();
+                    // add dummy entries
+                    _DominoList[i].ProjectCount.Add(0);
+                    _DominoList[i].ProjectCount.Add(0);
+                }
+
                 if (CurrentProject.Counts.Length > i + 1)
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[i + 1]);
+                    _DominoList[i].ProjectCount[0] = CurrentProject.Counts[i + 1];
+                    _DominoList[i].ProjectCount[1] = selectedColors[i + 1];
                 }
                 else
                 {
-                    _DominoList[i].ProjectCount.Add(CurrentProject.Counts[0]);
+                    _DominoList[i].ProjectCount[0] = CurrentProject.Counts[0];
+                    _DominoList[i].ProjectCount[1] = selectedColors[0];
                 }
+            }
+        }
+        public void cleanEvents()
+        {
+            foreach (DominoInCanvas dic in DominoProject.Stones)
+            {
+                dic.DisposeStone();
             }
         }
         private void refreshList()
         {
+            // Setup Columns
+            ColorColumnConfig = new ColumnConfig();
+
+            var columns = new ObservableCollection<Column>();
+            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
+            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
+            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
+            columns.Add(new Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField= "DominoColor.count" });
+            columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Selected" });
+            ColorColumnConfig.Columns = columns;
+            
             _DominoList.Clear();
             int counter = 0;
 
@@ -397,6 +386,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     dic.isSelected = true;
                     selectedDominoes.Add(dic);
+                    selectedColors[dic.domino.color]++;
                 }
             }
         }
@@ -450,9 +440,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
             }
-            catch (System.InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
-
+                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
             UpdateUIElements();
         }
@@ -495,9 +485,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PostFilter undoFilter = undoStack.Pop();
             redoStack.Push(undoFilter);
             undoFilter.Undo();
-
-            ClearCanvas();
-            RefreshCanvas();
+            if (!(undoFilter is EditingActivatedOperation))
+            {
+                ClearCanvas();
+                RefreshCanvas();
+                if (undoStack.Count == 0) UnsavedChanges = false;
+            }
         }
         public override void Redo()
         {
@@ -507,6 +500,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             redoFilter.Apply();
 
             //if (!(redoFilter is SetColorOperation || redoFilter is PasteFilter))
+            if (!(redoFilter is EditingDeactivatedOperation))
             {
                 ClearCanvas();
                 RefreshCanvas();
@@ -562,6 +556,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             sco.Apply();
 
             selectedDominoes.Clear();
+            selectedColors = new int[CurrentProject.colors.Length];
             UnsavedChanges = true;
             UpdateUIElements();
         }
@@ -582,8 +577,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         RefreshCanvas();
                         for (int i = 0; i < addRows.added_indizes.Count(); i++)
                         {
-                            DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
-                            selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                            AddToSelectedDominoes(DominoProject.Stones[addRows.added_indizes[i]]);
                         }
                         UpdateUIElements();
                     }
@@ -615,8 +609,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         RefreshCanvas();
                         for (int i = 0; i < addRows.added_indizes.Count(); i++)
                         {
-                            DominoProject.Stones[addRows.added_indizes[i]].isSelected = true;
-                            selectedDominoes.Add(DominoProject.Stones[addRows.added_indizes[i]]);
+                            AddToSelectedDominoes(DominoProject.Stones[addRows.added_indizes[i]]);
                         }
                         UpdateUIElements();
                     }
@@ -699,6 +692,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (DominoInCanvas dic in selectedDominoes)
                 dic.isSelected = false;
             selectedDominoes.Clear();
+            selectedColors = new int[CurrentProject.colors.Length];
             RefreshCanvas();
         }
 
@@ -754,37 +748,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                dic.isSelected = true;
                 if (!selectedDominoes.Contains(dic))
                 {
-                    selectedDominoes.Add(dic);
+                    AddToSelectedDominoes(dic);
                 }
             }
             else if (e.RightButton == MouseButtonState.Pressed)
             {
-                dic.isSelected = false;
-                selectedDominoes.Remove(dic);
+                RemoveFromSelectedDominoes(dic);
             }
         }
-
-        public override bool Save()
-        {
-            try
-            {
-                CurrentProject.Save();
-                UnsavedChanges = false;
-                return true;
-            }
-            catch (Exception) { return false; }
-        }
-
-        private void OpenBuildTools()
-        {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, ProjectName);
-            protocolV.ShowDialog();
-        }
-
         private void SelectAllStonesWithColor()
         {
             if (SelectedColor == null) return;
@@ -794,8 +767,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (selectedDominoes[i].StoneColor != SelectedColor.DominoColor.mediaColor)
                     {
-                        selectedDominoes[i].isSelected = false;
-                        selectedDominoes.Remove(selectedDominoes[i]);
+                        RemoveFromSelectedDominoes(selectedDominoes[i]);
                         i--;
                     }
                 }
@@ -807,8 +779,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     if (!(DominoProject.Stones[i] is DominoInCanvas)) continue;
                     if (((DominoInCanvas)DominoProject.Stones[i]).StoneColor == SelectedColor.DominoColor.mediaColor && ((DominoInCanvas)DominoProject.Stones[i]).isSelected == false)
                     {
-                        ((DominoInCanvas)DominoProject.Stones[i]).isSelected = true;
-                        selectedDominoes.Add((DominoInCanvas)DominoProject.Stones[i]);
+                        AddToSelectedDominoes(DominoProject.Stones[i]);
                     }
                 }
             }
@@ -903,16 +874,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             {
                                 if (!((DominoInCanvas)DominoProject.Stones[i]).isSelected)
                                 {
-                                    ((DominoInCanvas)DominoProject.Stones[i]).isSelected = true;
-                                    selectedDominoes.Add(((DominoInCanvas)DominoProject.Stones[i]));
+                                    AddToSelectedDominoes(DominoProject.Stones[i]);
                                 }
                             }
                             else if (e.ChangedButton == MouseButton.Right)
                             {
                                 if (((DominoInCanvas)DominoProject.Stones[i]).isSelected)
                                 {
-                                    ((DominoInCanvas)DominoProject.Stones[i]).isSelected = false;
-                                    selectedDominoes.Remove(((DominoInCanvas)DominoProject.Stones[i]));
+                                    RemoveFromSelectedDominoes(DominoProject.Stones[i]);
                                 }
                             }
                         }
@@ -965,16 +934,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             if (!((DominoInCanvas)DominoProject.Stones[i]).isSelected)
                             {
-                                ((DominoInCanvas)DominoProject.Stones[i]).isSelected = true;
-                                selectedDominoes.Add(((DominoInCanvas)DominoProject.Stones[i]));
+                                AddToSelectedDominoes(DominoProject.Stones[i]);
                             }
                         }
                         else if (e.ChangedButton == MouseButton.Right)
                         {
                             if (((DominoInCanvas)DominoProject.Stones[i]).isSelected)
                             {
-                                ((DominoInCanvas)DominoProject.Stones[i]).isSelected = false;
-                                selectedDominoes.Remove(((DominoInCanvas)DominoProject.Stones[i]));
+                                RemoveFromSelectedDominoes(DominoProject.Stones[i]);
                             }
                         }
                     }
@@ -985,6 +952,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.Children.Remove(rect);
 
             UpdateUIElements();
+        }
+        private void AddToSelectedDominoes(DominoInCanvas dic)
+        {
+            dic.isSelected = true;
+            selectedDominoes.Add(dic);
+            selectedColors[dic.domino.color]++;
+        }
+        private void RemoveFromSelectedDominoes(DominoInCanvas dic)
+        {
+            dic.isSelected = false;
+            selectedDominoes.Remove(dic);
+            selectedColors[dic.domino.color]--;
         }
         #endregion
 
@@ -1004,9 +983,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _RestoreBasicSettings;
         public ICommand RestoreBasicSettings { get { return _RestoreBasicSettings; } set { if (value != _RestoreBasicSettings) { _RestoreBasicSettings = value; } } }
 
-        private ICommand _BuildtoolsClick;
-        public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
-
+        
         private ICommand _MouseClickCommand;
         public ICommand MouseClickCommand { get { return _MouseClickCommand; } set { if (value != _MouseClickCommand) { _MouseClickCommand = value; } } }
 

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Emgu.CV.CvEnum;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,13 +18,14 @@ using System.Windows.Shapes;
 namespace DominoPlanner.Usage.UserControls.View
 {
     /// <summary>
-    /// Interaction logic for OnlyOwnStonesV.xaml
+    /// Interaktionslogik für FieldReadout.xaml
     /// </summary>
-    public partial class OnlyOwnStonesV : UserControl
+    public partial class FieldReadoutV : UserControl
     {
-        public OnlyOwnStonesV()
+        public FieldReadoutV()
         {
             InitializeComponent();
         }
     }
+    
 }

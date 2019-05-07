@@ -75,7 +75,7 @@ namespace DominoPlanner.Usage.UserControls.View
                 {
                     dataGrid.Columns.Add(column);
                 }
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
 
                 }

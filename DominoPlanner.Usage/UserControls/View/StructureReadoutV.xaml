@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="300">
+    <UserControl.Resources>
+        <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <GroupBox DockPanel.Dock="Top" Header="Image readout">
+            <DockPanel>
+                <Grid Grid.Row="4" DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Corner}}" GroupName="a"/>
+                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" GroupName="a" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Average}}"/>
+                </Grid>
+                <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
+            </DockPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

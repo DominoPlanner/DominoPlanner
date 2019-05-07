@@ -1,6 +1,7 @@
 ﻿using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,17 +14,40 @@ namespace DominoPlanner.Usage
 {
     class LiveBuildHelperVM : ModelBase
     {
+        private ICommand _OpenPopup;
+        public ICommand OpenPopup
+        {
+            get
+            {
+                return _OpenPopup;
+            }
+            set { if (value != _OpenPopup) { _OpenPopup = value; } }
+        }
+
         #region CTOR
-        public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize)
+        public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize, Core.Orientation orientation, bool MirrorX, bool MirrorY)
         {
             blockSize = pBlockSize;
             fParameters = pFParameters;
-            intField = fParameters.GetBaseField();
+            intField = fParameters.GetBaseField(orientation, MirrorX, MirrorY);
+            NextN = 500;
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
             CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / blockSize)));
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { currentBlock.Focus(); });
+            ColumnConfig = new ColumnConfig();
+
+            var columns = new ObservableCollection<Column>();
+            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
+            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
+            columns.Add(new Column() { DataField = "ProjectCount[0]", Header = "Total used" });
+            columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Remaining" });
+            columns.Add(new Column() { DataField = "ProjectCount[2]", Header = "Next " + NextN });
+
+            ColumnConfig.Columns = columns;
+
+            OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
         }
         #endregion
 
@@ -123,6 +147,42 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+        private bool _popupOpen;
+        public bool PopupOpen
+        {
+            get
+            {
+                return _popupOpen;
+            }
+            set
+            {
+                _popupOpen = value; RaisePropertyChanged();
+            }
+        }
+
+        private ColumnConfig _columnConfig;
+
+        public ColumnConfig ColumnConfig
+        {
+            get { return _columnConfig; }
+            set { _columnConfig = value; RaisePropertyChanged(); }
+        }
+        private ObservableCollection<ColorListEntry> _colors;
+
+        public ObservableCollection<ColorListEntry> Colors
+        {
+            get { return _colors; }
+            set { _colors = value; RaisePropertyChanged(); }
+        }
+        private int _nextN;
+
+        public int NextN
+        {
+            get { return _nextN; }
+            set { _nextN = value; }
+        }
+
+
         #endregion
 
         #region methods
@@ -188,6 +248,64 @@ namespace DominoPlanner.Usage
                         countColor++;
                 }
             }
+        }
+        private void RefreshRemainingColors()
+        {
+
+        }
+        private void FillColorList()
+        {
+            Colors = new ObservableCollection<ColorListEntry>();
+
+            int counter = 0;
+
+            if (fParameters.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
+            {
+                Colors.Add(new ColorListEntry() { DominoColor = fParameters.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
+            }
+            foreach (DominoColor domino in fParameters.colors.RepresentionForCalculation.OfType<DominoColor>())
+            {
+                Colors.Add(new ColorListEntry() { DominoColor = domino, SortIndex = fParameters.colors.Anzeigeindizes[counter] });
+                counter++;
+            }
+
+            RefreshColorAmount();
+        }
+        private void RefreshColorAmount()
+        {
+            int firstBlockStone = blockSize * (SelectedBlock - 1);
+            int firstRow = SelectedRow - 1;
+            int[] RemainingCount = new int[Colors.Count];
+            int[] NextNCount = new int[Colors.Count];
+            int counter = 0;
+            for (int i = firstRow; i < intField.GetLength(1); i++)
+            {
+                int startj = (i == firstRow) ? firstBlockStone : 0; 
+                for (int j = startj; j < intField.GetLength(0); j++)
+                {
+                    if (counter < NextN)
+                        NextNCount[intField[j, i]]++;
+                    RemainingCount[intField[j, i]]++;
+                    counter++;
+                }
+            }
+            for (int i = 0; i < Colors.Count; i++)
+            {
+                if (fParameters.Counts.Length > i)
+                {
+                    Colors[i].ProjectCount = new ObservableCollection<int>();
+                    Colors[i].ProjectCount.Add(fParameters.Counts[i]);
+
+                    Colors[i].ProjectCount.Add(RemainingCount[i]);
+                    Colors[i].ProjectCount.Add(NextNCount[i]);
+                    
+                }
+                else
+                {
+                    Colors[i].ProjectCount.Add(fParameters.Counts[0]);
+                }
+            }
+            Colors = new ObservableCollection<ColorListEntry>(Colors.Where(x => x.ProjectCount[0] > 0).OrderBy(x => x.SortIndex));
         }
 
         internal void PressedKey(Key pressedKey)

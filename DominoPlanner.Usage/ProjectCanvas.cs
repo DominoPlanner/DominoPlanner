@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace DominoPlanner.Usage
 {
-    class ProjectCanvas : Canvas
+    public class ProjectCanvas : Canvas
     {
         public List<DominoInCanvas> Stones = new List<DominoInCanvas>();
 

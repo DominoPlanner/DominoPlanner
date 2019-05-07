@@ -75,7 +75,11 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="140"/>
             </Grid.ColumnDefinitions>
-            <xctk:PropertyGrid Grid.Column="0" Margin="5,0,0,0" VerticalAlignment="Stretch" SelectedObject="{Binding SelectedStone.DominoColor}" HorizontalAlignment="Stretch"/>
+            <DockPanel>
+                <TextBlock TextWrapping="Wrap" Margin="5" Text="{Binding WarningLabelText}"  DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></TextBlock>
+                <xctk:PropertyGrid DockPanel.Dock="Top" Margin="5,0,0,0" VerticalAlignment="Stretch" SelectedObject="{Binding SelectedStone.DominoColor}" HorizontalAlignment="Stretch"/>
+                
+            </DockPanel>
             <Button Grid.Column="2" Height="30" Margin="5.2,0,4.8,109.6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnMoveUp}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/up.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality" />

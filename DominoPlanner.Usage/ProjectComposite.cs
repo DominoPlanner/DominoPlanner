@@ -298,6 +298,7 @@ namespace DominoPlanner.Usage
     {
         public ContextMenueProjectList() : base()
         {
+            openMI.Header = "Open File";
             openFolderMI.Header = "Open Folder";
             openFolderMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/folder_tar.ico", UriKind.Relative)) };
             exportImageMI.Header = "Export as Image";
@@ -312,8 +313,9 @@ namespace DominoPlanner.Usage
             fieldprotoMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/file_export.ico", UriKind.Relative)) };
             renameMI.Header = "Rename";
             renameMI.Icon = new System.Windows.Controls.Image { Source = new BitmapImage(new Uri("Icons/draw_freehand.ico", UriKind.Relative)) };
-            Items.Add(openFolderMI);
+            
         }
+        public MenuItem openMI = new MenuItem();
         public MenuItem fieldprotoMI = new MenuItem();
         public MenuItem createMI = new MenuItem();
         public MenuItem removeMI = new MenuItem();
@@ -328,17 +330,22 @@ namespace DominoPlanner.Usage
         public static ContextMenueProjectList TreeViewMenues(NodeType nodeType, bool hasProtocol = false)
         {
             ContextMenueProjectList cm = new ContextMenueProjectList();
+            
             switch (nodeType)
             {
                 case NodeType.MasterplanNode:
                     cm.Items.Add(cm.createMI);
                     cm.Items.Add(cm.renameMI);
                     cm.Items.Add(cm.removeMI);
-                    
+                    cm.Items.Add(cm.openFolderMI);
                     break;
                 case NodeType.ColorListNode:
+                    cm.Items.Add(cm.openMI);
+                    cm.Items.Add(cm.openFolderMI);
                     break;
                 case NodeType.ProjectNode:
+                    cm.Items.Add(cm.openMI);
+                    cm.Items.Add(cm.openFolderMI);
                     cm.Items.Add(cm.exportImageMI);
                     cm.Items.Add(cm.exportImageExtendedMI);
                     if (hasProtocol) cm.Items.Add(cm.fieldprotoMI);

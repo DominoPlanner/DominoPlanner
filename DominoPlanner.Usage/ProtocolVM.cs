@@ -26,11 +26,12 @@ namespace DominoPlanner.Usage
             Init();
         }
 
-        public ProtocolVM(IDominoProvider dominoProvider, string fieldName)
+        public ProtocolVM(IDominoProvider dominoProvider, string fieldName, string assemblyname = "")
         {
             DominoProvider = dominoProvider;
             dominoTransfer = DominoProvider.Generate();
             Titel = fieldName;
+            currentOPP.project = assemblyname;
             Init();
         }
         #endregion
@@ -282,17 +283,27 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
-        private bool _BuildReverse;
-        public bool BuildReverse
+        
+        public bool MirrorX
         {
-            get { return _BuildReverse; }
+            get { return currentOPP.mirrorHorizontal; }
             set
             {
-                if (_BuildReverse != value)
+                if (currentOPP.mirrorHorizontal != value)
                 {
-                    _BuildReverse = value;
-                    currentOPP.reverse = value;
+                    currentOPP.mirrorHorizontal = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public bool MirrorY
+        {
+            get { return currentOPP.mirrorVertical; }
+            set
+            {
+                if (currentOPP.mirrorVertical != value)
+                {
+                    currentOPP.mirrorVertical = value;
                     RaisePropertyChanged();
                 }
             }
@@ -333,15 +344,13 @@ namespace DominoPlanner.Usage
         {
             StonesPerBlock = 50;
             UseBlocks = true;
-            BuildReverse = false;
-            currentOPP.reverse = false;
             HasShortProperties = true;
             TextFormat = "<font face=\"Verdana\">";
             DefaultBackColor = true;
             IntelligentTextColor = true;
             HideText = true;
             currentOPP.orientation = DominoProvider.FieldPlanDirection;
-
+            currentOPP.mirrorHorizontal = DominoProvider.FieldPlanDirection == Core.Orientation.Vertical;
             CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
@@ -357,7 +366,7 @@ namespace DominoPlanner.Usage
         private void ShowLiveHelper()
         {
             LiveBuildHelperV lbhv = new LiveBuildHelperV();
-            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock);
+            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY);
             lbhv.ShowDialog();
         }
 
@@ -374,7 +383,7 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, "", currentOPP); // Jojo hier Projektname einfügen
+                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP); // Jojo hier Projektname einfügen
                     Process.Start(dlg.FileName);
                 }
                 catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }

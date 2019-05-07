@@ -59,7 +59,19 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-        
+        private double _weight;
+        public double Weight
+        {
+            get { return _weight; }
+            set
+            {
+                if (_weight != value)
+                {
+                    _weight = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         private ObservableCollection<int> _ProjectCount;
         public ObservableCollection<int> ProjectCount
         {

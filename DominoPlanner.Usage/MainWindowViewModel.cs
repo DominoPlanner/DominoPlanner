@@ -45,7 +45,7 @@ namespace DominoPlanner.Usage
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
-
+            FileListClickCommand = new RelayCommand(o => { OpenItemFromOpenedFiles(o); });
             Tabs = new ObservableCollection<TabItem>();
             Workspace.del = UpdateReference;
             loadProjectList();
@@ -73,16 +73,23 @@ namespace DominoPlanner.Usage
             {
                 return Workspace.MakeRelativePath(parentPath, ofd.FileName);
             }
-            
+
             return "";
         }
-        private void CurrentProject_EditingChanged(object sender, EventArgs e)
+        private void RegisterNewViewModel(DominoProviderTabItem oldViewModel, DominoProviderTabItem newViewModel)
         {
-            TabItem tabItem = Tabs.Where(x => x.Content.CurrentProject == sender).FirstOrDefault();
-            //((IDominoProvider)tabItem.Content.CurrentProject).Generate();
-            tabItem.Content.Save();
-            
-            tabItem.ResetContent();
+            TabItem tabItem = Tabs.Where(x => x.Content == oldViewModel).FirstOrDefault();
+            tabItem.Content = newViewModel;
+        }
+        private void RegisterReplacementViewModel(DominoProviderTabItem oldVM, DominoProviderTabItem newVM)
+        {
+            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            tabItem.Content = newVM;
+        }
+        private DominoProviderTabItem GetNewViewModel(DominoProviderTabItem oldVM)
+        {
+            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            return TabItem.ViewModelGenerator(tabItem.ProjectComp);
         }
         #endregion
 
@@ -161,6 +168,9 @@ namespace DominoPlanner.Usage
         private ICommand _SaveCurrentOpen;
         public ICommand SaveCurrentOpen { get { return _SaveCurrentOpen; } set { if (value != _SaveCurrentOpen) { _SaveCurrentOpen = value; } } }
 
+        private ICommand _FileListClickCommand;
+        public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand = value; } } }
+
         #endregion
 
         #region Methods
@@ -175,6 +185,11 @@ namespace DominoPlanner.Usage
             ((ProjectComposite)((System.Windows.Controls.MenuItem)sender).DataContext).IsSelected = true;
             NewFieldStructure();
         }
+        private void OpenMI_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            OpenItem((ProjectComposite)((System.Windows.Controls.MenuItem)sender).DataContext);
+        }
+    
         /// <summary>
         /// Remove selected Project
         /// </summary>
@@ -228,6 +243,22 @@ namespace DominoPlanner.Usage
         {
             OpenItem((ProjectComposite)sender);
         }
+        private void OpenItemFromOpenedFiles(object param)
+        {
+            ProjectComposite comp = null;
+            foreach (ProjectListComposite p in Projects)
+            {
+                foreach (ProjectComposite pp in p.Children)
+                {
+                    if (Path.GetFullPath(Path.Combine(Path.GetDirectoryName(p.FilePath), pp.FilePath))
+                        == Path.GetFullPath(param.ToString())) comp = pp;
+                }
+            }
+            if (comp != null)
+            {
+                OpenItem(comp);
+            }
+        }
 
         private void OpenItem(ProjectComposite toOpen)
         {
@@ -263,7 +294,7 @@ namespace DominoPlanner.Usage
                         selTab = new TabItem(toOpen);
                         Tabs.Add(selTab);
                     }
-                    catch (FileNotFoundException ex)
+                    catch (FileNotFoundException)
                     {
                         DocumentNode dn = (DocumentNode)toOpen.Project.documentNode;
                         dn.parent.children.Remove(dn);
@@ -275,11 +306,12 @@ namespace DominoPlanner.Usage
             }
             if (selTab != null) // && !tryAgain
             {
-                selTab.CloseIt += MainWindowViewModel_CloseIt;
+                selTab.CloseIt = MainWindowViewModel_CloseIt;
                 if (selTab.Content.CurrentProject != null)
                 {
-                    selTab.Content.CurrentProject.EditingChanged += CurrentProject_EditingChanged;
-                }
+                    ((DominoProviderTabItem)selTab.Content).GetNewViewModel = GetNewViewModel;
+                    ((DominoProviderTabItem)selTab.Content).RegisterNewViewModel = RegisterNewViewModel;
+                        }
                 SelectedTab = selTab;
             } 
         }
@@ -298,12 +330,9 @@ namespace DominoPlanner.Usage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindowViewModel_CloseIt(object sender, EventArgs e)
+        private bool MainWindowViewModel_CloseIt(TabItem tabItem)
         {
-            if (sender is TabItem tabItem)
-            {
-                RemoveItem(tabItem);
-            }
+            return RemoveItem(tabItem);
         }
         private bool RemoveProjectComposite(ProjectComposite comp)
         {
@@ -377,7 +406,7 @@ namespace DominoPlanner.Usage
                     string colorPath = mainnode.obj.colorPath;
                     bool colorpathExists = File.Exists(Workspace.AbsolutePathFromReference(ref colorPath, mainnode.obj));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     string colorpath = Path.Combine(newProject.path, "Planner Files");
                     var colorres = Directory.EnumerateFiles(colorpath, "*.DColor");
@@ -511,9 +540,11 @@ namespace DominoPlanner.Usage
                     newItem.conMenu.removeMI.Click += parentProject.RemoveMI_Object_Click;
                     newItem.conMenu.renameMI.Click += parentProject.RenameMI_Object_Click;
                     newItem.SelectedEvent += MainWindowViewModel_SelectedEvent;
+
+                    newItem.conMenu.openMI.Click += OpenMI_Click;
                     return newItem;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     NotFindRemove(parentProject, projectTransfer);
                     return null;
@@ -546,7 +577,8 @@ namespace DominoPlanner.Usage
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(SelectedProject.FilePath), ((AssemblyNode)((ProjectListComposite)SelectedProject).Project.documentNode).obj);
             new NewObject(novm).ShowDialog();
             if (!novm.Close || novm.ResultNode == null) return;
-            ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", novm.internPictureName), novm.ResultNode));
+            ProjectComposite compo = AddProjectToTree((ProjectListComposite)SelectedProject, 
+                new ProjectElement(novm.ObjectPath, Path.Combine(novm.ProjectPath, "Source Image", ImageHelper.GetImageOfFile(novm.ObjectPath)), novm.ResultNode));
             OpenItem(compo);
         }
 
@@ -641,183 +673,6 @@ namespace DominoPlanner.Usage
             else
                 Errorhandler.RaiseMessage("Error!", "Error saving changes!", Errorhandler.MessageType.Error);
         }
-        #endregion
-    }
-
-    public sealed class TabItem : ModelBase
-    {
-        #region CTOR
-        public TabItem(int projectID, string path)
-        {
-            Path = path;
-            Close = new RelayCommand(o => CloseThis());
-            zusatz = "";
-        }
-
-        public TabItem(ProjectComposite project) : this(project.OwnID, project.ParentProjectID, project.Name, project.PicturePath, project.FilePath)
-        {
-            ProjectComp = project;
-            ResetContent();
-        }
-
-        internal void ResetContent()
-        {
-            if (Content is EditProjectVM editProject)
-            {
-                editProject.ClearCanvas();
-            }
-            if (ProjectComp.Project.documentNode is DocumentNode documentNode)
-            {
-                if (documentNode.obj != null)
-                {
-                    if (documentNode.obj.Editing)
-                    {
-                        Content = new EditProjectVM(documentNode);
-                    }
-                    else
-                    {
-                        switch (documentNode)
-                        {
-                            case FieldNode fieldNode:
-                                Content = new CreateFieldVM(fieldNode);
-                                break;
-                            case StructureNode structureNode:
-                                Content = new CreateStructureVM(structureNode.obj, true);
-                                break;
-                            case SpiralNode spiralNode:
-                            case CircleNode circleNode:
-                                Content = new CreateStructureVM(documentNode.obj, false);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-            Content.UnsavedChanges = false;
-        }
-
-        public TabItem(int ownID, int projectID, string Header, string picturePath, string path) : this(projectID, path)
-        {
-            OwnID = ownID;
-            ProjectID = projectID;
-            this.Header = Header;
-            this.picture = picturePath;
-        }
-
-        public TabItem(int ownID, int projectID, string Header, string picturePath, string path, TabBaseVM content) : this(ownID, projectID, Header, picturePath, path)
-        {
-            this.Content = content;
-        }
-        #endregion
-
-        #region EventHandler
-        public event EventHandler CloseIt;
-        #endregion
-
-        #region prope
-        private ProjectComposite _ProjectComp;
-        public ProjectComposite ProjectComp
-        {
-            get { return _ProjectComp; }
-            set
-            {
-                if (_ProjectComp != value)
-                {
-                    _ProjectComp = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        //public WriteableBitmap picture { get; set; }
-
-        public string picture { get; set; }
-
-        private int _OwnID;
-        public int OwnID
-        {
-            get { return _OwnID; }
-            set
-            {
-                if (_OwnID != value)
-                {
-                    _OwnID = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private int _ProjectID;
-        public int ProjectID
-        {
-            get { return _ProjectID; }
-            set
-            {
-                if (_ProjectID != value)
-                {
-                    _ProjectID = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private string zusatz { get; set; }
-
-        private string _Header;
-        public string Header
-        {
-            get { return string.Format("{0}{1}", _Header, zusatz); }
-            set
-            {
-                if (_Header != value)
-                {
-                    _Header = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        public string Path { get; set; }
-
-        private TabBaseVM _Content;
-        public TabBaseVM Content
-        {
-            get { return _Content; }
-            set
-            {
-                if (_Content != value)
-                {
-                    if (_Content != null)
-                        _Content.Changes -= _Content_Changes;
-                    _Content = value;
-                    _Content.Changes += _Content_Changes;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private void _Content_Changes(object sender, bool e)
-        {
-            if (e == true)
-                zusatz = "*";
-            else
-                zusatz = "";
-            RaisePropertyChanged("Header");
-        }
-        #endregion
-
-        #region METHODS
-        private void CloseThis()
-        {
-            Content?.Close();
-            CloseIt?.Invoke(this, EventArgs.Empty);
-        }
-        #endregion
-
-        #region Command
-        private ICommand _Close;
-        public ICommand Close { get { return _Close; } set { if (value != _Close) { _Close = value; } } }
         #endregion
     }
 }

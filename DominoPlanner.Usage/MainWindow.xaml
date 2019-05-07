@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View" x:Class="DominoPlanner.Usage.MainWindow"
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
@@ -13,15 +14,13 @@
         <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
             <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
-            <View:CreateField HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CreateStructureVM}">
-            <View:CreateStructure HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:EditProjectVM}">
             <View:EditProject HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DominoProviderVM}">
+            <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+        </DataTemplate>
+        <local:PathToImageConverter x:Key="PathToImageConverter"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFieldStruct}"/>
@@ -122,10 +121,16 @@
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem Header="Edit">
+            <MenuItem>
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/draw_freehand.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Editing</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
                 <MenuItem.Style>
                     <Style TargetType="{x:Type MenuItem}">
-                        <Setter Property="Visibility" Value="Hidden"/>
+                        <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding SelectedTab.Content.tabType}" Value="{x:Static vm:TabItemType.EditProject}">
                                 <Setter Property="Visibility" Value="Visible"/>
@@ -133,9 +138,6 @@
                         </Style.Triggers>
                     </Style>
                 </MenuItem.Style>
-                <MenuItem.Icon>
-                    <Image Source="Icons/draw_freehand.ico"/>
-                </MenuItem.Icon>
                 <MenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" InputGestureText="Ctrl+C">
                     <MenuItem.Icon>
                         <Image Source="Icons/Copy.ico"/>
@@ -174,6 +176,22 @@
                     <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" InputGestureText="Alt+R"/>
                     <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGestureText="Alt+C"/>
                 </MenuItem>
+            </MenuItem>
+            <MenuItem ItemsSource="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Icons/open.ico" Margin="2"/>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Workspace</TextBlock>
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Icon" Value="{Binding Item1, Converter={StaticResource PathToImageConverter}}"/>
+                        <Setter Property="Header" Value="{Binding Item1}"/>
+                        <Setter Property="Command" Value="{Binding Path=DataContext.FileListClickCommand, RelativeSource={RelativeSource AncestorLevel=1, AncestorType={x:Type MenuItem}}}"/>
+                        <Setter Property="CommandParameter" Value="{Binding Item1}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
         </Menu>
         <Border  Margin="0,25,0,0" BorderBrush="Red" BorderThickness="0">

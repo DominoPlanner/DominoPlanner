@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.LiveBuildHelperV"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        mc:Ignorable="d" Title="FieldBlockViewer" Height="600" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Icons/DominoCalculator.ico">
+        mc:Ignorable="d" Title="FieldBlockViewer" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Icons/DominoCalculator.ico">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="MouseDown">
             <i:InvokeCommandAction Command="{Binding MouseDown}"/>
@@ -34,6 +34,7 @@
                 <xctk:IntegerUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
                 <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <Label Grid.Column="3" Content="{Binding CountRow}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
@@ -48,8 +49,19 @@
                 <Label Grid.Column="3" Content="{Binding CountBlock}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <Label Grid.Column="3" Content="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+            <Button Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right" Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
+                <StackPanel>
+                    <TextBlock>Show remaining colors</TextBlock>
+                    <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                        <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
+
+                        </local:ColorControl>
+                    </Popup>
+                </StackPanel>
+
+            </Button>
         </Grid>
-        <ContentControl Grid.Row="1" Content="{Binding currentBlock}">
+        <ContentControl Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SizeChanged">
                     <i:InvokeCommandAction Command="{Binding SizeChanged}"/>

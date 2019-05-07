@@ -30,5 +30,10 @@ namespace DominoPlanner.Usage
             if(e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
         }
+
+        private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ((ContentControl)sender).Focus();
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace DominoPlanner.Usage
                 {
                     File.Copy(@".\Resources\lamping.DColor", Properties.Settings.Default.StandardColorArray);
                 }
-                catch (Exception ex) { }
+                catch { }
             }
 
             ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);

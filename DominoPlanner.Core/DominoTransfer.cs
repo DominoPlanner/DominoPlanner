@@ -84,7 +84,7 @@ namespace DominoPlanner.Core
         {
             return GenerateImage(Colors.White, targetWidth, borders);
         }
-        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false, int xShift = 5, int yShift = 5)
+        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false, int xShift = 5, int yShift = 5, int colorType = 0)
         {
             double scalingFactor = 1;
             int width = shapes.Max(s => s.GetContainer().x2);
@@ -103,10 +103,22 @@ namespace DominoPlanner.Core
             
 
             Parallel.For(0, shapes.Length, (i) =>
-           {
-               Color c = colors[shapes[i].color].mediaColor;
-               //Color c = Color.FromArgb((byte)shapes[i].ditherColor.Alpha, (byte)shapes[i].ditherColor.Red, 
-               //    (byte)shapes[i].ditherColor.Green, (byte)shapes[i].ditherColor.Blue);
+            {
+                Color c;
+                if (colorType == 0)
+                {
+                    c = colors[shapes[i].color].mediaColor;
+                }
+                else if (colorType == 1)
+                {
+                    c = Color.FromArgb((byte)shapes[i].PrimaryDitherColor.Alpha, (byte)shapes[i].PrimaryDitherColor.Red,
+                    (byte)shapes[i].PrimaryDitherColor.Green, (byte)shapes[i].PrimaryDitherColor.Blue);
+                }
+                else
+                {
+                    c = Color.FromArgb((byte)shapes[i].PrimaryOriginalColor.Alpha, (byte)shapes[i].PrimaryOriginalColor.Red,
+                       (byte)shapes[i].PrimaryOriginalColor.Green, (byte)shapes[i].PrimaryOriginalColor.Blue);
+                }
                if (shapes[i] is RectangleDomino)
                {
                    DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);

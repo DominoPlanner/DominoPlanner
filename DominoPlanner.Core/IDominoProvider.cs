@@ -66,8 +66,6 @@ namespace DominoPlanner.Core
                     {
                         (this as IRowColumnAddableDeletable).ResetSize();
                     }
-                    EditingChanged?.Invoke(this, EventArgs.Empty);
-                    
                 }
             }
         }
@@ -225,13 +223,13 @@ namespace DominoPlanner.Core
             ct.ThrowIfCancellationRequested();
             if (!PrimaryCalculation.LastValid)
             {
-                PrimaryCalculation.Calculate(last, charLength);
+                PrimaryCalculation.Calculate(last, charLength, ct);
                 PrimaryCalculation.LastValid = true;
             }
             ct.ThrowIfCancellationRequested();
             if (!SecondaryCalculation.LastValid)
             {
-                SecondaryCalculation.Calculate(last, charLength);
+                SecondaryCalculation.Calculate(last, charLength, ct);
                 SecondaryCalculation.LastValid = true;
             }
             return last;
@@ -248,7 +246,7 @@ namespace DominoPlanner.Core
         /// <returns>Ein String, der das HTML des Protokoll enthält.</returns>
         public string GetHTMLProcotol(ObjectProtocolParameters parameters)
         {
-            return parameters.GetHTMLProcotol(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.reverse));
+            return parameters.GetHTMLProcotol(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical));
         }
         /// <summary>
         /// Speichert das Excel-Protokoll eines Objekts am angegebenen Ort.
@@ -256,20 +254,19 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="path">Der Speicherort des Protokolls.</param>
         /// <param name="parameters">Die Parameter des Protokolls.</param>
-        public void SaveXLSFieldPlan(string path, string projectname, ObjectProtocolParameters parameters)
+        public void SaveXLSFieldPlan(string path, ObjectProtocolParameters parameters)
         {
-            parameters.project = projectname;
             FileInfo file = new FileInfo(path);
             if (file.Exists) file.Delete();
             ExcelPackage pack = new ExcelPackage(file);
-            pack = parameters.GenerateExcelFieldplan(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.reverse), pack);
+            pack = parameters.GenerateExcelFieldplan(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical), pack);
             pack.Save();
             pack.Dispose();
             GC.Collect();
         }
-        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, bool reverse = false)
+        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, bool MirrorX = false, bool MirrorY = false)
         {
-            return GenerateProtocol(templateLength, FieldPlanDirection, reverse);
+            return GenerateProtocol(templateLength, FieldPlanDirection, MirrorX, MirrorY);
         }
         /// <summary>
         /// Generiert das Protokoll eines Objekts.
@@ -278,23 +275,10 @@ namespace DominoPlanner.Core
         /// <param name="o">Die Orientierung des Protokolls (optional)</param>
         /// <param name="reverse">Gibt an, ob das Objekt von der anderen Seite gebaut werden soll. Macht eigentlich nur bei Felder Sinn (optional)</param>
         /// <returns></returns>
-        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool reverse = false)
+        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
-            int[,] dominoes = GetBaseField(o);
-            int[,] tempdominoes;
-            if (reverse == true)
-            {
-                // if reversed building direction
-                tempdominoes = new int[dominoes.GetLength(0), dominoes.GetLength(1)];
-                for (int i = 0; i < dominoes.GetLength(0); i++)
-                {
-                    for (int j = 0; j < dominoes.GetLength(1); j++)
-                    {
-                        tempdominoes[i, j] = dominoes[dominoes.GetLength(0) - i - 1, dominoes.GetLength(1) - j - 1];
-                    }
-                }
-                dominoes = tempdominoes;
-            }
+            int[,] dominoes = GetBaseField(o, MirrorX, MirrorY);
+            
             ProtocolTransfer d = new ProtocolTransfer();
             d.dominoes = new List<List<Tuple<int, int>>>[dominoes.GetLength(1)];
             d.orientation = o;
@@ -330,11 +314,11 @@ namespace DominoPlanner.Core
                 }
             }
             d.counts = Counts;
-            d.rows = (o == Orientation.Horizontal) ? dominoes.GetLength(0) : dominoes.GetLength(1);
-            d.columns = (o == Orientation.Horizontal) ? dominoes.GetLength(1) : dominoes.GetLength(0);
+            d.rows = (o == Orientation.Horizontal) ? dominoes.GetLength(1) : dominoes.GetLength(0);
+            d.columns = (o == Orientation.Horizontal) ? dominoes.GetLength(0) : dominoes.GetLength(1);
             return d;
         }
-        public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal)
+        public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!HasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
             if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
@@ -354,6 +338,14 @@ namespace DominoPlanner.Core
                 }
             }
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
+            if (MirrorX == true)
+            {
+                basefield = MirrorArrayX(basefield);
+            }
+            if (MirrorY == true)
+            {
+                basefield = MirrorArrayY(basefield);
+            }
             return basefield;
         }
         public void Save(string filepath = "")
@@ -362,10 +354,9 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region events
-        public event EventHandler EditingChanged;
         #endregion
         #region abstracts
-        protected abstract void RegenerateShapes();
+        public abstract void RegenerateShapes();
         
         protected static T[,] TransposeArray<T>(T[,] array)
         {
@@ -376,6 +367,30 @@ namespace DominoPlanner.Core
                 {
                     //temp[i, j] = array[j, array.GetLength(0) - i - 1];
                     temp[i, j] = array[j, i];
+                }
+            }
+            return temp;
+        }
+        protected static T[,] MirrorArrayY<T>(T[,] array)
+        {
+            T[,] temp = new T[array.GetLength(0), array.GetLength(1)];
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    temp[i, j] = array[i, array.GetLength(1) - j - 1];
+                }
+            }
+            return temp;
+        }
+        protected static T[,] MirrorArrayX<T>(T[,] array)
+        {
+            T[,] temp = new T[array.GetLength(0), array.GetLength(1)];
+            for (int i = 0; i < array.GetLength(0); i++)
+            {
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    temp[i, j] = array[array.GetLength(0) - i - 1, j];
                 }
             }
             return temp;
@@ -393,14 +408,14 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
-            if (PrimaryCalculation == null)
+            /*if (PrimaryCalculation == null)
             {
                 PrimaryCalculation = CreatePrimaryCalculation();
             }
             if (PrimaryImageTreatment == null)
             {
                 PrimaryImageTreatment = CreatePrimaryTreatment();
-            }
+            }*/
             Generate();
             last.colors = colors;
             //CreatePrimaryTreatment();
@@ -420,7 +435,7 @@ namespace DominoPlanner.Core
         #endregion
 
         #region compatibility properties
-        private Calculation TempCalculation;
+        /*private Calculation TempCalculation;
         private ImageTreatment TempImageTreatment;
         internal Calculation CreatePrimaryCalculation()
         {
@@ -573,7 +588,7 @@ namespace DominoPlanner.Core
                 }
             }
         }
-        
+        */
         #endregion
         
     }
@@ -614,7 +629,7 @@ namespace DominoPlanner.Core
         }
         #endregion
         #region compatibility properties
-        
+        /*
         [ProtoMember(1)]
         private AverageMode average
         {
@@ -639,7 +654,7 @@ namespace DominoPlanner.Core
                 ((NormalReadout)CreatePrimaryTreatment()).AllowStretch = value;
             }
         }
-        
+        */
         #endregion
     }
 
