@@ -260,6 +260,7 @@ namespace DominoPlanner.Usage
             }
         }
 
+
         private void OpenItem(ProjectComposite toOpen)
         {
             TabItem selTab = null;
