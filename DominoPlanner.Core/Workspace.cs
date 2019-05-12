@@ -225,6 +225,10 @@ namespace DominoPlanner.Core
         {
             return LoadHasProtocolDefinition<T>(AbsolutePathFromReference(ref relativePath, reference));
         }
+        public static byte[] LoadThumbnailFromStream(Stream stream)
+        {
+            return Serializer.Deserialize<IDominoProviderThumbnail>(stream).Thumbnail;
+        }
         public static void CloseFile(string path)
         {
             if (new Uri(path, UriKind.RelativeOrAbsolute).IsAbsoluteUri)

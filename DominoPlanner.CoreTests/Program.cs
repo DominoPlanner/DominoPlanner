@@ -22,6 +22,15 @@ namespace DominoPlanner.CoreTests
         static void Main(string[] args)
 
         {
+            using (FileStream SelectedItemStream = new FileStream(@"C:\Users\jonat\Desktop\New Project2\Planner Files\elephant.dobject", FileMode.Open))
+            {
+                byte[] array = Workspace.LoadThumbnailFromStream(SelectedItemStream);
+                System.Drawing.Bitmap bmp;
+                using (var ms = new MemoryStream(array))
+                {
+                    bmp = new System.Drawing.Bitmap(ms);
+                }
+            }
             //ProjectTests.CreateProject();
             //ProjectTests.LoadProject();
             Thread.Sleep(500);
