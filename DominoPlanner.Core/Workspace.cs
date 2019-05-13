@@ -225,6 +225,10 @@ namespace DominoPlanner.Core
         {
             return LoadHasProtocolDefinition<T>(AbsolutePathFromReference(ref relativePath, reference));
         }
+        public static byte[] LoadThumbnailFromStream(Stream stream)
+        {
+            return Serializer.Deserialize<IDominoProviderThumbnail>(stream).Thumbnail;
+        }
         public static void CloseFile(string path)
         {
             if (new Uri(path, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
@@ -247,7 +251,7 @@ namespace DominoPlanner.Core
         }
         public static object Find<T>(string AbsolutePath)
         {
-            var result = Instance.openedFiles.Where(x => x.Item1 == AbsolutePath && x.Item2 is T);
+            var result = Instance.openedFiles.Where(x => Path.GetFullPath(x.Item1).Equals(Path.GetFullPath(AbsolutePath), StringComparison.OrdinalIgnoreCase) && x.Item2 is T);
             if (result.Count() == 0) return null;
             return result.First().Item2;
         }

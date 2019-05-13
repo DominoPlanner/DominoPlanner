@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.CoreTests", "
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{B670E8BB-4B22-43B6-8621-FE04C632DD1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.PreviewHandler", "DominoPlanner.PreviewHandler\DominoPlanner.PreviewHandler.csproj", "{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{B670E8BB-4B22-43B6-8621-FE04C632DD1F}.Release|Any CPU.ActiveCfg = Release
 		{B670E8BB-4B22-43B6-8621-FE04C632DD1F}.Release|Mixed Platforms.ActiveCfg = Release
 		{B670E8BB-4B22-43B6-8621-FE04C632DD1F}.Release|x86.ActiveCfg = Release
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Debug|x86.Build.0 = Debug|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|x86.ActiveCfg = Release|Any CPU
+		{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
