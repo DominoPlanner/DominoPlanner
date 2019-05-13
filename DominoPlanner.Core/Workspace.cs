@@ -251,7 +251,7 @@ namespace DominoPlanner.Core
         }
         public static object Find<T>(string AbsolutePath)
         {
-            var result = Instance.openedFiles.Where(x => x.Item1 == AbsolutePath && x.Item2 is T);
+            var result = Instance.openedFiles.Where(x => Path.GetFullPath(x.Item1).Equals(Path.GetFullPath(AbsolutePath), StringComparison.OrdinalIgnoreCase) && x.Item2 is T);
             if (result.Count() == 0) return null;
             return result.First().Item2;
         }
