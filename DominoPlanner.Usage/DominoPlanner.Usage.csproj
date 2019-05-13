@@ -60,6 +60,12 @@
     <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.GLControl.1.1.2225.0\lib\net20\OpenTK.GLControl.dll</HintPath>
     </Reference>
+    <Reference Include="ServerRegistrationManager, Version=2.7.1.0, Culture=neutral, PublicKeyToken=68bd4561cc3495fc, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServerRegistrationManager.2.7.1\lib\net45\ServerRegistrationManager.exe</HintPath>
+    </Reference>
+    <Reference Include="SharpShell, Version=2.7.1.0, Culture=neutral, PublicKeyToken=f14dc899472fe6fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpShell.2.7.1\lib\net40-client\SharpShell.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -401,6 +407,10 @@
     <ProjectReference Include="..\DominoPlanner.Core\DominoPlanner.Core.csproj">
       <Project>{7b3057cf-e826-401f-8f61-344a4ea1aafe}</Project>
       <Name>DominoPlanner.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DominoPlanner.PreviewHandler\DominoPlanner.PreviewHandler.csproj">
+      <Project>{7fb0e775-dd0a-4517-8a7d-ce5c3900a697}</Project>
+      <Name>DominoPlanner.PreviewHandler</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

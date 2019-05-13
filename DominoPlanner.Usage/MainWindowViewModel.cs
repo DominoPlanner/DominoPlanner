@@ -11,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace DominoPlanner.Usage
 {
@@ -250,8 +251,8 @@ namespace DominoPlanner.Usage
             {
                 foreach (ProjectComposite pp in p.Children)
                 {
-                    if (Path.GetFullPath(Path.Combine(Path.GetDirectoryName(p.FilePath), pp.FilePath))
-                        == Path.GetFullPath(param.ToString())) comp = pp;
+                    if (Path.GetFullPath(Path.Combine(Path.GetDirectoryName(p.FilePath), pp.FilePath)).Equals(
+                        Path.GetFullPath(param.ToString()), StringComparison.OrdinalIgnoreCase)) comp = pp;
                 }
             }
             if (comp != null)
@@ -315,6 +316,69 @@ namespace DominoPlanner.Usage
                         }
                 SelectedTab = selTab;
             } 
+        }
+        public void OpenFile(string filename)
+        {
+            foreach (string s in filename.Split('\n'))
+            {
+                ProjectComposite result = null;
+                string fn = s.Trim();
+                if (Path.GetExtension(fn).ToLower() == ".dobject")
+                {
+                    try
+                    {
+                        var dp = Workspace.Load<IDominoProvider>(fn);
+                    }
+                    catch
+                    {
+                        Errorhandler.RaiseMessage("The requested file is either unreadable or does not exist.", "Could not open file", Errorhandler.MessageType.Error);
+                        continue;
+                    }
+                    // check if there is a project file in the super folder
+                    string parent = Directory.GetParent(Path.GetDirectoryName(fn)).FullName;
+                    var parentfiles = Directory.GetFiles(parent, "*.dproject");
+                    if (parentfiles.Length != 0)
+                    {
+                        var proj = Projects.Where(x => Path.GetFullPath(((ProjectListComposite)x).FilePath)
+                            .Equals(Path.GetFullPath(parentfiles.First()), StringComparison.OrdinalIgnoreCase));
+                        if (proj.Count() != 0)
+                        {
+                            var res = (proj.First() as ProjectListComposite).Children
+                                .Where(x => Path.GetFullPath(x.FilePath)
+                                .Equals(Path.GetFullPath(fn), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                            if (res != null)
+                            {
+                                result = res;
+                            }
+                        }
+                    }
+                    foreach (ProjectListComposite plc in Projects)
+                    {
+                        if (result != null)
+                            break;
+                        foreach (ProjectComposite pc in plc.Children)
+                        {
+                            if (Path.GetFullPath(pc.FilePath).Equals(Path.GetFullPath(fn), StringComparison.OrdinalIgnoreCase))
+                            {
+                                result = pc;
+                                break;
+                            }
+                        }
+                    }
+                    if (result != null)
+                    {
+                        OpenItem(result);
+                    }
+                    else
+                    {
+                        Errorhandler.RaiseMessage("The file requested is not listed in any project. \n" +
+                            "You can either load its parent project or add the file to another project.", "File not found", Errorhandler.MessageType.Error);
+                    }
+                    
+                }
+
+
+            }
         }
         /// <summary>
         /// Selection Changed in der Baumstruktur (damit das akteuelle Item refreshed werden kann)
