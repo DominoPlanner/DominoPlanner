@@ -17,10 +17,10 @@ using System.IO;
 
 namespace DominoPlanner.PreviewHandler
 {
-    [ComVisible(true)]
-    [COMServerAssociation(AssociationType.ClassOfExtension, ".dobject")]
-    [DisplayName("DominoPlanner Object Preview Handler")]
-    [PreviewHandler(DisableLowILProcessIsolation = false, SurrogateHostType = SurrogateHostType.Prevhost)]
+    //[ComVisible(true)]
+    //[COMServerAssociation(AssociationType.ClassOfExtension, ".dobject")]
+    //[DisplayName("DominoPlanner Object Preview Handler")]
+    //[PreviewHandler(DisableLowILProcessIsolation = false, SurrogateHostType = SurrogateHostType.Prevhost)]
     public class IDominoProviderPreviewHandler : SharpPreviewHandler
     {
         
@@ -96,10 +96,14 @@ namespace DominoPlanner.PreviewHandler
         private System.ComponentModel.IContainer components = null;
     }
     [ComVisible(true)]
-    [COMServerAssociation(AssociationType.ClassOfExtension, ".dobject")]
+    [COMServerAssociation(AssociationType.FileExtension, ".dobject")]
     [DisplayName("DominoPlanner Object Thumbnail Handler")]
-    class IDominoProviderThumbnail : SharpThumbnailHandler
+    public class IDominoProviderThumbnail : SharpThumbnailHandler
     {
+        public IDominoProviderThumbnail()
+        {
+
+        }
         protected override Bitmap GetThumbnailImage(uint width)
         {
             Logging.Log("in GetThumbnailImage");
@@ -117,8 +121,9 @@ namespace DominoPlanner.PreviewHandler
                     int largerSide = Math.Max(bmp.Size.Height, bmp.Size.Width);
 
                     result = new Bitmap(largerSide+2, largerSide+2);
-                    Graphics g = Graphics.FromImage(result);
                     
+                    Graphics g = Graphics.FromImage(result);
+                    g.Clear(System.Drawing.Color.White);
                     
                     g.DrawImage(bmp, largerSide / 2 + 1 - bmp.Size.Width / 2, 
                         largerSide / 2 + 1- bmp.Size.Height / 2, bmp.Size.Width, bmp.Size.Height);
