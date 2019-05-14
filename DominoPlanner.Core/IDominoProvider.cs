@@ -422,29 +422,12 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
-            /*if (PrimaryCalculation == null)
+            if (PrimaryImageTreatment == null || PrimaryCalculation == null)
             {
-                PrimaryCalculation = CreatePrimaryCalculation();
+                throw new InvalidDataException();
             }
-            if (PrimaryImageTreatment == null)
-            {
-                PrimaryImageTreatment = CreatePrimaryTreatment();
-            }*/
             Generate();
             last.colors = colors;
-            //CreatePrimaryTreatment();
-            //bool lastValidTemp = lastValid;
-            ////if (!Editing)
-            ////{
-            //PrimaryImageTreatment?.();
-            //SecondaryImageTreatment?.UpdateSource();
-
-            //ApplyImageFilters();
-            //ApplyColorFilters();
-            //GenerateShapes();
-            //ReadUsedColors();
-            ////}
-            //lastValid = lastValidTemp;
         }
         #endregion
 

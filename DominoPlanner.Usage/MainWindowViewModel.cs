@@ -298,11 +298,13 @@ namespace DominoPlanner.Usage
                     }
                     catch (FileNotFoundException)
                     {
-                        DocumentNode dn = (DocumentNode)toOpen.Project.documentNode;
-                        dn.parent.children.Remove(dn);
-                        Workspace.CloseFile(toOpen.FilePath);
-                        ((ProjectListComposite)Projects.Where(x => x.OwnID == toOpen.ParentProjectID).First()).Children.Remove(toOpen);
-                        Workspace.Save(dn.parent);
+                        RemoveProjectNode(toOpen);
+                    }
+                    catch (InvalidDataException)
+                    {
+                        RemoveProjectNode(toOpen);
+                        Errorhandler.RaiseMessage($"The file {toOpen.Name} is broken. " +
+                            $"It has been removed from the project.", "File not readable", Errorhandler.MessageType.Error);
                     }
                 }
             }
@@ -316,6 +318,14 @@ namespace DominoPlanner.Usage
                         }
                 SelectedTab = selTab;
             } 
+        }
+        private void RemoveProjectNode(ProjectComposite pc)
+        {
+            DocumentNode dn = (DocumentNode)pc.Project.documentNode;
+            dn.parent.children.Remove(dn);
+            Workspace.CloseFile(pc.FilePath);
+            ((ProjectListComposite)Projects.Where(x => x.OwnID == pc.ParentProjectID).First()).Children.Remove(pc);
+            Workspace.Save(dn.parent);
         }
         public void OpenFile(string filename)
         {
@@ -375,6 +385,75 @@ namespace DominoPlanner.Usage
                             "You can either load its parent project or add the file to another project.", "File not found", Errorhandler.MessageType.Error);
                     }
                     
+                }
+                else if (Path.GetExtension(fn).ToLower() == ".dcolor")
+                {
+                    try
+                    {
+                        var cr = Workspace.Load<ColorRepository>(fn);
+                    }
+                    catch
+                    {
+                        Errorhandler.RaiseMessage("The requested file is either unreadable or does not exist.", "Could not open file", Errorhandler.MessageType.Error);
+                        continue;
+                    }
+                    // check if there is a project file in the super folder
+                    string parent = Directory.GetParent(Path.GetDirectoryName(fn)).FullName;
+                    var parentfiles = Directory.GetFiles(parent, "*.dproject");
+                    ProjectListComposite searchResult = null;
+                    if (parentfiles.Length != 0)
+                    {
+                        // look for the same project in the list of opened projects
+                        var proj = Projects.Where(x => Path.GetFullPath(((ProjectListComposite)x).FilePath)
+                            .Equals(Path.GetFullPath(parentfiles.First()), StringComparison.OrdinalIgnoreCase));
+                        searchResult = proj.FirstOrDefault() as ProjectListComposite;
+                    }
+                    List<ProjectComposite> l = new List<ProjectComposite>();
+                    if (searchResult != null) l.Add(searchResult);
+                    l.AddRange(Projects);
+                    foreach (ProjectListComposite plc in l)
+                    {
+                        var absCurrentColorPath = Path.Combine(Path.GetDirectoryName(plc.FilePath),
+                            (plc.Project.documentNode as AssemblyNode).obj.colorPath);
+                        if (Path.GetFullPath(absCurrentColorPath).Equals(Path.GetFullPath(fn), StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = plc.Children[0];
+                            OpenItem(result);
+                            plc.IsExpanded = true;
+                            break;
+                            
+                        }
+                        
+                    }
+                }
+                else if (Path.GetExtension(fn).ToLower() == ".dproject")
+                {
+                    ProjectListComposite res = null;
+                    foreach (ProjectListComposite p in Projects)
+                    {
+                        if (Path.GetFullPath(p.FilePath).Equals(Path.GetFullPath(fn), StringComparison.OrdinalIgnoreCase))
+                        {
+                            res = p;
+                            res.IsExpanded = true;
+                            break;
+                        }
+                    }
+                    if (res != null) continue;
+                    if (File.Exists(fn))
+                    {
+                        try
+                        {
+                            var assy = Workspace.Load<DominoAssembly>(fn);
+                        }
+                        catch
+                        {
+                            Errorhandler.RaiseMessage("The requested file is either unreadable or does not exist.", "Could not open file", Errorhandler.MessageType.Error);
+                            continue;
+                        }
+                        OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(fn), Path.GetDirectoryName(fn));
+                        loadProject(openProject);
+                        
+                    }
                 }
 
 
