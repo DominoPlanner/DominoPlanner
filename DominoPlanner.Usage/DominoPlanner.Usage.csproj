@@ -151,8 +151,6 @@
     <Compile Include="NewProjectVM.cs" />
     <Compile Include="Operations.cs" />
     <Compile Include="ProjectCanvas.cs" />
-    <Compile Include="ProjectComposite.cs" />
-    <Compile Include="ProjectListComposite.cs" />
     <Compile Include="ProtocolV.xaml.cs">
       <DependentUpon>ProtocolV.xaml</DependentUpon>
     </Compile>
@@ -174,6 +172,7 @@
     <Compile Include="UserControls\ViewModel\EditProjectVM.cs" />
     <Compile Include="UserControls\ViewModel\ImageTreatmentVM.cs" />
     <Compile Include="UserControls\ViewModel\IterationInformationVM.cs" />
+    <Compile Include="UserControls\ViewModel\ProjectHierarchyVM.cs" />
     <Compile Include="UserControls\ViewModel\RenameObjectVM.cs" />
     <Compile Include="UserControls\ViewModel\TabBaseVM.cs" />
     <Compile Include="UserControls\ViewModel\TabItem.cs" />

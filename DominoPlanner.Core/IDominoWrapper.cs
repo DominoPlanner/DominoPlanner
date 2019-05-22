@@ -92,9 +92,8 @@ namespace DominoPlanner.Core
     [ProtoInclude(103, typeof(SpiralNode))]
     public abstract class DocumentNode : IDominoWrapper
     {
-
-        private string _relativePath;
         [ProtoMember(1)]
+        private string _relativePath;
         public string relativePath
         {
             get => _relativePath;
@@ -102,9 +101,22 @@ namespace DominoPlanner.Core
             {
                 if (value != _relativePath)
                 {
+                    if (_obj != null) Workspace.CloseFile(obj);
                     _relativePath = value;
                     _obj = null;
+                    RelativePathChanged?.Invoke();
+                    var res = obj;
                 }
+            }
+        }
+        public string AbsolutePath
+        {
+            get
+            {
+                string _oldpath = _relativePath;
+                var result = Workspace.AbsolutePathFromReference(ref _relativePath, parent);
+                if (_oldpath != _relativePath) RelativePathChanged?.Invoke();
+                return result;
             }
         }
         private IDominoProvider _obj;
@@ -113,7 +125,9 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<IDominoProvider>(relativePath, parent);
+                {
+                    _obj = Workspace.Load<IDominoProvider>(AbsolutePath);
+                }
                 return _obj;
             }
         }
@@ -122,10 +136,11 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    return Workspace.LoadColorList<IDominoProviderPreview>(relativePath).Item2;
+                    return Workspace.LoadColorList<IDominoProviderPreview>(AbsolutePath).Item2;
                 return obj.Counts;
             }
         }
+        public Action RelativePathChanged;
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
             this.relativePath = relativePath;
@@ -199,21 +214,50 @@ namespace DominoPlanner.Core
 
         }
     }
-    [ProtoContract(SkipConstructor =true)]
+    [ProtoContract(SkipConstructor = true)]
     public class AssemblyNode : IDominoWrapper
     {
         [ProtoMember(1)]
-        public string Path;
+        private string path;
+
+        public string Path
+        {
+            get { return path; }
+            set
+            {
+                if (_obj != null) Workspace.CloseFile(obj);
+                path = value;
+                RelativePathChanged?.Invoke();
+                _obj = null;
+                var res = obj;
+            }
+        }
+        public string AbsolutePath
+        {
+            get
+            {
+                string _oldpath = path;
+                var result = Workspace.AbsolutePathFromReference(ref path, parent);
+                if (_oldpath != path)
+                {
+                    RelativePathChanged?.Invoke();
+                }
+                return result;
+            }
+        }
+
         private DominoAssembly _obj;
         public DominoAssembly obj
         {
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<DominoAssembly>(Path, parent);
+                    _obj = Workspace.Load<DominoAssembly>(AbsolutePath);
                 return _obj;
             }
         }
+        public Action RelativePathChanged;
+
         public AssemblyNode(string Path, DominoAssembly parent = null) : base(parent)
         {
             this.Path = Path;
