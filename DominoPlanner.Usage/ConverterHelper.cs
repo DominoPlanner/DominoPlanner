@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using System;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -326,6 +327,38 @@ namespace DominoPlanner.Usage
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return Convert(value, targetType, parameter, culture);
+        }
+    }
+    public class FilenameToImageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string uri = value as string;
+
+            if (uri != null)
+            {
+                BitmapImage image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                var ur = new Uri(uri, UriKind.RelativeOrAbsolute);
+                if (ur.IsAbsoluteUri == false)
+                {
+                    if (uri[0] == '/')
+                        uri = uri.Substring(1);
+                    ur = new Uri("pack://application:,,,/" + uri);
+                }
+                image.UriSource = ur;
+                image.DecodePixelWidth = 40;
+                image.EndInit();
+                return image;
+            }
+
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }

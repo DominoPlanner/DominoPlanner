@@ -21,6 +21,7 @@
             <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
         <local:PathToImageConverter x:Key="PathToImageConverter"/>
+        <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFieldStruct}"/>
@@ -225,7 +226,7 @@
                                         <ColumnDefinition Width="20"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Grid.Column="0" Source="{Binding ImagePath}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                    <Image Grid.Column="0" Source="{Binding ImagePath, Converter={StaticResource FilenameToThumbnailConverter}}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                     <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                                 </Grid>
                             </ContentControl>
@@ -245,7 +246,7 @@
                                     <ColumnDefinition Width="2"/>
                                     <ColumnDefinition Width="20"/>
                                 </Grid.ColumnDefinitions>
-                                <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center" MaxHeight="25"/>
+                                <Image Grid.Column="0" Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
                                 <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
                                 <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
                                     <Button.Background>
