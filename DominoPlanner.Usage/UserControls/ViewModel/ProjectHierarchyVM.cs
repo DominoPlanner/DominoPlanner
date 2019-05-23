@@ -223,7 +223,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     vm.parent = this;
                     Children.Add(vm);
                 }
-                catch (InvalidDataException)
+                catch (Exception ex) when (ex is InvalidDataException) // TODO: Protobuf Exception hinzufügen
                 {
                     // broken Subassembly
                     var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
@@ -237,7 +237,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     
                 }
-
+                catch (FileNotFoundException)
+                {
+                    string path = "";
+                    if (node is AssemblyNode asn) path = asn.Path;
+                    Errorhandler.RaiseMessage($"The project file {path} does not exist at the current location. " +
+                        $"It will be removed from the project.", "Error", Errorhandler.MessageType.Error);
+                    // Remove file from Assembly and decrease counter
+                    AssemblyModel.obj.children.RemoveAt(i--);
+                    AssemblyModel.Save();
+                }
             }
         }
 
