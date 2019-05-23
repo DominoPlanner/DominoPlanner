@@ -144,6 +144,7 @@ namespace DominoPlanner.Core
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
             this.relativePath = relativePath;
+            RelativePathChanged = () => parent?.Save();
         }
         
     }

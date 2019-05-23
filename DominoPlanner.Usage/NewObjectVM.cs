@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage
         #endregion
         
         #region prop
-        public DocumentNode ResultNode { get; private set; }
+        public IDominoWrapper ResultNode { get; private set; }
         public string ProjectPath { get; private set; }
         public string ObjectPath { get { return string.Format("{0}\\Planner Files\\{1}{2}", ProjectPath, _filename, _endung); } }
 
@@ -49,8 +49,8 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-        private DominoProviderVM _CurrentViewModel;
-        public DominoProviderVM CurrentViewModel
+        private object _CurrentViewModel;
+        public object CurrentViewModel
         {
             get => _CurrentViewModel;
             set
@@ -84,9 +84,9 @@ namespace DominoPlanner.Usage
                 if (_selectedType != value)
                 {
                     _selectedType = value;
-                    CurrentViewModel = ViewModels[value].Provider;
+                    Extension = ViewModels[value].Extension;
+                    CurrentViewModel = ViewModels[value].ViewModel;
                     CurrentImageInformation = ViewModels[value].ImageInformation;
-                    CurrentImageInformation.UpdateProvider(CurrentViewModel);
                     RaisePropertyChanged();
                 }
             }
@@ -106,7 +106,7 @@ namespace DominoPlanner.Usage
         }
 
         private string _endung = ".dobject";
-        public string endung
+        public string Extension
         {
             get { return _endung; }
             set
@@ -151,7 +151,7 @@ namespace DominoPlanner.Usage
             ViewModels = new ObservableCollection<NewObjectEntry>();
             CurrentImageInformation = new SingleImageInformation();
             string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject);
-            ViewModels.Add(new NewObjectEntry()
+            ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Field",
                 Description = "Add a field based on an image",
@@ -162,7 +162,7 @@ namespace DominoPlanner.Usage
                     8, 8, 24, 8, 5000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
-            ViewModels.Add(new NewObjectEntry()
+            ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Structure",
                 Description = "Add a structure (e.g. Wall) based on an image",
@@ -172,7 +172,7 @@ namespace DominoPlanner.Usage
                     new StructureParameters(5, 5, System.Windows.Media.Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
                     2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
             });
-            ViewModels.Add(new NewObjectEntry()
+            ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Circle",
                 Description = "Add a circle bomb based on an image",
@@ -182,7 +182,7 @@ namespace DominoPlanner.Usage
                     new CircleParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
                     AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
             });
-            ViewModels.Add(new NewObjectEntry()
+            ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Spiral",
                 Description = "Add a spiral based on an image",
@@ -192,56 +192,20 @@ namespace DominoPlanner.Usage
                     new SpiralParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
                     AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), false)
             });
-        }
-        private bool FinalizeProvider(string filepath)
-        {
-            CurrentViewModel.CurrentProject.Save(filepath);
-            string colorlist = parentProject.colorPath;
-            CurrentViewModel.CurrentProject.ColorPath = $@"..\{colorlist}";
-            return CurrentImageInformation.FinalizeProvider(CurrentViewModel.CurrentProject, filepath);
+            ViewModels.Add(new NewAssemblyEntry()
+            {
+                Name = "Subproject",
+                Description = "Add a subproject with the same color list",
+                Icon = "/Icons/folder_txt.ico",
+                ImageInformation = new NoImageInformation()
+            });
         }
         private void mCreateIt()
         {
-            try
+            ResultNode = ViewModels[SelectedType].CreateIt(parentProject, filename, ProjectPath);
+            if (ResultNode != null)
             {
-                foreach (DocumentNode dc in parentProject.children)
-                {
-                    if (filename == Path.GetFileNameWithoutExtension(dc.relativePath))
-                    {
-                        Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose different Name.", "Error!", Errorhandler.MessageType.Error);
-                        return;
-                    }
-                }
-                if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
-                {
-                    Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
-                    return;
-                }
-                string resultPath = Path.Combine(ProjectPath, Path.Combine("Planner Files", string.Format("{0}.DObject", filename)));
-                try
-                {
-                    bool finalizeResult = FinalizeProvider(resultPath);
-
-                    if (!finalizeResult)
-                    {
-                        throw new OperationCanceledException("Finalize failed");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    File.Delete(Workspace.AbsolutePathFromReference(ref resultPath, parentProject));
-                    CurrentImageInformation.RevertChangesToFileSystem();
-                    ResultNode = null;
-                    Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
-                }
-                CurrentViewModel.CurrentProject.Save();
                 Close = true;
-                ResultNode = (DocumentNode)IDominoWrapper.CreateNodeFromPath(parentProject, resultPath);
-                parentProject.Save();
-            }
-            catch (Exception es)
-            {
-                Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error);
             }
         }
         #endregion
@@ -316,7 +280,7 @@ namespace DominoPlanner.Usage
                 return false;
             }
 
-            finalImagePath = string.Format("{0}{1}", Path.GetFileName(savepath), Path.GetExtension(finalImagePath));
+            finalImagePath = string.Format("{0}{1}", Path.GetFileNameWithoutExtension(savepath), Path.GetExtension(finalImagePath));
             int counter = 1;
             while (File.Exists(Path.Combine(Path.GetDirectoryName(savepath), @"..\Source Image", finalImagePath)))
             {
@@ -346,17 +310,139 @@ namespace DominoPlanner.Usage
         }
         public override void RevertChangesToFileSystem()
         {
-            File.Delete(finalImagePath);
+            if (File.Exists(finalImagePath)) File.Delete(finalImagePath);
         }
         #endregion
     }
-    public class NewObjectEntry
+
+    public abstract class NewObjectEntry
     {
         public ImageInformation ImageInformation { get; set; }
-        public DominoProviderVM Provider { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Icon { get; set; }
+        public abstract string Extension { get; }
+        public abstract IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath);
+        public abstract object ViewModel { get; }
+        public abstract void UpdateImageInformation();
+    }
+    public class DominoProviderObjectEntry : NewObjectEntry
+    {
+        public override void UpdateImageInformation()
+        {
+            ImageInformation.UpdateProvider(Provider);
+        }
+        public override object ViewModel => Provider;
+        public DominoProviderVM Provider { get; set; }
+
+        public override string Extension => ".dobject";
+
+        public bool Finalize(string filepath, DominoAssembly parentProject)
+        {
+            Provider.CurrentProject.Save(filepath);
+            string colorlist = parentProject.colorPath;
+            Provider.CurrentProject.ColorPath = $@"..\{colorlist}";
+            return ImageInformation.FinalizeProvider(Provider.CurrentProject, filepath);
+        }
+        public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
+        {
+            try
+            {
+                string resultPath = Path.Combine(ProjectPath, Path.Combine("Planner Files", string.Format("{0}{1}", filename, Extension)));
+
+                if (File.Exists(resultPath))
+                {
+                    Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose a different Name.", "Error!", Errorhandler.MessageType.Error);
+                    return null;
+                }
+                if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
+                {
+                    Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
+                    return null;
+                }
+                try
+                {
+                    bool finalizeResult = Finalize(resultPath, parentProject);
+
+                    if (!finalizeResult)
+                    {
+                        throw new OperationCanceledException("Finalize failed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (File.Exists(resultPath)) File.Delete(resultPath);
+                    Workspace.CloseFile(Provider.CurrentProject);
+                    ImageInformation.RevertChangesToFileSystem();
+                    if (!(ex is OperationCanceledException))
+                        Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex.Message + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
+                    return null;
+                }
+                Provider.CurrentProject.Save();
+                var ResultNode = (DocumentNode)IDominoWrapper.CreateNodeFromPath(parentProject, resultPath);
+                parentProject.Save();
+                return ResultNode;
+            }
+            catch (Exception es)
+            {
+                Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error);
+                return null;
+            }
+        }
+    }
+    public class NewAssemblyEntry : NewObjectEntry
+    {
+        public override string Extension => ".dproject";
+        public override object ViewModel => new object();
+
+        public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
+        {
+            string newProject = Path.Combine(ProjectPath, "Planner Files", filename);
+            string PlannerFilesPath = Path.Combine(newProject, "Planner Files");
+            string SourceImagesPath = Path.Combine(newProject, "Source Image");
+            string assemblyPath = Path.Combine(newProject, filename + Extension);
+            try
+            {
+                
+                if (Directory.Exists(ProjectPath))
+                {
+                    if (Directory.Exists(newProject))
+                    {
+                        Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error", 
+                            Errorhandler.MessageType.Error);
+                        return null;
+                    }
+                    if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
+                    {
+                        Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
+                        return null;
+                    }
+                    Directory.CreateDirectory(newProject);
+                    Directory.CreateDirectory(PlannerFilesPath);
+                    Directory.CreateDirectory(SourceImagesPath);
+                    
+                    DominoAssembly dominoAssembly = new DominoAssembly() { };
+                    dominoAssembly.Save(assemblyPath);
+                    dominoAssembly.colorPath = Workspace.MakeRelativePath(assemblyPath,
+                        Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject));
+                    dominoAssembly.Save();
+                    AssemblyNode asn = new AssemblyNode(Workspace.MakeRelativePath(ProjectPath + "\\", assemblyPath), parentProject);
+                    parentProject.Save();
+                    return asn;
+                }
+            }
+            catch
+            {
+                if (Directory.Exists(newProject)) Directory.Delete(newProject, true);
+                Errorhandler.RaiseMessage("Project creation failed. The file system changes have been reverted", "Error", Errorhandler.MessageType.Error);
+            }
+            return null;
+        }
+
+        public override void UpdateImageInformation()
+        {
+            
+        }
     }
     public class ImageSelector : DataTemplateSelector
     {

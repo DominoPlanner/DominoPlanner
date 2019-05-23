@@ -405,7 +405,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             List<string> warningfiles = new List<string>();
             if (DominoAssembly != null)
             {
-                foreach (DocumentNode project in DominoAssembly?.children)
+                foreach (DocumentNode project in DominoAssembly?.children.OfType<DocumentNode>())
                 {
                     try
                     {

@@ -134,7 +134,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             switch (node)
             {
                 case AssemblyNode assy:
-                    return new AssemblyNodeVM(assy, parent);
+                    return new AssemblyNodeVM(assy, parent.openTab, parent.closeTab, parent.getTab);
                 case DocumentNode dn:
                     return new DocumentNodeVM(dn);
             }
@@ -190,33 +190,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 LoadChildren();
             }
         }
-        public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent)
-        {
-            AssemblyModel = assembly;
-            this.parent = parent;
-            LoadChildren();
-        }
+        public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent) :
+            this(assembly, parent, parent.openTab, parent.closeTab, parent.getTab) { }
+
         public AssemblyNodeVM(AssemblyNode assembly, Action<TabItem> openTab,
+            Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab) : this(assembly, null, openTab, closeTab, getTab) { }
+
+        public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent, Action<TabItem> openTab,
             Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab)
         {
             AssemblyModel = assembly;
             AssemblyModel.RelativePathChanged = RelativePathChanged;
-            parent = null;
             this.openTab = openTab;
             this.closeTab = closeTab;
             this.getTab = getTab;
             colorNode = new ColorNodeVM(this);
-            // if Color path is wrong, remove project 
-
-            if (!this.CheckPath())
-            {
-                Remove();
-            }
-            if (!colorNode.CheckPath())
-            {
-                Remove();
-            }
-
             LoadChildren();
         }
         public void LoadChildren()
@@ -262,20 +250,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 foreach (NodeVM i in e.NewItems)
                 {
-                    i.getTab = this.getTab;
-                    i.openTab = this.openTab;
-                    i.closeTab = this.closeTab;
-                    
                     if (i is DocumentNodeVM dn)
                     {
+                        dn.getTab = this.getTab;
+                        dn.openTab = this.openTab;
+                        dn.closeTab = this.closeTab;
                         dn.DocumentModel.RelativePathChanged = dn.RelativePathChanged;
-                        
                     }
                     else if (i is AssemblyNodeVM an)
                     {
                         an.AssemblyModel.RelativePathChanged = an.RelativePathChanged;
                     }
-
                     if (!i.CheckPath())
                     {
                         if (i is DominoWrapperNodeVM)
@@ -330,6 +315,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, openFileDialog.FileName);
                         var newNodeVM = NodeVMFactory(node, this);
                         Children.Add(newNodeVM);
+                        AssemblyModel.Save();
                         newNodeVM.Open();
                     }
                     catch (FileNotFoundException)
