@@ -83,6 +83,14 @@ namespace DominoPlanner.Core
         {
             Workspace.Save(this, relativePath);
         }
+        [ProtoAfterDeserialization]
+        private void CheckIntegrity()
+        {
+            if (colorPath == null || colors == null)
+            {
+                throw new InvalidDataException("File invalid");
+            }
+        }
         
     }
     [ProtoContract(SkipConstructor =true)]

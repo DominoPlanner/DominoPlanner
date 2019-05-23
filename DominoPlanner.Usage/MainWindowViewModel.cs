@@ -380,7 +380,6 @@ namespace DominoPlanner.Usage
                     try
                     {
                         AssemblyNode restored = AssemblyNodeVM.RestoreAssembly(projectpath);
-                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
                         node = new AssemblyNodeVM(restored, OpenItem, RemoveNodeFromTabs, GetTab);
                     }
                     catch (FileNotFoundException)

@@ -93,9 +93,16 @@ namespace DominoPlanner.Usage
             bool isMethod = !bool.TryParse(attr.Activated, out Activated);
             if (isMethod)
             {
-                var mipred = reference.GetType().GetRuntimeMethod(attr.Activated, new Type[] { });
-                var micoll = reference.GetType().GetRuntimeMethods();
-                Activated = (bool)mipred.Invoke(reference, new object[] { });
+                try
+                {
+                    var mipred = reference.GetType().GetRuntimeMethod(attr.Activated, new Type[] { });
+                    var micoll = reference.GetType().GetRuntimeMethods();
+                    Activated = (bool)mipred.Invoke(reference, new object[] { });
+                }
+                catch
+                {
+                    Activated = false;
+                }
             }
             Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
             Header = attr.Header;

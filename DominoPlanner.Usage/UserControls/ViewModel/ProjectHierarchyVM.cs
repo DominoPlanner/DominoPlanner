@@ -214,11 +214,29 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Children.CollectionChanged += ChildrenAddDelegates;
             Children.CollectionChanged -= Children_CollectionChanged;
             Children.CollectionChanged += Children_CollectionChanged;
-            foreach (var node in AssemblyModel.obj.children)
+            for (int i = 0; i < AssemblyModel.obj.children.Count; i++)
             {
-                var vm = NodeVMFactory(node, this);
-                vm.parent = this;
-                Children.Add(vm);
+                var node = AssemblyModel.obj.children[i];
+                try
+                {
+                    var vm = NodeVMFactory(node, this);
+                    vm.parent = this;
+                    Children.Add(vm);
+                }
+                catch (InvalidDataException)
+                {
+                    // broken Subassembly
+                    var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
+                    {
+                        restored.parent = AssemblyModel.obj;
+                        // make color path relative
+                        restored.Path = Workspace.MakeRelativePath(AbsolutePath, restored.Path);
+                        AssemblyModel.obj.children[i] = restored;
+                        Children.Add(NodeVMFactory(restored, this));
+                        AssemblyModel.Save();
+                    }
+                    
+                }
 
             }
         }
@@ -363,7 +381,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
-            AssemblyNode mainnode = null;
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
             var colorres = Directory.EnumerateFiles(colorpath, "*.DColor");
             // restore project if colorfile exists
@@ -378,22 +395,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
             newMainNode.colorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
-            foreach (string path in Directory.EnumerateFiles(colorpath, "*.DObject"))
+            foreach (string path in Directory.EnumerateDirectories(colorpath))
+            {
+                try
+                {
+                    var assembly = Directory.EnumerateFiles(path, "*.dproject").
+                        Where(x => Path.GetFileName(x).Contains("backup_")).FirstOrDefault();
+                    if (string.IsNullOrEmpty(assembly)) continue;
+                    AssemblyNode an = new AssemblyNode(Workspace.MakeRelativePath(projectpath, assembly), newMainNode);
+                    newMainNode.children.Add(an);
+                }
+                catch { } // if error on add assembly, don't add assembly
+            }
+            foreach (string path in Directory.EnumerateFiles(colorpath, "*.dobject"))
             {
                 try
                 {
                     var node = (DocumentNode)IDominoWrapper.CreateNodeFromPath(newMainNode, path);
                 }
                 catch { } // if error on add of file, don't add file 
-            }
-            foreach (string path in Directory.EnumerateFiles(colorpath, "*.DProject"))
-            {
-                var assembly = (AssemblyNodeVM.RestoreAssembly(path, colorlistPath));
-                mainnode.obj.children.Add(assembly);
+                
             }
             newMainNode.Save();
             Workspace.CloseFile(projectpath);
-            return mainnode = new AssemblyNode(projectpath);
+            Errorhandler.RaiseMessage($"The project file {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
+
+            return new AssemblyNode(projectpath);
         }
         public override string AbsolutePath
         {
