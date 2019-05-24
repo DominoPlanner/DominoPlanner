@@ -19,7 +19,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public abstract class NodeVM : ModelBase
     {
         
-        public ObservableCollection<NodeVM> Children { get; set; }
+        public ObservableCollection<DominoWrapperNodeVM> Children { get; set; }
 
         private bool _isSelected;
         public bool IsSelected
@@ -200,7 +200,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab)
         {
             AssemblyModel = assembly;
-            AssemblyModel.RelativePathChanged = RelativePathChanged;
+            AssemblyModel.RelativePathChanged += (s, args) => RelativePathChanged();
             this.openTab = openTab;
             this.closeTab = closeTab;
             this.getTab = getTab;
@@ -209,19 +209,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void LoadChildren()
         {
-            Children = new ObservableCollection<NodeVM>();
+            Children = new ObservableCollection<DominoWrapperNodeVM>();
             Children.CollectionChanged -= ChildrenAddDelegates;
             Children.CollectionChanged += ChildrenAddDelegates;
-            Children.CollectionChanged -= Children_CollectionChanged;
-            Children.CollectionChanged += Children_CollectionChanged;
+            
             for (int i = 0; i < AssemblyModel.obj.children.Count; i++)
             {
                 var node = AssemblyModel.obj.children[i];
                 try
                 {
-                    var vm = NodeVMFactory(node, this);
-                    vm.parent = this;
-                    Children.Add(vm);
+                    if (node is IDominoWrapper idw && (idw is AssemblyNode || idw is DocumentNode) )
+                    {
+                        var vm = NodeVMFactory(idw, this);
+                        vm.parent = this;
+                        Children.Add(vm as DominoWrapperNodeVM);
+                    }
                 }
                 catch (Exception ex) when (ex is InvalidDataException) // TODO: Protobuf Exception hinzufügen
                 {
@@ -232,7 +234,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         // make color path relative
                         restored.Path = Workspace.MakeRelativePath(AbsolutePath, restored.Path);
                         AssemblyModel.obj.children[i] = restored;
-                        Children.Add(NodeVMFactory(restored, this));
+                        Children.Add(NodeVMFactory(restored, this) as AssemblyNodeVM);
                         AssemblyModel.Save();
                     }
                     
@@ -248,29 +250,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     AssemblyModel.Save();
                 }
             }
+            AssemblyModel.obj.children.CollectionChanged += AssemblyModelChildren_CollectionChanged;
         }
-
-        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            {
-                foreach (NodeVM i in e.OldItems)
-                {
-                    if (i is AssemblyNodeVM a)
-                    {
-                        a.AssemblyModel.parent.children.Remove(a.AssemblyModel);
-                        Workspace.CloseFile(a.AssemblyModel.AbsolutePath);
-                    }
-                    if (i is DocumentNodeVM d)
-                    {
-                        d.DocumentModel.parent.children.Remove(d.DocumentModel);
-                        Workspace.CloseFile(d.DocumentModel.AbsolutePath);
-                    }
-                }
-                AssemblyModel.Save();
-            }
-        }
-
         private void ChildrenAddDelegates(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -282,17 +263,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         dn.getTab = this.getTab;
                         dn.openTab = this.openTab;
                         dn.closeTab = this.closeTab;
-                        dn.DocumentModel.RelativePathChanged = dn.RelativePathChanged;
+                        dn.DocumentModel.RelativePathChanged += (s, args) => dn.RelativePathChanged();
                     }
                     else if (i is AssemblyNodeVM an)
                     {
-                        an.AssemblyModel.RelativePathChanged = an.RelativePathChanged;
+                        an.AssemblyModel.RelativePathChanged += (s, args) => an.RelativePathChanged();
                     }
                     if (!i.CheckPath())
                     {
-                        if (i is DominoWrapperNodeVM)
+                        if (i is DominoWrapperNodeVM dwnvm)
                         {
-                            Children.Remove(i);
+                            Children.Remove(dwnvm);
                             Errorhandler.RaiseMessage($"The file {RelativePathFromParent} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
                         }
                     }
@@ -300,13 +281,39 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             }
         }
-        public void RemoveChild(NodeVM node)
+        private void AssemblyModelChildren_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (!(node is DominoWrapperNodeVM))
+            if (e.OldItems != null)
             {
-                throw new InvalidOperationException("You can't remove a colorNode");
+                foreach (IDominoWrapper i in e.OldItems)
+                {
+                    if (i is AssemblyNode a)
+                    {
+                        Children.RemoveAll(x => x is AssemblyNodeVM vm && vm.AssemblyModel == a);
+                    }
+                    if (i is DocumentNode d)
+                    {
+                        Children.RemoveAll(x => x is DocumentNodeVM vm && vm.DocumentModel == d);
+                    }
+                }
             }
-            Children.Remove(node);
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    if (item is AssemblyNode || item is DocumentNode)
+                    {
+                        var newNode = NodeVMFactory(item as IDominoWrapper, this);
+                        newNode.parent = this;
+                        Children.Add(newNode as DominoWrapperNodeVM);
+                    }
+                }
+            }
+            AssemblyModel.Save();
+        }
+        public void RemoveChild(DominoWrapperNodeVM node)
+        {
+            AssemblyModel.obj.children.Remove(node.Model);
         }
         [ContextMenuAttribute("Open color list", "Icons/colorLine.ico", index: 0)]
         public void OpenColorList()
@@ -323,31 +330,40 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.obj);
             new NewObject(novm).ShowDialog();
             if (!novm.Close || novm.ResultNode == null) return;
-            var newNode = NodeVMFactory(novm.ResultNode, this);
-            Children.Add(newNode);
-            newNode.Open();
+            Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
         }
         [ContextMenuAttribute("Add existing object", "Icons/add.ico", index: 2)]
         public void AddExistingItem()
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = "project files (*.DObject)|*.DObject";
+            openFileDialog.Filter = "object files (*.DObject)|*.DObject|project files (*.DProject)|*.DProject";
             openFileDialog.RestoreDirectory = true;
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 if (File.Exists(openFileDialog.FileName))
                 {
-                    try
+                    string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
+                    if (extension == ".dobject")
                     {
-                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, openFileDialog.FileName);
-                        var newNodeVM = NodeVMFactory(node, this);
-                        Children.Add(newNodeVM);
-                        AssemblyModel.Save();
-                        newNodeVM.Open();
+                        try
+                        {
+                            IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, openFileDialog.FileName);
+                            AssemblyModel.Save();
+                            Children.Where(x => x.Model == node).FirstOrDefault()?.Open();
+                        }
+                        catch (FileNotFoundException)
+                        {
+                            // Unable to load project
+                        }
                     }
-                    catch (FileNotFoundException)
+                    else
                     {
-                        // Unable to load project
+                        try
+                        {
+                            IDominoWrapper node = new AssemblyNode(Workspace.MakeRelativePath(AbsolutePath, openFileDialog.FileName), AssemblyModel.obj);
+                            AssemblyModel.Save();
+                        }
+                        catch { }
                     }
                 }
             }
@@ -366,7 +382,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     OpenProjectSerializer.RenameProject(AbsolutePath, new_path);
                     AssemblyModel.Path = new_path;
-                    
+
                 }
                 else
                 {

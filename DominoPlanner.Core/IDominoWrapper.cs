@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,8 +30,7 @@ namespace DominoPlanner.Core
             innode = new DominoConnector();
             innode.next = this;
             this.parent = parent;
-            if (parent != null) // rootnode
-                parent.children.Add(this);
+            
         }
         public static IDominoWrapper CreateNodeFromPath(DominoAssembly futureParent, string path)
         {
@@ -56,7 +56,7 @@ namespace DominoPlanner.Core
     public class DominoAssembly : IWorkspaceLoadable
     {
         [ProtoMember(1, OverwriteList =true)]
-        public List<IDominoWrapper> children;
+        public ObservableCollection<IDominoWrapper> children;
         [ProtoMember(2)]
         List<Constraint> constraints;
         private string _colorPath;
@@ -76,7 +76,7 @@ namespace DominoPlanner.Core
         public ColorRepository colors { get; private set; }
         public DominoAssembly()
         {
-            children = new List<IDominoWrapper>();
+            children = new ObservableCollection<IDominoWrapper>();
         }
 
         public void Save(string relativePath = "")
@@ -112,7 +112,7 @@ namespace DominoPlanner.Core
                     if (_obj != null) Workspace.CloseFile(obj);
                     _relativePath = value;
                     _obj = null;
-                    RelativePathChanged?.Invoke();
+                    RelativePathChanged?.Invoke(this, null);
                     var res = obj;
                 }
             }
@@ -123,7 +123,7 @@ namespace DominoPlanner.Core
             {
                 string _oldpath = _relativePath;
                 var result = Workspace.AbsolutePathFromReference(ref _relativePath, parent);
-                if (_oldpath != _relativePath) RelativePathChanged?.Invoke();
+                if (_oldpath != _relativePath) RelativePathChanged?.Invoke(this, null);
                 return result;
             }
         }
@@ -148,11 +148,13 @@ namespace DominoPlanner.Core
                 return obj.Counts;
             }
         }
-        public Action RelativePathChanged;
+        public event EventHandler RelativePathChanged;
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
             this.relativePath = relativePath;
-            RelativePathChanged = () => parent?.Save();
+            RelativePathChanged += (sender, args) => parent?.Save();
+            if (parent != null) // rootnode
+                parent.children.Add(this);
         }
         
     }
@@ -236,7 +238,7 @@ namespace DominoPlanner.Core
             {
                 if (_obj != null) Workspace.CloseFile(obj);
                 path = value;
-                RelativePathChanged?.Invoke();
+                RelativePathChanged?.Invoke(this, null);
                 _obj = null;
                 var res = obj;
             }
@@ -249,7 +251,7 @@ namespace DominoPlanner.Core
                 var result = Workspace.AbsolutePathFromReference(ref path, parent);
                 if (_oldpath != path)
                 {
-                    RelativePathChanged?.Invoke();
+                    RelativePathChanged?.Invoke(this, null);
                 }
                 return result;
             }
@@ -265,11 +267,14 @@ namespace DominoPlanner.Core
                 return _obj;
             }
         }
-        public Action RelativePathChanged;
+        public event EventHandler RelativePathChanged;
 
         public AssemblyNode(string Path, DominoAssembly parent = null) : base(parent)
         {
             this.Path = Path;
+            RelativePathChanged += (sender, args) => parent?.Save();
+            if (parent != null) // rootnode
+                parent.children.Add(this);
         }
         public void Save()
         {
