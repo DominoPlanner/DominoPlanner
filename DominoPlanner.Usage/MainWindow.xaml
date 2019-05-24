@@ -221,7 +221,7 @@
                                         <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
-                                <Grid ContextMenu="{Binding ContextMenu}">
+                                <Grid ContextMenu="{Binding ContextMenu}" ToolTip="{Binding AbsolutePath}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="20"/>
                                         <ColumnDefinition Width="*"/>
@@ -238,7 +238,7 @@
                     <TabControl.ItemTemplate>
                         <!-- this is the header template-->
                         <DataTemplate>
-                            <Grid Background="#66FFFFFF">
+                            <Grid Background="#66FFFFFF" ToolTip="{Binding Path}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20"/>
                                     <ColumnDefinition Width="2"/>
