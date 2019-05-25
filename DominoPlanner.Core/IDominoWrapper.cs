@@ -91,7 +91,18 @@ namespace DominoPlanner.Core
                 throw new InvalidDataException("File invalid");
             }
         }
-        
+        // Check for circular references
+        public bool ContainsReferenceTo(DominoAssembly assembly)
+        {
+            bool result = false;
+            foreach (var s in children.OfType<AssemblyNode>())
+            {
+                if (s.obj == assembly) return true;
+                else result = result && ContainsReferenceTo(assembly);
+            }
+            return result;
+        }
+
     }
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(100, typeof(FieldNode))]

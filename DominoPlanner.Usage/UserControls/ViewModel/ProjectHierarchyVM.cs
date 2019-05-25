@@ -361,7 +361,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         try
                         {
-                            IDominoWrapper node = new AssemblyNode(Workspace.MakeRelativePath(AbsolutePath, openFileDialog.FileName), AssemblyModel.obj);
+                            string relativePath = Workspace.MakeRelativePath(AbsolutePath, openFileDialog.FileName);
+                            var assy = Workspace.Load<DominoAssembly>(openFileDialog.FileName);
+                            if (assy == AssemblyModel.obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.obj))
+                            {
+                                Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
+                                return;
+                            }
+                            IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.obj);
                             AssemblyModel.Save();
                         }
                         catch { }
