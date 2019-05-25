@@ -192,7 +192,7 @@ namespace DominoPlanner.Usage
                     new SpiralParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
                     AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), false)
             });
-            ViewModels.Add(new NewAssemblyEntry()
+            ViewModels.Add(new NewAssemblyEntry(parentProject)
             {
                 Name = "Subproject",
                 Description = "Add a subproject with the same color list",
@@ -393,8 +393,14 @@ namespace DominoPlanner.Usage
     public class NewAssemblyEntry : NewObjectEntry
     {
         public override string Extension => Properties.Resources.ProjectExtension;
-        public override object ViewModel => new object();
-
+        public override object ViewModel => this;
+        public string ColorPath { get; set; }
+        DominoAssembly parentProject;
+        public NewAssemblyEntry(DominoAssembly parentProject)
+        {
+            this.parentProject = parentProject;
+            ColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject);
+        }
         public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
         {
             string newProject = Path.Combine(ProjectPath, "Planner Files", filename);

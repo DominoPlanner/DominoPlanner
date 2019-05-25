@@ -46,7 +46,17 @@
                 </Border>
             </DockPanel>
         </DataTemplate>
-        
+        <DataTemplate DataType="{x:Type local:NoImageInformation}">
+            
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:NewAssemblyEntry}">
+            <StackPanel Orientation="Vertical">
+                <Label>Color path (inherited from parent):</Label>
+                <Label Margin="5, 0, 0, 0">
+                    <TextBlock Text="{Binding ColorPath}" TextWrapping="Wrap"/>
+                </Label>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         
