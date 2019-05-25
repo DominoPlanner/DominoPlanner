@@ -105,7 +105,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private string _endung = ".dobject";
+        private string _endung = Properties.Resources.ObjectExtension;
         public string Extension
         {
             get { return _endung; }
@@ -335,7 +335,7 @@ namespace DominoPlanner.Usage
         public override object ViewModel => Provider;
         public DominoProviderVM Provider { get; set; }
 
-        public override string Extension => ".dobject";
+        public override string Extension => Properties.Resources.ObjectExtension;
 
         public bool Finalize(string filepath, DominoAssembly parentProject)
         {
@@ -392,7 +392,7 @@ namespace DominoPlanner.Usage
     }
     public class NewAssemblyEntry : NewObjectEntry
     {
-        public override string Extension => ".dproject";
+        public override string Extension => Properties.Resources.ProjectExtension;
         public override object ViewModel => new object();
 
         public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)

@@ -24,7 +24,7 @@ namespace DominoPlanner.Usage
             Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
             if (Properties.Settings.Default.FirstStartup)
             {
-                Properties.Settings.Default.StandardColorArray = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "colors.DColor");
+                Properties.Settings.Default.StandardColorArray = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "colors" + Properties.Resources.ColorExtension);
                 Properties.Settings.Default.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner");
                 Properties.Settings.Default.OpenProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "OpenProjects.xml");
                 Directory.CreateDirectory(Path.GetDirectoryName(Properties.Settings.Default.StandardColorArray));
@@ -210,7 +210,7 @@ namespace DominoPlanner.Usage
         {
             string path = param.ToString();
             string ex = Path.GetExtension(path).ToLower();
-            if (ex == ".dcolor" || ex == ".dobject")
+            if (ex == Properties.Resources.ColorExtension.ToLower() || ex == Properties.Resources.ObjectExtension.ToLower())
             {
                 OpenItem(GetTab(path) ?? new TabItem(path));
             }
@@ -247,11 +247,11 @@ namespace DominoPlanner.Usage
             {
                 var fn = s.Trim();
                 var ext = Path.GetExtension(fn).ToLower();
-                if (ext == ".dobject" || ext == ".dcolor")
+                if (ext == Properties.Resources.ObjectExtension.ToLower() || ext == Properties.Resources.ColorExtension.ToLower())
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == ".dproject")
+                else if (ext == Properties.Resources.ProjectExtension.ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)
@@ -362,7 +362,7 @@ namespace DominoPlanner.Usage
         private void loadProject(OpenProject newProject)
         {
             bool remove = true;
-            string projectpath = Path.Combine(newProject.path, string.Format("{0}.DProject", newProject.name));
+            string projectpath = Path.Combine(newProject.path, $"{newProject.name}{Properties.Resources.ProjectExtension}");
             if (File.Exists(projectpath))
             {
                 remove = false;
@@ -455,7 +455,7 @@ namespace DominoPlanner.Usage
         private void AddProject_Exists()
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = "project files (*.DProject)|*.DProject";
+            openFileDialog.Filter = $"project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
             openFileDialog.RestoreDirectory = true;
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {

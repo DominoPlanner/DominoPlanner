@@ -222,7 +222,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if(FilePath == string.Empty)
             {
                 SaveFileDialog ofd = new SaveFileDialog();
-                ofd.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
+                ofd.Filter = $"Color repository files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == true)
                 {
                     if (ofd.FileName != string.Empty)

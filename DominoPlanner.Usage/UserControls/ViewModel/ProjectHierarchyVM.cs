@@ -336,14 +336,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void AddExistingItem()
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = "object files (*.DObject)|*.DObject|project files (*.DProject)|*.DProject";
+            openFileDialog.Filter = $"object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
+                $"|project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
             openFileDialog.RestoreDirectory = true;
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 if (File.Exists(openFileDialog.FileName))
                 {
                     string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
-                    if (extension == ".dobject")
+                    if (extension == Properties.Resources.ObjectExtension.ToLower())
                     {
                         try
                         {
@@ -356,7 +357,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             // Unable to load project
                         }
                     }
-                    else
+                    else if (extension == Properties.Resources.ProjectExtension.ToLower())
                     {
                         try
                         {
@@ -407,7 +408,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
-            var colorres = Directory.EnumerateFiles(colorpath, "*.DColor");
+            var colorres = Directory.EnumerateFiles(colorpath, $"*{Properties.Resources.ColorExtension}");
             // restore project if colorfile exists
             if (colorlistPath == null && colorres.First() == null)
             {
@@ -416,7 +417,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorlistPath = colorlistPath ?? colorres.First();
             Workspace.CloseFile(projectpath);
             if (File.Exists(projectpath))
-                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.DProject"));
+                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}{Properties.Resources.ProjectExtension}"));
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
             newMainNode.colorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
@@ -424,7 +425,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 try
                 {
-                    var assembly = Directory.EnumerateFiles(path, "*.dproject").
+                    var assembly = Directory.EnumerateFiles(path, $"*{Properties.Resources.ProjectExtension}").
                         Where(x => Path.GetFileName(x).Contains("backup_")).FirstOrDefault();
                     if (string.IsNullOrEmpty(assembly)) continue;
                     AssemblyNode an = new AssemblyNode(Workspace.MakeRelativePath(projectpath, assembly), newMainNode);
@@ -432,7 +433,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 catch { } // if error on add assembly, don't add assembly
             }
-            foreach (string path in Directory.EnumerateFiles(colorpath, "*.dobject"))
+            foreach (string path in Directory.EnumerateFiles(colorpath, "*" + Properties.Resources.ObjectExtension))
             {
                 try
                 {
