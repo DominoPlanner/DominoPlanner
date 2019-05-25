@@ -251,11 +251,23 @@ namespace DominoPlanner.Usage
         private void SetNewImage(DominoProviderVM provider)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png)|*.jpg;*.jpeg;*.jpe;*.jfif;*.png|All Files|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
                 InternPictureName = openFileDialog.FileName;
             }
-            UpdateProvider(provider);
+            try
+            {
+                var img = new Emgu.CV.Mat(InternPictureName, Emgu.CV.CvEnum.ImreadModes.Unchanged);
+                img.Dispose();
+                UpdateProvider(provider);
+            }
+            catch
+            {
+                Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error);
+            }
+            
         }
         public override void UpdateProvider(DominoProviderVM provider)
         {
