@@ -52,18 +52,18 @@ namespace DominoPlanner.Usage
                 Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
                 DominoAssembly main = new DominoAssembly();
-                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
+                main.Save(Path.Combine(projectpath, ProjectName + Properties.Resources.ProjectExtension));
 
                 if (File.Exists(sPath))
                 {
-                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", "colors.DColor");
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors{Properties.Resources.ColorExtension}");
                     File.Copy(sPath, colorPath);
-                    main.colorPath = Path.Combine("Planner Files", "colors.DColor");
+                    main.colorPath = Path.Combine("Planner Files", "colors" + Properties.Resources.ColorExtension);
                 }
 
-                main.Save(Path.Combine(projectpath, string.Format("{0}.DProject", ProjectName)));
+                main.Save();
 
-                Errorhandler.RaiseMessage($"The project {ProjectName}.DProject has been created", "Created", Errorhandler.MessageType.Info);
+                Errorhandler.RaiseMessage($"The project {ProjectName}{Properties.Resources.ProjectExtension} has been created", "Created", Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)
@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage
             try
             {
                 openFileDialog.InitialDirectory = sPath;
-                openFileDialog.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
+                openFileDialog.Filter = $"domino color files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|All files (*.*)|*.*";
             }
             catch (Exception) { }
 

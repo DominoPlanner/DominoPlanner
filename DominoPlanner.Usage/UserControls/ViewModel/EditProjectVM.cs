@@ -17,20 +17,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public class EditProjectVM : DominoProviderTabItem
     {
         #region CTOR
-        public EditProjectVM(DocumentNode dominoProvider) : base()
+        public EditProjectVM(IDominoProvider dominoProvider) : base()
         {
-            name = Path.GetFileNameWithoutExtension(dominoProvider.relativePath);
 
-            HaveBuildtools = dominoProvider.obj.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
             
-            string relativePath = dominoProvider.relativePath;
-            string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider.parent);
-            ImageSource = ImageHelper.GetImageOfFile(filepath);
+            //string relativePath = dominoProvider.relativePath;
+            //string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider.parent);
+            //ImageSource = ImageHelper.GetImageOfFile(filepath);
 
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
-            CurrentProject = dominoProvider.obj;
+            CurrentProject = dominoProvider;
 
             _DominoList = new ObservableCollection<ColorListEntry>();
 

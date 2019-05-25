@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,8 +30,7 @@ namespace DominoPlanner.Core
             innode = new DominoConnector();
             innode.next = this;
             this.parent = parent;
-            if (parent != null) // rootnode
-                parent.children.Add(this);
+            
         }
         public static IDominoWrapper CreateNodeFromPath(DominoAssembly futureParent, string path)
         {
@@ -56,7 +56,7 @@ namespace DominoPlanner.Core
     public class DominoAssembly : IWorkspaceLoadable
     {
         [ProtoMember(1, OverwriteList =true)]
-        public List<IDominoWrapper> children;
+        public ObservableCollection<IDominoWrapper> children;
         [ProtoMember(2)]
         List<Constraint> constraints;
         private string _colorPath;
@@ -76,14 +76,33 @@ namespace DominoPlanner.Core
         public ColorRepository colors { get; private set; }
         public DominoAssembly()
         {
-            children = new List<IDominoWrapper>();
+            children = new ObservableCollection<IDominoWrapper>();
         }
 
         public void Save(string relativePath = "")
         {
             Workspace.Save(this, relativePath);
         }
-        
+        [ProtoAfterDeserialization]
+        private void CheckIntegrity()
+        {
+            if (colorPath == null || colors == null)
+            {
+                throw new InvalidDataException("File invalid");
+            }
+        }
+        // Check for circular references
+        public bool ContainsReferenceTo(DominoAssembly assembly)
+        {
+            bool result = false;
+            foreach (var s in children.OfType<AssemblyNode>())
+            {
+                if (s.obj == assembly) return true;
+                else result = result && ContainsReferenceTo(assembly);
+            }
+            return result;
+        }
+
     }
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(100, typeof(FieldNode))]
@@ -92,9 +111,8 @@ namespace DominoPlanner.Core
     [ProtoInclude(103, typeof(SpiralNode))]
     public abstract class DocumentNode : IDominoWrapper
     {
-
-        private string _relativePath;
         [ProtoMember(1)]
+        private string _relativePath;
         public string relativePath
         {
             get => _relativePath;
@@ -102,9 +120,22 @@ namespace DominoPlanner.Core
             {
                 if (value != _relativePath)
                 {
+                    if (_obj != null) Workspace.CloseFile(obj);
                     _relativePath = value;
                     _obj = null;
+                    RelativePathChanged?.Invoke(this, null);
+                    var res = obj;
                 }
+            }
+        }
+        public string AbsolutePath
+        {
+            get
+            {
+                string _oldpath = _relativePath;
+                var result = Workspace.AbsolutePathFromReference(ref _relativePath, parent);
+                if (_oldpath != _relativePath) RelativePathChanged?.Invoke(this, null);
+                return result;
             }
         }
         private IDominoProvider _obj;
@@ -113,7 +144,9 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<IDominoProvider>(relativePath, parent);
+                {
+                    _obj = Workspace.Load<IDominoProvider>(AbsolutePath);
+                }
                 return _obj;
             }
         }
@@ -122,13 +155,17 @@ namespace DominoPlanner.Core
             get
             {
                 if (_obj == null)
-                    return Workspace.LoadColorList<IDominoProviderPreview>(relativePath).Item2;
+                    return Workspace.LoadColorList<IDominoProviderPreview>(AbsolutePath).Item2;
                 return obj.Counts;
             }
         }
+        public event EventHandler RelativePathChanged;
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
             this.relativePath = relativePath;
+            RelativePathChanged += (sender, args) => parent?.Save();
+            if (parent != null) // rootnode
+                parent.children.Add(this);
         }
         
     }
@@ -199,24 +236,56 @@ namespace DominoPlanner.Core
 
         }
     }
-    [ProtoContract(SkipConstructor =true)]
+    [ProtoContract(SkipConstructor = true)]
     public class AssemblyNode : IDominoWrapper
     {
         [ProtoMember(1)]
-        public string Path;
+        private string path;
+
+        public string Path
+        {
+            get { return path; }
+            set
+            {
+                if (_obj != null) Workspace.CloseFile(obj);
+                path = value;
+                RelativePathChanged?.Invoke(this, null);
+                _obj = null;
+                var res = obj;
+            }
+        }
+        public string AbsolutePath
+        {
+            get
+            {
+                string _oldpath = path;
+                var result = Workspace.AbsolutePathFromReference(ref path, parent);
+                if (_oldpath != path)
+                {
+                    RelativePathChanged?.Invoke(this, null);
+                }
+                return result;
+            }
+        }
+
         private DominoAssembly _obj;
         public DominoAssembly obj
         {
             get
             {
                 if (_obj == null)
-                    _obj = Workspace.Load<DominoAssembly>(Path, parent);
+                    _obj = Workspace.Load<DominoAssembly>(AbsolutePath);
                 return _obj;
             }
         }
+        public event EventHandler RelativePathChanged;
+
         public AssemblyNode(string Path, DominoAssembly parent = null) : base(parent)
         {
             this.Path = Path;
+            RelativePathChanged += (sender, args) => parent?.Save();
+            if (parent != null) // rootnode
+                parent.children.Add(this);
         }
         public void Save()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 
 namespace DominoPlanner.Usage
@@ -9,6 +10,8 @@ namespace DominoPlanner.Usage
     public partial class MainWindow : Window
     {
         NamedPipeManager PipeManager;
+        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -16,6 +19,18 @@ namespace DominoPlanner.Usage
             PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
+            var args = Environment.GetCommandLineArgs();
+            string filesToOpen = "";
+            if (args != null && args.Length > 1)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i < args.Length; i++)
+                {
+                    sb.AppendLine(args[i]);
+                }
+                filesToOpen = sb.ToString();
+            }
+            PipeManager.Write(filesToOpen);
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

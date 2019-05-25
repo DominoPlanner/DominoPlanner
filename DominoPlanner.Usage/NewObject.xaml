@@ -46,7 +46,17 @@
                 </Border>
             </DockPanel>
         </DataTemplate>
-        
+        <DataTemplate DataType="{x:Type local:NoImageInformation}">
+            
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:NewAssemblyEntry}">
+            <StackPanel Orientation="Vertical">
+                <Label>Color path (inherited from parent):</Label>
+                <Label Margin="5, 0, 0, 0">
+                    <TextBlock Text="{Binding ColorPath}" TextWrapping="Wrap"/>
+                </Label>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         
@@ -64,7 +74,7 @@
                 <Border DockPanel.Dock="Right" Width="1" BorderBrush="Black" BorderThickness="1"></Border>
             <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="5">
                 <Label Content="Filename:" />
-                <Label DockPanel.Dock="Right" Content="{Binding endung}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                <Label DockPanel.Dock="Right" Content="{Binding Extension}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
                 <TextBox VerticalContentAlignment="Center" TextWrapping="Wrap" Margin="5, 0, 0, 0" Text="{Binding filename, UpdateSourceTrigger=PropertyChanged}"  />
             </DockPanel>
             <ListBox Margin="5" DockPanel.Dock="Top" SelectedIndex="{Binding SelectedType}" ItemsSource="{Binding ViewModels}" HorizontalAlignment="Stretch" Height="250" VerticalAlignment="Top" BorderThickness="2">

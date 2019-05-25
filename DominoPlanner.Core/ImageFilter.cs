@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -256,25 +257,52 @@ namespace DominoPlanner.Core
     {
         public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
         {
-            Parallel.For(0, overlay.Height, (y) =>
+            Bitmap source = background.Bitmap;
+            Bitmap over = overlay.Bitmap;
+            unsafe
             {
-                for (int x = 0; x < overlay.Width; x++)
+                BitmapData backgroundData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), 
+                    ImageLockMode.ReadWrite, source.PixelFormat);
+                BitmapData overlayData = over.LockBits(new Rectangle(0, 0, over.Width, over.Height),
+                    ImageLockMode.ReadWrite, over.PixelFormat);
+
+                int bytesPerPixel_source = Image.GetPixelFormatSize(source.PixelFormat) / 8;
+                int heightInPixels_source = backgroundData.Height;
+                int widthInPixels_source = backgroundData.Width;
+                int widthInBytes_source = backgroundData.Width * bytesPerPixel_source;
+                byte* PtrFirstPixel_source = (byte*)backgroundData.Scan0;
+
+                int bytesPerPixel_overlay = Image.GetPixelFormatSize(over.PixelFormat) / 8;
+                int heightInPixels_overlay = overlayData.Height;
+                int widthInPixels_overlay = overlayData.Width;
+                int widthInBytes_overlay = overlayData.Width * bytesPerPixel_overlay;
+                byte* PtrFirstPixel_overlay = (byte*)overlayData.Scan0;
+                Parallel.For(start_y < 0 ? start_y : 0, overlayData.Height, new ParallelOptions() { MaxDegreeOfParallelism = -1 }, y =>
                 {
-                    if (y + start_y >= 0 && x + start_x >= 0 && y + start_y < background.Height && x + start_x < background.Width)
+                    if (y + start_y < heightInPixels_source)
                     {
-                        double opacity_overlay = overlay.Data[y, x , 3] / 255.0d;
-
-                        for (int c = 2; c >= 0; c--)
+                        byte* currentLine_overlay = PtrFirstPixel_overlay + (y * overlayData.Stride);
+                        byte* currentLine_background = PtrFirstPixel_source + (y + start_y) * backgroundData.Stride;
+                        int x = start_x < 0 ? start_x : 0;
+                        while (x + start_x < widthInPixels_source && x < widthInPixels_overlay)
                         {
-                            background.Data[y+start_y, x+start_x, c] = (byte)(background.Data[y+start_y, x+start_x, c] * (1 - opacity_overlay)
-                            + overlay.Data[y, x, c] * opacity_overlay);
+                            int pixelx_source = (x + start_x) * bytesPerPixel_source;
+                            int pixelx_overlay = x * bytesPerPixel_overlay;
+                            double opacity_overlay = currentLine_overlay[pixelx_overlay + 3] / 255.0d;
+                            for (int c = 0; c < 3; c++)
+                            {
+                                currentLine_background[pixelx_source + c] = (byte)(currentLine_background[pixelx_source + c] * (1 - opacity_overlay)
+                                    + currentLine_overlay[pixelx_overlay + c] * opacity_overlay);
+                            }
+                            int transp_neu = currentLine_background[pixelx_source + 3] + currentLine_overlay[pixelx_overlay + 3];
+                            currentLine_background[pixelx_source + 3] = (byte)(transp_neu > 255 ? 255 : transp_neu);
+                            x++;
                         }
-                        int transp_neu = background.Data[y+start_y, x+start_x, 3] + overlay.Data[y, x, 3];
-                        background.Data[y + start_y, x + start_x, 3] = (byte)(transp_neu > 255 ? 255 : transp_neu);
                     }
-
-                }
-            });
+                });
+                source.UnlockBits(backgroundData);
+            }
+            background = new Image<Bgra, byte>(source);
         }
     }
 }

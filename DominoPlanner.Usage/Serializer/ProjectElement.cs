@@ -10,17 +10,17 @@ namespace DominoPlanner.Usage.Serializer
             this.documentNode = documentNode;
             this.FilePath = FilePath;
             this.IcoPath = IcoPath;
-            switch (Path.GetExtension(this.FilePath).ToUpper())
-            {
-                case ".DCOLOR":
-                    CurrType = NodeType.ColorListNode;
-                    break;
-                case ".DOBJECT":
-                    CurrType = NodeType.ProjectNode;
-                    break;
-                default:
-                    break;
-            }
+            //switch (Path.GetExtension(this.FilePath).ToUpper())
+            //{
+            //    case ".DCOLOR":
+            //        CurrType = NodeType.ColorListNode;
+            //        break;
+            //    case ".DOBJECT":
+            //        CurrType = NodeType.ProjectNode;
+            //        break;
+            //    default:
+            //        break;
+            //}
         }
 
         public IDominoWrapper documentNode;
@@ -34,6 +34,6 @@ namespace DominoPlanner.Usage.Serializer
         }
         public string FilePath { get; set; }
         public string IcoPath;
-        public NodeType CurrType;
+        //public NodeType CurrType;
     }
 }

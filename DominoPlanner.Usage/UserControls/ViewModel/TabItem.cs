@@ -13,82 +13,115 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public sealed class TabItem : ModelBase
     {
         #region CTOR
-        public TabItem(int projectID, string path)
+        public TabItem(string path, string Zusatz)
         {
             Path = path;
             Close = new RelayCommand(o => CloseThis());
-            zusatz = "";
+            zusatz = Zusatz;
         }
 
-        public TabItem(ProjectComposite project) : this(project.OwnID, project.ParentProjectID, project.Name, project.PicturePath, project.FilePath)
+        public TabItem(string Header, string picturePath, string path) : this(path, "")
         {
-            ProjectComp = project;
+            this.Header = Header;
+            this.picture = picturePath;
+        }
+
+        public TabItem(string Header, string picturePath, string path, TabBaseVM content) : this(Header, picturePath, path)
+        {
+            this.Content = content;
+        }
+        public TabItem(string path) : this(path, "")
+        {
+            this.Header = System.IO.Path.GetFileNameWithoutExtension(path);
+            this.picture = ImageHelper.GetImageOfFile(path);
+            var ext = System.IO.Path.GetExtension(path).ToLower();
+            if (ext == Properties.Resources.ColorExtension.ToLower())
+            {
+                Content = new ColorListControlVM(path);
+                ResetContent();
+            }
+            else if (ext == Properties.Resources.ObjectExtension.ToLower())
+            {
+                Content = ViewModelGenerator(Workspace.Load<IDominoProvider>(path), (path));
+                ResetContent();
+            }
+            else
+            {
+                throw new InvalidOperationException("Incorrect file extension");
+            }
+        }
+
+        public TabItem(DocumentNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
+        {
+            Content = ViewModelGenerator(project.DocumentModel.obj, project.AbsolutePath);
             ResetContent();
         }
-        public static DominoProviderTabItem ViewModelGenerator(ProjectComposite project)
+        public TabItem(ColorNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
+        { 
+            Content = new ColorListControlVM(project.parent.AssemblyModel.obj);
+            ResetContent();
+        }
+        public static TabItem TabItemGenerator(NodeVM project)
+        {
+            switch (project)
+            {
+                case DocumentNodeVM dn:
+                    return new TabItem(dn);
+                case ColorNodeVM cn:
+                    return new TabItem(cn);
+                default:
+                    return null;
+            }
+        }
+        public static DominoProviderTabItem ViewModelGenerator(IDominoProvider project, string path)
         {
             DominoProviderTabItem Content = null;
-            if (((DocumentNode)project.Project.documentNode).obj != null)
+            if (project != null)
             {
-                DocumentNode dn = ((DocumentNode)project.Project.documentNode);
-                if (((DocumentNode)project.Project.documentNode).obj.Editing)
+                if (project.Editing)
                 {
-                    Content = new EditProjectVM((DocumentNode)project.Project.documentNode);
+                    Content = new EditProjectVM(project);
                 }
                 else
                 {
-                    switch (dn)
+                    switch (project)
                     {
-                        case FieldNode fieldNode:
-                            Content = new CreateFieldVM((FieldParameters)fieldNode.obj, true);
+                        case FieldParameters fieldNode:
+                            Content = new CreateFieldVM(fieldNode, true);
                             break;
-                        case StructureNode structureNode:
-                            Content = new CreateRectangularStructureVM((StructureParameters)structureNode.obj, true);
+                        case StructureParameters structureNode:
+                            Content = new CreateRectangularStructureVM(structureNode, true);
                             break;
-                        case SpiralNode spiralNode:
-                            Content = new CreateSpiralVM((SpiralParameters)spiralNode.obj, true);
+                        case SpiralParameters spiralNode:
+                            Content = new CreateSpiralVM(spiralNode, true);
                             break;
-                        case CircleNode circleNode:
-                            Content = new CreateCircleVM((CircleParameters)circleNode.obj, true);
+                        case CircleParameters circleNode:
+                            Content = new CreateCircleVM(circleNode, true);
                             break;
                         default:
                             break;
                     }
                 }
 
-                (Content as DominoProviderTabItem).assemblyname =
-                            OpenProjectSerializer.GetOpenProjects().Where(x => x.id == project.ParentProjectID).First().name;
+                //(Content as DominoProviderTabItem).assemblyname =
+                //           OpenProjectSerializer.GetOpenProjects().Where(x => x.id == project.ParentProjectID).First().name;
 
-                (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(dn.relativePath);
+                (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(path);
             }
             return Content;
         }
 
         internal void ResetContent()
         {
+
             if (Content is EditProjectVM editProject)
             {
                 editProject.ClearCanvas();
             }
-            if (ProjectComp.Project.documentNode is DocumentNode documentNode)
-            {
-                Content = ViewModelGenerator(ProjectComp);
-            }
             Content.UnsavedChanges = false;
         }
 
-        public TabItem(int ownID, int projectID, string Header, string picturePath, string path) : this(projectID, path)
-        {
-            OwnID = ownID;
-            ProjectID = projectID;
-            this.Header = Header;
-            this.picture = picturePath;
-        }
-
-        public TabItem(int ownID, int projectID, string Header, string picturePath, string path, TabBaseVM content) : this(ownID, projectID, Header, picturePath, path)
-        {
-            this.Content = content;
-        }
+        
         #endregion
 
         #region EventHandler
@@ -98,37 +131,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
-        private ProjectComposite _ProjectComp;
-        public ProjectComposite ProjectComp
-        {
-            get { return _ProjectComp; }
-            set
-            {
-                if (_ProjectComp != value)
-                {
-                    _ProjectComp = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        //public WriteableBitmap picture { get; set; }
 
         public string picture { get; set; }
-
-        private int _OwnID;
-        public int OwnID
-        {
-            get { return _OwnID; }
-            set
-            {
-                if (_OwnID != value)
-                {
-                    _OwnID = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
 
         private int _ProjectID;
         public int ProjectID

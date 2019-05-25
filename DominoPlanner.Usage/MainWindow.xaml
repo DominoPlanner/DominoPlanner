@@ -21,6 +21,7 @@
             <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
         </DataTemplate>
         <local:PathToImageConverter x:Key="PathToImageConverter"/>
+        <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFieldStruct}"/>
@@ -41,7 +42,11 @@
         <KeyBinding Key="C" Modifiers="Alt" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
     </Window.InputBindings>
     <Grid>
-        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0,0" Grid.ColumnSpan="2" Background="#7FF0F0F0" VerticalContentAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="247*"/>
+            <RowDefinition Height="424*"/>
+        </Grid.RowDefinitions>
+        <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" VerticalContentAlignment="Center">
             <MenuItem>
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -78,7 +83,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            
+
             <MenuItem >
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -194,71 +199,71 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
         </Menu>
-        <Border  Margin="0,25,0,0" BorderBrush="Red" BorderThickness="0">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" MinWidth="100"/>
-                <ColumnDefinition Width="3" />
-                <ColumnDefinition Width="720*"/>
-            </Grid.ColumnDefinitions>
-            <TreeView Grid.Column="0" Margin="0,0,0,0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
-                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        <ContentControl Height="20">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseDoubleClick">
-                                    <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <Grid ContextMenu="{Binding conMenu}">
+        <Border  Margin="0,25,0.286,0.428" BorderBrush="Red" BorderThickness="0" Grid.RowSpan="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" MinWidth="100"/>
+                    <ColumnDefinition Width="3" />
+                    <ColumnDefinition Width="720*"/>
+                </Grid.ColumnDefinitions>
+                <TreeView Grid.Column="0" Margin="0,0,0,0" ItemsSource="{Binding Projects}" Background="#34FFFFFF">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <ContentControl Height="20">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDoubleClick">
+                                        <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <Grid ContextMenu="{Binding ContextMenu}" ToolTip="{Binding AbsolutePath}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Source="{Binding ImagePath, Converter={StaticResource FilenameToThumbnailConverter}}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                    <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                </Grid>
+                            </ContentControl>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+                <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#FFDDDDDD" Grid.Column="1"/>
+                <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,5,0">
+                    <TabControl.ItemTemplate>
+                        <!-- this is the header template-->
+                        <DataTemplate>
+                            <Grid Background="#66FFFFFF" ToolTip="{Binding Path}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="2"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2"/>
+                                    <ColumnDefinition Width="20"/>
                                 </Grid.ColumnDefinitions>
-                                <Image Grid.Column="0" Source="{Binding Img}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                                <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <Image Grid.Column="0" Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
+                                <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
+                                    <Button.Background>
+                                        <ImageBrush ImageSource="Icons/closewindow.ico"/>
+                                    </Button.Background>
+                                </Button>
                             </Grid>
-                        </ContentControl>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-            <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#FFDDDDDD" Grid.Column="1"/>
-            <TabControl Grid.Column="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,5,0">
-                <TabControl.ItemTemplate>
-                    <!-- this is the header template-->
-                    <DataTemplate>
-                        <Grid Background="#66FFFFFF">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="2"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2"/>
-                                <ColumnDefinition Width="20"/>
-                            </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" Source="{Binding picture}" VerticalAlignment="Center" MaxHeight="25"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
-                            <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
-                                <Button.Background>
-                                    <ImageBrush ImageSource="Icons/closewindow.ico"/>
-                                </Button.Background>
-                            </Button>
-                        </Grid>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
-                <TabControl.ContentTemplate>
-                    <!-- this is the body of the TabItem template-->
-                    <DataTemplate>
-                        <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Content="{Binding Content}"/>
-                    </DataTemplate>
-                </TabControl.ContentTemplate>
-            </TabControl>
-        </Grid>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <!-- this is the body of the TabItem template-->
+                        <DataTemplate>
+                            <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Content="{Binding Content}"/>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Grid>
         </Border>
     </Grid>
 </Window>

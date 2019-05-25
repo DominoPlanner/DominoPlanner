@@ -202,4 +202,13 @@
   <data name="Structures" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\structures.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="ColorExtension" xml:space="preserve">
+    <value>.DColor</value>
+  </data>
+  <data name="ObjectExtension" xml:space="preserve">
+    <value>.DObject</value>
+  </data>
+  <data name="ProjectExtension" xml:space="preserve">
+    <value>.DProject</value>
+  </data>
 </root>
