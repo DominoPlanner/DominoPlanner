@@ -225,7 +225,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         Children.Add(vm as DominoWrapperNodeVM);
                     }
                 }
-                catch (Exception ex) when (ex is InvalidDataException) // TODO: Protobuf Exception hinzufügen
+                catch (Exception ex) when (ex is InvalidDataException || ex is ProtoBuf.ProtoException)
                 {
                     // broken Subassembly
                     var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
