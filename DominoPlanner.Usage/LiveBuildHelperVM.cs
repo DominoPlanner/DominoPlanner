@@ -201,15 +201,17 @@ namespace DominoPlanner.Usage
             int firstBlockStone = blockSize * (SelectedBlock - 1);
 
             int lastColor = intField[(SelectedBlock - 1) * blockSize, SelectedRow - 1];
-            string lastColorName = fParameters.colors[lastColor].name;
+            string lastColorName = lastColor > 0 ? fParameters.colors[lastColor].name : "";
             int lastLeftMargin = 2 * space;
             int countColor = 0;
-
+            
             for (int i = 0; i < blockSize; i++)
             {
                 if (firstBlockStone + i < stonesPerLine)
                 {
-                    currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[intField[firstBlockStone + i, SelectedRow - 1]].mediaColor));
+                    int stoneindex = intField[firstBlockStone + i, SelectedRow - 1];
+                    if (stoneindex < 0) continue;
+                    currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[stoneindex].mediaColor));
                     
                     if (lastColor != intField[firstBlockStone + i, SelectedRow - 1])
                     {
@@ -220,16 +222,19 @@ namespace DominoPlanner.Usage
                         tb.Margin = new System.Windows.Thickness(lastLeftMargin, marginHeight + 20, 0, 0);
                         tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                         tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                        tb.Text = lastColorName + Environment.NewLine + countColor;
+                        if (lastColor >= 0)
+                        {
+                            tb.Text = lastColorName + Environment.NewLine + countColor;
+                        }
                         tb.Width = ((i + 1) * space) + (i * stoneWidth) - lastLeftMargin;
                         currentBlock.Children.Add(tb);
                         lastColor = intField[firstBlockStone + i, SelectedRow - 1];
-                        lastColorName = fParameters.colors[intField[firstBlockStone + i, SelectedRow - 1]].name;
+                        lastColorName = fParameters.colors[lastColor < 0 ? 0 : lastColor].name;
                         lastLeftMargin = ((i + 1) * space) + (i * stoneWidth);
                         countColor = 0;
                     }
 
-                    if (i == blockSize - 1 || firstBlockStone + i == stonesPerLine - 1)
+                    if (i == blockSize - 1 || firstBlockStone + i == stonesPerLine - 1) // last stone of block
                     {
                         countColor++;
                         TextBlock tb = new TextBlock();
