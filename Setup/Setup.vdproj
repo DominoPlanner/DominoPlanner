@@ -303,12 +303,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4D5BB50449E64E2493D83BA506FA96E0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4E0D2A3F384CC7AE198AF0A0BAE56C5E"
         "OwnerKey" = "8:_BD244204AB064AD3A80D3A3048F71302"
         "MsmSig" = "8:_UNDEFINED"
@@ -635,6 +629,24 @@
         {
         "MsmKey" = "8:_A27BAA027565E53C05ACD03616E4745E"
         "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
+        "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
+        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
+        "OwnerKey" = "8:_BD244204AB064AD3A80D3A3048F71302"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1096,7 +1108,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E146DFFE34BE4F0398F83957CB46B422"
+        "OwnerKey" = "8:_A3EE31DFF0A08C06783C884DFB397DFF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1300,12 +1312,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BD244204AB064AD3A80D3A3048F71302"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1331,18 +1337,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_7D4D39467E40DF6A9FE2AABBD9A8FA6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4D5BB50449E64E2493D83BA506FA96E0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_766B84D92ED308CF5FD5E6E2C1B7C6CF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2877,37 +2871,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4D5BB50449E64E2493D83BA506FA96E0"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:EPPlus, Version=4.5.2.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_4D5BB50449E64E2493D83BA506FA96E0"
-                    {
-                    "Name" = "8:EPPlus.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:EPPlus.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4E0D2A3F384CC7AE198AF0A0BAE56C5E"
             {
             "AssemblyRegister" = "3:1"
@@ -3468,7 +3431,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:DominoPlanner.Core, Version=3.0.0.6, Culture=neutral, PublicKeyToken=a8efbbccdad96a17, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:DominoPlanner.Core, Version=3.0.0.7, Culture=neutral, PublicKeyToken=a8efbbccdad96a17, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_766B84D92ED308CF5FD5E6E2C1B7C6CF"
@@ -4045,6 +4008,37 @@
                     }
                 }
             "SourcePath" = "8:System.Reflection.Primitives.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A3EE31DFF0A08C06783C884DFB397DFF"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:EPPlus, Version=4.5.3.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_A3EE31DFF0A08C06783C884DFB397DFF"
+                    {
+                    "Name" = "8:EPPlus.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:EPPlus.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_7E1F8EB58D6B489887E79D672E591ADF"
@@ -5487,15 +5481,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DominoPlanner"
-        "ProductCode" = "8:{C9B7DAA1-A7F8-4A3B-B518-661E348A6195}"
-        "PackageCode" = "8:{9DEA485C-1994-4123-B885-C6FD60546476}"
+        "ProductCode" = "8:{56A4EDD3-50BE-469E-9DDA-B12E9D078238}"
+        "PackageCode" = "8:{5DECF278-10A5-45EF-A0AB-6BBF4EC4D371}"
         "UpgradeCode" = "8:{A5203434-2746-4DF1-82A6-821CBC4C4A63}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.0.6"
+        "ProductVersion" = "8:3.0.7"
         "Manufacturer" = "8:DominoPlanner"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -5781,8 +5775,8 @@
                             "Type" = "3:3"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:1"
-                            "Value" = "8:#1202"
+                            "Setting" = "3:2"
+                            "Value" = "8:This software is licensed under the GNU Public License (GPL 3.0)."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -5919,8 +5913,8 @@
                             "Type" = "3:3"
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
-                            "Setting" = "3:1"
-                            "Value" = "8:#1202"
+                            "Setting" = "3:2"
+                            "Value" = "8:This software is licensed under the GNU Public License (GPL 3.0)."
                             "DefaultValue" = "8:#1202"
                             "UsePlugInResources" = "11:TRUE"
                             }
