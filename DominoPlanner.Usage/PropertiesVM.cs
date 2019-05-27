@@ -1,0 +1,348 @@
+﻿using DominoPlanner.Usage;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+
+namespace DominoPlanner.Usage
+{
+    public class PropertiesVM : ModelBase
+    {
+        public object Model { get; set; }
+        public List<PropertyEntryVM> Children { get; set; }
+        public PropertiesVM(object model)
+        {
+            Model = model.GetType();
+            var dummy = new DummyObjectWrapper() { DummyObject = model };
+            var pi = dummy.GetType().GetProperties().First();
+            var basenode = new PropertyItemVM(dummy, pi);
+            basenode.LoadChildren(model, true);
+            Children = basenode.Children;
+        }
+    }
+    public class DummyObjectWrapper
+    {
+        public object DummyObject { get; set; }
+    }
+    public abstract class PropertyEntryVM : ModelBase
+    {
+        
+        private ICommand command;
+
+        public ICommand OpenChildren
+        {
+            get { return command; }
+            set { command = value; RaisePropertyChanged(); }
+        }
+        private List<PropertyEntryVM> propertyItemVMs;
+
+        public List<PropertyEntryVM> Children
+        {
+            get { return propertyItemVMs; }
+            set { propertyItemVMs = value; RaisePropertyChanged(); }
+        }
+        public object Value { get; set; }
+        public bool CanWrite { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+
+        public PropertyEntryVM()
+        {
+            OpenChildren = new RelayCommand(o => LoadChildren(Value, (bool) o));
+        }
+
+        public static List<PropertyEntryVM> LoadChildren(IEnumerable<MemberInfo> ChildPI, object parent, string name)
+        {
+            var result = new List<PropertyEntryVM>();
+            if (parent is System.Collections.IList list)
+            {
+                int index = 0;
+                foreach (var mi in list)
+                {
+                    result.Add(new ArrayPropertyItem(parent, index, name));
+                    index++;
+                }
+            }
+            else
+            {
+                foreach (var mi in ChildPI)
+                {
+                    result.Add(new PropertyItemVM(parent, mi));
+                }
+            }
+            return result;
+        }
+        public void PrepareTree()
+        {
+            if (!(Value is Exception || Value is System.Collections.IList || 
+                Value == null || 
+                Value.GetType().IsSimpleType()))
+            {
+                GetSubMembers();
+            }
+            if (ChildPI?.Count() > 0 || (Value is System.Collections.IList list && list.Count > 0))
+            {
+                // add dummy child
+                Children = new List<PropertyEntryVM>() { new DummyPropertyItem() };
+            }
+
+        }
+
+        private IEnumerable<MemberInfo> ChildPI;
+        public void GetSubMembers()
+        {
+            if (!(Value is System.Collections.IList list))
+            {
+                var childPropInfo = Value.GetType().GetProperties().Where(x => x.CanRead);
+                var childFieldInfo = Value.GetType().GetFields();
+                ChildPI = childPropInfo.Concat<MemberInfo>(childFieldInfo)
+                    .Where(x => x.IsPublic() && !x.IsSubtypeOf(typeof(MulticastDelegate)) 
+                                             && !x.IsSubtypeOf(typeof(EventHandler)) 
+                                             && !x.IsSubtypeOf(typeof(ICommand)))
+                    .OrderBy(x => x.Name);
+            }
+        }
+        public void LoadChildren(object parent, bool check = true)
+        {
+            if (check && Children?.OfType<DummyPropertyItem>().Count() == 1)
+            {
+                Children = LoadChildren(ChildPI, parent, Name);
+            }
+        }
+    }
+    
+    public class PropertyItemVM : PropertyEntryVM
+    {
+        MemberInfo pi;
+        public PropertyItemVM(object parent, MemberInfo pi)
+        {
+            this.pi = pi;
+            Name = pi.Name;
+            Type = "Field";
+            CanWrite = true;
+            if (pi is PropertyInfo p)
+            {
+                Type = "Prop";
+                CanWrite = p.CanWrite;
+            }
+            Value = Eval(parent);
+            PrepareTree();
+        }
+        
+        
+        
+        public object Eval(object parent)
+        {
+            try
+            {
+                if (pi is PropertyInfo p && p.CanRead)
+                {
+                    return p.GetValue(parent);
+                    
+                }
+                else if (pi is FieldInfo f)
+                {
+                    return f.GetValue(parent);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+            return null;
+        }
+    }
+    public class ArrayPropertyItem : PropertyEntryVM
+    {
+        public int index { get; set; }
+        // parent is IList
+        public ArrayPropertyItem(object parent, int index, string parentname) : base()
+        {
+            this.index = index;
+            Value = Eval(parent);
+            CanWrite = true;
+            Type = "Item";
+            Name = parentname + "[" + index + "]";
+            PrepareTree();
+        }
+
+        public object Eval(object parent)
+        {
+            try
+            {
+                return (parent as System.Collections.IList)[index];
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
+        }
+    }
+    public class DummyPropertyItem : PropertyEntryVM
+    {
+        public DummyPropertyItem() : base()
+        {
+
+        }
+    }
+    public class TreeListView : TreeView
+    {
+        protected override DependencyObject
+                           GetContainerForItemOverride()
+        {
+            return new TreeListViewItem();
+        }
+
+        protected override bool
+                           IsItemItsOwnContainerOverride(object item)
+        {
+            return item is TreeListViewItem;
+        }
+    }
+
+    public class TreeListViewItem : TreeViewItem
+    {
+        /// <summary>
+        /// Item's hierarchy in the tree
+        /// </summary>
+        public int Level
+        {
+            get
+            {
+                if (_level == -1)
+                {
+                    TreeListViewItem parent =
+                        ItemsControl.ItemsControlFromItemContainer(this)
+                            as TreeListViewItem;
+                    _level = (parent != null) ? parent.Level + 1 : 0;
+                }
+                return _level;
+            }
+        }
+
+
+        protected override DependencyObject
+                           GetContainerForItemOverride()
+        {
+            return new TreeListViewItem();
+        }
+
+        protected override bool IsItemItsOwnContainerOverride(object item)
+        {
+            return item is TreeListViewItem;
+        }
+
+        private int _level = -1;
+    }
+    public class LevelToIndentConverter : IValueConverter
+    {
+        public object Convert(object o, Type type, object parameter,
+                              CultureInfo culture)
+        {
+            return new Thickness((int)o * c_IndentSize, 0, 0, 0);
+        }
+
+        public object ConvertBack(object o, Type type, object parameter,
+                                  CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+
+        private const double c_IndentSize = 19.0;
+    }
+    public class ObjectToStringConverter : IValueConverter
+
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null) return "null";
+            switch (value)
+            {
+                case Exception ex:
+                    return "Exception of type " + ex.GetType();
+                case System.Collections.IList ie:
+                    var type = ie.GetType();
+                    var membertype = (type.GenericTypeArguments.Count() > 0 ? type.GenericTypeArguments[0] : null) ?? type.GetElementType();
+                    return membertype?.ToString() + "[" + ie.Count + "]";
+                default:
+                    return value;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class BooleanAndConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return values.OfType<IConvertible>().All(System.Convert.ToBoolean);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+    public static class TypeExtensions
+    {
+        /// <summary>
+        /// Determine whether a type is simple (String, Decimal, DateTime, etc) 
+        /// or complex (i.e. custom class with public properties and methods).
+        /// </summary>
+        /// <see cref="http://stackoverflow.com/questions/2442534/how-to-test-if-type-is-primitive"/>
+        public static bool IsSimpleType(
+            this Type type)
+        {
+            return
+                type.IsValueType ||
+                type.IsPrimitive ||
+                new Type[] {
+                typeof(String),
+                typeof(Decimal),
+                typeof(DateTime),
+                typeof(DateTimeOffset),
+                typeof(TimeSpan),
+                typeof(Guid)
+                }.Contains(type) ||
+                Convert.GetTypeCode(type) != TypeCode.Object;
+        }
+        public static bool IsPublic(this MemberInfo mi)
+        {
+            if (mi is PropertyInfo p)
+            {
+                return p.GetGetMethod() != null;
+            }
+            else if (mi is FieldInfo f)
+            {
+                return f.IsPublic;
+            }
+            return false;
+        }
+        public static bool IsSubtypeOf(this MemberInfo mi, Type type)
+        {
+            if (mi is PropertyInfo p)
+            {
+                return type.IsAssignableFrom(p.PropertyType);
+            }
+            else if (mi is FieldInfo f)
+            {
+                return type.IsAssignableFrom(f.FieldType);
+            }
+            return false;
+        }
+    }
+    public class ControlTemplateSelector : DataTemplateSelector
+    {
+    }
+}

@@ -414,6 +414,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (index >= 0) OpenProjectSerializer.RemoveOpenProject(index);
             }
         }
+        [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
+        public void ShowProperties()
+        {
+            PropertiesWindow pw = new PropertiesWindow(Model);
+            pw.ShowDialog();
+        }
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
@@ -652,6 +658,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
             }
         }
-        
+        [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
+        public void ShowProperties()
+        {
+            PropertiesWindow pw = new PropertiesWindow(Model);
+            pw.ShowDialog();
+        }
     }
 }

@@ -156,6 +156,10 @@
     <Compile Include="NewProjectVM.cs" />
     <Compile Include="Operations.cs" />
     <Compile Include="ProjectCanvas.cs" />
+    <Compile Include="Properties.xaml.cs">
+      <DependentUpon>Properties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertiesVM.cs" />
     <Compile Include="ProtocolV.xaml.cs">
       <DependentUpon>ProtocolV.xaml</DependentUpon>
     </Compile>
@@ -252,6 +256,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NewProject.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Properties.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
