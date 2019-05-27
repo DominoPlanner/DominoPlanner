@@ -63,9 +63,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public AssemblyNodeVM parent { get; set; }
         public ContextMenu contextMenu { get; set; }
 
-        public Action<TabItem> openTab;
-        public Func<NodeVM, bool> closeTab;
-        public Func<NodeVM, TabItem> getTab;
+        public static Action<TabItem> openTab;
+        public static Func<NodeVM, bool> closeTab;
+        public static Func<NodeVM, TabItem> getTab;
         
         public abstract string RelativePathFromParent { get; set; }
 
@@ -134,7 +134,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             switch (node)
             {
                 case AssemblyNode assy:
-                    return new AssemblyNodeVM(assy, parent.openTab, parent.closeTab, parent.getTab);
+                    return new AssemblyNodeVM(assy, parent);
                 case DocumentNode dn:
                     return new DocumentNodeVM(dn);
             }
@@ -190,8 +190,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 LoadChildren();
             }
         }
-        public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent) :
-            this(assembly, parent, parent.openTab, parent.closeTab, parent.getTab) { }
+        public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent)
+        {
+            AssemblyModel = assembly;
+            AssemblyModel.RelativePathChanged += (s, args) => RelativePathChanged();
+            colorNode = new ColorNodeVM(this);
+            LoadChildren();
+        }
 
         public AssemblyNodeVM(AssemblyNode assembly, Action<TabItem> openTab,
             Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab) : this(assembly, null, openTab, closeTab, getTab) { }
@@ -201,9 +206,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             AssemblyModel = assembly;
             AssemblyModel.RelativePathChanged += (s, args) => RelativePathChanged();
-            this.openTab = openTab;
-            this.closeTab = closeTab;
-            this.getTab = getTab;
+            NodeVM.openTab = openTab;
+            NodeVM.closeTab = closeTab;
+            NodeVM.getTab = getTab;
             colorNode = new ColorNodeVM(this);
             LoadChildren();
         }
@@ -260,9 +265,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (i is DocumentNodeVM dn)
                     {
-                        dn.getTab = this.getTab;
-                        dn.openTab = this.openTab;
-                        dn.closeTab = this.closeTab;
                         dn.DocumentModel.RelativePathChanged += (s, args) => dn.RelativePathChanged();
                     }
                     else if (i is AssemblyNodeVM an)
@@ -489,10 +491,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public override void Open()
         {
-            TabItem tabItem = parent.getTab(this);
+            TabItem tabItem = NodeVM.getTab(this);
             if (tabItem != null && tabItem.Content is ColorListControlVM c) 
                 c.DominoAssembly = parent.AssemblyModel.obj;
-            parent.openTab(tabItem ?? new TabItem(this));
+            NodeVM.openTab(tabItem ?? new TabItem(this));
         }
         public override string AbsolutePath {
             get => Workspace.AbsolutePathFromReferenceLoseUpdate(RelativePathFromParent, parent.AssemblyModel.obj);
