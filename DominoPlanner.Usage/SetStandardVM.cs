@@ -87,8 +87,8 @@ namespace DominoPlanner.Usage
             try
             {
                 openFileDialog.InitialDirectory = ColorVM.FilePath;
-                openFileDialog.Filter = "All color files |*.DColor;*.clr;*.farbe|" +
-                    "DominoPlanner 3.x color files (*.DColor)|*.DColor|" +
+                openFileDialog.Filter = $"All color files |*{Properties.Resources.ColorExtension};*.clr;*.farbe|" +
+                    $"DominoPlanner 3.x color files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|" +
                     "DominoPlanner 2.x color files (*.clr)|*.clr|" +
                     "Dominorechner color files (*.farbe)|*.farbe|" +
                     "All files (*.*)|*.*";

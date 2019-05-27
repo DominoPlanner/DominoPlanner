@@ -38,7 +38,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
         public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReferenceLoseUpdate(dominoAssembly.colorPath, dominoAssembly))
         {
-            this.dominoAssembly = dominoAssembly;
+            this.DominoAssembly = dominoAssembly;
         }
         #endregion
 
@@ -222,7 +222,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if(FilePath == string.Empty)
             {
                 SaveFileDialog ofd = new SaveFileDialog();
-                ofd.Filter = "domino color files (*.DColor)|*.DColor|All files (*.*)|*.*";
+                ofd.Filter = $"Color repository files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == true)
                 {
                     if (ofd.FileName != string.Empty)
@@ -283,9 +283,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region prop
         private DominoAssembly dominoAssembly;
+
         public DominoAssembly DominoAssembly
         {
             get { return dominoAssembly; }
+            set { dominoAssembly = value; ResetContent();  }
         }
         private ColorListEntry _SelectedStone;
         public ColorListEntry SelectedStone
@@ -359,6 +361,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_DifColumns != value)
                 {
                     _DifColumns = value;
+                    //TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
@@ -391,53 +394,56 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal override void ResetContent()
         {
             ShowProjects = true;
-            DifColumns = new ObservableCollection<DataGridColumn>();
+            //if (DifColumns == null)
+                DifColumns = new ObservableCollection<DataGridColumn>();
+            //DifColumns.Clear();
             foreach(ColorListEntry cle in _ColorList)
             {
                 cle.ProjectCount.Clear();
             }
-            string colorpath = dominoAssembly.colorPath;
-            string thispath = Workspace.AbsolutePathFromReference(ref colorpath, dominoAssembly);
-            List<string> warningfiles = new List<string>();
             
-            foreach (DocumentNode project in dominoAssembly.children)
+            List<string> warningfiles = new List<string>();
+            if (DominoAssembly != null)
             {
-                try
+                foreach (DocumentNode project in DominoAssembly?.children.OfType<DocumentNode>())
                 {
-                    var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, dominoAssembly);
-                    if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(thispath))
+                    try
                     {
-                        //Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
-                        warningfiles.Add(Path.GetFileNameWithoutExtension(project.relativePath));
-                        continue;
+                        var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, DominoAssembly);
+                        if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(FilePath))
+                        {
+                            //Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
+                            warningfiles.Add(Path.GetFileNameWithoutExtension(project.relativePath));
+                            continue;
+                        }
+                        for (int i = 0; i < counts2.Item2.Length; i++)
+                        {
+                            _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                        }
+                        for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
+                        {
+                            _ColorList[i].ProjectCount.Add(0);
+                        }
+                        AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
                     }
-                    for (int i = 0; i < counts2.Item2.Length; i++)
+                    catch
                     {
-                        _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                        Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
                     }
-                    for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
-                    {
-                        _ColorList[i].ProjectCount.Add(0);
-                    }
-                    AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
                 }
-                catch
+                for (int i = 0; i < warningfiles.Count; i++)
                 {
-                    Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
+                    warningfiles[i] = "\"" + warningfiles[i] + "\"";
                 }
-            }
-            for (int i = 0; i < warningfiles.Count; i++)
-            { 
-                warningfiles[i] = "\"" + warningfiles[i] + "\"";
-            }
-            if (warningfiles.Count == 1)
-            {
-                WarningLabelText = $"The file {warningfiles[0]} uses a different color table and is not shown in this view." ;
-            }
-            else if (warningfiles.Count > 1)
-            {
-                WarningLabelText = $"The files {string.Join(", ", warningfiles.ToArray())} use a different color table and are not shown in this view.";
+                if (warningfiles.Count == 1)
+                {
+                    WarningLabelText = $"The file {warningfiles[0]} uses a different color table and is not shown in this view.";
+                }
+                else if (warningfiles.Count > 1)
+                {
+                    WarningLabelText = $"The files {string.Join(", ", warningfiles.ToArray())} use a different color table and are not shown in this view.";
 
+                }
             }
         }
 

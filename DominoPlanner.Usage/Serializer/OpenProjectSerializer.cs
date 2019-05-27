@@ -103,6 +103,62 @@ namespace DominoPlanner.Usage.Serializer
                 return null;
             }
         }
+        public static void RenameProject(string name, string new_name)
+        {
+            try
+            {
+                XmlDocument currDocument = new XmlDocument();
+                if (File.Exists(path))
+                {
+                    currDocument.Load(path);
+                    XmlElement root = (XmlElement)currDocument.FirstChild;
+                    if (root != null && root.HasChildNodes)
+                    {
+                        foreach (XmlElement curElement in root.ChildNodes)
+                        {
+                            if (string.Equals(curElement.Attributes["FolderPath"].Value, Path.GetDirectoryName(name), StringComparison.OrdinalIgnoreCase)
+                                && string.Equals(curElement.Attributes["Projectname"].Value, Path.GetFileNameWithoutExtension(name), StringComparison.OrdinalIgnoreCase))
+                            {
+                                curElement.SetAttribute("FolderPath", Path.GetDirectoryName(new_name));
+                                curElement.SetAttribute("Projectname", Path.GetFileNameWithoutExtension(new_name));
+                                currDocument.Save(path);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+        public static int GetProjectID(string name)
+        {
+            try
+            {
+                XmlDocument currDocument = new XmlDocument();
+                if (File.Exists(path))
+                {
+                    currDocument.Load(path);
+                    XmlElement root = (XmlElement)currDocument.FirstChild;
+                    if (root != null && root.HasChildNodes)
+                    {
+                        foreach (XmlElement curElement in root.ChildNodes)
+                        {
+                            if (string.Equals(curElement.Attributes["FolderPath"].Value, Path.GetDirectoryName(name), StringComparison.OrdinalIgnoreCase)
+                                && string.Equals(curElement.Attributes["Projectname"].Value, Path.GetFileNameWithoutExtension(name), StringComparison.OrdinalIgnoreCase))
+                            {
+                                return int.Parse(curElement.Attributes["ID"].Value);
+                            }
+                        }
+                    }
+                }
+                return -1;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
     }
 
     public class OpenProject

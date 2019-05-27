@@ -12,7 +12,7 @@ namespace DominoPlanner.Core
     [ProtoContract]
     [ProtoInclude(100, typeof(FieldParameters))]
     [ProtoInclude(101, typeof(GeneralShapesProvider))]
-    public abstract class IDominoProvider : IWorkspaceLoadable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter
+    public abstract class IDominoProvider : IWorkspaceLoadable, IWorkspaceLoadColorList, IWorkspaceLoadImageFilter, IHasThumbnail
     {
         #region properties
         [ProtoMember(1, OverwriteList = true)]
@@ -34,7 +34,21 @@ namespace DominoPlanner.Core
             }
             private set { }
         }
-
+        [ProtoMember(5)]
+        public byte[] Thumbnail
+        {
+            get
+            {
+                System.Drawing.Bitmap b = new System.Drawing.Bitmap(256, 256);
+                if (last != null && last.colors != null)
+                    b = last.GenerateImage(256).ToImage<Emgu.CV.Structure.Bgra, byte>().ToBitmap();
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    b.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    return memoryStream.ToArray();
+                }
+            }
+        }
         [ProtoMember(3)]
         public virtual bool HasProtocolDefinition { get; set; }
 
@@ -408,29 +422,12 @@ namespace DominoPlanner.Core
         [ProtoAfterDeserialization]
         private void restoreShapes()
         {
-            /*if (PrimaryCalculation == null)
+            if (PrimaryImageTreatment == null || PrimaryCalculation == null)
             {
-                PrimaryCalculation = CreatePrimaryCalculation();
+                throw new InvalidDataException();
             }
-            if (PrimaryImageTreatment == null)
-            {
-                PrimaryImageTreatment = CreatePrimaryTreatment();
-            }*/
             Generate();
             last.colors = colors;
-            //CreatePrimaryTreatment();
-            //bool lastValidTemp = lastValid;
-            ////if (!Editing)
-            ////{
-            //PrimaryImageTreatment?.();
-            //SecondaryImageTreatment?.UpdateSource();
-
-            //ApplyImageFilters();
-            //ApplyColorFilters();
-            //GenerateShapes();
-            //ReadUsedColors();
-            ////}
-            //lastValid = lastValidTemp;
         }
         #endregion
 
@@ -713,6 +710,16 @@ namespace DominoPlanner.Core
     public interface ICountTargetable
     {
         int TargetCount { set; }
+    }
+    public interface IHasThumbnail
+    {
+        byte[] Thumbnail { get; }
+    }
+    [ProtoContract]
+    public class IDominoProviderThumbnail : IHasThumbnail
+    {
+        [ProtoMember(5)]
+        public byte[] Thumbnail { get; private set; }
     }
 
 }
