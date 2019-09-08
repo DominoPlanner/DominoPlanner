@@ -20,7 +20,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="234"/>
         </Grid.RowDefinitions>
-        <DataGrid SelectedIndex="{Binding selindex}" x:Name="dGrid" GridLinesVisibility="None" RowHeaderWidth="0" local:ColorListControl.BindableColumns="{Binding DifColumns}" Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding ColorList}" SelectedItem="{Binding SelectedStone}" Margin="5,5,5,5" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" SelectionMode="Single" CanUserResizeRows="False" BorderBrush="{x:Null}" RowHeight="30" Background="{x:Null}" CanUserDeleteRows="False" HeadersVisibility="Column" CanUserSortColumns="False">
+        <DataGrid x:Name="dGrid" GridLinesVisibility="None" RowHeaderWidth="0" local:ColorListControl.BindableColumns="{Binding DifColumns}" Grid.Row="0" HorizontalAlignment="Stretch" ItemsSource="{Binding ColorList}"  SelectedValue="{Binding SelectedStone, Mode=TwoWay}" Margin="5,5,5,5" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" SelectionMode="Single" CanUserResizeRows="False" BorderBrush="{x:Null}" RowHeight="30" Background="{x:Null}" CanUserDeleteRows="False" HeadersVisibility="Column" CanUserSortColumns="False">
             <DataGrid.Resources>
                 <parent:BindingProxy x:Key="FirstColumnCheckedProxy" Data="{Binding ShowProjects}"   />
             </DataGrid.Resources>
@@ -78,7 +78,7 @@
             <DockPanel>
                 <TextBlock TextWrapping="Wrap" Margin="5" Text="{Binding WarningLabelText}"  DockPanel.Dock="Bottom" VerticalAlignment="Bottom"></TextBlock>
                 <xctk:PropertyGrid DockPanel.Dock="Top" Margin="5,0,0,0" VerticalAlignment="Stretch" SelectedObject="{Binding SelectedStone.DominoColor}" HorizontalAlignment="Stretch"/>
-                
+
             </DockPanel>
             <Button Grid.Column="2" Height="30" Margin="5.2,0,4.8,109.6" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Command="{Binding BtnMoveUp}">
                 <StackPanel Orientation="Horizontal">
