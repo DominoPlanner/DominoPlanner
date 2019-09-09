@@ -27,13 +27,30 @@ namespace DominoPlanner.Usage
 
         private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
+            {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
+                CC.Focus();
+                Keyboard.Focus(CC);
+                e.Handled = true;
+            }
         }
 
         private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            ((ContentControl)sender).Focus();
+            CC.Focus();
+            Keyboard.Focus(CC);
+        }
+
+        private void IntegerUpDown_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
+            {
+                ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
+                CC.Focus();
+                Keyboard.Focus(CC);
+                e.Handled = true;
+            }
         }
     }
 }

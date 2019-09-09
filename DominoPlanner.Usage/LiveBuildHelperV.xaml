@@ -31,10 +31,10 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Row:" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <xctk:IntegerUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
+                <xctk:IntegerUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False" PreviewKeyDown="IntegerUpDown_PreviewKeyDown"/>
                 <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <Label Grid.Column="3" Content="{Binding CountRow}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                
+
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
@@ -44,7 +44,7 @@
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Block:" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <xctk:IntegerUpDown Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <xctk:IntegerUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" PreviewKeyDown="IntegerUpDown_PreviewKeyDown"/>
                 <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <Label Grid.Column="3" Content="{Binding CountBlock}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
@@ -61,7 +61,7 @@
 
             </Button>
         </Grid>
-        <ContentControl Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
+        <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SizeChanged">
                     <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
