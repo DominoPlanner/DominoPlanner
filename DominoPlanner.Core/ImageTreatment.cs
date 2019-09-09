@@ -148,6 +148,18 @@ namespace DominoPlanner.Core
             Height = height;
             UpdateSource();
         }
+
+        public System.Drawing.Bitmap FilteredImage
+        {
+            get
+            {
+                if(imageFiltered != null)
+                {
+                    return imageFiltered.Bitmap;
+                }
+                return null;
+            }
+        }
     }
     [ProtoContract(SkipConstructor =true)]
     public class NormalReadout : ImageTreatment

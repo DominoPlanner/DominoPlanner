@@ -45,7 +45,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>strongname.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=4.0.1.3373, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
@@ -130,7 +131,6 @@
     <None Include="ClassDiagram1.cd" />
     <None Include="Core Klassendiagramm.cd" />
     <None Include="packages.config" />
-    <None Include="strongname.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License-LGPL.txt" />
