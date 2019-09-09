@@ -1,6 +1,7 @@
 ﻿using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,6 +65,27 @@ namespace DominoPlanner.Usage.UserControls.View
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             CanGrid.ColumnDefinitions[2].Width = new GridLength(10);
+        }
+    }
+
+    public class ImageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(value is System.Drawing.Bitmap bitmap)
+            {
+                return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                          bitmap.GetHbitmap(),
+                          IntPtr.Zero,
+                          Int32Rect.Empty,
+                          BitmapSizeOptions.FromEmptyOptions());
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

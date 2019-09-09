@@ -10,7 +10,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -19,18 +18,31 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public EditProjectVM(IDominoProvider dominoProvider) : base()
         {
-
             HaveBuildtools = dominoProvider.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
-            
-            //string relativePath = dominoProvider.relativePath;
-            //string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider.parent);
-            //ImageSource = ImageHelper.GetImageOfFile(filepath);
+
+            if (dominoProvider != null && dominoProvider.PrimaryImageTreatment != null)
+            {
+                if (dominoProvider.PrimaryImageTreatment.FilteredImage != null)
+                {
+                    FilteredImage = dominoProvider.PrimaryImageTreatment.FilteredImage;
+                }
+                else
+                {
+                    BlendFileFilter bff = dominoProvider.PrimaryImageTreatment.ImageFilters.OfType<BlendFileFilter>().FirstOrDefault();
+                    if (bff != null)
+                    {
+                        string relativePath = bff.FilePath;
+
+                        FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(Workspace.AbsolutePathFromReference(ref relativePath, dominoProvider));
+                    }
+                }
+            }
 
             UICursor = null;
             selectedDominoes = new List<DominoInCanvas>();
             UnsavedChanges = false;
             CurrentProject = dominoProvider;
-
+            
             _DominoList = new ObservableCollection<ColorListEntry>();
 
             _DominoList.Clear();
@@ -76,6 +88,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private System.Windows.Point SelectionStartPoint;
         private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
+
+        private string PreviewPath
+        {
+            get
+            {
+                string imagepath = System.Windows.Forms.Application.LocalUserAppDataPath;
+                imagepath += "\\" + name + "_prev.png";
+                return imagepath;
+            }
+        }
         #endregion
 
         #region events
@@ -126,15 +148,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private string _ImageSource;
-        public string ImageSource
+        private System.Drawing.Bitmap _FilteredImage;
+
+        public System.Drawing.Bitmap FilteredImage
         {
-            get { return _ImageSource; }
+            get { return _FilteredImage; }
             set
             {
-                if (_ImageSource != value)
+                if(_FilteredImage != value)
                 {
-                    _ImageSource = value;
+                    _FilteredImage = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
@@ -283,6 +306,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal override void Close()
         {
             base.Close();
+
+            try
+            {
+                if (File.Exists(PreviewPath)) File.Delete(PreviewPath);
+            }catch(Exception ex) { }
+
             ClearCanvas();
         }
 
@@ -394,7 +423,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                Process.Start(ImageSource);
+                if (!File.Exists(PreviewPath))
+                {
+                    FilteredImage.Save(PreviewPath);
+                }
+                Process.Start(PreviewPath);
             }
             catch (Exception)
             {

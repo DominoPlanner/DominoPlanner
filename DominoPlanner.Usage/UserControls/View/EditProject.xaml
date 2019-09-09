@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
+        <local:ImageConverter x:Key="ImageConverter"/>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
@@ -28,7 +29,6 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125"/>
-
                     <RowDefinition Height="200" MinHeight="150"/>
                     <RowDefinition Height="3"/>
                     <RowDefinition Height="*"/>
@@ -63,9 +63,8 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-
                 </Grid>
-                <Image Grid.Row="1" Source="{Binding ImageSource}">
+                <Image Grid.Row="1" Source="{Binding FilteredImage, Converter={StaticResource ImageConverter}}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDown">
                             <i:InvokeCommandAction Command="{Binding ShowImageClick}"/>
