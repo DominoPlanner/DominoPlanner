@@ -178,6 +178,7 @@
     <Compile Include="UserControls\ViewModel\CreateRectangularStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\CreateStructureVM.cs" />
     <Compile Include="UserControls\ViewModel\DominoProviderVM.cs" />
+    <Compile Include="UserControls\ViewModel\EditingToolsVM.cs" />
     <Compile Include="UserControls\ViewModel\EditProjectVM.cs" />
     <Compile Include="UserControls\ViewModel\ImageTreatmentVM.cs" />
     <Compile Include="UserControls\ViewModel\IterationInformationVM.cs" />
@@ -264,6 +265,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ProtocolV.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Icons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

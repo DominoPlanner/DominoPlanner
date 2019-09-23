@@ -59,12 +59,12 @@ namespace DominoPlanner.Usage.UserControls.View
 
         private void Grid_SizeChanged_1(object sender, SizeChangedEventArgs e)
         {
-            ((Grid)sender).ColumnDefinitions[2].Width = new GridLength(e.NewSize.Width - 340);
+            ((Grid)sender).ColumnDefinitions[1].Width = new GridLength(e.NewSize.Width - 300);
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            CanGrid.ColumnDefinitions[2].Width = new GridLength(10);
+            CanGrid.ColumnDefinitions[1].Width = new GridLength(10);
         }
     }
 

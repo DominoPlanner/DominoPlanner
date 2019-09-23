@@ -72,6 +72,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             SelectAllCom = new RelayCommand(o => { SelectAll(); });
             RefreshCanvas();
             UnsavedChanges = false;
+
+            EditingTools = new ObservableCollection<EditingToolVM>() {
+                new EditingToolVM() { Image = "rect_selectDrawingImage", Name = "Select",  },
+                new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
+                new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
+                new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
+                new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
+                new EditingToolVM() {Image= "zoomDrawingImage", Name = "Zoom" },
+                new EditingToolVM() { Image = "display_settingsDrawingImage", Name="View settings"}
+            };
+            SelectedTool = EditingTools[1];
+
         }
         #endregion
 
@@ -105,7 +117,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prope
-        
+
+        private ObservableCollection<EditingToolVM> editingTools;
+
+        public ObservableCollection<EditingToolVM> EditingTools
+        {
+            get { return editingTools; }
+            set { editingTools = value; RaisePropertyChanged(); }
+        }
+        private EditingToolVM selectedTool;
+
+        public EditingToolVM SelectedTool
+        {
+            get { return selectedTool; }
+            set { selectedTool = value; RaisePropertyChanged(); }
+        }
+
+
         private Visibility _HaveBuildtools;
         public Visibility HaveBuildtools
         {
@@ -727,6 +755,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedColors = new int[CurrentProject.colors.Length];
             RefreshCanvas();
         }
+        
 
         internal void RefreshCanvas()
         {

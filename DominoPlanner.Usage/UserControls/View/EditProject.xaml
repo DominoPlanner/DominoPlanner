@@ -4,29 +4,121 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="720" Cursor="{Binding UICursor}" SizeChanged="UserControl_SizeChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+             d:DesignHeight="600" d:DesignWidth="1000" Cursor="{Binding UICursor}" SizeChanged="UserControl_SizeChanged" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
+        <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
+        
+        <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>
+
+        <DataTemplate x:Key="SelectTemplate" DataType="{x:Type vm:SelectionToolVM}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Mode:</TextBlock>
+                <RadioButton Width="24" Margin="0, 0" GroupName="SelectMode" ToolTip="Remove from selection" IsChecked="{Binding SelectionDomain, Converter={StaticResource EnumBooleanConverter} }">
+                    +
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Left mouse button: add, right mouse button: remove">
+                    ±
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Remove from selection">
+                    -
+                </RadioButton>
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Shape:</TextBlock>
+                <RadioButton Width="24" Margin="0, 0" GroupName="SelectDomain" ToolTip="Rectangle">
+                    <Image Source="{StaticResource rect_selectDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectDomain" ToolTip="Circle">
+                    <Image Source="{StaticResource round_selectDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectDomain" ToolTip="Polygon">
+                    <Image Source="{StaticResource poly_selectDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectDomain" ToolTip="Freehand">
+                    <Image Source="{StaticResource freehand_selectDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Boundary treatment:</TextBlock>
+                <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip="Include dominoes on selection boundary">
+                    <Image Source="{StaticResource include_borderDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip="Exclude dominoes on selection boundary">
+                    <Image Source="{StaticResource exclude_borderDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Undo last selection operation">
+                    <Image Source="{StaticResource undoDrawingImage}" Width="18" Height="18"/>
+                </Button>
+                <Button Width="24" Margin="1, 0" ToolTip="Redo selection operation">
+                    <Image Source="{StaticResource redoDrawingImage}" Width="18" Height="18"/>
+                </Button>
+                <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Clear selection">
+                    <Image Source="{StaticResource closeDrawingImage}" Width="18" Height="18"/>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="DisplaySettingsTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0">Background Color:</TextBlock>
+                <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0"/>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+
+                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center"/>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Color:</TextBlock>
+                <xctk:ColorPicker Width="50" Margin="2, 0, 5, 0"/>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Size:</TextBlock>
+
+                <Slider Margin="5, 0, 0, 0" Width="50"></Slider>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Image overlay transparency:</TextBlock>
+                <Slider Margin="5, 0, 0, 0" Width="50"></Slider>
+                <RadioButton Width="24" Margin="0, 0" GroupName="ImagePosition" ToolTip="Display image below dominoes">
+                    <Image Source="{StaticResource stack_image_belowDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="ImagePosition" ToolTip="Display image above dominoes">
+                    <Image Source="{StaticResource stack_image_aboveDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Open Image:</TextBlock>
+                <Button Width="24" Margin="1, 0"  ToolTip="">
+                    <Image Source="{StaticResource openDrawingImage}" Width="18" Height="18"/>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid x:Name="CanGrid" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
+        <Border BorderThickness="0, 0, 0, 1" BorderBrush="Gray">
+
+            <StackPanel Orientation="Horizontal" Margin="1, 1">
+                <Border BorderBrush="Black" BorderThickness="1" Width="24">
+                    <Image Source="{Binding SelectedTool.img}" Width="18" Height="18"/>
+                </Border>
+                <ContentPresenter Margin="2, 0, 0, 0" ContentTemplate="{StaticResource DisplaySettingsTemplate}">
+
+                </ContentPresenter>
+                
+            </StackPanel>
+        </Border>
+        <Grid x:Name="CanGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" SizeChanged="Grid_SizeChanged_1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="25"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125"/>
                     <RowDefinition Height="200" MinHeight="150"/>
@@ -100,22 +192,46 @@
                     </parent:ColorControl>
                 </Grid>
             </Grid>
-            <ScrollViewer x:Name="ScrollViewer" Grid.Column="2"  Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
-                <ContentControl Grid.Column="2" Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+            <ScrollViewer x:Name="ScrollViewer" Grid.Column="1" Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                <ContentControl Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
-            <Grid Grid.Column="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="150"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
-                <Slider HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
+            <ListBox Background="Transparent"    
+                     BorderBrush="Transparent"               
+                     BorderThickness="0"
+                     VerticalAlignment="Stretch" 
+                     ItemsSource="{Binding EditingTools}"
+                     SelectedItem="{Binding SelectedTool, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                
+                <ListBox.ItemTemplate>
+                    <DataTemplate >
+                        <RadioButton ToolTip="{Binding Name}" 
+                                     IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Mode=TwoWay}"
+                                     Height="25" Margin="0, 1" GroupName="A">
+                            <Image Width="18" Height="18" Source="{Binding img}"/>
+                        </RadioButton>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <!--
+                <Image  Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
+                <Slider Height="100" HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
                 <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="2"/>
-            </Grid>
+            -->
+            
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <!--Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
