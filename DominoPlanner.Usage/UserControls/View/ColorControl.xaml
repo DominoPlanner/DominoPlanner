@@ -15,12 +15,8 @@
         <parent:ConfigToDynamicGridViewConverter x:Key="ConfigToDynamicGridViewConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot">
-        <ListView ItemsSource="{Binding Colors}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}" SelectedValue="{Binding SelectedColor}" SelectedIndex="{Binding SelectedIndex}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding ClickCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+        <ListView ItemsSource="{Binding Colors}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}" SelectedValue="{Binding SelectedColor}" SelectedIndex="{Binding SelectedIndex}"
+            MouseDoubleClick="ListView_MouseDoubleClick">
         </ListView>
     </Grid>
 </UserControl>

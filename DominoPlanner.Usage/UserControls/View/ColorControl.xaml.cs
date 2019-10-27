@@ -89,8 +89,15 @@ namespace DominoPlanner.Usage
             ColumnConfig = new ColumnConfig();
             ColumnConfig.Columns = new ObservableCollection<Column>();
         }
-        
-    } 
+
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (((FrameworkElement)e.OriginalSource).DataContext is ColorListEntry)
+            {
+                ClickCommand.Execute(null);
+            }
+        }
+    }
     public class ColumnConfig
     {
         public IEnumerable<Column> Columns { get; set; }
