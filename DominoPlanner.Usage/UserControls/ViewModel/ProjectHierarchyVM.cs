@@ -540,12 +540,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Export as Image", "Icons/image.ico", index: 4 )]
         public void ExportImage()
         {
-            ExportImage(true);
+            ExportImage(false);
         }
         [ContextMenuAttribute("Custom Image Export", "Icons/image.ico", index: 5)]
         public void ExportImageCustom()
         {
-            ExportImage(false);
+            ExportImage(true);
         }
         public void ExportImage(bool userDefinedExport)
         {
