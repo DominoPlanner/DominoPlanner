@@ -101,21 +101,31 @@ namespace DominoPlanner.Usage
                     string text;
                     using (var server = new NamedPipeServerStream(pipeName as string))
                     {
-                        server.WaitForConnection();
-
-                        using (StreamReader reader = new StreamReader(server))
+                        Thread.Sleep(100);
+                        try
                         {
-                            text = reader.ReadToEnd();
+                            server.WaitForConnection();
+                            using (StreamReader reader = new StreamReader(server))
+                            {
+                                text = reader.ReadToEnd();
+                            }
+                            if (text == EXIT_STRING)
+                                break;
+
+                            OnReceiveString(text);
+
+                            if (_isRunning == false)
+                                break;
                         }
+                        catch (IOException ex)
+                        {
+                            
+                        }
+
+                        
                     }
 
-                    if (text == EXIT_STRING)
-                        break;
-
-                    OnReceiveString(text);
-
-                    if (_isRunning == false)
-                        break;
+                    
                 }
             });
             Thread.Start(NamedPipeName);
@@ -161,8 +171,9 @@ namespace DominoPlanner.Usage
 
                 using (StreamWriter writer = new StreamWriter(client))
                 {
+                    writer.AutoFlush = true;
                     writer.Write(text);
-                    writer.Flush();
+                    client.WaitForPipeDrain();
                 }
             }
             return true;

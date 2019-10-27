@@ -6,12 +6,14 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
 
     public class EditingToolVM : ModelBase
     {
+        public EditProjectVM parent;
         public string Name { get; internal set; }
         private string image;
 
@@ -42,7 +44,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public bool IncludeBoundary
         {
             get { return includeBoundary; }
-            set { includeBoundary = value; RaisePropertyChanged(); }
+            set { includeBoundary = value; RaisePropertyChanged(); SelectionDomain.IncludeBoundary = value; }
         }
 
         private SelectionDomain selectionDomain;
@@ -50,61 +52,164 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public SelectionDomain SelectionDomain
         {
             get { return selectionDomain; }
-            set { selectionDomain = value; RaisePropertyChanged(); }
+            set { selectionDomain = value; RaisePropertyChanged();
+                selectionDomain.SelectionMode = SelectionMode;
+                selectionDomain.IncludeBoundary = includeBoundary;
+            }
         }
         private SelectionMode selectionMode;
 
         public SelectionMode SelectionMode
         {
             get { return selectionMode; }
-            set { selectionMode = value; RaisePropertyChanged(); }
+            set
+            {
+                selectionMode = value; RaisePropertyChanged();
+                selectionDomain.SelectionMode = value;
+                selectionDomain.IncludeBoundary = includeBoundary;
+            }
         }
 
-        public SelectionToolVM()
+        public SelectionToolVM(EditProjectVM parent)
         {
             Image = "rect_selectDrawingImage";
             Name = "Select";
+            SelectionDomain = new RectangleSelection();
+            this.parent = parent;
         }
 
         public override void MouseDown(object sender, MouseButtonEventArgs e)
         {
-            
+            SelectionDomain.MouseDown(sender, e, parent.DominoProject);   
+        }
+        public override void MouseMove(object sender, MouseEventArgs e)
+        {
+            SelectionDomain.MouseMove(sender, e, parent.DominoProject);
+        }
+        public override void MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var result = SelectionDomain.MouseUp(sender, e, parent.DominoProject);
+            if (SelectionDomain.CurrentSelectionMode == SelectionMode.Add)
+            {
+                result.ForEach(x => parent.AddToSelectedDominoes(parent.DominoProject.Stones[x]));
+            }
+            else if (SelectionDomain.CurrentSelectionMode == SelectionMode.Remove)
+            {
+                result.ForEach(x => parent.RemoveFromSelectedDominoes(parent.DominoProject.Stones[x]));
+            }
+            parent.UpdateUIElements();
         }
     }
     public abstract class SelectionDomain
     {
+        SolidColorBrush AddColor = Brushes.LightBlue;
+        SolidColorBrush RemoveColor = Brushes.IndianRed;
+
+
+        public SolidColorBrush SelectionColor()
+        {
+            if (CurrentSelectionMode == SelectionMode.Add)
+            {
+                return AddColor;
+            }
+            else return RemoveColor;
+        }
+        public bool IncludeBoundary;
+        public SelectionMode CurrentSelectionMode;
+        public SelectionMode SelectionMode;
+        public System.Windows.Shapes.Shape s;
+        
+        public void RemoveSelectionDomain(ProjectCanvas pc)
+        {
+            s.Visibility = Visibility.Hidden;
+            pc.Children.Remove(s);
+        }
+        public void AddSelectionDomain(ProjectCanvas pc)
+        {
+            if (s.Visibility == Visibility.Visible)
+            {
+                RemoveSelectionDomain(pc);
+            }
+            s.Visibility = Visibility.Visible;
+            pc.Children.Add(s);
+        }
         public abstract void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc);
 
         public abstract void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc);
 
         public abstract List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc);
+
+        public abstract Rect GetBoundingBox();
+
+        public bool IsInsideBoundingBox(Rect BoundingBox, DominoInCanvas dic, bool includeBoundary)
+        {
+            if (includeBoundary)
+            {
+                return dic.canvasPoints.Max(x => x.X) > BoundingBox.Left &&
+                    dic.canvasPoints.Min(x => x.X) < BoundingBox.Right &&
+                    dic.canvasPoints.Min(x => x.Y) < BoundingBox.Bottom &&
+                    dic.canvasPoints.Max(x => x.Y) > BoundingBox.Top;
+            }
+            else
+            {
+                return dic.canvasPoints.Min(x => x.X) > BoundingBox.Left &&
+                    dic.canvasPoints.Max(x => x.X) < BoundingBox.Right &&
+                    dic.canvasPoints.Max(x => x.Y) < BoundingBox.Bottom &&
+                    dic.canvasPoints.Min(x => x.Y) > BoundingBox.Top;
+                
+            }
+        }
+
+        public abstract bool? IsInside();
+
+        public abstract void UpdateShape(Point position);
     }
     public class RectangleSelection : SelectionDomain
     {
-        Point SelectionStartPoint;
-        System.Windows.Shapes.Rectangle rect;
+        public RectangleSelection()
+        {
+            s = new System.Windows.Shapes.Rectangle();
+        }
+        Point MouseDownPoint;
+
+        public void UpdateSelectionMode(MouseButtonEventArgs e) // called on Mouse down
+        {
+            if ((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right))
+            {
+                if (SelectionMode == SelectionMode.Add || (SelectionMode == SelectionMode.Neutral && e.ChangedButton == MouseButton.Left))
+                {
+                    CurrentSelectionMode = SelectionMode.Add;
+                }
+                else if (SelectionMode == SelectionMode.Remove || (SelectionMode == SelectionMode.Neutral && e.ChangedButton == MouseButton.Right))
+                {
+                    CurrentSelectionMode = SelectionMode.Remove;
+                }
+                else
+                {
+                    CurrentSelectionMode = SelectionMode.Neutral;
+                }
+            }
+            
+        }
 
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
         {
             if (e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
             {
-                if (rect != null)
-                {
-                    pc.Children.Remove(rect);
-                    rect = null;
-                }
+                RemoveSelectionDomain(pc);
                 return;
             }
-
-            if (rect == null) return;
-
             var pos = e.GetPosition((Canvas)sender);
 
-            var x = Math.Min(pos.X, SelectionStartPoint.X);
-            var y = Math.Min(pos.Y, SelectionStartPoint.Y);
+            System.Windows.Shapes.Rectangle rect = s as System.Windows.Shapes.Rectangle;
+            if (rect == null) return;
+            
 
-            var w = Math.Max(pos.X, SelectionStartPoint.X) - x;
-            var h = Math.Max(pos.Y, SelectionStartPoint.Y) - y;
+            var x = Math.Min(pos.X, MouseDownPoint.X);
+            var y = Math.Min(pos.Y, MouseDownPoint.Y);
+
+            var w = Math.Max(pos.X, MouseDownPoint.X) - x;
+            var h = Math.Max(pos.Y, MouseDownPoint.Y) - y;
 
             rect.Width = w;
             rect.Height = h;
@@ -117,138 +222,66 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Canvas.SetLeft(rect, x);
             Canvas.SetTop(rect, y);
         }
-
+        public override Rect GetBoundingBox()
+        {
+            System.Windows.Shapes.Rectangle rect = s as System.Windows.Shapes.Rectangle;
+            double left = Canvas.GetLeft(rect);
+            double top = Canvas.GetTop(rect);
+            return new Rect(left, top, rect.Width, rect.Height);
+        }
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            if (rect == null || rect.Visibility != Visibility.Visible)
+            List<int> result = new List<int>();
+            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released))
             {
-                for (int i = 0; i < pc.Stones.Count; i++)
-                {
-                    if (DominoProject.Stones[i] is DominoInCanvas dic)
-                    {
-                        double _top = double.MaxValue;
-                        double _bottom = 0;
-                        double _left = double.MaxValue;
-                        double _right = 0;
-
-                        foreach (System.Windows.Point point in dic.canvasPoints)
-                        {
-                            if (point.Y < _top) _top = point.Y;
-                            if (point.Y > _bottom) _bottom = point.Y;
-                            if (point.X < _left) _left = point.X;
-                            if (point.X > _right) _right = point.X;
-                        }
-                        if (_left < e.GetPosition(pc).X && _right > e.GetPosition(pc).X
-                            && _top < e.GetPosition(pc).Y && _bottom > e.GetPosition(pc).Y)
-                        {
-                            if (e.ChangedButton == MouseButton.Left)
-                            {
-                                if (!((DominoInCanvas)pc.Stones[i]).isSelected)
-                                {
-                                    AddToSelectedDominoes(pc.Stones[i]);
-                                }
-                            }
-                            else if (e.ChangedButton == MouseButton.Right)
-                            {
-                                if (((DominoInCanvas)DominoProject.Stones[i]).isSelected)
-                                {
-                                    RemoveFromSelectedDominoes(pc.Stones[i]);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                UpdateUIElements();
-                return;
+                return result;
             }
-            double top = Canvas.GetTop(rect);
-            double right = Canvas.GetLeft(rect) + rect.ActualWidth;
-            double bottom = Canvas.GetTop(rect) + rect.ActualHeight;
-            double left = Canvas.GetLeft(rect);
-
+            Rect boundingBox = GetBoundingBox();
+            bool singleClickFlag = false;
+            if (s.Visibility == Visibility.Hidden || s == null)
+            {
+                // single click 
+                boundingBox = new Rect(e.GetPosition(pc).X, e.GetPosition(pc).Y, 0, 0);
+                singleClickFlag = true;
+            }
             for (int i = 0; i < pc.Stones.Count; i++)
             {
-                if (pc.Stones[i] is DominoInCanvas dic)
+                if (pc.Stones[i] is DominoInCanvas dic && IsInsideBoundingBox(boundingBox, dic, singleClickFlag ? false: IncludeBoundary))
                 {
-                    double _top = double.MaxValue;
-                    double _bottom = 0;
-                    double _left = double.MaxValue;
-                    double _right = 0;
-
-                    foreach (System.Windows.Point point in dic.canvasPoints)
-                    {
-                        if (point.Y < _top) _top = point.Y;
-                        if (point.Y > _bottom) _bottom = point.Y;
-                        if (point.X < _left) _left = point.X;
-                        if (point.X > _right) _right = point.X;
-                    }
-
-                    /*if ((dic.RenderedGeometry.Bounds.Left > left && dic.RenderedGeometry.Bounds.Left < right
-                          || dic.RenderedGeometry.Bounds.Right > left && dic.RenderedGeometry.Bounds.Right < right
-                          || dic.RenderedGeometry.Bounds.Left < left && dic.RenderedGeometry.Bounds.Right > left 
-                          && dic.RenderedGeometry.Bounds.Left < right && dic.RenderedGeometry.Bounds.Right > right)
-                          && (dic.RenderedGeometry.Bounds.Top > top && dic.RenderedGeometry.Bounds.Top < bottom
-                          || dic.RenderedGeometry.Bounds.Bottom > top && dic.RenderedGeometry.Bounds.Bottom < bottom
-                          || (dic.RenderedGeometry.Bounds.Top < top && dic.RenderedGeometry.Bounds.Bottom > top
-                          && dic.RenderedGeometry.Bounds.Top < bottom && dic.RenderedGeometry.Bounds.Bottom > bottom)))*/
-                    if ((_left > left && _left < right
-                      || _right > left && _right < right
-                      || _left < left && _right > left
-                      && _left < right && _right > right)
-                      && (_top > top && _top < bottom
-                      || _bottom > top && _bottom < bottom
-                      || (_top < top && _bottom > top
-                      && _top < bottom && _bottom > bottom)))
-                    {
-                        if (e.ChangedButton == MouseButton.Left)
-                        {
-                            if (!((DominoInCanvas)pc.Stones[i]).isSelected)
-                            {
-                                AddToSelectedDominoes(pc.Stones[i]);
-                            }
-                        }
-                        else if (e.ChangedButton == MouseButton.Right)
-                        {
-                            if (((DominoInCanvas)pc.Stones[i]).isSelected)
-                            {
-                                RemoveFromSelectedDominoes(pc.Stones[i]);
-                            }
-                        }
-                    }
+                    result.Add(i);
                 }
             }
+            RemoveSelectionDomain(pc);
+            return result;
 
-            rect.Visibility = Visibility.Hidden;
-            pc.Children.Remove(rect);
-
-            UpdateUIElements();
         }
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            if (e.MiddleButton == MouseButtonState.Pressed) return;
+            UpdateSelectionMode(e);
 
-            SelectionStartPoint = e.GetPosition(pc);
-            if (e.LeftButton == MouseButtonState.Pressed)
+            MouseDownPoint = e.GetPosition((Canvas) sender);
+
+            SolidColorBrush color = SelectionColor();
+
+            s = new System.Windows.Shapes.Rectangle
             {
-                rect = new System.Windows.Shapes.Rectangle
-                {
-                    Stroke = Brushes.LightBlue,
-                    StrokeThickness = 8
-                };
-            }
-            else if (e.RightButton == MouseButtonState.Pressed)
-            {
-                rect = new System.Windows.Shapes.Rectangle
-                {
-                    Stroke = Brushes.IndianRed,
-                    StrokeThickness = 8
-                };
-            }
-            Canvas.SetLeft(rect, SelectionStartPoint.X);
-            Canvas.SetTop(rect, SelectionStartPoint.Y);
-            rect.Visibility = System.Windows.Visibility.Hidden;
-            pc.Children.Add(rect);
+                Stroke = color,
+                StrokeThickness = 8
+            };
+         
+            Canvas.SetLeft(s, MouseDownPoint.X);
+            Canvas.SetTop(s, MouseDownPoint.Y);
+            AddSelectionDomain(pc);
+        }
+
+        public override bool? IsInside()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void UpdateShape(Point position)
+        {
+            throw new NotImplementedException();
         }
     }
 }

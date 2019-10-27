@@ -9,6 +9,8 @@ namespace DominoPlanner.Usage
     {
         public List<DominoInCanvas> Stones = new List<DominoInCanvas>();
 
+        public PointCollection selectionArea;
+
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);

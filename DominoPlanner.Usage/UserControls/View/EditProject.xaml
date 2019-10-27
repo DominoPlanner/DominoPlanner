@@ -14,20 +14,28 @@
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
         <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
+        <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
         
         <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>
 
-        <DataTemplate x:Key="SelectTemplate" DataType="{x:Type vm:SelectionToolVM}">
+        <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Mode:</TextBlock>
-                <RadioButton Width="24" Margin="0, 0" GroupName="SelectMode" ToolTip="Remove from selection" IsChecked="{Binding SelectionDomain, Converter={StaticResource EnumBooleanConverter} }">
+                <RadioButton Width="24" Margin="0, 0" GroupName="SelectMode" ToolTip="Remove from selection" 
+                             IsChecked="{Binding SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Add} }">
                     +
                 </RadioButton>
-                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Left mouse button: add, right mouse button: remove">
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Left mouse button: add, right mouse button: remove" IsChecked="{Binding SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Neutral} }">
                     ±
                 </RadioButton>
-                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Remove from selection">
+                <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip="Remove from selection" IsChecked="{Binding SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Remove} }">
                     -
                 </RadioButton>
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Shape:</TextBlock>
@@ -44,10 +52,10 @@
                     <Image Source="{StaticResource freehand_selectDrawingImage}" Width="18" Height="18"/>
                 </RadioButton>
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Boundary treatment:</TextBlock>
-                <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip="Include dominoes on selection boundary">
+                <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip="Include dominoes on selection boundary" IsChecked="{Binding IncludeBoundary}">
                     <Image Source="{StaticResource include_borderDrawingImage}" Width="18" Height="18"/>
                 </RadioButton>
-                <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip="Exclude dominoes on selection boundary">
+                <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip="Exclude dominoes on selection boundary" IsChecked="{Binding IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
                     <Image Source="{StaticResource exclude_borderDrawingImage}" Width="18" Height="18"/>
                 </RadioButton>
                 <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Undo last selection operation">
@@ -102,13 +110,14 @@
         </Grid.RowDefinitions>
         <Border BorderThickness="0, 0, 0, 1" BorderBrush="Gray">
 
-            <StackPanel Orientation="Horizontal" Margin="1, 1">
+            <StackPanel Orientation="Horizontal" Margin="1, 1" Height="24">
                 <Border BorderBrush="Black" BorderThickness="1" Width="24">
                     <Image Source="{Binding SelectedTool.img}" Width="18" Height="18"/>
                 </Border>
-                <ContentPresenter Margin="2, 0, 0, 0" ContentTemplate="{StaticResource DisplaySettingsTemplate}">
+                <ContentControl Margin="2, 0, 0, 0" Content="{Binding SelectedTool}">
+                    <!--ContentTemplate="{StaticResource DisplaySettingsTemplate}"-->
 
-                </ContentPresenter>
+                </ContentControl>
                 
             </StackPanel>
         </Border>
@@ -118,7 +127,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="2">
+            <!--<Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="125"/>
                     <RowDefinition Height="200" MinHeight="150"/>
@@ -184,14 +193,15 @@
                             <TextBlock> Select all stones in the color selected in the list below. <LineBreak /> If some stones are selected this function only applies to the selected stones.</TextBlock>
                         </Button.ToolTip>
                     </Button>
-                    <parent:ColorControl Grid.Row="2" 
+                    
+                </Grid>
+            </Grid>-->
+            <parent:ColorControl Grid.Row="1" Grid.Column="2" 
                                          ClickCommand="{Binding MouseClickCommand}" 
                                          ColumnConfig="{Binding ColorColumnConfig}" 
                                          Colors="{Binding DominoList}" 
                                          SelectedColor="{Binding SelectedColor}">
-                    </parent:ColorControl>
-                </Grid>
-            </Grid>
+            </parent:ColorControl>
             <ScrollViewer x:Name="ScrollViewer" Grid.Column="1" Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
                 <ContentControl Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
