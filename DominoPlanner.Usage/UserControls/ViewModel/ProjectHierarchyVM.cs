@@ -339,7 +339,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
             openFileDialog.Filter = $"All DominoPlanner files|*{Properties.Resources.ObjectExtension};*{Properties.Resources.ProjectExtension}" +
-                $"object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
+                $"|object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
                 $"|project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.CheckPathExists = true;
@@ -540,12 +540,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Export as Image", "Icons/image.ico", index: 4 )]
         public void ExportImage()
         {
-            ExportImage(true);
+            ExportImage(false);
         }
         [ContextMenuAttribute("Custom Image Export", "Icons/image.ico", index: 5)]
         public void ExportImageCustom()
         {
-            ExportImage(false);
+            ExportImage(true);
         }
         public void ExportImage(bool userDefinedExport)
         {

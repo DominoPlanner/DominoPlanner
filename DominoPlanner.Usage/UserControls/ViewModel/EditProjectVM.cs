@@ -162,6 +162,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+        private Color backgroundColor = Colors.Transparent;
+        public Color BackgroundColor
+        {
+            get => backgroundColor;
+            set
+            {
+                backgroundColor = value;
+                TabPropertyChanged(ProducesUnsavedChanges: false);
+                RefreshCanvas();
+                UpdateUIElements();
+            }
+        }
         private Cursor _UICursor;
         public Cursor UICursor
         {
@@ -772,7 +784,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseDown += Canvas_MouseDown;
             DominoProject.MouseMove += Canvas_MouseMove;
             DominoProject.MouseUp += Canvas_MouseUp;
-            DominoProject.Background = new SolidColorBrush(Color.FromArgb(1, 0, 0, 0));
+            DominoProject.Background = new SolidColorBrush(BackgroundColor);
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             dominoTransfer = CurrentProject.Generate(new System.Threading.CancellationToken(), progress);
 
