@@ -339,7 +339,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
             openFileDialog.Filter = $"All DominoPlanner files|*{Properties.Resources.ObjectExtension};*{Properties.Resources.ProjectExtension}" +
-                $"object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
+                $"|object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
                 $"|project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.CheckPathExists = true;
