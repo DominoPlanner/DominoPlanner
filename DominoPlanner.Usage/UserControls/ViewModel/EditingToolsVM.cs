@@ -7,6 +7,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -39,23 +40,85 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class SelectionToolVM : EditingToolVM
     {
-        private bool includeBoundary;
+        public SelectionToolVM(EditProjectVM parent)
+        {
+            Image = "rect_selectDrawingImage";
+            Name = "Select";
+            SelectionTools = new ObservableCollection<SelectionDomain>() {
+                new RectangleSelection(), new CircleSelectionDomain(),
+                new PolygonSelectionDomain(), new FreehandSelectionDomain() };
+            CurrentSelectionDomain = SelectionTools[0];
+            this.parent = parent;
+        }
+
+        private SelectionDomain currentSelectionDomain;
+
+        public SelectionDomain CurrentSelectionDomain
+        {
+            get { return currentSelectionDomain; }
+            set {
+                if (value != null)
+                {
+                    if (currentSelectionDomain != null)
+                    {
+                        value.IncludeBoundary = currentSelectionDomain.IncludeBoundary;
+                        value.SelectionMode = currentSelectionDomain.SelectionMode;
+                    }
+                    currentSelectionDomain = value; 
+                }
+                RaisePropertyChanged();
+            }
+        }
+
+        private ObservableCollection<SelectionDomain> selectionTools;
+
+        public ObservableCollection<SelectionDomain> SelectionTools
+        {
+            get { return selectionTools; }
+            set { selectionTools = value; RaisePropertyChanged();  }
+        }
+
+        public override void MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            CurrentSelectionDomain?.MouseDown(sender, e, parent.DominoProject);   
+        }
+        public override void MouseMove(object sender, MouseEventArgs e)
+        {
+            CurrentSelectionDomain?.MouseMove(sender, e, parent.DominoProject);
+        }
+        public override void MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var result = CurrentSelectionDomain?.MouseUp(sender, e, parent.DominoProject);
+            if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Add)
+            {
+                result.ForEach(x => parent.AddToSelectedDominoes(parent.DominoProject.Stones[x]));
+            }
+            else if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Remove)
+            {
+                result.ForEach(x => parent.RemoveFromSelectedDominoes(parent.DominoProject.Stones[x]));
+            }
+            parent.UpdateUIElements();
+        }
+    }
+    public abstract class SelectionDomain : ModelBase
+    {
+        public string Name { get; internal set; }
+        public DrawingImage img { get; private set; }
+        private string image;
+
+        public string Image
+        {
+            get { return image; }
+            set { image = value; img = (DrawingImage)System.Windows.Application.Current.Resources[value]; }
+        }
+       
+
+        private bool includeBoundary = true;
 
         public bool IncludeBoundary
         {
             get { return includeBoundary; }
-            set { includeBoundary = value; RaisePropertyChanged(); SelectionDomain.IncludeBoundary = value; }
-        }
-
-        private SelectionDomain selectionDomain;
-
-        public SelectionDomain SelectionDomain
-        {
-            get { return selectionDomain; }
-            set { selectionDomain = value; RaisePropertyChanged();
-                selectionDomain.SelectionMode = SelectionMode;
-                selectionDomain.IncludeBoundary = includeBoundary;
-            }
+            set { includeBoundary = value; RaisePropertyChanged(); }
         }
         private SelectionMode selectionMode;
 
@@ -64,72 +127,39 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return selectionMode; }
             set
             {
-                selectionMode = value; RaisePropertyChanged();
-                selectionDomain.SelectionMode = value;
-                selectionDomain.IncludeBoundary = includeBoundary;
+                selectionMode = value;
+                RaisePropertyChanged();
             }
         }
 
-        public SelectionToolVM(EditProjectVM parent)
+        public SolidColorBrush SelectionColor
         {
-            Image = "rect_selectDrawingImage";
-            Name = "Select";
-            SelectionDomain = new RectangleSelection();
-            this.parent = parent;
+            get
+            {
+                if (CurrentSelectionMode == SelectionMode.Add)
+                {
+                    return AddColor;
+                }
+                else return RemoveColor;
+            }
         }
 
-        public override void MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            SelectionDomain.MouseDown(sender, e, parent.DominoProject);   
-        }
-        public override void MouseMove(object sender, MouseEventArgs e)
-        {
-            SelectionDomain.MouseMove(sender, e, parent.DominoProject);
-        }
-        public override void MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            var result = SelectionDomain.MouseUp(sender, e, parent.DominoProject);
-            if (SelectionDomain.CurrentSelectionMode == SelectionMode.Add)
-            {
-                result.ForEach(x => parent.AddToSelectedDominoes(parent.DominoProject.Stones[x]));
-            }
-            else if (SelectionDomain.CurrentSelectionMode == SelectionMode.Remove)
-            {
-                result.ForEach(x => parent.RemoveFromSelectedDominoes(parent.DominoProject.Stones[x]));
-            }
-            parent.UpdateUIElements();
-        }
-    }
-    public abstract class SelectionDomain
-    {
         SolidColorBrush AddColor = Brushes.LightBlue;
         SolidColorBrush RemoveColor = Brushes.IndianRed;
 
+        protected bool ResetFlag = false;
 
-        public SolidColorBrush SelectionColor()
-        {
-            if (CurrentSelectionMode == SelectionMode.Add)
-            {
-                return AddColor;
-            }
-            else return RemoveColor;
-        }
-        public bool IncludeBoundary;
         public SelectionMode CurrentSelectionMode;
-        public SelectionMode SelectionMode;
         public System.Windows.Shapes.Shape s;
         
         public void RemoveSelectionDomain(ProjectCanvas pc)
         {
             s.Visibility = Visibility.Hidden;
-            pc.Children.Remove(s);
+            (VisualTreeHelper.GetParent(s) as Canvas)?.Children.Remove(s);
         }
         public void AddSelectionDomain(ProjectCanvas pc)
         {
-            if (s.Visibility == Visibility.Visible)
-            {
-                RemoveSelectionDomain(pc);
-            }
+            pc.Children.Remove(s);
             s.Visibility = Visibility.Visible;
             pc.Children.Add(s);
         }
@@ -160,18 +190,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        public abstract bool? IsInside();
+        public abstract bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary);
 
-        public abstract void UpdateShape(Point position);
-    }
-    public class RectangleSelection : SelectionDomain
-    {
-        public RectangleSelection()
+        public void ResetSelectionArea()
         {
-            s = new System.Windows.Shapes.Rectangle();
+            ResetFlag = true;
         }
-        Point MouseDownPoint;
-
+    }
+    public abstract class TwoClickSelection : SelectionDomain
+    {
+        protected Point MouseDownPoint;
         public void UpdateSelectionMode(MouseButtonEventArgs e) // called on Mouse down
         {
             if ((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right))
@@ -189,9 +217,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     CurrentSelectionMode = SelectionMode.Neutral;
                 }
             }
-            
         }
+        public abstract Rect GetCurrentDimensions(Point pos);
 
+        public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            UpdateSelectionMode(e);
+
+            MouseDownPoint = e.GetPosition((Canvas)sender);
+
+            SolidColorBrush color = SelectionColor;
+
+            s.Stroke = color;
+            s.StrokeThickness = 8;
+
+            Canvas.SetLeft(s, MouseDownPoint.X);
+            Canvas.SetTop(s, MouseDownPoint.Y);
+            s.Width = 0;
+            s.Height = 0;
+            AddSelectionDomain(pc);
+        }
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
         {
             if (e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
@@ -199,35 +244,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RemoveSelectionDomain(pc);
                 return;
             }
-            var pos = e.GetPosition((Canvas)sender);
+            if (s == null) return;
 
-            System.Windows.Shapes.Rectangle rect = s as System.Windows.Shapes.Rectangle;
-            if (rect == null) return;
-            
+            var dims = GetCurrentDimensions(e.GetPosition((Canvas)sender));
+            s.Width = dims.Width;
+            s.Height = dims.Height;
 
-            var x = Math.Min(pos.X, MouseDownPoint.X);
-            var y = Math.Min(pos.Y, MouseDownPoint.Y);
-
-            var w = Math.Max(pos.X, MouseDownPoint.X) - x;
-            var h = Math.Max(pos.Y, MouseDownPoint.Y) - y;
-
-            rect.Width = w;
-            rect.Height = h;
-
-            if (w > 10 || h > 10)
-                rect.Visibility = Visibility.Visible;
+            if (dims.Width > 10 || dims.Height > 10)
+                s.Visibility = Visibility.Visible;
             else
-                rect.Visibility = Visibility.Hidden;
+                s.Visibility = Visibility.Hidden;
 
-            Canvas.SetLeft(rect, x);
-            Canvas.SetTop(rect, y);
-        }
-        public override Rect GetBoundingBox()
-        {
-            System.Windows.Shapes.Rectangle rect = s as System.Windows.Shapes.Rectangle;
-            double left = Canvas.GetLeft(rect);
-            double top = Canvas.GetTop(rect);
-            return new Rect(left, top, rect.Width, rect.Height);
+            Canvas.SetLeft(s, dims.X);
+            Canvas.SetTop(s, dims.Y);
         }
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
@@ -237,51 +266,158 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return result;
             }
             Rect boundingBox = GetBoundingBox();
-            bool singleClickFlag = false;
-            if (s.Visibility == Visibility.Hidden || s == null)
+            bool SingleClickFlag = false;
+            var pos = e.GetPosition(pc);
+            if ((pos.X - MouseDownPoint.X) * (pos.X - MouseDownPoint.X) + (pos.Y - MouseDownPoint.Y) * (pos.Y - MouseDownPoint.Y) < 5)
             {
                 // single click 
                 boundingBox = new Rect(e.GetPosition(pc).X, e.GetPosition(pc).Y, 0, 0);
-                singleClickFlag = true;
+                SingleClickFlag = true;
             }
-            for (int i = 0; i < pc.Stones.Count; i++)
+            if (!ResetFlag)
             {
-                if (pc.Stones[i] is DominoInCanvas dic && IsInsideBoundingBox(boundingBox, dic, singleClickFlag ? false: IncludeBoundary))
+                for (int i = 0; i < pc.Stones.Count; i++)
                 {
-                    result.Add(i);
+                    if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, SingleClickFlag ? true : IncludeBoundary))
+                    {
+                        result.Add(i);
+                    }
                 }
             }
+            ResetFlag = false;
             RemoveSelectionDomain(pc);
             return result;
+        }
+
+        public override Rect GetBoundingBox()
+        {
+            double left = Canvas.GetLeft(s);
+            double top = Canvas.GetTop(s);
+            return new Rect(left, top, s.Width, s.Height);
+        }
+    }
+    public class RectangleSelection : TwoClickSelection
+    {
+        public RectangleSelection()
+        {
+            s = new System.Windows.Shapes.Rectangle();
+            Image = "rect_selectDrawingImage";
+            Name = "Rectangle";
+        }
+        public override Rect GetCurrentDimensions(Point pos)
+        {
+            var x = Math.Min(pos.X, MouseDownPoint.X);
+            var y = Math.Min(pos.Y, MouseDownPoint.Y);
+
+            var w = Math.Max(pos.X, MouseDownPoint.X) - x;
+            var h = Math.Max(pos.Y, MouseDownPoint.Y) - y;
+            return new Rect(x, y, w, h);
 
         }
+        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        {
+            return IsInsideBoundingBox(boundingBox, dic, includeBoundary);
+        }
+    }
+    public class CircleSelectionDomain : TwoClickSelection
+    {
+        public CircleSelectionDomain()
+        {
+            s = new System.Windows.Shapes.Ellipse();
+            Image = "round_selectDrawingImage";
+            Name = "Circle";
+        }
+        public override Rect GetCurrentDimensions(Point pos)
+        {
+            var radius = Math.Sqrt(Math.Pow(pos.X - MouseDownPoint.X, 2) + Math.Pow(pos.Y - MouseDownPoint.Y, 2));
+            return new Rect(MouseDownPoint.X - radius, MouseDownPoint.Y - radius, 2 * radius, 2*radius);
+        }
+
+        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        {
+            var radius = boundingBox.Width / 2;
+            var center = new Point(boundingBox.X + radius, boundingBox.Y + radius);
+
+            if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
+            {
+                var insideCircle = dic.canvasPoints.Count(x =>
+                Math.Sqrt((x.X - center.X) * (x.X - center.X) + (x.Y - center.Y) * (x.Y - center.Y)) < radius);
+                if (IncludeBoundary)
+                {
+                    if (insideCircle > 0)
+                        return true;
+                }
+                else
+                {
+                    if (insideCircle == dic.canvasPoints.Length)
+                        return true;
+                }
+            }
+            return false;
+        }
+        
+    }
+    public class PolygonSelectionDomain : SelectionDomain
+    {
+        public PolygonSelectionDomain()
+        {
+            Image = "poly_selectDrawingImage";
+            Name = "Polygon";
+        }
+        public override Rect GetBoundingBox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            UpdateSelectionMode(e);
-
-            MouseDownPoint = e.GetPosition((Canvas) sender);
-
-            SolidColorBrush color = SelectionColor();
-
-            s = new System.Windows.Shapes.Rectangle
-            {
-                Stroke = color,
-                StrokeThickness = 8
-            };
-         
-            Canvas.SetLeft(s, MouseDownPoint.X);
-            Canvas.SetTop(s, MouseDownPoint.Y);
-            AddSelectionDomain(pc);
+            throw new NotImplementedException();
         }
 
-        public override bool? IsInside()
+        public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
+        {
+        }
+
+        public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class FreehandSelectionDomain : SelectionDomain
+    {
+        public FreehandSelectionDomain()
+        {
+            Image = "freehand_selectDrawingImage";
+            Name = "Freehand";
+        }
+        public override Rect GetBoundingBox()
         {
             throw new NotImplementedException();
         }
 
-        public override void UpdateShape(Point position)
+        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
         {
             throw new NotImplementedException();
         }
+
+        public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
+        {
+        }
+
+        public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            throw new NotImplementedException();
+        }
+        
     }
 }

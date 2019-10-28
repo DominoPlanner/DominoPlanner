@@ -130,7 +130,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public EditingToolVM SelectedTool
         {
             get { return selectedTool; }
-            set { selectedTool = value; RaisePropertyChanged(); }
+            set
+            {
+                if (value != null)
+                    selectedTool = value;
+                RaisePropertyChanged();
+
+            }
         }
 
 
@@ -766,6 +772,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedDominoes.Clear();
             selectedColors = new int[CurrentProject.colors.Length];
             RefreshCanvas();
+            (EditingTools[0] as SelectionToolVM).CurrentSelectionDomain.ResetSelectionArea();
         }
         
 
