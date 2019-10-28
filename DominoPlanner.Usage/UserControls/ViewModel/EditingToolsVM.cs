@@ -235,6 +235,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Canvas.SetTop(s, MouseDownPoint.Y);
             s.Width = 0;
             s.Height = 0;
+            ResetFlag = false;
             AddSelectionDomain(pc);
         }
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
@@ -418,6 +419,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             throw new NotImplementedException();
         }
-        
+    }
+    public class DisplaySettingsToolVM : EditingToolVM
+    {
+        public DisplaySettingsToolVM(EditProjectVM parent)
+        {
+            Image = "display_settingsDrawingImage";
+            Name = "View Properties";
+            this.parent = parent;
+        }
     }
 }

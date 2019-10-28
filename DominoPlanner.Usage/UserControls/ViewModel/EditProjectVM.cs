@@ -74,13 +74,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UnsavedChanges = false;
 
             EditingTools = new ObservableCollection<EditingToolVM>() {
-                new SelectionToolVM(this) { Image = "rect_selectDrawingImage", Name = "Select",  },
+                new SelectionToolVM(this),
                 new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
                 new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
                 new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
                 new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
                 new EditingToolVM() {Image= "zoomDrawingImage", Name = "Zoom" },
-                new EditingToolVM() { Image = "display_settingsDrawingImage", Name="View settings"}
+                new DisplaySettingsToolVM(this)
             };
             SelectedTool = EditingTools[0];
 
@@ -97,8 +97,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private int[] selectedColors;
         private DominoInCanvas[] copyedDominoes;
         private int startindex;
-        private System.Windows.Point SelectionStartPoint;
-        private System.Windows.Shapes.Rectangle rect;
         private DominoTransfer dominoTransfer;
 
         private string PreviewPath
@@ -180,6 +178,34 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 UpdateUIElements();
             }
         }
+        private Color borderColor = Color.FromArgb(50, 0, 0, 255);
+        public Color BorderColor
+        {
+            get => borderColor;
+            set
+            {
+                borderColor = value;
+                DominoProject.UnselectedBorderColor = BorderColor;
+                DominoProject.SelectedBorderColor = Colors.Blue;
+                TabPropertyChanged(ProducesUnsavedChanges: false);
+                UpdateUIElements();
+            }
+        }
+
+        private double borderSize = 2;
+
+        public double BorderSize
+        {
+            get { return borderSize; }
+            set
+            {
+                borderSize = value;
+                DominoProject.BorderSize = BorderSize;
+                TabPropertyChanged(ProducesUnsavedChanges: false);
+                UpdateUIElements();
+            }
+        }
+
         private Cursor _UICursor;
         public Cursor UICursor
         {
@@ -792,17 +818,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.MouseMove += Canvas_MouseMove;
             DominoProject.MouseUp += Canvas_MouseUp;
             DominoProject.Background = new SolidColorBrush(BackgroundColor);
+            DominoProject.UnselectedBorderColor = BorderColor;
+            DominoProject.SelectedBorderColor = Colors.Blue;
+            DominoProject.BorderSize = BorderSize;
             Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
             dominoTransfer = CurrentProject.Generate(new System.Threading.CancellationToken(), progress);
 
             for (int i = 0; i < dominoTransfer.shapes.Count(); i++)
             {
                 DominoInCanvas dic = new DominoInCanvas(i, dominoTransfer[i], CurrentProject.colors, !Expanded);
+                
                 dic.MouseDown += Dic_MouseDown;
                 System.Windows.Shapes.Path sd = new System.Windows.Shapes.Path();
 
                 DominoProject.Stones.Add(dic);
             }
+            var selectedIndices = selectedDominoes.Select(x => x.idx).ToList();
+            foreach (DominoInCanvas dic in selectedDominoes)
+                dic.isSelected = false;
+            selectedDominoes.Clear();
+            selectedColors = new int[CurrentProject.colors.Length];
+            selectedIndices.ForEach(x => AddToSelectedDominoes(DominoProject.Stones[x]));
             largestX = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
             largestY = dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
             DominoProject.Width = largestX;

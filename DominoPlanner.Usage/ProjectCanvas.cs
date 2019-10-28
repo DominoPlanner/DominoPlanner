@@ -11,6 +11,11 @@ namespace DominoPlanner.Usage
 
         public PointCollection selectionArea;
 
+        public Color UnselectedBorderColor { get; set; }
+
+        public Color SelectedBorderColor { get; set; }
+        public double BorderSize;
+
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
@@ -36,18 +41,18 @@ namespace DominoPlanner.Usage
                 Pen pen = new Pen();
                 if (dic.isSelected)
                 {
-                    pen.Brush = Brushes.Blue;
-                    pen.Thickness = 2;
+                    pen.Brush = new SolidColorBrush(SelectedBorderColor);
+                    pen.Thickness = BorderSize;
                 }
                 else if (dic.PossibleToPaste)
                 {
                     pen.Brush = Brushes.Plum;
-                    pen.Thickness = 2;
+                    pen.Thickness = BorderSize;
                 }
                 else
                 {
-                    pen.Brush = new SolidColorBrush(Color.FromArgb(50, 0,0, 255));
-                    pen.Thickness = 1;
+                    pen.Brush = new SolidColorBrush(UnselectedBorderColor);
+                    pen.Thickness = BorderSize / 2;
                 }
 
                 dc.DrawGeometry(new SolidColorBrush(dic.StoneColor), pen, streamGeometry);

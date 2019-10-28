@@ -87,26 +87,26 @@
                 <Button Width="24" Margin="1, 0" ToolTip="Redo selection operation">
                     <Image Source="{StaticResource redoDrawingImage}" Width="18" Height="18"/>
                 </Button>
-                <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Clear selection">
+                <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Clear selection" Command="{Binding DataContext.ClearSelection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
                     <Image Source="{StaticResource closeDrawingImage}" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
         </DataTemplate>
-        <DataTemplate x:Key="DisplaySettingsTemplate">
-            <StackPanel Orientation="Horizontal">
+        <DataTemplate DataType="{x:Type vm:DisplaySettingsToolVM}">
+            <StackPanel Orientation="Horizontal" DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
                 <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0">Background Color:</TextBlock>
-                <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0"/>
+                <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0" SelectedColor="{Binding BackgroundColor }"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
-                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center"/>
+                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" Visibility="{Binding Collapsible}" IsChecked="{Binding Expanded}"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Color:</TextBlock>
-                <xctk:ColorPicker Width="50" Margin="2, 0, 5, 0"/>
+                <xctk:ColorPicker Width="50" Margin="2, 0, 5, 0" SelectedColor="{Binding BorderColor}"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Size:</TextBlock>
 
-                <Slider Margin="5, 0, 0, 0" Width="50"></Slider>
+                <Slider Margin="5, 0, 0, 0" Width="50" Minimum="0" Maximum="5" Value="{Binding BorderSize, Delay=200}"></Slider>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Image overlay transparency:</TextBlock>
@@ -119,7 +119,7 @@
                 </RadioButton>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Open Image:</TextBlock>
-                <Button Width="24" Margin="1, 0"  ToolTip="">
+                <Button Width="24" Margin="1, 0"  ToolTip="" Command="{Binding ShowImageClick}">
                     <Image Source="{StaticResource openDrawingImage}" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
