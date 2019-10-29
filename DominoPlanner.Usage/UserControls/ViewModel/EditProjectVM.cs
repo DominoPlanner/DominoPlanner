@@ -339,8 +339,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
                 return;
             }
+            toCopy = new List<int>(selectedDominoes);
             startindex = selectedDominoes.Min();
-            selectedDominoes.ForEach(a => RemoveFromSelectedDominoes(a));
+            ClearFullSelection();
             try
             {
                 int[] validPositions = ((ICopyPasteable)this.CurrentProject).GetValidPastePositions(startindex);
