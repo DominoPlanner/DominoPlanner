@@ -272,6 +272,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void RefreshColorAmount()
         {
+            var projectCounts = CurrentProject.Counts;
             for (int i = 0; i < _DominoList.Count(); i++)
             {
                 if (_DominoList[i].ProjectCount.Count != 2)
@@ -282,14 +283,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _DominoList[i].ProjectCount.Add(0);
                 }
 
-                if (CurrentProject.Counts.Length > i + 1)
+                if (projectCounts.Length > i + 1)
                 {
-                    _DominoList[i].ProjectCount[0] = CurrentProject.Counts[i + 1];
+                    _DominoList[i].ProjectCount[0] = projectCounts[i + 1];
                     _DominoList[i].ProjectCount[1] = selectedColors[i + 1];
                 }
                 else
                 {
-                    _DominoList[i].ProjectCount[0] = CurrentProject.Counts[0];
+                    _DominoList[i].ProjectCount[0] = projectCounts[0];
                     _DominoList[i].ProjectCount[1] = selectedColors[0];
                 }
             }
