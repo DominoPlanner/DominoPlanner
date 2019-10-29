@@ -20,7 +20,7 @@ namespace DominoPlanner.Core
     public abstract class ImageTreatment
     {
         private Mat source;
-        protected Mat imageFiltered;
+        public Mat imageFiltered;
         [ProtoMember(1)]
         private int _width;
         public int Width

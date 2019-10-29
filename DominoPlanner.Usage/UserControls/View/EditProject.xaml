@@ -110,11 +110,11 @@
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Image overlay transparency:</TextBlock>
-                <Slider Margin="5, 0, 0, 0" Width="50"></Slider>
-                <RadioButton Width="24" Margin="0, 0" GroupName="ImagePosition" ToolTip="Display image below dominoes">
+                <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding ImageOpacity}" Minimum="0" Maximum="1"></Slider>
+                <RadioButton Width="24" Margin="0, 0" GroupName="ImagePosition" ToolTip="Display image below dominoes" IsChecked="{Binding Above, Converter={StaticResource BoolInverterConverter}}">
                     <Image Source="{StaticResource stack_image_belowDrawingImage}" Width="18" Height="18"/>
                 </RadioButton>
-                <RadioButton Width="24" Margin="1, 0" GroupName="ImagePosition" ToolTip="Display image above dominoes">
+                <RadioButton Width="24" Margin="1, 0" GroupName="ImagePosition" ToolTip="Display image above dominoes" IsChecked="{Binding Above}">
                     <Image Source="{StaticResource stack_image_aboveDrawingImage}" Width="18" Height="18"/>
                 </RadioButton>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>

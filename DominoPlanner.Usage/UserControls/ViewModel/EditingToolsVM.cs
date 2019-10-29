@@ -10,6 +10,7 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Diagnostics;
+using Emgu.CV;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -201,6 +202,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public abstract class TwoClickSelection : SelectionDomain
     {
+        public TwoClickSelection()
+        {
+            MouseDownPoint = new Point(-1, -1);
+        }
         protected Point MouseDownPoint;
         public void UpdateSelectionMode(MouseButtonEventArgs e) // called on Mouse down
         {
@@ -263,8 +268,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
+            
             List<int> result = new List<int>();
-            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released))
+            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released) 
+                || (MouseDownPoint.X == -1 && MouseDownPoint.Y == -1))
             {
                 return result;
             }
@@ -289,6 +296,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             ResetFlag = false;
             RemoveSelectionDomain(pc);
+            MouseDownPoint = new Point(-1, -1);
             return result;
         }
 
@@ -428,6 +436,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private double visibleHeight = 0;
         private double largestX = 0;
         private double largestY = 0;
+        private Image<Emgu.CV.Structure.Bgra, byte> FilteredMat;
 
         private ProjectCanvas _DominoProject;
         public ProjectCanvas DominoProject
@@ -463,6 +472,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (parent.CurrentProject.PrimaryImageTreatment.FilteredImage != null)
                 {
                     FilteredImage = parent.CurrentProject.PrimaryImageTreatment.FilteredImage;
+                    FilteredMat = parent.CurrentProject.PrimaryImageTreatment.imageFiltered.ToImage<Emgu.CV.Structure.Bgra, byte>();
                 }
                 else
                 {
@@ -470,8 +480,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     if (bff != null)
                     {
                         string relativePath = bff.FilePath;
-
-                        FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject));
+                        string absolutePath = Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject);
+                        if (File.Exists(absolutePath))
+                        {
+                            FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(absolutePath);
+                            FilteredMat = new Image<Emgu.CV.Structure.Bgra, byte>(absolutePath);
+                        }
                     }
                 }
             }
@@ -545,7 +559,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Redraw();
             }
         }
-        
+
+        private double opacity = 0;
+        public double ImageOpacity
+        {
+            get { return opacity; }
+            set
+            {
+                opacity = value;
+                DominoProject.OpacityValue = opacity;
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
+
+        private bool above = false;
+        public bool Above
+        {
+            get { return above; }
+            set
+            {
+                above = value;
+                DominoProject.above = above;
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
         private int _ZoomValue = 1;
         public int ZoomValue
         {
@@ -601,6 +640,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             
             DominoProject = new ProjectCanvas();
+            parent.dominoTransfer = parent.CurrentProject.Generate(new System.Threading.CancellationToken());
+            largestX = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
+            largestY = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
+            DominoProject.Width = largestX;
+            DominoProject.Height = largestY;
             DominoProject.MouseDown += parent.Canvas_MouseDown;
             DominoProject.MouseMove += parent.Canvas_MouseMove;
             DominoProject.MouseUp += parent.Canvas_MouseUp;
@@ -608,8 +652,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.UnselectedBorderColor = BorderColor;
             DominoProject.SelectedBorderColor = Colors.Blue;
             DominoProject.BorderSize = BorderSize;
-
-            parent.dominoTransfer = parent.CurrentProject.Generate(new System.Threading.CancellationToken());
+            DominoProject.OriginalImage = FilteredMat;
+            DominoProject.OpacityValue = ImageOpacity;
+            DominoProject.above = above;
+            
 
             for (int i = 0; i < parent.dominoTransfer.shapes.Count(); i++)
             {
@@ -618,10 +664,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             
             selectedIndices.ForEach(x => parent.AddToSelectedDominoes(x));
-            largestX = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
-            largestY = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
-            DominoProject.Width = largestX;
-            DominoProject.Height = largestY;
+            
 
             parent.UpdateUIElements();
         }

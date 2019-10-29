@@ -101,7 +101,6 @@ namespace DominoPlanner.Usage
                     string text;
                     using (var server = new NamedPipeServerStream(pipeName as string))
                     {
-                        Thread.Sleep(100);
                         try
                         {
                             server.WaitForConnection();
@@ -111,7 +110,7 @@ namespace DominoPlanner.Usage
                             }
                             if (text == EXIT_STRING)
                                 break;
-
+                            
                             OnReceiveString(text);
 
                             if (_isRunning == false)

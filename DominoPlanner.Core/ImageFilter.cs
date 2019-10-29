@@ -304,5 +304,19 @@ namespace DominoPlanner.Core
             }
             background = new Image<Bgra, byte>(source);
         }
+        public static void OpacityReduction(this Image<Bgra, byte> input, double opacity)
+        {
+            int height = input.Height;
+            int width = input.Width;
+            Parallel.For(0, height, (y) =>
+            {
+                for (int x = width - 1; x >= 0; x--)
+                {
+
+                    var new_opacity = input.Data[y, x, 3] * opacity;
+                    input.Data[y, x, 3] = (byte) (new_opacity > 255 ? 255 : new_opacity);
+                }
+            });
+        }
     }
 }
