@@ -34,6 +34,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public virtual void MouseDown(object sender, MouseButtonEventArgs e) { }
 
         public virtual void MouseUp(object sender, MouseButtonEventArgs e) { }
+
+        public virtual void KeyPressed(Key key) { }
     }
     public enum SelectionMode
     {
@@ -101,6 +103,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 result.ForEach(x => parent.RemoveFromSelectedDominoes(x));
             }
             parent.UpdateUIElements();
+        }
+        public override void KeyPressed(Key key)
+        {
+            if (key == Key.Escape)
+            {
+                parent.ClearFullSelection();
+            }
         }
     }
     public abstract class SelectionDomain : ModelBase
@@ -199,6 +208,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ResetFlag = true;
         }
+        
     }
     public abstract class TwoClickSelection : SelectionDomain
     {

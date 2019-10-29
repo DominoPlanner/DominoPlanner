@@ -45,8 +45,7 @@ namespace DominoPlanner.Usage.UserControls.View
 
         private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
-                ((EditProjectVM)DataContext).PressedKey(e.Key);
+            ((EditProjectVM)DataContext).PressedKey(e.Key);
         }
 
         private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)

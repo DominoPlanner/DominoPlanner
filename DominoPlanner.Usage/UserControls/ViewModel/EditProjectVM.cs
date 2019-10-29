@@ -404,7 +404,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         internal void PressedKey(Key key)
         {
-            ClearFullSelection();
+            SelectedTool.KeyPressed(key);
         }
         internal override void ResetContent()
         {
