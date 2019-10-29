@@ -93,7 +93,7 @@
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:DisplaySettingsToolVM}">
-            <StackPanel Orientation="Horizontal" DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
+            <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0">Background Color:</TextBlock>
                 <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0" SelectedColor="{Binding BackgroundColor }"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
@@ -219,7 +219,7 @@
                 </parent:ColorControl>
             </DockPanel>
             <ScrollViewer Grid.Column="1" x:Name="ScrollViewer" Margin="0,0" SizeChanged="Grid_SizeChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
-                <ContentControl Content="{Binding DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                <ContentControl Content="{Binding DisplaySettingsTool.DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
             </ScrollViewer>
             <ListBox Background="Transparent"    
                      BorderBrush="Transparent"               

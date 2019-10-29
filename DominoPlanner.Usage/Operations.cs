@@ -120,13 +120,13 @@ namespace DominoPlanner.Usage
         public override void Apply()
         {
             base.Apply();
-            ((EditProjectVM)NewViewModel).RefreshCanvas();
+            ((EditProjectVM)NewViewModel).DisplaySettingsTool.Redraw();
         }
         public override void Undo()
         {
 
             //((DominoProviderVM)OldViewModel).CurrentProject.shapesValid = false;
-            ((EditProjectVM)NewViewModel).cleanEvents();
+            ((EditProjectVM)NewViewModel).DisplaySettingsTool.cleanEvents();
             base.Undo();
 
             //((DominoProviderVM)OldViewModel).Refresh();
@@ -152,7 +152,7 @@ namespace DominoPlanner.Usage
                 current_width = rowc.current_width;
                 current_height = rowc.current_height;
             }
-            ((EditProjectVM)OldViewModel).cleanEvents();
+            ((EditProjectVM)OldViewModel).DisplaySettingsTool.cleanEvents();
             base.Apply();
             //((DominoProviderVM)OldViewModel).Refresh();
 
@@ -167,7 +167,7 @@ namespace DominoPlanner.Usage
                 rowc.current_height = current_height;
             }
             base.Undo();
-            cmodel.RefreshCanvas();
+            cmodel.DisplaySettingsTool.ResetCanvas();
 
         }
     }

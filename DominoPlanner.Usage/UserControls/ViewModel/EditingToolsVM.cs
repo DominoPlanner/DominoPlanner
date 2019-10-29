@@ -8,6 +8,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Diagnostics;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -80,22 +82,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override void MouseDown(object sender, MouseButtonEventArgs e)
         {
-            CurrentSelectionDomain?.MouseDown(sender, e, parent.DominoProject);   
+            CurrentSelectionDomain?.MouseDown(sender, e, sender as ProjectCanvas);   
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
-            CurrentSelectionDomain?.MouseMove(sender, e, parent.DominoProject);
+            CurrentSelectionDomain?.MouseMove(sender, e, sender as ProjectCanvas);
         }
         public override void MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var result = CurrentSelectionDomain?.MouseUp(sender, e, parent.DominoProject);
+            var result = CurrentSelectionDomain?.MouseUp(sender, e, sender as ProjectCanvas);
             if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Add)
             {
-                result.ForEach(x => parent.AddToSelectedDominoes(parent.DominoProject.Stones[x]));
+                result.ForEach(x => parent.AddToSelectedDominoes(x));
             }
             else if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Remove)
             {
-                result.ForEach(x => parent.RemoveFromSelectedDominoes(parent.DominoProject.Stones[x]));
+                result.ForEach(x => parent.RemoveFromSelectedDominoes(x));
             }
             parent.UpdateUIElements();
         }
@@ -422,11 +424,300 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class DisplaySettingsToolVM : EditingToolVM
     {
+        private double visibleWidth = 0;
+        private double visibleHeight = 0;
+        private double largestX = 0;
+        private double largestY = 0;
+
+        private ProjectCanvas _DominoProject;
+        public ProjectCanvas DominoProject
+        {
+            get { return _DominoProject; }
+            set
+            {
+                if (_DominoProject != value)
+                {
+                    if (_DominoProject != null)
+                    {
+                        _DominoProject.SizeChanged -= _DominoProject_SizeChanged;
+                    }
+                    _DominoProject = value;
+                    RaisePropertyChanged();
+                    _DominoProject.SizeChanged += _DominoProject_SizeChanged;
+
+                    _DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    _DominoProject.VerticalAlignment = VerticalAlignment.Stretch;
+                }
+            }
+        }
         public DisplaySettingsToolVM(EditProjectVM parent)
         {
             Image = "display_settingsDrawingImage";
             Name = "View Properties";
             this.parent = parent;
+            PossiblePastePositions = new List<DominoInCanvas>();
+            ShowImageClick = new RelayCommand(o => { ShowImage(); });
+
+            if (parent.CurrentProject != null && parent.CurrentProject.PrimaryImageTreatment != null)
+            {
+                if (parent.CurrentProject.PrimaryImageTreatment.FilteredImage != null)
+                {
+                    FilteredImage = parent.CurrentProject.PrimaryImageTreatment.FilteredImage;
+                }
+                else
+                {
+                    Core.BlendFileFilter bff = parent.CurrentProject.PrimaryImageTreatment.ImageFilters.OfType<Core.BlendFileFilter>().FirstOrDefault();
+                    if (bff != null)
+                    {
+                        string relativePath = bff.FilePath;
+
+                        FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject));
+                    }
+                }
+            }
+
         }
+        private System.Drawing.Bitmap _FilteredImage;
+
+        public System.Drawing.Bitmap FilteredImage
+        {
+            get { return _FilteredImage; }
+            set
+            {
+                if (_FilteredImage != value)
+                {
+                    _FilteredImage = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _Expanded;
+        public bool Expanded
+        {
+            get => _Expanded;
+            set
+            {
+                if (_Expanded != value)
+                {
+                    _Expanded = value;
+                    RaisePropertyChanged();
+                    ResetCanvas();
+                }
+            }
+        }
+        private Color backgroundColor = Colors.Transparent;
+        public Color BackgroundColor
+        {
+            get => backgroundColor;
+            set
+            {
+                backgroundColor = value;
+                DominoProject.Background = new SolidColorBrush(value);
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
+        private Color borderColor = Color.FromArgb(50, 0, 0, 255);
+        public Color BorderColor
+        {
+            get => borderColor;
+            set
+            {
+                borderColor = value;
+                DominoProject.UnselectedBorderColor = BorderColor;
+                DominoProject.SelectedBorderColor = Colors.Blue;
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
+
+        private double borderSize = 2;
+
+        public double BorderSize
+        {
+            get { return borderSize; }
+            set
+            {
+                borderSize = value;
+                DominoProject.BorderSize = BorderSize;
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
+        
+        private int _ZoomValue = 1;
+        public int ZoomValue
+        {
+            get { return _ZoomValue; }
+            set
+            {
+                if (_ZoomValue != value)
+                {
+                    double scale = _DominoProject.LayoutTransform.Value.M11 / _ZoomValue * value;
+                    _ZoomValue = value;
+                    _DominoProject.LayoutTransform = new ScaleTransform(scale, scale);
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private string PreviewPath
+        {
+            get
+            {
+                string imagepath = System.Windows.Forms.Application.LocalUserAppDataPath;
+                imagepath += "\\" + parent.name + "_prev.png";
+                return imagepath;
+            }
+        }
+        private void _DominoProject_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RefreshTransformation();
+        }
+        internal void RefreshTransformation()
+        {
+            double ScaleX, ScaleY;
+
+            ScaleX = visibleWidth / largestX * ZoomValue;
+            ScaleY = visibleHeight / largestY * ZoomValue;
+
+            if (ScaleX < ScaleY)
+                _DominoProject.LayoutTransform = new ScaleTransform(ScaleX, ScaleX);
+            else
+                _DominoProject.LayoutTransform = new ScaleTransform(ScaleY, ScaleY);
+
+            _DominoProject.UpdateLayout();
+        }
+        internal void ResetCanvas()
+        {
+            var selectedIndices = parent.selectedDominoes.ToList();
+            parent.ClearFullSelection();
+            if (DominoProject != null)
+            {
+                RemoveStones();
+                DominoProject.MouseDown -= parent.Canvas_MouseDown;
+                DominoProject.MouseMove -= parent.Canvas_MouseMove;
+                DominoProject.MouseUp -= parent.Canvas_MouseUp;
+            }
+            
+            DominoProject = new ProjectCanvas();
+            DominoProject.MouseDown += parent.Canvas_MouseDown;
+            DominoProject.MouseMove += parent.Canvas_MouseMove;
+            DominoProject.MouseUp += parent.Canvas_MouseUp;
+            DominoProject.Background = new SolidColorBrush(BackgroundColor);
+            DominoProject.UnselectedBorderColor = BorderColor;
+            DominoProject.SelectedBorderColor = Colors.Blue;
+            DominoProject.BorderSize = BorderSize;
+
+            parent.dominoTransfer = parent.CurrentProject.Generate(new System.Threading.CancellationToken());
+
+            for (int i = 0; i < parent.dominoTransfer.shapes.Count(); i++)
+            {
+                DominoInCanvas dic = new DominoInCanvas(i, parent.dominoTransfer[i], parent.CurrentProject.colors, !Expanded);
+                DominoProject.Stones.Add(dic);
+            }
+            
+            selectedIndices.ForEach(x => parent.AddToSelectedDominoes(x));
+            largestX = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
+            largestY = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
+            DominoProject.Width = largestX;
+            DominoProject.Height = largestY;
+
+            parent.UpdateUIElements();
+        }
+        internal void SizeChanged(double width, double height)
+        {
+            visibleWidth = width;
+            visibleHeight = height;
+            RefreshTransformation();
+        }
+        internal void RemoveStones()
+        {
+            while (DominoProject.Stones.Count > 0)
+            {
+                if (DominoProject.Stones[0] is DominoInCanvas dic)
+                    dic.DisposeStone();
+                DominoProject.Stones.RemoveAt(0);
+            }
+        }
+        public void cleanEvents()
+        {
+            foreach (DominoInCanvas dic in DominoProject.Stones)
+            {
+                dic.DisposeStone();
+            }
+        }
+        public bool SelectDominoVisual(int position)
+        {
+            var dic = DominoProject.Stones[position];
+            if (dic.isSelected == false)
+            {
+                dic.isSelected = true;
+                return true;
+            }
+            return false;
+        }
+        public bool DeSelectDominoVisual(int position)
+        {
+            var dic = DominoProject.Stones[position];
+            if (dic.isSelected == true)
+            {
+                dic.isSelected = false;
+                return true;
+            }
+            return false;
+        }
+        private List<DominoInCanvas> PossiblePastePositions;
+        public void HighlightPastePositions(int[] validPositions)
+        {
+            PossiblePastePositions = new List<DominoInCanvas>();
+            foreach (int i in validPositions)
+            {
+                var dic = DominoProject.Stones[i];
+                dic.PossibleToPaste = true;
+                PossiblePastePositions.Add(dic);
+            }
+            Redraw();
+        }
+        public void ClearPastePositions()
+        {
+            foreach (DominoInCanvas dic in PossiblePastePositions)
+            {
+                dic.PossibleToPaste = false;
+            }
+            PossiblePastePositions.Clear();
+            Redraw();
+        }
+        public void Redraw()
+        {
+            DominoProject?.InvalidateVisual();
+        }
+        private void ShowImage()
+        {
+            try
+            {
+                if (!File.Exists(PreviewPath))
+                {
+                    FilteredImage.Save(PreviewPath);
+                }
+                Process.Start(PreviewPath);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        internal void DeleteImage()
+        {
+            try
+            {
+                if (File.Exists(PreviewPath)) File.Delete(PreviewPath);
+            }
+            catch (Exception ex) { }
+        }
+        private ICommand _ShowImageClick;
+        public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
+
     }
+
 }

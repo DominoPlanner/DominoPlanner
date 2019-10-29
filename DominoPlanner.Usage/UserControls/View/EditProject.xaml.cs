@@ -34,13 +34,13 @@ namespace DominoPlanner.Usage.UserControls.View
             if(DataContext != null && DataContext is EditProjectVM editProjectVM)
             {
                 editProjectVM.RefreshSize += EditProjectVM_RefreshSize;
-                editProjectVM.SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
+                editProjectVM.DisplaySettingsTool.SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
             }
         }
 
         private void EditProjectVM_RefreshSize(object sender, EventArgs e)
         {
-            (sender as EditProjectVM).SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
+            (sender as EditProjectVM).DisplaySettingsTool.SizeChanged(ScrollViewer.RenderSize.Width, ScrollViewer.RenderSize.Height);
         }
 
         private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
@@ -53,7 +53,7 @@ namespace DominoPlanner.Usage.UserControls.View
         {
             if(DataContext != null && DataContext.GetType() == typeof(ViewModel.EditProjectVM))
             {
-               ((ViewModel.EditProjectVM)DataContext).SizeChanged(e.NewSize.Width, e.NewSize.Height);
+               ((ViewModel.EditProjectVM)DataContext).DisplaySettingsTool.SizeChanged(e.NewSize.Width, e.NewSize.Height);
             }
         }
 
