@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Diagnostics;
 using Emgu.CV;
+using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -43,6 +44,46 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         Neutral,
         Remove
     }
+    public class SelectionOperation : PostFilter
+    {
+        SelectionToolVM reference;
+        IList<int> ToSelect;
+        bool positiveselect;
+        bool[] oldState;
+        public SelectionOperation(SelectionToolVM reference, IList<int> ToSelect, bool select )
+        {
+            this.reference = reference;
+            this.ToSelect = ToSelect.ToArray();
+            this.positiveselect = select;
+            oldState = new bool[ToSelect.Count];
+        }
+        public override void Apply()
+        {
+            for (int i = 0; i < ToSelect.Count; i++)
+            {
+                oldState[i] = reference.parent.IsSelected(ToSelect[i]);
+                if (positiveselect)
+                    reference.parent.AddToSelectedDominoes(ToSelect[i]);
+                else
+                    reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+            }
+        }
+
+        public override void Undo()
+        {
+            for (int i = 0; i < ToSelect.Count; i++)
+            {
+                if (oldState[i])
+                {
+                    reference.parent.AddToSelectedDominoes(ToSelect[i]);
+                }
+                else
+                {
+                    reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+                }
+            }
+        }
+    }
     public class SelectionToolVM : EditingToolVM
     {
         public SelectionToolVM(EditProjectVM parent)
@@ -53,6 +94,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 new RectangleSelection(), new CircleSelectionDomain(),
                 new PolygonSelectionDomain(), new FreehandSelectionDomain() };
             CurrentSelectionDomain = SelectionTools[0];
+            UndoSelectionOperation = new RelayCommand((o) => {
+                parent.UndoInternal(true);
+            });
+            RedoSelectionOperation = new RelayCommand((o) => {
+                parent.RedoInternal(true);
+            });
             this.parent = parent;
         }
 
@@ -96,11 +143,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var result = CurrentSelectionDomain?.MouseUp(sender, e, sender as ProjectCanvas);
             if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Add)
             {
-                result.ForEach(x => parent.AddToSelectedDominoes(x));
+                Select(result, true);
             }
             else if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Remove)
             {
-                result.ForEach(x => parent.RemoveFromSelectedDominoes(x));
+                Select(result, false);
             }
             parent.UpdateUIElements();
         }
@@ -108,9 +155,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (key == Key.Escape)
             {
-                parent.ClearFullSelection();
+                parent.ClearFullSelection(true);
             }
         }
+        public void Select(IList<int> toSelect, bool select)
+        {
+            parent.ExecuteOperation(new SelectionOperation(this, toSelect, select));
+        }
+        private ICommand _UndoSelectionOperation;
+        public ICommand UndoSelectionOperation { get { return _UndoSelectionOperation; } set { if (value != _UndoSelectionOperation) { _UndoSelectionOperation= value; } } }
+
+        private ICommand _RedoSelectionOperation;
+        public ICommand RedoSelectionOperation { get { return _RedoSelectionOperation; } set { if (value != _RedoSelectionOperation) { _RedoSelectionOperation = value; } } }
+
     }
     public abstract class SelectionDomain : ModelBase
     {
@@ -214,9 +271,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     {
         public TwoClickSelection()
         {
-            MouseDownPoint = new Point(-1, -1);
+            MouseDownPoint = new System.Windows.Point(-1, -1);
         }
-        protected Point MouseDownPoint;
+        protected System.Windows.Point MouseDownPoint;
         public void UpdateSelectionMode(MouseButtonEventArgs e) // called on Mouse down
         {
             if ((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right))
@@ -235,7 +292,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        public abstract Rect GetCurrentDimensions(Point pos);
+        public abstract Rect GetCurrentDimensions(System.Windows.Point pos);
 
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
@@ -306,7 +363,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             ResetFlag = false;
             RemoveSelectionDomain(pc);
-            MouseDownPoint = new Point(-1, -1);
+            MouseDownPoint = new System.Windows.Point(-1, -1);
             return result;
         }
 
@@ -325,7 +382,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Image = "rect_selectDrawingImage";
             Name = "Rectangle";
         }
-        public override Rect GetCurrentDimensions(Point pos)
+        public override Rect GetCurrentDimensions(System.Windows.Point pos)
         {
             var x = Math.Min(pos.X, MouseDownPoint.X);
             var y = Math.Min(pos.Y, MouseDownPoint.Y);
@@ -348,7 +405,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Image = "round_selectDrawingImage";
             Name = "Circle";
         }
-        public override Rect GetCurrentDimensions(Point pos)
+        public override Rect GetCurrentDimensions(System.Windows.Point pos)
         {
             var radius = Math.Sqrt(Math.Pow(pos.X - MouseDownPoint.X, 2) + Math.Pow(pos.Y - MouseDownPoint.Y, 2));
             return new Rect(MouseDownPoint.X - radius, MouseDownPoint.Y - radius, 2 * radius, 2*radius);
@@ -357,7 +414,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
         {
             var radius = boundingBox.Width / 2;
-            var center = new Point(boundingBox.X + radius, boundingBox.Y + radius);
+            var center = new System.Windows.Point(boundingBox.X + radius, boundingBox.Y + radius);
 
             if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
             {
@@ -625,6 +682,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         internal void RefreshTransformation()
         {
+            if (_DominoProject == null)
+                return;
             double ScaleX, ScaleY;
 
             ScaleX = visibleWidth / largestX * ZoomValue;
@@ -640,7 +699,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal void ResetCanvas()
         {
             var selectedIndices = parent.selectedDominoes.ToList();
-            parent.ClearFullSelection();
+            parent.selectedDominoes.Clear();
             if (DominoProject != null)
             {
                 RemoveStones();
@@ -744,6 +803,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void Redraw()
         {
             DominoProject?.InvalidateVisual();
+            bool discrepancy = false;
+            if (DominoProject?.Stones == null) return;
+            for (int i = 0; i < DominoProject.Stones.Count; i++)
+            {
+                if (DominoProject.Stones[i].isSelected != parent.selectedDominoes.Contains(i))
+                {
+                    discrepancy = true;
+                }
+            }
+            if (discrepancy)
+               MessageBox.Show("Discrepancy detected!");
         }
         private void ShowImage()
         {
@@ -767,6 +837,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (File.Exists(PreviewPath)) File.Delete(PreviewPath);
             }
             catch (Exception ex) { }
+        }
+        public bool IsSelected(int i)
+        {
+            return DominoProject.Stones[i].isSelected;
         }
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }

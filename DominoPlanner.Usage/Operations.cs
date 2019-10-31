@@ -120,7 +120,7 @@ namespace DominoPlanner.Usage
         public override void Apply()
         {
             base.Apply();
-            ((EditProjectVM)NewViewModel).DisplaySettingsTool.Redraw();
+            ((EditProjectVM)NewViewModel).DisplaySettingsTool.ResetCanvas();
         }
         public override void Undo()
         {
