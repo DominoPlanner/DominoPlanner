@@ -190,7 +190,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return includeBoundary; }
             set { includeBoundary = value; RaisePropertyChanged(); }
         }
-        private SelectionMode selectionMode;
+        private SelectionMode selectionMode = SelectionMode.Neutral;
 
         public SelectionMode SelectionMode
         {
@@ -523,7 +523,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (points.Count == 0)
             {
                 firstButton = e.ChangedButton;
-                CurrentSelectionMode = e.ChangedButton == MouseButton.Left ? SelectionMode.Add : SelectionMode.Remove;
+                if (SelectionMode == SelectionMode.Neutral)
+                {
+                    CurrentSelectionMode = e.ChangedButton == MouseButton.Left ? SelectionMode.Add : SelectionMode.Remove;
+                }
+                else
+                {
+                    CurrentSelectionMode = SelectionMode;
+                }
                 AddSelectionDomain(pc);
             }
             else if (e.ClickCount == 2)
