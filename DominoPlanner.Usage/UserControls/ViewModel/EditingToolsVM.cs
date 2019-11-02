@@ -141,6 +141,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public override void MouseUp(object sender, MouseButtonEventArgs e)
         {
             var result = CurrentSelectionDomain?.MouseUp(sender, e, sender as ProjectCanvas);
+            if (result.Count == 0) return;
             if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Add)
             {
                 Select(result, true);
@@ -236,8 +237,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public abstract void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc);
 
-        public abstract List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc);
-
+        public virtual List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            return new List<int>();
+        }
         public abstract Rect GetBoundingBox();
 
         public bool IsInsideBoundingBox(Rect BoundingBox, DominoInCanvas dic, bool includeBoundary)
@@ -265,7 +268,37 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ResetFlag = true;
         }
-        
+        public static bool IsPointInPolygon(IList<System.Windows.Point> polygon, System.Windows.Point testPoint)
+        {
+            bool result = false;
+            int j = polygon.Count() - 1;
+            for (int i = 0; i < polygon.Count(); i++)
+            {
+                if (polygon[i].Y < testPoint.Y && polygon[j].Y >= testPoint.Y || polygon[j].Y < testPoint.Y && polygon[i].Y >= testPoint.Y)
+                {
+                    if (polygon[i].X + (testPoint.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) * (polygon[j].X - polygon[i].X) < testPoint.X)
+                    {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
+        }
+        public bool CheckBoundary(DominoInCanvas dic, int pointsInsideSelection)
+        {
+            if (IncludeBoundary)
+            {
+                if (pointsInsideSelection > 0)
+                    return true;
+            }
+            else
+            {
+                if (pointsInsideSelection == dic.canvasPoints.Length)
+                    return true;
+            }
+            return false;
+        }
     }
     public abstract class TwoClickSelection : SelectionDomain
     {
@@ -292,7 +325,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        public abstract Rect GetCurrentDimensions(System.Windows.Point pos);
+        public abstract void UpdateShapeProperties(System.Windows.Point pos);
+        public abstract void Initialize();
 
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
@@ -305,11 +339,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             s.Stroke = color;
             s.StrokeThickness = 8;
 
-            Canvas.SetLeft(s, MouseDownPoint.X);
-            Canvas.SetTop(s, MouseDownPoint.Y);
-            s.Width = 0;
-            s.Height = 0;
+            Initialize();
             ResetFlag = false;
+            
             AddSelectionDomain(pc);
         }
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
@@ -320,18 +352,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return;
             }
             if (s == null) return;
+            
+            UpdateShapeProperties(e.GetPosition((Canvas)sender));
 
-            var dims = GetCurrentDimensions(e.GetPosition((Canvas)sender));
-            s.Width = dims.Width;
-            s.Height = dims.Height;
-
-            if (dims.Width > 10 || dims.Height > 10)
-                s.Visibility = Visibility.Visible;
-            else
-                s.Visibility = Visibility.Hidden;
-
-            Canvas.SetLeft(s, dims.X);
-            Canvas.SetTop(s, dims.Y);
+            
         }
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
@@ -366,7 +390,34 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseDownPoint = new System.Windows.Point(-1, -1);
             return result;
         }
+        
+        
+    }
+    public abstract class WidthHeightSelection: TwoClickSelection
+    {
+        public override void Initialize()
+        {
+            Canvas.SetLeft(s, MouseDownPoint.X);
+            Canvas.SetTop(s, MouseDownPoint.Y);
+            s.Width = 0;
+            s.Height = 0;
+        }
+        public abstract Rect GetCurrentDimensions(System.Windows.Point pos);
 
+        public override void UpdateShapeProperties(System.Windows.Point pos)
+        {
+            var dims = GetCurrentDimensions(pos);
+            s.Width = dims.Width;
+            s.Height = dims.Height;
+
+            if (dims.Width > 10 || dims.Height > 10)
+                s.Visibility = Visibility.Visible;
+            else
+                s.Visibility = Visibility.Hidden;
+
+            Canvas.SetLeft(s, dims.X);
+            Canvas.SetTop(s, dims.Y);
+        }
         public override Rect GetBoundingBox()
         {
             double left = Canvas.GetLeft(s);
@@ -374,7 +425,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return new Rect(left, top, s.Width, s.Height);
         }
     }
-    public class RectangleSelection : TwoClickSelection
+    public class RectangleSelection : WidthHeightSelection
     {
         public RectangleSelection()
         {
@@ -397,7 +448,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return IsInsideBoundingBox(boundingBox, dic, includeBoundary);
         }
     }
-    public class CircleSelectionDomain : TwoClickSelection
+    public class CircleSelectionDomain : WidthHeightSelection
     {
         public CircleSelectionDomain()
         {
@@ -420,16 +471,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 var insideCircle = dic.canvasPoints.Count(x =>
                 Math.Sqrt((x.X - center.X) * (x.X - center.X) + (x.Y - center.Y) * (x.Y - center.Y)) < radius);
-                if (IncludeBoundary)
-                {
-                    if (insideCircle > 0)
-                        return true;
-                }
-                else
-                {
-                    if (insideCircle == dic.canvasPoints.Length)
-                        return true;
-                }
+                return CheckBoundary(dic, insideCircle);
             }
             return false;
         }
@@ -437,64 +479,156 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class PolygonSelectionDomain : SelectionDomain
     {
+        public List<System.Windows.Point> points;
+        public MouseButton? firstButton;
         public PolygonSelectionDomain()
         {
             Image = "poly_selectDrawingImage";
             Name = "Polygon";
+            s = new System.Windows.Shapes.Polyline();
+            points = new List<System.Windows.Point>();
+            var poly = s as System.Windows.Shapes.Polyline;
+            poly.Fill = new SolidColorBrush(Color.FromArgb(50, 100, 100, 100));
+            Canvas.SetLeft(poly, 0);
+            Canvas.SetTop(poly, 0);
+            
         }
+
         public override Rect GetBoundingBox()
         {
-            throw new NotImplementedException();
+            double left = points.Min(x => x.X);
+            double top = points.Min(x => x.Y);
+            double bottom = points.Max(x => x.Y);
+            double right = points.Max(x => x.X);
+            return new Rect(left, top, right - left, bottom - top);
         }
 
         public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
         {
-            throw new NotImplementedException();
+            if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
+            {
+                var insidePoly = dic.canvasPoints.Count(x => IsPointInPolygon(points, new System.Windows.Point(x.X, x.Y)));
+                return CheckBoundary(dic, insidePoly);
+            }
+            return false;
         }
-
+        bool DoubleClickFlag;
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            throw new NotImplementedException();
+            
+            if (!((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right) &&
+                (e.LeftButton == MouseButtonState.Pressed ^ e.RightButton == MouseButtonState.Pressed)))
+                return;
+            
+            if (points.Count == 0)
+            {
+                firstButton = e.ChangedButton;
+                CurrentSelectionMode = e.ChangedButton == MouseButton.Left ? SelectionMode.Add : SelectionMode.Remove;
+                AddSelectionDomain(pc);
+            }
+            else if (e.ClickCount == 2)
+            {
+                DoubleClickFlag = true;
+            }
+            if (e.ChangedButton != firstButton)
+            {
+                // selection canceled, clear polygon
+                points.Clear();
+                RemoveSelectionDomain(pc);
+                return;
+            }
+            s.Stroke = SelectionColor;
+            s.StrokeThickness = 8;
+            points.Add(e.GetPosition(pc));
+            var poly = s as System.Windows.Shapes.Polyline;
+            poly.Points = new System.Windows.Media.PointCollection(points);
+            
         }
 
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
         {
+            if (s == null) return;
+
+            var poly = s as System.Windows.Shapes.Polyline;
+            if (poly.Points.Count == points.Count)
+                poly.Points.Add(e.GetPosition(pc));
+            else
+                poly.Points[poly.Points.Count - 1] = e.GetPosition(pc);
         }
 
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            throw new NotImplementedException();
+            var result = new List<int>();
+            if (!DoubleClickFlag)
+                return result;
+            DoubleClickFlag = false;
+            var boundingBox = GetBoundingBox();
+            for (int i = 0; i < pc.Stones.Count; i++)
+            {
+                if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, IncludeBoundary))
+                {
+                    result.Add(i);
+                }
+            }
+            RemoveSelectionDomain(pc);
+            points = new List<System.Windows.Point>();
+            firstButton = null;
+            return result;
         }
     }
-    public class FreehandSelectionDomain : SelectionDomain
+    public class FreehandSelectionDomain : TwoClickSelection
     {
         public FreehandSelectionDomain()
         {
             Image = "freehand_selectDrawingImage";
             Name = "Freehand";
+            s = new System.Windows.Shapes.Polyline();
+            MouseDownPoint = new System.Windows.Point(-1, -1);
+            var poly = s as System.Windows.Shapes.Polyline;
+            poly.Fill = new SolidColorBrush(Color.FromArgb(50, 100, 100, 100));
+            Canvas.SetLeft(poly, 0);
+            Canvas.SetTop(poly, 0);
+
         }
-        public override Rect GetBoundingBox()
+        public override void Initialize()
         {
-            throw new NotImplementedException();
+            var poly = s as System.Windows.Shapes.Polyline;
+            poly.Points = new System.Windows.Media.PointCollection();
+            poly.Points.Add(MouseDownPoint);
         }
 
         public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
         {
-            throw new NotImplementedException();
+            var poly = s as System.Windows.Shapes.Polyline;
+            var points = poly.Points.ToList();
+            if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
+            {
+                var insidePoly = dic.canvasPoints.Count(x => IsPointInPolygon(points, new System.Windows.Point(x.X, x.Y)));
+                return CheckBoundary(dic, insidePoly);
+            }
+            return false;
         }
 
-        public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        public override void UpdateShapeProperties(System.Windows.Point pos)
         {
-            throw new NotImplementedException();
+            var poly = s as System.Windows.Shapes.Polyline;
+            var last = poly.Points.Last();
+            Debug.WriteLine("Hit, Length: " + poly.Points.Count);
+            if ((last.X - pos.X) * (last.X - pos.X) + (last.Y - pos.Y) * (last.Y - pos.Y) > 3)
+            {
+                
+                poly.Points.Add(pos);
+            }
         }
-
-        public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
+        public override Rect GetBoundingBox()
         {
-        }
-
-        public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
-        {
-            throw new NotImplementedException();
+            var poly = s as System.Windows.Shapes.Polyline;
+            var points = poly.Points;
+            double left = points.Min(x => x.X);
+            double top = points.Min(x => x.Y);
+            double bottom = points.Max(x => x.Y);
+            double right = points.Max(x => x.X);
+            return new Rect(left, top, right - left, bottom - top);
         }
     }
     public class DisplaySettingsToolVM : EditingToolVM
