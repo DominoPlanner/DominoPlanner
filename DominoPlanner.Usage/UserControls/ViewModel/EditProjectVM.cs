@@ -617,8 +617,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 oldSelection = Enumerable.Range(0, dominoTransfer.length);
             }
             IEnumerable<int> newSelection = oldSelection.Where(x => dominoTransfer[x].color == selectedIndex);
-            
-            SelectionTool.Select(oldSelection.Except(newSelection).ToList(), false);
+            if (selectedDominoes.Count == 0)
+            {
+                SelectionTool.Select(newSelection.ToList(), true);
+            }
+            else
+            {
+                SelectionTool.Select(oldSelection.Except(newSelection).ToList(), false);
+            }
             UpdateUIElements();
         }
 
