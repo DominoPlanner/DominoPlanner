@@ -16,9 +16,8 @@
         <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
         <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
-        
-        <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>
 
+        <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>
         <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Mode:</TextBlock>
@@ -86,6 +85,9 @@
                 </Button>
                 <Button Width="24" Margin="1, 0" ToolTip="Redo selection operation" Command="{Binding RedoSelectionOperation}">
                     <Image Source="{StaticResource redoDrawingImage}" Width="18" Height="18"/>
+                </Button>
+                <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Invert selection" Command="{Binding InvertSelection}">
+                    <Image Source="{StaticResource invert_selectionDrawingImage}" Width="18" Height="18"/>
                 </Button>
                 <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Clear selection" Command="{Binding DataContext.ClearSelection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
                     <Image Source="{StaticResource closeDrawingImage}" Width="18" Height="18"/>

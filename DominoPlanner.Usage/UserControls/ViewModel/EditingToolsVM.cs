@@ -100,6 +100,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RedoSelectionOperation = new RelayCommand((o) => {
                 parent.RedoInternal(true);
             });
+            InvertSelection = new RelayCommand((o) => InvertSelectionOperation());
             this.parent = parent;
         }
 
@@ -163,11 +164,22 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             parent.ExecuteOperation(new SelectionOperation(this, toSelect, select));
         }
+        public void InvertSelectionOperation()
+        {
+            var current = parent.selectedDominoes.ToList();
+            var n = Enumerable.Range(0, parent.dominoTransfer.length).Except(current).ToList();
+            Select(current, false);
+            Select(n, true);
+            parent.UpdateUIElements();
+        }
         private ICommand _UndoSelectionOperation;
         public ICommand UndoSelectionOperation { get { return _UndoSelectionOperation; } set { if (value != _UndoSelectionOperation) { _UndoSelectionOperation= value; } } }
 
         private ICommand _RedoSelectionOperation;
         public ICommand RedoSelectionOperation { get { return _RedoSelectionOperation; } set { if (value != _RedoSelectionOperation) { _RedoSelectionOperation = value; } } }
+
+        private ICommand _InvertSelection;
+        public ICommand InvertSelection { get { return _InvertSelection; } set { if (value != _InvertSelection) { _InvertSelection = value; } } }
 
     }
     public abstract class SelectionDomain : ModelBase
@@ -986,6 +998,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
 
+    }
+    public class RulerTool : EditingToolVM
+    {
+        public override void KeyPressed(Key key)
+        {
+            base.KeyPressed(key);
+        }
+        public override void MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            base.MouseUp(sender, e);
+        }
+        public override void MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            base.MouseDown(sender, e);
+        }
     }
 
 }

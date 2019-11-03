@@ -1034,4 +1034,26 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    <Geometry x:Key="invert_selectionGeometry1">F1 M50.799999,50.799998z M0,0z M49.512833,247.48718L34.564927,262.43509C39.689824,267.5599 39.689823,275.86896 34.564929,280.99377 29.440113,286.11867 21.131058,286.11867 16.006242,280.99377L1.0583363,295.94168 49.512833,295.94168z</Geometry>
+    <Geometry x:Key="invert_selectionGeometry2">F1 M50.799999,50.799998z M0,0z M34.564857,262.43516A13.12287,13.12287,0,0,0,16.006168,262.43516A13.12287,13.12287,0,0,0,16.006167,280.99385z</Geometry>
+    <DrawingGroup x:Key="invert_selectionDrawingGroup" ClipGeometry="M0,0 V50.799998 H50.799999 V0 H0 Z">
+        <DrawingGroup.Transform>
+            <TranslateTransform X="49.7417" Y="295.9417" />
+        </DrawingGroup.Transform>
+        <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
+            <GeometryDrawing Brush="#FF000000" Geometry="{StaticResource invert_selectionGeometry1}" />
+            <GeometryDrawing Brush="#FF000000" Geometry="{StaticResource invert_selectionGeometry2}" />
+            <DrawingGroup Transform="-1,0,0,-1,0,0">
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FF000000" Thickness="2.11666656" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry RadiusX="0" RadiusY="0" Rect="-49.7417,-295.9417,48.6833,48.6833" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingGroup>
+    </DrawingGroup>
+    <DrawingImage x:Key="invert_selectionDrawingImage" Drawing="{StaticResource invert_selectionDrawingGroup}" />
 </ResourceDictionary>
