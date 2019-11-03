@@ -121,8 +121,19 @@
                 </RadioButton>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Open Image:</TextBlock>
-                <Button Width="24" Margin="1, 0"  ToolTip="" Command="{Binding ShowImageClick}">
+                <Button Width="24" Margin="1, 0"  ToolTip="Open image" Command="{Binding ShowImageClick}">
                     <Image Source="{StaticResource openDrawingImage}" Width="18" Height="18"/>
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ZoomToolVM}">
+            <StackPanel Orientation="Horizontal" Margin="5, 0">
+                <Button Width="24" Margin="1, 0"  ToolTip="Zoom out" Command="{Binding ZoomOut}">
+                    <Image Source="{StaticResource zoom_outDrawingImage}" Width="18" Height="18"/>
+                </Button>
+                <Slider HorizontalAlignment="center" Minimum="1" Maximum="6" Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
+                <Button Width="24" Margin="1, 0"  ToolTip="Zoom in" Command="{Binding ZoomIn}">
+                    <Image Source="{StaticResource zoom_inDrawingImage}" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
         </DataTemplate>
@@ -240,7 +251,7 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
-                
+
                 <ListBox.ItemTemplate>
                     <DataTemplate >
                         <RadioButton ToolTip="{Binding Name}" 
@@ -251,12 +262,6 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <!--
-                <Image  Source="/DominoPlanner.Usage;component/Icons/Zoom_In.ico" Grid.Row="0"/>
-                <Slider Height="100" HorizontalAlignment="center" Minimum="1" Maximum="10" Value="{Binding ZoomValue}" Margin="0,5" Grid.Row="1" VerticalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5"/>
-                <Image Source="/DominoPlanner.Usage;component/Icons/Zoom_Out.ico" Grid.Row="2"/>
-            -->
-            
         </Grid>
 
         <Grid Grid.Row="2">

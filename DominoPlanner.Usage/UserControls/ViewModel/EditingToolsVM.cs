@@ -805,14 +805,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Redraw();
             }
         }
-        private int _ZoomValue = 1;
-        public int ZoomValue
+        private double _ZoomValue = 1;
+        public double ZoomValue
         {
             get { return _ZoomValue; }
             set
             {
                 if (_ZoomValue != value)
                 {
+                    if (value < 1) value = 1;
                     double scale = _DominoProject.LayoutTransform.Value.M11 / _ZoomValue * value;
                     _ZoomValue = value;
                     _DominoProject.LayoutTransform = new ScaleTransform(scale, scale);
@@ -989,7 +990,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (File.Exists(PreviewPath)) File.Delete(PreviewPath);
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
         }
         public bool IsSelected(int i)
         {
@@ -1013,6 +1014,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             base.MouseDown(sender, e);
         }
+    }
+    public class ZoomToolVM : EditingToolVM
+    {
+        public ZoomToolVM(EditProjectVM parent) : base()
+        {
+            this.parent = parent;
+            Image = "zoomDrawingImage";
+            Name = "Zoom";
+            ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue += 1);
+            ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue -= 1);
+        }
+        private ICommand _ZoomIn;
+        public ICommand ZoomIn { get { return _ZoomIn; } set { if (value != _ZoomIn) { _ZoomIn = value; } } }
+
+        private ICommand _ZoomOut;
+        public ICommand ZoomOut { get { return _ZoomOut; } set { if (value != _ZoomOut) { _ZoomOut = value; } } }
+
     }
 
 }
