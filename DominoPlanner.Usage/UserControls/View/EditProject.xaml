@@ -100,8 +100,8 @@
                 <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0" SelectedColor="{Binding BackgroundColor }"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
-                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" Visibility="{Binding Collapsible}" IsChecked="{Binding Expanded}"/>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" Visibility="{Binding Expandable}" IsChecked="{Binding Expanded}"/>
+                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0" Visibility="{Binding Expandable}"></Border>
 
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Color:</TextBlock>
                 <xctk:ColorPicker Width="50" Margin="2, 0, 5, 0" SelectedColor="{Binding BorderColor}"/>

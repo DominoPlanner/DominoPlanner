@@ -709,7 +709,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
             }
-
+            Expandable = parent.CurrentProject is FieldParameters ? Visibility.Visible : Visibility.Collapsed;
         }
         private System.Drawing.Bitmap _FilteredImage;
 
@@ -737,6 +737,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _Expanded = value;
                     RaisePropertyChanged();
                     ResetCanvas();
+                }
+            }
+        }
+        private Visibility _Expandable;
+        public Visibility Expandable
+        {
+            get { return _Expandable; }
+            set
+            {
+                if (_Expandable != value)
+                {
+                    _Expandable = value;
+                    RaisePropertyChanged();
                 }
             }
         }
