@@ -248,10 +248,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ClearCanvas();
         }
 
-        internal void ClearCanvas()
+        internal void ClearCanvas(bool ClearSelection = true)
         {
             DisplaySettingsTool.ClearPastePositions();
-            ClearFullSelection(true);
+            if (ClearSelection) ClearFullSelection(true);
             if (DisplaySettingsTool.DominoProject != null)
                 DisplaySettingsTool.RemoveStones();
         }
@@ -271,6 +271,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             RefreshColorAmount();
             DisplaySettingsTool.Redraw();
+            RefreshSizeLabels();
         }
         private void RefreshColorAmount()
         {
@@ -397,7 +398,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             if (!(undoFilter is EditingActivatedOperation || undoFilter is SelectionOperation || undoFilter is SetColorOperation) )
             {
-                ClearCanvas();
+                ClearCanvas(false);
                 DisplaySettingsTool.ResetCanvas();
                 if (undoStack.Count == 0) UnsavedChanges = false;
             }
@@ -421,11 +422,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 redoFilter = redoStack.Pop();
                 undoStack.Push(redoFilter);
                 redoFilter.Apply();
-            } while ((!IncludeSelectionOperation && redoFilter is SelectionOperation) && undoStack.Count != 0);
+            } while ((!IncludeSelectionOperation && redoFilter is SelectionOperation) && redoStack.Count != 0);
           
             if (!(redoFilter is EditingDeactivatedOperation || redoFilter is SelectionOperation || redoFilter is SetColorOperation))
             {
-                ClearCanvas();
+                ClearCanvas(false);
                 DisplaySettingsTool.ResetCanvas();
             }
             else
@@ -586,11 +587,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void RefreshSizeLabels()
         {
-            ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
-            ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
-            ProjectAmount = dominoTransfer.shapes.Count().ToString();
-            PhysicalLength = dominoTransfer.physicalLength;
-            PhysicalHeight = dominoTransfer.physicalHeight;
+            if (dominoTransfer != null)
+            {
+                ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
+                ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
+                ProjectAmount = dominoTransfer.shapes.Count().ToString();
+                PhysicalLength = dominoTransfer.physicalLength;
+                PhysicalHeight = dominoTransfer.physicalHeight;
+            }
         }
 
         private void Dic_MouseDown(object sender, MouseButtonEventArgs e)

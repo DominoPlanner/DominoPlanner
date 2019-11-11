@@ -142,7 +142,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Border BorderThickness="0, 0, 0, 1" BorderBrush="Gray">
 
@@ -163,60 +163,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="320"/>
             </Grid.ColumnDefinitions>
-            <!--<Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="125"/>
-                    <RowDefinition Height="200" MinHeight="150"/>
-                    <RowDefinition Height="3"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="0" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Name"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding name}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Rows"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Stones/Row"/>
-                    <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount"/>
-                    <TextBlock Grid.Column="1" Grid.Row="3" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
-                    <TextBlock Grid.Column="0" Grid.Row="4" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Dimensions"/>
-                    <TextBlock Grid.Column="1" Grid.Row="4" TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0}mm x {1}mm">
-                                <Binding Path="PhysicalLength"/>
-                                <Binding Path="PhysicalHeight"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </Grid>
-                <Image Grid.Row="1" Source="{Binding FilteredImage, Converter={StaticResource ImageConverter}}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDown">
-                            <i:InvokeCommandAction Command="{Binding ShowImageClick}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseEnter">
-                            <i:InvokeCommandAction Command="{Binding MouseInPicture}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseLeave">
-                            <i:InvokeCommandAction Command="{Binding MouseOutPicture}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Image>
-                <GridSplitter Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="3" Background="#FFDDDDDD">
-
-                </GridSplitter>-->
+            
             <DockPanel Margin="5, 0" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch">
                 <Button DockPanel.Dock="Top" Grid.Row="0" Margin="0, 2" Height="24" Content="Clear Selection" Command="{Binding ClearSelection}"/>
                 <Button DockPanel.Dock="Top" Grid.Row="1" Margin="0, 2" Height="24" Content="Select stones in selected color" Command="{Binding SelectColor}">
@@ -265,12 +212,6 @@
         </Grid>
 
         <Grid Grid.Row="2">
-            <!--Button Grid.Row="2" Height="30" Margin="0, 5, 5, 5" Width="120" HorizontalAlignment="Right" Command="{Binding SaveField}">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                    <Image Height="20" Source="/Icons/document_save.ico" RenderOptions.BitmapScalingMode="HighQuality" Margin="2" />
-                    <Label Content="Save Field" />
-                </StackPanel>
-            </-->
             <StackPanel Grid.Row="2"  Orientation="Horizontal">
                 <Button Height="30" Width="120" Margin="5" HorizontalAlignment="Left" Command="{Binding RestoreBasicSettings}">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -284,10 +225,28 @@
                         <Label Content="Buildtools" />
                     </StackPanel>
                 </Button>
-                <CheckBox Grid.Row="2" Margin="5" VerticalAlignment="Center" Content="Hide spaces" Visibility="{Binding Collapsible}" IsChecked="{Binding Expanded}"/>
-                <Label VerticalAlignment="Center">Background Color:</Label>
-                <xctk:ColorPicker Grid.Row="2" Margin="5" VerticalAlignment="Center" Width="80" HorizontalAlignment="Left" SelectedColor="{Binding BackgroundColor}"></xctk:ColorPicker>
+                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Name: "/>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding name}"/>
+                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Rows: "/>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
+                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Stones/Row: "/>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
+                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount: "/>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
+                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="Dimensions: {}{0}mm x {1}mm">
+                            <Binding Path="PhysicalLength"/>
+                            <Binding Path="PhysicalHeight"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
             </StackPanel>
-        </Grid>
+            </Grid>
     </Grid>
 </UserControl>
