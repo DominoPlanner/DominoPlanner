@@ -18,6 +18,9 @@
         <local:ImageConverter x:Key="ImageConverter"/>
 
         <Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>
+        <DataTemplate DataType="{x:Type vm:EditingToolVM}">
+            <TextBlock VerticalAlignment="Center">Coming soon!</TextBlock>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Mode:</TextBlock>
