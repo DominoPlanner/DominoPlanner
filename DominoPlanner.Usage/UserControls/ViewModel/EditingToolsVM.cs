@@ -180,7 +180,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override void LeaveTool()
         {
-            CurrentSelectionDomain.RemoveSelectionDomain(parent.EditingTools.OfType<DisplaySettingsToolVM>().First().DominoProject);
+            CurrentSelectionDomain.RemoveSelectionDomain(parent.DisplaySettingsTool.DominoProject);
         }
         public override void EnterTool()
         {
@@ -1066,20 +1066,164 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
 
     }
-    public class RulerTool : EditingToolVM
+    public class RulerToolVM : EditingToolVM
     {
+        private double _length;
+
+        public double Length
+        {
+            get { return _length; }
+            set { _length = value; RaisePropertyChanged(); }
+        }
+        private bool _snapping;
+
+        public bool Snapping
+        {
+            get { return _snapping; }
+            set { _snapping = value; RaisePropertyChanged(); }
+        }
+
+        private System.Windows.Point start;
+        private System.Windows.Point end;
+        private double linewidth = 8;
+        private System.Windows.Shapes.Shape[] shapes;
+        private int dragging;
+        public RulerToolVM(EditProjectVM parent)
+        {
+            this.parent = parent;
+            shapes = new System.Windows.Shapes.Shape[] { new System.Windows.Shapes.Ellipse(),
+                new System.Windows.Shapes.Ellipse(), new System.Windows.Shapes.Line(), new System.Windows.Shapes.Line() };
+            shapes[0].Width = linewidth * 2;
+            shapes[0].Height = linewidth * 2;
+            shapes[1].Width = linewidth * 2;
+            shapes[1].Height = linewidth * 2;
+            shapes[0].Fill = Brushes.Blue;
+            shapes[1].Fill = Brushes.Blue;
+            shapes[2].Stroke = System.Windows.Media.Brushes.Blue;
+            shapes[2].StrokeThickness = linewidth;
+            shapes[3].Stroke = System.Windows.Media.Brushes.White;
+            shapes[3].StrokeThickness = linewidth / 3;
+            Image = "ruler2DrawingImage";
+            Name = "Measure distance";
+            MakeInvisible();
+        }
         public override void KeyPressed(Key key)
         {
-            base.KeyPressed(key);
+            if (key == Key.LeftCtrl || key == Key.RightCtrl)
+                Snapping = !Snapping;
         }
         public override void MouseUp(object sender, MouseButtonEventArgs e)
         {
-            base.MouseUp(sender, e);
+            if (e.ChangedButton != MouseButton.Left) return;
+
+            dragging = 0;
         }
         public override void MouseDown(object sender, MouseButtonEventArgs e)
         {
-            base.MouseDown(sender, e);
+            if (e.ChangedButton != MouseButton.Left) return;
+
+            var pos = e.GetPosition((Canvas)sender);
+            if (shapes[0].Visibility != Visibility.Hidden)
+            {
+                if (Distance(pos, start) < (4 * linewidth))
+                    dragging = 1;
+                else if (Distance(pos, end) < (4 * linewidth))
+                    dragging = 2;
+                else
+                    dragging = 0;
+            }
+            else // no ruler there yet
+            {
+                dragging = 0;
+                MakeVisible();
+            }
+            if (dragging == 0)
+            {
+                start = pos;
+                end = pos;
+                UpdateShapes();
+                dragging = 2;
+            }
+
+
         }
+        public double Distance(System.Windows.Point a, System.Windows.Point b)
+        {
+            return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
+        }
+        public override void MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                dragging = 0;
+                return;
+            }
+            var s = (Canvas)sender;
+            var pos = e.GetPosition(s);
+            if (pos.X < 0) pos.X = 0;
+            if (pos.Y < 0) pos.Y = 0;
+            if (pos.X > s.Width) pos.X = s.Width;
+            if (pos.Y > s.Height) pos.Y = s.Height;
+
+            if (Snapping)
+            {
+                // get angle between stationary and dragged point
+                var stationary = dragging == 1 ? end : start;
+                var angle = Math.Atan2(pos.X - stationary.X, pos.Y - stationary.Y);
+                // round to multiples of Pi/8 (22.5 deg)
+                var steps = 360 / 5;
+                angle = Math.Round(angle * steps / Math.PI) * Math.PI / steps;
+                var distance = Distance(pos, stationary);
+                pos.X = Math.Sin(angle) * distance + stationary.X;
+                pos.Y = Math.Cos(angle) * distance + stationary.Y;
+            }
+            if (dragging == 1)
+                start = pos;
+            else if (dragging == 2)
+                end = pos;
+            Length = Distance(start, end);
+            UpdateShapes();
+        }
+        public override void EnterTool()
+        {
+            Length = 0;
+        }
+        public override void LeaveTool()
+        {
+            MakeInvisible();
+        }
+        public void MakeVisible()
+        {
+            foreach (System.Windows.Shapes.Shape s in shapes)
+            {
+                parent.DisplaySettingsTool.DominoProject.Children.Remove(s);
+                s.Visibility = Visibility.Visible;
+                parent.DisplaySettingsTool.DominoProject.Children.Add(s);
+            }
+        }
+        public void MakeInvisible()
+        {
+            foreach (System.Windows.Shapes.Shape s in shapes)
+            {
+                s.Visibility = Visibility.Hidden;
+            }
+        }
+        public void UpdateShapes()
+        {
+            foreach (System.Windows.Shapes.Line line in shapes.Skip(2))
+            {
+                line.X1 = start.X;
+                line.X2 = end.X;
+                line.Y1 = start.Y;
+                line.Y2 = end.Y;
+            }
+            Canvas.SetLeft(shapes[0], start.X - linewidth);
+            Canvas.SetTop(shapes[0], start.Y - linewidth);
+            Canvas.SetLeft(shapes[1], end.X - linewidth);
+            Canvas.SetTop(shapes[1], end.Y - linewidth);
+
+        }
+        
     }
     public class ZoomToolVM : EditingToolVM
     {

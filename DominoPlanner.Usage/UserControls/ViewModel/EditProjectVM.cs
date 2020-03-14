@@ -55,9 +55,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             SelectionTool = new SelectionToolVM(this);
             DisplaySettingsTool = new DisplaySettingsToolVM(this);
             ZoomTool = new ZoomToolVM(this);
+            RulerTool = new RulerToolVM(this);
             EditingTools = new ObservableCollection<EditingToolVM>() {
                 SelectionTool,
-                new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
+                RulerTool,
                 new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
                 new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
                 new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
@@ -79,6 +80,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private SelectionToolVM SelectionTool;
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
         public ZoomToolVM ZoomTool;
+        public RulerToolVM RulerTool;
         #endregion
 
         #region events

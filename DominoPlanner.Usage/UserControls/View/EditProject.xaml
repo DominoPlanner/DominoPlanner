@@ -140,6 +140,21 @@
                 </Button>
             </StackPanel>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RulerToolVM}">
+            <DockPanel Margin="5, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="18">
+
+                <TextBlock Margin="0, 0" Width="150" Text="{Binding Length, StringFormat=Current Length: {0:F2} mm}" VerticalAlignment="Center"/>
+                <CheckBox Margin="10,0,0,-1"  IsChecked="{Binding Snapping}" VerticalAlignment="Center">Snap to 5 degree increments (Toggle with Ctrl)</CheckBox>
+                <TextBlock TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" Margin="20, 0, 0, 0">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
+                            <Binding Path="DataContext.PhysicalLength" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+                            <Binding Path="DataContext.PhysicalHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DockPanel>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
         <Grid.RowDefinitions>
@@ -241,14 +256,7 @@
                 <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="Amount: "/>
                 <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
                 <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
-                            <Binding Path="PhysicalLength"/>
-                            <Binding Path="PhysicalHeight"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                
             </StackPanel>
             </Grid>
     </Grid>
