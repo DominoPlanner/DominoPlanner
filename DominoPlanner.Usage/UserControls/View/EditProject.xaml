@@ -102,7 +102,7 @@
                 <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0">Background Color:</TextBlock>
                 <xctk:ColorPicker Width="50" Margin="0, 0, 5, 0" SelectedColor="{Binding BackgroundColor }"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
-
+                <CheckBox Content="Show grid" Margin="5, 0, 5, 0" VerticalAlignment="Center" Visibility="{Binding HasGridlines}" IsChecked="{Binding GridlinesVisible}"/>
                 <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" Visibility="{Binding Expandable}" IsChecked="{Binding Expanded}"/>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0" Visibility="{Binding Expandable}"></Border>
 

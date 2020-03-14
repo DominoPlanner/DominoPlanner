@@ -709,7 +709,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
             }
-            Expandable = parent.CurrentProject is FieldParameters ? Visibility.Visible : Visibility.Collapsed;
+            _Expandable = parent.CurrentProject is FieldParameters ? Visibility.Visible : Visibility.Collapsed;
+            _HasGridlines = parent.CurrentProject is StructureParameters ? Visibility.Visible : Visibility.Collapsed;
         }
         private System.Drawing.Bitmap _FilteredImage;
 
@@ -749,6 +750,33 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_Expandable != value)
                 {
                     _Expandable = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        private bool _GridlinesVisible;
+        public bool GridlinesVisible
+        {
+            get => _GridlinesVisible;
+            set
+            {
+                if (_GridlinesVisible != value)
+                {
+                    _GridlinesVisible = value;
+                    RaisePropertyChanged();
+                    ResetCanvas();
+                }
+            }
+        }
+        private Visibility _HasGridlines;
+        public Visibility HasGridlines
+        {
+            get { return _HasGridlines; }
+            set
+            {
+                if (_HasGridlines != value)
+                {
+                    _HasGridlines = value;
                     RaisePropertyChanged();
                 }
             }
@@ -892,6 +920,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.OpacityValue = ImageOpacity;
             DominoProject.above = above;
             
+            if (GridlinesVisible && parent.CurrentProject is StructureParameters sp)
+            {
+                DominoProject.gridlines_x = Enumerable.Range(0, sp.current_width + 1).Select(x => sp.cells[0, 0].width + sp.cells[1, 1].width * x).ToArray();
+                DominoProject.gridlines_y = Enumerable.Range(0, sp.current_height + 1).Select(x => sp.cells[0, 0].height + sp.cells[1, 1].height * x).ToArray();
+            }
 
             for (int i = 0; i < parent.dominoTransfer.shapes.Count(); i++)
             {

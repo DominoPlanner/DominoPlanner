@@ -13,7 +13,7 @@ namespace DominoPlanner.Core
     partial class StructureParameters
     {
         public String name;
-        internal CellDefinition[,] cells;
+        public CellDefinition[,] cells;
         private double PreviewScaleFactor(int TargetDimension)
         {
             double largest = 0;

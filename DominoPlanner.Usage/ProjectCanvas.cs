@@ -22,6 +22,8 @@ namespace DominoPlanner.Usage
 
         public Image<Emgu.CV.Structure.Bgra, byte> OriginalImage;
 
+        public double[] gridlines_x = new double[] { }, gridlines_y = new double[] { };
+
         public bool above;
         private double opacity_value;
 
@@ -85,7 +87,20 @@ namespace DominoPlanner.Usage
             }
             if (above && bit != null)
                 dc.DrawImage(bit, new Rect(0, 0, Width, Height));
-
+            var LinePen = new Pen(Brushes.Black, 1);
+            var LineContrastPen = new Pen(Brushes.White, 1);
+            foreach (int x in gridlines_x)
+            {
+                dc.DrawLine(LineContrastPen, new Point(x-1, 0), new Point(x-1, Height));
+                dc.DrawLine(LinePen, new Point(x, 0), new Point(x, Height));
+                dc.DrawLine(LineContrastPen, new Point(x + 1, 0), new Point(x + 1, Height));
+            }
+            foreach (int y in gridlines_y)
+            {
+                dc.DrawLine(LineContrastPen, new Point(0, y-1), new Point(Width, y-1));
+                dc.DrawLine(LinePen, new Point(0, y), new Point(Width, y));
+                dc.DrawLine(LineContrastPen, new Point(0, y + 1), new Point(Width, y + 1));
+            }
         }
     }
     public static class BitmapSourceConvert
