@@ -243,7 +243,7 @@
                 <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
                 <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="left" VerticalAlignment="Center">
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="Dimensions: {}{0}mm x {1}mm">
+                        <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
                             <Binding Path="PhysicalLength"/>
                             <Binding Path="PhysicalHeight"/>
                         </MultiBinding>
