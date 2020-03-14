@@ -37,6 +37,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public virtual void MouseUp(object sender, MouseButtonEventArgs e) { }
 
         public virtual void KeyPressed(Key key) { }
+
+        public virtual void LeaveTool() { }
+        public virtual void EnterTool() { }
     }
     public enum SelectionMode
     {
@@ -116,8 +119,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         value.IncludeBoundary = currentSelectionDomain.IncludeBoundary;
                         value.SelectionMode = currentSelectionDomain.SelectionMode;
+                        LeaveTool();
                     }
-                    currentSelectionDomain = value; 
+                    currentSelectionDomain = value;
+                    EnterTool();
                 }
                 RaisePropertyChanged();
             }
@@ -171,6 +176,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Select(current, false);
             Select(n, true);
             parent.UpdateUIElements();
+        }
+
+        public override void LeaveTool()
+        {
+            CurrentSelectionDomain.RemoveSelectionDomain(parent.EditingTools.OfType<DisplaySettingsToolVM>().First().DominoProject);
+        }
+        public override void EnterTool()
+        {
+            CurrentSelectionDomain.ResetSelectionDomain();
         }
         private ICommand _UndoSelectionOperation;
         public ICommand UndoSelectionOperation { get { return _UndoSelectionOperation; } set { if (value != _UndoSelectionOperation) { _UndoSelectionOperation= value; } } }
@@ -280,6 +294,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ResetFlag = true;
         }
+        public virtual void ResetSelectionDomain() { }
+
         public static bool IsPointInPolygon(IList<System.Windows.Point> polygon, System.Windows.Point testPoint)
         {
             bool result = false;
@@ -532,7 +548,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 (e.LeftButton == MouseButtonState.Pressed ^ e.RightButton == MouseButtonState.Pressed)))
                 return;
             
-            if (points.Count == 0)
+            if (points.Count == 0 || s.Visibility == Visibility.Hidden)
             {
                 firstButton = e.ChangedButton;
                 if (SelectionMode == SelectionMode.Neutral)
@@ -594,6 +610,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             firstButton = null;
             return result;
         }
+        public override void ResetSelectionDomain()
+        {
+            points = new List<System.Windows.Point>();
+        }
     }
     public class FreehandSelectionDomain : TwoClickSelection
     {
@@ -632,7 +652,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             var poly = s as System.Windows.Shapes.Polyline;
             var last = poly.Points.Last();
-            Debug.WriteLine("Hit, Length: " + poly.Points.Count);
+            //Debug.WriteLine("Hit, Length: " + poly.Points.Count);
             if ((last.X - pos.X) * (last.X - pos.X) + (last.Y - pos.Y) * (last.Y - pos.Y) > 3)
             {
                 

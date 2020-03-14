@@ -101,8 +101,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return selectedTool; }
             set
             {
-                if (value != null)
+                if (value != null && value != selectedTool)
+                {
+                    selectedTool?.LeaveTool();
                     selectedTool = value;
+                    selectedTool.EnterTool();
+                }
                 TabPropertyChanged(ProducesUnsavedChanges: false);
 
             }
