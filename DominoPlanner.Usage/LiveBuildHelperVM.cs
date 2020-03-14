@@ -56,6 +56,8 @@ namespace DominoPlanner.Usage
         private IDominoProvider fParameters;
         private int stonesPerLine;
         private int[,] intField;
+        private int space = 2;
+        private int stoneWidth = 0;
         #endregion
 
         #region prope
@@ -192,9 +194,8 @@ namespace DominoPlanner.Usage
             + (((System.Windows.Forms.SystemInformation.PowerStatus.BatteryChargeStatus & System.Windows.Forms.BatteryChargeStatus.Charging) == System.Windows.Forms.BatteryChargeStatus.Charging) ? ", charging" : "");
 
             currentBlock.Children.RemoveRange(0, currentBlock.Children.Count);
-            int space = 2;
-
-            int stoneWidth = (((int)currentBlock.ActualWidth) - (2 * 2 * space) - ((blockSize - 1) * space)) / blockSize;
+            
+            stoneWidth = (((int)currentBlock.ActualWidth) - (2 * 2 * space) - ((blockSize - 1) * space)) / blockSize;
             int stoneHeight = 250;
             int marginHeight = (((int)currentBlock.ActualHeight) / 2);
 
@@ -215,45 +216,55 @@ namespace DominoPlanner.Usage
                     
                     if (lastColor != intField[firstBlockStone + i, SelectedRow - 1])
                     {
-                        TextBlock tb = new TextBlock();
-                        tb.FontSize = 16;
-                        tb.FontWeight = System.Windows.FontWeights.Bold;
-                        tb.TextAlignment = System.Windows.TextAlignment.Center;
-                        tb.Margin = new System.Windows.Thickness(lastLeftMargin, marginHeight + 20, 0, 0);
-                        tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                        tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                        if (lastColor >= 0)
-                        {
-                            tb.Text = lastColorName + Environment.NewLine + countColor;
-                        }
-                        tb.Width = ((i + 1) * space) + (i * stoneWidth) - lastLeftMargin;
-                        currentBlock.Children.Add(tb);
+                        _DrawText(lastColorName, countColor, lastLeftMargin, marginHeight);
                         lastColor = intField[firstBlockStone + i, SelectedRow - 1];
-                        lastColorName = fParameters.colors[lastColor < 0 ? 0 : lastColor].name;
+                        lastColorName = lastColor > 0 ? fParameters.colors[lastColor].name : "";
                         lastLeftMargin = ((i + 1) * space) + (i * stoneWidth);
-                        countColor = 0;
-                    }
-
-                    if (i == blockSize - 1 || firstBlockStone + i == stonesPerLine - 1) // last stone of block
-                    {
-                        countColor++;
-                        TextBlock tb = new TextBlock();
-                        tb.FontSize = 16;
-                        tb.FontWeight = System.Windows.FontWeights.Bold;
-                        tb.TextAlignment = System.Windows.TextAlignment.Center;
-                        tb.Margin = new System.Windows.Thickness(lastLeftMargin, marginHeight + 20, 0, 0);
-                        tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                        tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                        tb.Width = ((i + 2) * space) + ((i + 1) * stoneWidth) - lastLeftMargin;
-                        tb.Text = lastColorName + Environment.NewLine + countColor;
-                        currentBlock.Children.Add(tb);
-                        break;
+                        countColor = 1;
                     }
                     else
+                    {
                         countColor++;
+                    }
                 }
             }
+            _DrawText(lastColorName, countColor, lastLeftMargin, marginHeight);
         }
+
+        private void _DrawText(string colorName, int colorAmount, int margin_left, int margin_top)
+        {
+            int stonesWidth = (((colorAmount + 1) * space) + (colorAmount * stoneWidth));
+
+            TextBlock tb = new TextBlock();
+            tb.FontSize = 16;
+            tb.Text = colorName + Environment.NewLine + colorAmount;
+            tb.FontWeight = System.Windows.FontWeights.Bold;
+            tb.TextAlignment = System.Windows.TextAlignment.Center;
+            tb.Margin = new System.Windows.Thickness(margin_left, margin_top + 20, 0, 0);
+            tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            tb.Width = ((colorAmount + 1) * space) + (colorAmount * stoneWidth);
+
+            System.Drawing.Size textSize = System.Windows.Forms.TextRenderer.MeasureText(colorName, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
+
+            if (stonesWidth < textSize.Width)
+            {
+                if (stoneWidth < tb.FontSize * 1.4)
+                {
+                    tb.FontSize = stoneWidth / 1.4;
+                }
+                tb.Text = colorName + " " + colorAmount;
+                textSize = System.Windows.Forms.TextRenderer.MeasureText(tb.Text, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
+                tb.TextAlignment = System.Windows.TextAlignment.Left;
+                tb.Width = textSize.Width;
+                tb.TextWrapping = System.Windows.TextWrapping.NoWrap;
+                tb.Margin = new System.Windows.Thickness(margin_left + (stonesWidth / 2) + (tb.FontSize * 1.4 / 2), margin_top + 20, 0, 0);
+                tb.RenderTransform = new RotateTransform() { Angle = 90 };
+            }
+
+            currentBlock.Children.Add(tb);
+        }
+
         private void RefreshRemainingColors()
         {
 

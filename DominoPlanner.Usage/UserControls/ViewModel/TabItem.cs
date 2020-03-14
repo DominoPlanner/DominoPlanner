@@ -346,7 +346,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.ShowDialog();
+            protocolV.Show();
         }
         public override bool Save()
         {
