@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Linq;
 using System.IO;
+using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage
 {
@@ -50,27 +51,21 @@ namespace DominoPlanner.Usage
                 dc.DrawImage(bit, new Rect(0, 0, Width, Height));
             foreach (DominoInCanvas dic in Stones)
             {
-                Point point1 = dic.canvasPoints[0];
-                Point point2 = dic.canvasPoints[1];
-                Point point3 = dic.canvasPoints[2];
-                Point point4 = dic.canvasPoints[3];
 
                 StreamGeometry streamGeometry = new StreamGeometry();
                 using (StreamGeometryContext geometryContext = streamGeometry.Open())
                 {
-                    geometryContext.BeginFigure(point1, true, true);
-                    var points = new System.Windows.Media.PointCollection
-                                             {
-                                                 point2, point3, point4
-                                             };
+                    geometryContext.BeginFigure(dic.canvasPoints[0], true, true);
+                    var points = new System.Windows.Media.PointCollection(dic.canvasPoints.Skip(1));
                     geometryContext.PolyLineTo(points, true, true);
                 }
 
                 Pen pen = new Pen();
                 if (dic.isSelected)
                 {
-                    pen.Brush = new SolidColorBrush(SelectedBorderColor);
+                    pen.Brush = new SolidColorBrush(dic.StoneColor.IntelligentBW(Colors.Black, Colors.LightGray)); 
                     pen.Thickness = BorderSize;
+                    pen.DashStyle = DashStyles.Dash;
                 }
                 else if (dic.PossibleToPaste)
                 {
@@ -84,6 +79,14 @@ namespace DominoPlanner.Usage
                 }
 
                 dc.DrawGeometry(new SolidColorBrush(dic.StoneColor), pen, streamGeometry);
+                // Point in the center
+                /* if (dic.isSelected)
+                {
+                    var center_x = dic.canvasPoints.Sum(x => x.X) / dic.canvasPoints.Length;
+                    var center_y = dic.canvasPoints.Sum(x => x.Y) / dic.canvasPoints.Length;
+                    dc.DrawEllipse(new SolidColorBrush(dic.StoneColor.IntelligentBW()), null,
+                        new System.Windows.Point(center_x, center_y), BorderSize / 2, BorderSize/2);
+                } */
             }
             if (above && bit != null)
                 dc.DrawImage(bit, new Rect(0, 0, Width, Height));
@@ -91,15 +94,15 @@ namespace DominoPlanner.Usage
             var LineContrastPen = new Pen(Brushes.White, 1);
             foreach (int x in gridlines_x)
             {
-                dc.DrawLine(LineContrastPen, new Point(x-1, 0), new Point(x-1, Height));
-                dc.DrawLine(LinePen, new Point(x, 0), new Point(x, Height));
-                dc.DrawLine(LineContrastPen, new Point(x + 1, 0), new Point(x + 1, Height));
+                dc.DrawLine(LineContrastPen, new System.Windows.Point(x-1, 0), new System.Windows.Point(x-1, Height));
+                dc.DrawLine(LinePen, new System.Windows.Point(x, 0), new System.Windows.Point(x, Height));
+                dc.DrawLine(LineContrastPen, new System.Windows.Point(x + 1, 0), new System.Windows.Point(x + 1, Height));
             }
             foreach (int y in gridlines_y)
             {
-                dc.DrawLine(LineContrastPen, new Point(0, y-1), new Point(Width, y-1));
-                dc.DrawLine(LinePen, new Point(0, y), new Point(Width, y));
-                dc.DrawLine(LineContrastPen, new Point(0, y + 1), new Point(Width, y + 1));
+                dc.DrawLine(LineContrastPen, new System.Windows.Point(0, y-1), new System.Windows.Point(Width, y-1));
+                dc.DrawLine(LinePen, new System.Windows.Point(0, y), new System.Windows.Point(Width, y));
+                dc.DrawLine(LineContrastPen, new System.Windows.Point(0, y + 1), new System.Windows.Point(Width, y + 1));
             }
         }
     }

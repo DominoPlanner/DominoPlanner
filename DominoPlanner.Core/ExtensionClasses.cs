@@ -25,11 +25,15 @@ namespace DominoPlanner.Core
         /// <returns></returns>
         public static Color IntelligentBW(this Color c)
         {
+            return c.IntelligentBW(Colors.Black, Colors.White);
+        }
+        public static Color IntelligentBW(this Color c, Color DarkColor, Color LightColor)
+        {
             if (c.R * .3d + c.G * .59 + c.B * 0.11 > 128)
             {
-                return Colors.Black;
+                return DarkColor;
             }
-            return Colors.White;
+            return LightColor;
         }
         /// <summary>
         /// Gibt eine String-Repräsentation der Farbe im Format #rrggbb zurück.
