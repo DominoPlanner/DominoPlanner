@@ -49,17 +49,19 @@
                 <Label Grid.Column="3" Content="{Binding CountBlock}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <Label Grid.Column="3" Content="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
-            <Button Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right" Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
-                <StackPanel>
-                    <TextBlock>Show remaining colors</TextBlock>
-                    <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
-                        <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
+            <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
+                    <StackPanel>
+                        <TextBlock>Show remaining colors</TextBlock>
+                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                            <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
 
-                        </local:ColorControl>
-                    </Popup>
-                </StackPanel>
-
-            </Button>
+                            </local:ColorControl>
+                        </Popup>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </Grid>
         <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
             <i:Interaction.Triggers>

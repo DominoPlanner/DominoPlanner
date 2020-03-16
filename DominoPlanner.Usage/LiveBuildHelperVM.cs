@@ -136,6 +136,21 @@ namespace DominoPlanner.Usage
             }
         }
 
+        private bool _ShowHistory;
+        public bool ShowHistory
+        {
+            get { return _ShowHistory; }
+            set
+            {
+                if(_ShowHistory != value)
+                {
+                    _ShowHistory = value;
+                    RaisePropertyChanged();
+                    RefreshCanvas();
+                }
+            }
+        }
+
         private int _CountBlock;
         public int CountBlock
         {
@@ -210,6 +225,12 @@ namespace DominoPlanner.Usage
             {
                 if (firstBlockStone + i < stonesPerLine)
                 {
+                    if(ShowHistory && SelectedRow - 2 >= 0)
+                    {
+                        int oldStoneIndex = intField[firstBlockStone + i, SelectedRow - 2];
+                        currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight / 4, ((i + 2) * space) + (i * stoneWidth), 10, fParameters.colors[oldStoneIndex].mediaColor));
+                    }
+
                     int stoneindex = intField[firstBlockStone + i, SelectedRow - 1];
                     if (stoneindex < 0) continue;
                     currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[stoneindex].mediaColor));
