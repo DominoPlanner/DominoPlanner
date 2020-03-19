@@ -6,7 +6,7 @@ using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage
 {
-    public class DominoInCanvas : Shape
+    public class DominoInCanvas : Shape, Core.RTree.Geometry
     {
         public int idx;
         public System.Windows.Point[] canvasPoints = new System.Windows.Point[4];
@@ -163,6 +163,16 @@ namespace DominoPlanner.Usage
                 Stroke = Brushes.Blue;
                 StrokeThickness = 1;
             }
+        }
+
+        public bool Intersects(DominoRectangle rect)
+        {
+            return domino.Intersects(rect);
+        }
+
+        public DominoRectangle getBoundingRectangle()
+        {
+            return domino.getBoundingRectangle();
         }
     }
 }

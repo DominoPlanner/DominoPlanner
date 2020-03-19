@@ -19,6 +19,8 @@ namespace DominoPlanner.Core
         public int y2 { get { return (int)(height + y); } }
         public int x1 { get { return (int)(x); } }
         public int y1 { get { return (int)(y); } }
+        public double xc { get { return (width / 2 + x); } }
+        public double yc { get { return (height / 2 + y); } }
 
         public System.Windows.Rect getWPFRectangle()
         {

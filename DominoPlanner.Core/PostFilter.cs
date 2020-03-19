@@ -98,9 +98,9 @@ namespace DominoPlanner.Core
     }
     public struct PositionWrapper
     {
-        internal int X { get; set; }
-        internal int Y { get; set; }
-        internal int CountInsideCell { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int CountInsideCell { get; set; }
     }
     public class AddRows : PostFilter
     {

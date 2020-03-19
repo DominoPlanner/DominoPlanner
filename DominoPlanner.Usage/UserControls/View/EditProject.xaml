@@ -76,13 +76,8 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Boundary treatment:</TextBlock>
-                <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip="Include dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary}">
-                    <Image Source="{StaticResource include_borderDrawingImage}" Width="18" Height="18"/>
-                </RadioButton>
-                <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip="Exclude dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
-                    <Image Source="{StaticResource exclude_borderDrawingImage}" Width="18" Height="18"/>
-                </RadioButton>
+                <ContentControl Content="{Binding CurrentSelectionDomain}" Width="160" Margin="5, 0"></ContentControl>
+                
                 <Button Width="24" Margin="30, 0, 1, 0" ToolTip="Undo last selection operation" Command="{Binding UndoSelectionOperation}">
                     <Image Source="{StaticResource undoDrawingImage}" Width="18" Height="18"/>
                 </Button>
@@ -96,6 +91,20 @@
                     <Image Source="{StaticResource closeDrawingImage}" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SelectionDomain}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Margin="0, 0, 2, 0">Boundary treatment:</TextBlock>
+                <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip="Include dominoes on selection boundary" IsChecked="{Binding IncludeBoundary}">
+                    <Image Source="{StaticResource include_borderDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+                <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip="Exclude dominoes on selection boundary" IsChecked="{Binding IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
+                    <Image Source="{StaticResource exclude_borderDrawingImage}" Width="18" Height="18"/>
+                </RadioButton>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FillBucketDomain}">
+            <CheckBox VerticalAlignment="Center" IsChecked="{Binding IncludeDiagonals}">Include diagonals</CheckBox>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:DisplaySettingsToolVM}">
             <StackPanel Orientation="Horizontal">

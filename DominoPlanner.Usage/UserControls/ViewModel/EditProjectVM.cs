@@ -61,7 +61,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RulerTool,
                 new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
                 new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
-                new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
                 ZoomTool,
                 DisplaySettingsTool
             };

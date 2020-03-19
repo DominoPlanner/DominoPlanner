@@ -12,6 +12,7 @@ using System.IO;
 using System.Diagnostics;
 using Emgu.CV;
 using DominoPlanner.Core;
+using DominoPlanner.Core.RTree;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -95,7 +96,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Name = "Select";
             SelectionTools = new ObservableCollection<SelectionDomain>() {
                 new RectangleSelection(), new CircleSelectionDomain(),
-                new PolygonSelectionDomain(), new FreehandSelectionDomain() };
+                new PolygonSelectionDomain(), new FreehandSelectionDomain(), new FillBucketDomain(parent) };
             CurrentSelectionDomain = SelectionTools[0];
             UndoSelectionOperation = new RelayCommand((o) => {
                 parent.UndoInternal(true);
@@ -112,7 +113,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public SelectionDomain CurrentSelectionDomain
         {
             get { return currentSelectionDomain; }
-            set {
+            set { 
                 if (value != null)
                 {
                     if (currentSelectionDomain != null)
@@ -138,7 +139,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override void MouseDown(object sender, MouseButtonEventArgs e)
         {
-            CurrentSelectionDomain?.MouseDown(sender, e, sender as ProjectCanvas);   
+            CurrentSelectionDomain?.MouseDown(sender, e, sender as ProjectCanvas);
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
@@ -207,7 +208,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return image; }
             set { image = value; img = (DrawingImage)System.Windows.Application.Current.Resources[value]; }
         }
-       
+
 
         private bool includeBoundary = true;
 
@@ -247,11 +248,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public SelectionMode CurrentSelectionMode;
         public System.Windows.Shapes.Shape s;
-        
+
         public void RemoveSelectionDomain(ProjectCanvas pc)
         {
-            s.Visibility = Visibility.Hidden;
-            (VisualTreeHelper.GetParent(s) as Canvas)?.Children.Remove(s);
+            if (s != null)
+            {
+                s.Visibility = Visibility.Hidden;
+                (VisualTreeHelper.GetParent(s) as Canvas)?.Children.Remove(s);
+            }
         }
         public void AddSelectionDomain(ProjectCanvas pc)
         {
@@ -284,7 +288,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     dic.canvasPoints.Max(x => x.X) < BoundingBox.Right &&
                     dic.canvasPoints.Max(x => x.Y) < BoundingBox.Bottom &&
                     dic.canvasPoints.Min(x => x.Y) > BoundingBox.Top;
-                
+
             }
         }
 
@@ -369,7 +373,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             Initialize();
             ResetFlag = false;
-            
+
             AddSelectionDomain(pc);
         }
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
@@ -380,34 +384,35 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return;
             }
             if (s == null) return;
-            
+
             UpdateShapeProperties(e.GetPosition((Canvas)sender));
 
-            
+
         }
         public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            
+
             List<int> result = new List<int>();
-            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released) 
+            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released)
                 || (MouseDownPoint.X == -1 && MouseDownPoint.Y == -1))
             {
                 return result;
             }
             Rect boundingBox = GetBoundingBox();
-            bool SingleClickFlag = false;
             var pos = e.GetPosition(pc);
             if ((pos.X - MouseDownPoint.X) * (pos.X - MouseDownPoint.X) + (pos.Y - MouseDownPoint.Y) * (pos.Y - MouseDownPoint.Y) < 5)
             {
                 // single click 
                 boundingBox = new Rect(e.GetPosition(pc).X, e.GetPosition(pc).Y, 0, 0);
-                SingleClickFlag = true;
+                var r = pc.FindDominoAtPosition(pos);
+                if (r != null) result.Add(r.idx);
+                ResetFlag = true;
             }
             if (!ResetFlag)
             {
                 for (int i = 0; i < pc.Stones.Count; i++)
                 {
-                    if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, SingleClickFlag ? true : IncludeBoundary))
+                    if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, IncludeBoundary))
                     {
                         result.Add(i);
                     }
@@ -418,8 +423,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseDownPoint = new System.Windows.Point(-1, -1);
             return result;
         }
-        
-        
+
+
     }
     public abstract class WidthHeightSelection: TwoClickSelection
     {
@@ -503,7 +508,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             return false;
         }
-        
+
     }
     public class PolygonSelectionDomain : SelectionDomain
     {
@@ -519,7 +524,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             poly.Fill = new SolidColorBrush(Color.FromArgb(50, 100, 100, 100));
             Canvas.SetLeft(poly, 0);
             Canvas.SetTop(poly, 0);
-            
+
         }
 
         public override Rect GetBoundingBox()
@@ -543,11 +548,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         bool DoubleClickFlag;
         public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
         {
-            
+
             if (!((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right) &&
                 (e.LeftButton == MouseButtonState.Pressed ^ e.RightButton == MouseButtonState.Pressed)))
                 return;
-            
+
             if (points.Count == 0 || s.Visibility == Visibility.Hidden)
             {
                 firstButton = e.ChangedButton;
@@ -577,7 +582,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             points.Add(e.GetPosition(pc));
             var poly = s as System.Windows.Shapes.Polyline;
             poly.Points = new System.Windows.Media.PointCollection(points);
-            
+
         }
 
         public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
@@ -655,7 +660,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             //Debug.WriteLine("Hit, Length: " + poly.Points.Count);
             if ((last.X - pos.X) * (last.X - pos.X) + (last.Y - pos.Y) * (last.Y - pos.Y) > 3)
             {
-                
+
                 poly.Points.Add(pos);
             }
         }
@@ -668,6 +673,201 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             double bottom = points.Max(x => x.Y);
             double right = points.Max(x => x.X);
             return new Rect(left, top, right - left, bottom - top);
+        }
+    }
+    public class FillBucketDomain : SelectionDomain
+    {
+
+        public bool IncludeDiagonals
+        {
+            get { return nl.EightNeighbor; }
+            set { nl.EightNeighbor = value; RaisePropertyChanged(); }
+        }
+
+        private readonly NeighborLocator nl;
+        private EditProjectVM parent;
+        private ProjectCanvas pc;
+        public FillBucketDomain(EditProjectVM parent)
+        {
+            if (parent.CurrentProject is FieldParameters)
+            {
+                nl = new FieldNeighborLocator();
+            }
+            else
+            {
+                nl = new GeneralNeighborLocator();
+            }
+            this.parent = parent;
+            Image = "fill_bucketDrawingImage";
+            Name = "Fill area";
+        }
+
+        public override void MouseDown(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            if ((e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right))
+            {
+                if (SelectionMode == SelectionMode.Add || (SelectionMode == SelectionMode.Neutral && e.ChangedButton == MouseButton.Left))
+                {
+                    CurrentSelectionMode = SelectionMode.Add;
+                }
+                else if (SelectionMode == SelectionMode.Remove || (SelectionMode == SelectionMode.Neutral && e.ChangedButton == MouseButton.Right))
+                {
+                    CurrentSelectionMode = SelectionMode.Remove;
+                }
+                else
+                {
+                    CurrentSelectionMode = SelectionMode.Neutral;
+                }
+            }
+        }
+        public override List<int> MouseUp(object sender, MouseButtonEventArgs e, ProjectCanvas pc)
+        {
+            // If the canvas has been reset (i.e. after inserting / removing a line), reset the locator (= recalculate R tree)
+            if (pc != this.pc)
+            {
+                this.pc = pc;
+                nl.ResetLocator(parent, pc);
+            }
+            if (!(e.LeftButton == MouseButtonState.Released && e.RightButton == MouseButtonState.Released))
+                return new List<int>();
+            var pos = e.GetPosition((Canvas)sender);
+
+            List<int> neighbors = new List<int>();
+
+            var start = ((ProjectCanvas)sender).FindDominoAtPosition(pos);
+            if (start == null) return neighbors; // no domino was clicked
+
+            RecursiveSearch(start.idx, neighbors);
+            return neighbors;
+        }
+
+        private void RecursiveSearch(int dc, List<int> list)
+        {
+            var neighbors = nl.FindNeighbors(dc);
+            foreach (var n in neighbors)
+            {
+                if (list.Contains(n)) continue;
+                if (parent.dominoTransfer[n].color == parent.dominoTransfer[dc].color)
+                {
+                    list.Add(n);
+                    RecursiveSearch(n, list);
+                }
+
+            }
+        }
+        public override Rect GetBoundingBox()
+        {
+            throw new NotImplementedException();
+        }
+        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        {
+            throw new NotImplementedException();
+        }
+        public override void MouseMove(object sender, MouseEventArgs e, ProjectCanvas pc)
+        {
+
+        }
+    }
+    public abstract class NeighborLocator
+    {
+        public bool EightNeighbor = false;
+        public NeighborLocator()
+        {
+        }
+        public virtual void ResetLocator(EditProjectVM e, ProjectCanvas pc) { }
+        public abstract List<int> FindNeighbors(int dc);
+    }
+    public class FieldNeighborLocator : NeighborLocator
+    {
+        private ProjectCanvas pc;
+        private FieldParameters fp;
+        private readonly int[] positions = new int[] { -1, 0, 1 };
+        public FieldNeighborLocator()
+        {
+
+        }
+        public override void ResetLocator(EditProjectVM e, ProjectCanvas pc)
+        {
+            this.pc = pc;
+            this.fp = (e.CurrentProject as FieldParameters);
+        }
+
+        public override List<int> FindNeighbors(int dc)
+        {
+            var result = new List<int>();
+            var pos = fp.getPositionFromIndex(dc);
+
+            foreach (int i in positions)
+            {
+                foreach (int j in positions)
+                {
+                    if (Math.Abs(i) + Math.Abs(j) <= 1 || EightNeighbor)
+                    {
+                        CheckCandidateAndAddToList(pos.X + i, pos.Y + j, result);
+                    }
+                }
+            }
+            return result;
+        }
+        private void CheckCandidateAndAddToList(int x, int y, List<int> list)
+        {
+            if (x >= 0 && x < fp.current_width && y >= 0 && y < fp.current_height)
+            {
+                list.Add(fp.getIndexFromPosition(y, x, 0));
+                var w = fp.getIndexFromPosition(y, x, 0);
+            }
+        }
+    }
+
+    public class GeneralNeighborLocator : NeighborLocator
+    {
+        private RTree<DominoInCanvas> tree;
+        private EditProjectVM parent;
+        private ProjectCanvas pc;
+        public GeneralNeighborLocator() : base() { }
+
+        public override List<int> FindNeighbors(int dc)
+        {
+            double cl = parent.CurrentProject.charLength;
+            var rect = parent.dominoTransfer[dc].getBoundingRectangle();
+            var roi = new DominoRectangle() {
+                height = cl * 2, width = cl * 2,
+                x = rect.xc - cl, y = rect.yc - cl
+            };
+            var results = tree.Search(roi);
+            
+            // Todo: replace with real distance between polygons
+            var ordered_distances = results.Select(r => {
+                var current = r.domino.getBoundingRectangle();
+                var dx = Math.Abs(current.xc - rect.xc) - (current.width + rect.width) / 2;
+                var dy = Math.Abs(current.yc - rect.yc) - (current.height + rect.height) / 2;
+                return new Tuple<DominoInCanvas, double>(r, EightNeighbor ? Math.Min(dx, dy) :Math.Max(dx, dy));
+            }).OrderByDescending(x => x.Item2);
+
+            return ordered_distances.Where(x => x.Item2 < cl / 10).Select(x => x.Item1.idx).ToList();
+        }
+        public override void ResetLocator(EditProjectVM e, ProjectCanvas pc)
+        {
+            if (pc != this.pc)
+            {
+                this.parent = e;
+                this.pc = pc;
+                tree = new RTree<DominoInCanvas>(9, new GuttmannQuadraticSplit<DominoInCanvas>());
+                var list = pc.Stones.OrderByDescending(x =>
+                {
+                    var container = x.domino.GetContainer();
+                    return container.y + container.height / 2;
+                }).ThenBy(x =>
+                {
+                    var container = x.domino.GetContainer();
+                    return container.x + container.width / 2;
+                }).ToList();
+
+                for (int i = 0; i < pc.Stones.Count; i++)
+                {
+                    tree.Insert(pc.Stones[i]);
+                }
+            }
         }
     }
     public class DisplaySettingsToolVM : EditingToolVM
@@ -922,7 +1122,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoProject.MouseMove -= parent.Canvas_MouseMove;
                 DominoProject.MouseUp -= parent.Canvas_MouseUp;
             }
-            
+
             DominoProject = new ProjectCanvas();
             parent.dominoTransfer = parent.CurrentProject.Generate(new System.Threading.CancellationToken());
             largestX = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
@@ -939,7 +1139,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             DominoProject.OriginalImage = FilteredMat;
             DominoProject.OpacityValue = ImageOpacity;
             DominoProject.above = above;
-            
+
             if (GridlinesVisible && parent.CurrentProject is StructureParameters sp)
             {
                 DominoProject.gridlines_x = Enumerable.Range(0, sp.current_width + 1).Select(x => sp.cells[0, 0].width + sp.cells[1, 1].width * x).ToArray();
@@ -951,9 +1151,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 DominoInCanvas dic = new DominoInCanvas(i, parent.dominoTransfer[i], parent.CurrentProject.colors, !Expanded);
                 DominoProject.Stones.Add(dic);
             }
-            
+
             selectedIndices.ForEach(x => parent.AddToSelectedDominoes(x));
-            
+
 
             parent.UpdateUIElements();
         }
@@ -1033,7 +1233,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
             if (discrepancy)
-               MessageBox.Show("Discrepancy detected!");
+                MessageBox.Show("Discrepancy detected!");
         }
         private void ShowImage()
         {
@@ -1223,7 +1423,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Canvas.SetTop(shapes[1], end.Y - linewidth);
 
         }
-        
+
     }
     public class ZoomToolVM : EditingToolVM
     {

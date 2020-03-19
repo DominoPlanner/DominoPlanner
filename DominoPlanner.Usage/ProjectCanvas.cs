@@ -105,6 +105,24 @@ namespace DominoPlanner.Usage
                 dc.DrawLine(LineContrastPen, new System.Windows.Point(0, y + 1), new System.Windows.Point(Width, y + 1));
             }
         }
+        public DominoInCanvas FindDominoAtPosition(System.Windows.Point pos)
+        {
+            double min_dist = int.MaxValue;
+            DominoInCanvas result = null;
+            foreach (var shape in Stones)
+            {
+                if (shape.domino.IsInside(new Core.Point(pos.X, pos.Y))) return shape;
+                var rect = shape.domino.getBoundingRectangle();
+                double dist = Math.Pow((rect.x + rect.width / 2) - pos.X, 2) + Math.Pow(rect.y + rect.height / 2 - pos.Y, 2);
+                if (min_dist > dist)
+                {
+                    min_dist = dist;
+                    result = shape;
+
+                }
+            }
+            return result;
+        }
     }
     public static class BitmapSourceConvert
     {
