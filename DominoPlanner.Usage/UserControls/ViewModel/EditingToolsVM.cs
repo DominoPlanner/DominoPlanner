@@ -930,6 +930,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
             _Expandable = parent.CurrentProject is FieldParameters ? Visibility.Visible : Visibility.Collapsed;
+            _Expanded = parent.CurrentProject is FieldParameters ? true : false;
             _HasGridlines = parent.CurrentProject is StructureParameters ? Visibility.Visible : Visibility.Collapsed;
         }
         private System.Drawing.Bitmap _FilteredImage;
