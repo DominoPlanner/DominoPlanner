@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             refreshList();
             selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
-            RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
+            RestoreBasicSettings = new RelayCommand(o => { redoStack = new ObservableStack<PostFilter>(); Editing = false; });
             
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
@@ -66,7 +66,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             };
             SelectedTool = SelectionTool;
             UpdateUIElements();
-
+            //if (dominoProvider is FieldParameters fp && fp.restored == false)
+            //{
+            //    fp.current_width = fp.current_width + 1;
+            //}
+            if (dominoProvider is FieldParameters f && f.restored)
+            {
+                f.restored = false;
+                UnsavedChanges = true;
+            }
         }
         #endregion
 
@@ -405,13 +413,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 ClearCanvas(false);
                 DisplaySettingsTool.ResetCanvas();
-                if (undoStack.Count == 0) UnsavedChanges = false;
             }
             else
             {
                 UpdateUIElements();
             }
+            if (undoStack.Count == 0) UnsavedChanges = false;
             
+
         }
             
         public override void Redo()

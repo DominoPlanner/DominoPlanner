@@ -22,6 +22,7 @@
         </DataTemplate>
         <local:PathToImageConverter x:Key="PathToImageConverter"/>
         <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding NewFieldStruct}"/>
@@ -238,22 +239,16 @@
                     <TabControl.ItemTemplate>
                         <!-- this is the header template-->
                         <DataTemplate>
-                            <Grid Background="#66FFFFFF" ToolTip="{Binding Path}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20"/>
-                                    <ColumnDefinition Width="2"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="2"/>
-                                    <ColumnDefinition Width="20"/>
-                                </Grid.ColumnDefinitions>
-                                <Image Grid.Column="0" Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
-                                <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
-                                <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
+                                <TextBlock Margin="4, 0" Text="{Binding Header}" VerticalAlignment="Center"/>
+                                <TextBlock Text="*" VerticalAlignment="Center" Visibility="{Binding Content.UnsavedChanges, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                <Button Margin="4, 0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
                                     <Button.Background>
                                         <ImageBrush ImageSource="Icons/closewindow.ico"/>
                                     </Button.Background>
                                 </Button>
-                            </Grid>
+                            </StackPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>

@@ -2,6 +2,8 @@
 using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,14 +15,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public sealed class TabItem : ModelBase
     {
         #region CTOR
-        public TabItem(string path, string Zusatz)
-        {
-            Path = path;
-            Close = new RelayCommand(o => CloseThis());
-            zusatz = Zusatz;
-        }
 
-        public TabItem(string Header, string picturePath, string path) : this(path, "")
+        public TabItem(string Header, string picturePath, string path) : this(path)
         {
             this.Header = Header;
             this.picture = picturePath;
@@ -30,8 +26,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             this.Content = content;
         }
-        public TabItem(string path) : this(path, "")
+        public TabItem(string path)
         {
+            Path = path;
+            Close = new RelayCommand(o => CloseThis());
             this.Header = System.IO.Path.GetFileNameWithoutExtension(path);
             this.picture = ImageHelper.GetImageOfFile(path);
             var ext = System.IO.Path.GetExtension(path).ToLower();
@@ -49,12 +47,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 throw new InvalidOperationException("Incorrect file extension");
             }
+        
         }
 
         public TabItem(DocumentNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         {
-            Content = ViewModelGenerator(project.DocumentModel.obj, project.AbsolutePath);
-            ResetContent();
+            if (Content == null)
+            {
+                Content = ViewModelGenerator(project.DocumentModel.obj, project.AbsolutePath);
+                ResetContent();
+            }
         }
         public TabItem(ColorNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         { 
@@ -118,7 +120,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 editProject.ClearCanvas();
             }
-            Content.UnsavedChanges = false;
+            else
+            {
+                Content.UnsavedChanges = false;
+            }
         }
 
         
@@ -147,13 +152,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
-        private string zusatz { get; set; }
+        
 
         private string _Header;
         public string Header
         {
-            get { return string.Format("{0}{1}", _Header, zusatz); }
+            get { return _Header; }
             set
             {
                 if (_Header != value)
@@ -174,22 +178,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (_Content != value)
                 {
-                    if (_Content != null)
-                        _Content.Changes -= _Content_Changes;
                     _Content = value;
-                    _Content.Changes += _Content_Changes;
                     RaisePropertyChanged();
                 }
             }
-        }
-
-        private void _Content_Changes(object sender, bool e)
-        {
-            if (e == true)
-                zusatz = "*";
-            else
-                zusatz = "";
-            RaisePropertyChanged("Header");
         }
         #endregion
 
@@ -215,8 +207,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public string name { get; set; }
         public string assemblyname { get; set; }
 
-        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
+        public ObservableStack<PostFilter> undoStack = new ObservableStack<PostFilter>();
+        public ObservableStack<PostFilter> redoStack = new ObservableStack<PostFilter>();
         #endregion
         #region properties
         private IDominoProvider _CurrentProject;
@@ -364,6 +356,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public DominoProviderTabItem()
         {
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
+            undoStack.CollectionChanged += UndoStack_CollectionChanged;
+        }
+
+        private void UndoStack_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var stack = sender as ObservableStack<PostFilter>;
+            if (stack.Count == 0)
+            {
+                UnsavedChanges = false;
+            }
+            else if (stack.TakeWhile(x => x is SelectionOperation).Count(x => true) == stack.Count)
+            {
+                UnsavedChanges = false;
+            }
+            else
+            {
+                UnsavedChanges = true;
+            }
         }
 
         #endregion
@@ -372,5 +382,79 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand BuildtoolsClick { get { return _BuildtoolsClick; } set { if (value != _BuildtoolsClick) { _BuildtoolsClick = value; } } }
 
         #endregion
+    }
+    public class ObservableStack<T> : Stack<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    {
+        public ObservableStack()
+        {
+        }
+
+        public ObservableStack(IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+                base.Push(item);
+        }
+
+        public ObservableStack(List<T> list)
+        {
+            foreach (var item in list)
+                base.Push(item);
+        }
+
+
+        public new virtual void Clear()
+        {
+            base.Clear();
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        public new virtual T Pop()
+        {
+            var item = base.Pop();
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
+            return item;
+        }
+
+        public new virtual void Push(T item)
+        {
+            base.Push(item);
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+        }
+
+
+        public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
+
+
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.RaiseCollectionChanged(e);
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            this.RaisePropertyChanged(e);
+        }
+
+
+        protected virtual event PropertyChangedEventHandler PropertyChanged;
+
+
+        private void RaiseCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            if (this.CollectionChanged != null)
+                this.CollectionChanged(this, e);
+        }
+
+        private void RaisePropertyChanged(PropertyChangedEventArgs e)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, e);
+        }
+        
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add { this.PropertyChanged += value; }
+            remove { this.PropertyChanged -= value; }
+        }
     }
 }

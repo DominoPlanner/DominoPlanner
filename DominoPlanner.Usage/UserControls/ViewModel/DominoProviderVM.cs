@@ -28,7 +28,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
 
-            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
+            EditClick = new RelayCommand(o => { redoStack = new ObservableStack<PostFilter>();  Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
             ColorColumnConfig = new ColumnConfig();
 
@@ -427,7 +427,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         undoStack.Push(filter);
                         filter.Apply();
                     }
-                    redoStack = new Stack<PostFilter>();
+                    redoStack = new ObservableStack<PostFilter>();
                 }
                 finally
                 {

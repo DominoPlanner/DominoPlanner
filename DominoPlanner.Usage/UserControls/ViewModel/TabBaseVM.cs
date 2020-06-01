@@ -1,6 +1,7 @@
 ﻿using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -44,13 +45,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private bool _UnsavedChanges;
         public bool UnsavedChanges
         {
-            get { return _UnsavedChanges; }
+            get { Debug.WriteLine("UnsavedChanges " + _UnsavedChanges); return _UnsavedChanges; }
             set
             {
+                Debug.WriteLine("Trying to set Unsaved Changes on object " + this.GetHashCode() + " to " + value);
+                StackTrace stackTrace = new StackTrace();
+                Debug.WriteLine("Calling Method: " + stackTrace.GetFrame(1).GetMethod());
                 if (_UnsavedChanges != value)
                 {
                     _UnsavedChanges = value;
-                    Changes?.Invoke(this, value);
+                    Debug.WriteLine("UnsavedChanges set to " + value);
+                    TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }

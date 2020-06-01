@@ -201,8 +201,7 @@ namespace DominoPlanner.Core
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            current_width = last.FieldPlanLength;
-            current_height = last.FieldPlanHeight;
+            RestoreFieldDimensions();
             int[,] result = new int[current_width, current_height];
             for (int i = 0; i < current_width; i++)
             {
@@ -221,6 +220,18 @@ namespace DominoPlanner.Core
                 result = MirrorArrayY(result);
             }
             return result;
+        }
+        public bool restored = false;
+        [ProtoAfterDeserialization]
+        public void RestoreFieldDimensions()
+        {
+            int rw = last.FieldPlanLength;
+            if (current_width != rw)
+            {
+                restored = true;
+                current_width = rw;
+                current_height = last.FieldPlanHeight;
+            }
         }
         #endregion
         #region compatibility properties
