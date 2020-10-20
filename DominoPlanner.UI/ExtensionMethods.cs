@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Media;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;

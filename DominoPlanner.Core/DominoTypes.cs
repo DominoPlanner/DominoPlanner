@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
+using Avalonia.Media;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Core
@@ -199,7 +199,7 @@ namespace DominoPlanner.Core
         }
         private Point() { }
 
-        public static implicit operator System.Windows.Point(Point v)
+        public static implicit operator Avalonia.Point(Point v)
         {
             throw new NotImplementedException();
         }

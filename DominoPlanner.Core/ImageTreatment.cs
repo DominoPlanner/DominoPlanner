@@ -10,7 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {
@@ -46,7 +46,7 @@ namespace DominoPlanner.Core
             {
                 return _background.ToString();
             }
-            set { Background = (Color)ColorConverter.ConvertFromString(value); }
+            set { Background = Color.Parse(value); }
         }
         public Color Background
         {
@@ -155,7 +155,7 @@ namespace DominoPlanner.Core
             {
                 if(imageFiltered != null)
                 {
-                    return imageFiltered.Bitmap;
+                    return imageFiltered.ToBitmap();
                 }
                 return null;
             }

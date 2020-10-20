@@ -1,7 +1,7 @@
 ﻿using Emgu.CV.CvEnum;
 using ProtoBuf;
 using System;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {

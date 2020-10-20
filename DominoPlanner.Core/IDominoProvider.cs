@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
-using System.Windows.Media;
+using Avalonia.Media;
+using Emgu.CV;
 
 namespace DominoPlanner.Core
 {

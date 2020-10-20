@@ -106,7 +106,7 @@ namespace DominoPlanner.Core
             graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             graphics.Clear(Color.Transparent);
             graphics.DrawString(Text, font, new SolidBrush(Color), new PointF(0, 0));
-            to_blend = new Image<Bgra, byte>(bmp);
+            to_blend = bmp.ToImage<Bgra, byte>();
             mat_valid = true;
         }
     }
@@ -257,8 +257,8 @@ namespace DominoPlanner.Core
     {
         public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
         {
-            Bitmap source = background.Bitmap;
-            Bitmap over = overlay.Bitmap;
+            Bitmap source = background.ToBitmap();
+            Bitmap over = overlay.AsBitmap();
             unsafe
             {
                 BitmapData backgroundData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), 
@@ -302,7 +302,7 @@ namespace DominoPlanner.Core
                 });
                 source.UnlockBits(backgroundData);
             }
-            background = new Image<Bgra, byte>(source);
+            background = source.ToImage<Bgra, byte>();
         }
         public static void OpacityReduction(this Image<Bgra, byte> input, double opacity)
         {

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {

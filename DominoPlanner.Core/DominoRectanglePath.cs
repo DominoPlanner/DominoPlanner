@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {
@@ -20,9 +20,9 @@ namespace DominoPlanner.Core
         public int x1 { get { return (int)(x); } }
         public int y1 { get { return (int)(y); } }
 
-        public System.Windows.Rect getWPFRectangle()
+        public Avalonia.Rect getWPFRectangle()
         {
-            return new System.Windows.Rect(x, y, width, height);
+            return new Avalonia.Rect(x, y, width, height);
         }
         // assumes that y axis points upwards
         public bool Contains(DominoRectangle other) => x < other.x && x2 > other.x2 && y > other.y && y2 < other.y2;
@@ -53,16 +53,16 @@ namespace DominoPlanner.Core
     public class DominoPath
     {
         public Point[] points;
-        public PointCollection getWPFPath()
-        {
-            throw new NotImplementedException();
+        //public PointCollection getWPFPath()
+        //{
+        //    throw new NotImplementedException();
             /*var pointcol = new PointCollection();
             for (int i = 0; i < points.Length; i++)
             {
                 pointcol.Add(points[i]);
             }
             return pointcol;*/
-        }
+        //*}
         public System.Drawing.Point[] getSDPath(int xShift = 0, int yShift = 0)
         {
             return points.Select(point => new System.Drawing.Point() { X = (int) point.X + xShift, Y = (int) point.Y  + xShift}).ToArray();

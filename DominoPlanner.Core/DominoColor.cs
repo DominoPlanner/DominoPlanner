@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Avalonia.Media;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using ProtoBuf;
@@ -24,7 +24,7 @@ namespace DominoPlanner.Core
                 return mediaColor.ToString();
 
             }
-            set { mediaColor = (Color)ColorConverter.ConvertFromString(value); }
+            set { mediaColor = Color.Parse(value); }
         }
         internal Emgu.CV.Structure.Lab labColor;
         public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
@@ -102,7 +102,7 @@ namespace DominoPlanner.Core
         }
         public EmptyDomino()
         {
-            mediaColor = System.Windows.Media.Colors.Transparent;
+            mediaColor = Colors.Transparent;
             name = "[empty]";
         }
     }

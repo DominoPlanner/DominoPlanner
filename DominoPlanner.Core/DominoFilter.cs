@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 namespace DominoPlanner.Core
 { 
@@ -93,7 +93,7 @@ namespace DominoPlanner.Core
         private String ColorSerialized
         {
             get { return Color.ToString(); }
-            set { Color = (Color)ColorConverter.ConvertFromString(value); }
+            set { Color = Color.Parse(value); }
         }
         public override void Apply(ColorRepository input)
         {

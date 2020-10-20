@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Core
@@ -53,7 +53,7 @@ namespace DominoPlanner.Core
         {
             CellDefinition cell = cells[col, row];
             double scalingFactor = PreviewScaleFactor(targetDimension); // scale everything to the same size
-            WriteableBitmap b = BitmapFactory.New((int)(cell.width * scalingFactor + 2), (int)(cell.height * scalingFactor + 2));
+            /*WriteableBitmap b = BitmapFactory.New((int)(cell.width * scalingFactor + 2), (int)(cell.height * scalingFactor + 2));
             for (int colc = (col == 2) ? 1 : 0; colc <= ((col == 0) ? 1 : 2); colc++)
             {
                 for (int rowc = (row == 2) ? 1 : 0; rowc <= ((row == 0) ? 1 : 2); rowc++) // only use the cells next to the specified (so top left uses 4 top center, center left and center center).
@@ -68,12 +68,14 @@ namespace DominoPlanner.Core
                             yOffsetMultiplier * ((yOffsetMultiplier > 0) ? cell.height : current.height), 0, 0, 0, 0); // move the dominoes
                         DominoRectangle container = transformed.GetContainer(); // get containing rectangle
                         if (container.x >= cells[col, row].width || container.x + container.width <= 0 || container.y >= cells[col, row].height || container.y + container.height <= 0) continue; // check if rectangle is out of drawing area
-                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle((int)Math.Ceiling(scalingFactor)).getWBXPath(), System.Windows.Media.Colors.Black); // outline
-                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle(-(int)Math.Ceiling(scalingFactor)).getWBXPath(), System.Windows.Media.Colors.LightGray); // inner line
+                        
+                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle((int)Math.Ceiling(scalingFactor)).getWBXPath(), Avalonia.Media.Colors.Black); // outline
+                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle(-(int)Math.Ceiling(scalingFactor)).getWBXPath(), Avalonia.Media.Colors.LightGray); // inner line
                     }
                 }
-            }
-            return b;
+            }*/
+            return new WriteableBitmap(new Avalonia.PixelSize((int)(cell.width * scalingFactor + 2), (int)(cell.height * scalingFactor + 2)), new Avalonia.Vector(96, 96), Avalonia.Platform.PixelFormat.Bgra8888, Avalonia.Platform.AlphaFormat.Unpremul);
+            //return b;
         }
         public static WriteableBitmap[,] getPreviews(int targetDimension, XElement structure)
         {

@@ -31,7 +31,7 @@ namespace DominoPlanner.Core
 
             return new Lab((116 * y) - 16, (500 * (x - y)), 200 * (y - z));
         }
-        public static Lab ToLab(this System.Windows.Media.Color color)
+        public static Lab ToLab(this Avalonia.Media.Color color)
         {
             return new Bgr(color.B, color.G, color.R).ToLab();
         }

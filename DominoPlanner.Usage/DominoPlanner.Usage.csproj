@@ -51,8 +51,8 @@
     <Reference Include="Emgu.CV.World, Version=4.0.1.3373, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.0.1.3373\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
-    <Reference Include="EPPlus, Version=4.5.3.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
-      <HintPath>..\packages\EPPlus.4.5.3.1\lib\net40\EPPlus.dll</HintPath>
+    <Reference Include="EPPlus, Version=5.4.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.5.4.0\lib\net45\EPPlus.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
@@ -61,7 +61,7 @@
       <HintPath>..\packages\OpenTK.GLControl.1.1.2225.0\lib\net20\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net, Version=2.4.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\packages\protobuf-net.2.4.0\lib\net40\protobuf-net.dll</HintPath>
+      <HintPath>..\packages\protobuf-net.2.4.6\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="ServerRegistrationManager, Version=2.7.1.0, Culture=neutral, PublicKeyToken=68bd4561cc3495fc, processorArchitecture=MSIL">
       <HintPath>..\packages\ServerRegistrationManager.2.7.1\lib\net45\ServerRegistrationManager.exe</HintPath>
@@ -70,12 +70,14 @@
       <HintPath>..\packages\SharpShell.2.7.1\lib\net40-client\SharpShell.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -421,10 +423,6 @@
     <Resource Include="Icons\file_export.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DominoPlanner.Core\DominoPlanner.Core.csproj">
-      <Project>{7b3057cf-e826-401f-8f61-344a4ea1aafe}</Project>
-      <Name>DominoPlanner.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DominoPlanner.PreviewHandler\DominoPlanner.PreviewHandler.csproj">
       <Project>{7fb0e775-dd0a-4517-8a7d-ce5c3900a697}</Project>
       <Name>DominoPlanner.PreviewHandler</Name>

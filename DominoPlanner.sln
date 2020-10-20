@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner", "DominoPlanner\DominoPlanner.csproj", "{7AC2F7A9-4252-4265-9324-340AD469A938}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE} = {7B3057CF-E826-401F-8F61-344A4EA1AAFE}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FA7DD8A5-51E0-4ED7-AADA-7A48E2556D28}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,15 +12,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.Usage", "DominoPlanner.Usage\DominoPlanner.Usage.csproj", "{B94C974F-BD58-4022-B878-BA9F1ECE34A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.Core", "DominoPlanner.Core\DominoPlanner.Core.csproj", "{7B3057CF-E826-401F-8F61-344A4EA1AAFE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.CoreTests", "DominoPlanner.CoreTests\DominoPlanner.CoreTests.csproj", "{2F101449-5DBE-41A6-847A-E0F8E1E8056A}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{B670E8BB-4B22-43B6-8621-FE04C632DD1F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.PreviewHandler", "DominoPlanner.PreviewHandler\DominoPlanner.PreviewHandler.csproj", "{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlanner.UI", "DominoPlanner.Avalonia\DominoPlanner.UI.csproj", "{32AAB48F-E24C-481F-A649-83CF442AE92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlanner.UI", "DominoPlanner.UI\DominoPlanner.UI.csproj", "{32AAB48F-E24C-481F-A649-83CF442AE92A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlanner.Core", "DominoPlanner.Core\DominoPlanner.Core.csproj", "{05AC7367-0922-46E9-8EEB-2FE186BD4D09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,18 +54,6 @@ Global
 		{B94C974F-BD58-4022-B878-BA9F1ECE34A9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B94C974F-BD58-4022-B878-BA9F1ECE34A9}.Release|x86.ActiveCfg = Release|Any CPU
 		{B94C974F-BD58-4022-B878-BA9F1ECE34A9}.Release|x86.Build.0 = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Debug|x86.Build.0 = Debug|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|x86.ActiveCfg = Release|Any CPU
-		{7B3057CF-E826-401F-8F61-344A4EA1AAFE}.Release|x86.Build.0 = Release|Any CPU
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F101449-5DBE-41A6-847A-E0F8E1E8056A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -111,6 +96,18 @@ Global
 		{32AAB48F-E24C-481F-A649-83CF442AE92A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{32AAB48F-E24C-481F-A649-83CF442AE92A}.Release|x86.ActiveCfg = Release|Any CPU
 		{32AAB48F-E24C-481F-A649-83CF442AE92A}.Release|x86.Build.0 = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Debug|x86.Build.0 = Debug|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|x86.ActiveCfg = Release|Any CPU
+		{05AC7367-0922-46E9-8EEB-2FE186BD4D09}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
