@@ -455,6 +455,9 @@
   <ItemGroup>
     <Resource Include="DominoCalculator.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="XMLFile1.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.0.1.3373\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.0.1.3373\build\EMGU.CV.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
