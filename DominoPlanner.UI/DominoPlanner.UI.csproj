@@ -6,6 +6,13 @@
   <ItemGroup>
     <None Remove="MainWindow.xaml" />
     <None Remove="MessageBox.xaml" />
+    <None Remove="NewObject.xaml" />
+    <None Remove="NewProject.xaml" />
+    <None Remove="UserControls\View\CircleSize.xaml" />
+    <None Remove="UserControls\View\DominoDimensionsV.xaml" />
+    <None Remove="UserControls\View\FieldSize.xaml" />
+    <None Remove="UserControls\View\RectangularSize.xaml" />
+    <None Remove="UserControls\View\SpiralSize.xaml" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaXaml Include="MainWindow.xaml">
@@ -14,11 +21,35 @@
     <AvaloniaXaml Include="MessageBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
+    <AvaloniaXaml Include="NewObject.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="NewProject.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\CircleSize.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\DominoDimensionsV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\FieldSize.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\RectangularSize.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\SpiralSize.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.0-preview5" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview5" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-preview5" />
     <PackageReference Include="EMGU.CV" Version="4.4.0.4099" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +61,30 @@
     </Compile>
     <Compile Update="MessageBox.xaml.cs">
       <DependentUpon>MessageBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="NewObject.xaml.cs">
+      <DependentUpon>NewObject.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="NewProject.xaml.cs">
+      <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="NewProject.xaml.cs">
+      <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\CircleSize.xaml.cs">
+      <DependentUpon>CircleSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\DominoDimensionsV.xaml.cs">
+      <DependentUpon>DominoDimensionsV.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\FieldSize.xaml.cs">
+      <DependentUpon>FieldSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\RectangularSize.xaml.cs">
+      <DependentUpon>RectangularSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\SpiralSize.xaml.cs">
+      <DependentUpon>SpiralSize.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

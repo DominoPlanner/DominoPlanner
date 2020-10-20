@@ -11,8 +11,8 @@ namespace DominoPlanner.UI
         public MainWindow()
         {
             InitializeComponent();
-            /*DataContext = new MainWindowViewModel();
-            PipeManager = new NamedPipeManager("DominoPlanner");
+            DataContext = new MainWindowViewModel();
+            /*PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
             var args = Environment.GetCommandLineArgs();

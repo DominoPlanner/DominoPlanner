@@ -240,8 +240,8 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             get
             {
                 if (CurrentProject?.HasProtocolDefinition == true)
-                    return True;
-                else return False;
+                    return true;
+                else return false;
             }
         }
 
@@ -344,9 +344,9 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         }
         private void OpenBuildTools()
         {
-            ProtocolV protocolV = new ProtocolV();
+            /*ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.Show();
+            protocolV.Show();*/
         }
         public override bool Save()
         {

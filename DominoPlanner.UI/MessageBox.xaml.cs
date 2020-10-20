@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using DominoPlanner.Avalonia;
+using DominoPlanner.UI;
 
 namespace MsgBox
 {

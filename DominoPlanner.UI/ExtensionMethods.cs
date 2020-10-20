@@ -14,7 +14,16 @@ namespace DominoPlanner.UI
         {
             return Task.Run(async () => await ofd.ShowAsync(MainWindowViewModel.GetWindow())).Result;
         }
+        /*public async static Task<string[]> ShowDialog(this OpenFileDialog ofd)
+        {
+            var result = await ofd.ShowAsync(MainWindowViewModel.GetWindow());
+            return result;
+        }*/
         public static string ShowDialog(this SaveFileDialog ofd)
+        {
+            return Task.Run(async () => await ofd.ShowAsync(MainWindowViewModel.GetWindow())).Result;
+        }
+        public static string ShowDialog(this OpenFolderDialog ofd)
         {
             return Task.Run(async () => await ofd.ShowAsync(MainWindowViewModel.GetWindow())).Result;
         }

@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
@@ -8,9 +7,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
 
-namespace DominoPlanner.Usage.UserControls.ViewModel
+namespace DominoPlanner.UI.UserControls.ViewModel
 {
     class CreateFieldVM : DominoProviderVM
     {

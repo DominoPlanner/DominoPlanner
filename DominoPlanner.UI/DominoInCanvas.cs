@@ -131,11 +131,10 @@ namespace DominoPlanner.UI
         private void DrawGeometry(StreamGeometryContext context)
         {
             context.BeginFigure(canvasPoints[0], true); //Top Left
-            IList< Avalonia.Point> points = new List<Avalonia.Point>();
-            points.Add(canvasPoints[1]); //Top Right
-            points.Add(canvasPoints[2]); // Bottom Right
-            points.Add(canvasPoints[3]); // Bottom Left
-            context.PolyLineTo(points, true, true);
+            context.LineTo(canvasPoints[1]); //Top Right
+            context.LineTo(canvasPoints[2]); // Bottom Right
+            context.LineTo(canvasPoints[3]); // Bottom Left
+            context.EndFigure(true);
         }
 
         public void DisposeStone()

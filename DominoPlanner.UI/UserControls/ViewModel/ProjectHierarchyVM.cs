@@ -11,6 +11,7 @@ using System.Windows;
 using Avalonia.Controls;
 using DominoPlanner.UI.Serializer;
 using Avalonia.Media;
+using MsgBox;
 
 namespace DominoPlanner.UI.UserControls.ViewModel
 {
@@ -86,16 +87,17 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         internal string _AbsolutePath;
         public abstract string AbsolutePath { get; set; }
 
-        private ContextMenu _ContextMenu;
+        private ObservableCollection<MenuItem> _ContextMenu;
 
-        public ContextMenu ContextMenu
+        public ObservableCollection<MenuItem> ContextMenu
         {
             get
             {
                 if (_ContextMenu == null)
                 {
                     var ContextMenuEntries = BuildContextMenu();
-                    ContextMenu.Items = ContextMenuEntries;
+                    _ContextMenu = new ObservableCollection<Avalonia.Controls.MenuItem>(ContextMenuEntries);
+                    RaisePropertyChanged();
                 }
                 return _ContextMenu;
             }
@@ -320,10 +322,10 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             // will be implemented when doing Masterplan
         }
         [ContextMenuAttribute("Add new object", "Icons/add.ico", index: 1)]
-        public void NewFieldStructure()
+        public async void NewFieldStructure()
         {
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.obj);
-            new NewObject(novm).ShowDialog();
+            await new NewObject(novm).ShowDialog(MainWindowViewModel.GetWindow()) ;
             if (!novm.Close || novm.ResultNode == null) return;
             Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
         }
@@ -377,7 +379,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         public void Rename()
         {
             var dn = (AssemblyNode)Model;
-            RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
+            /*RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
             if (ro.ShowDialog() == true)
             {
                 Workspace.CloseFile(AbsolutePath);
@@ -393,7 +395,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
                 {
                     AssemblyModel.Path = Workspace.MakeRelativePath(parent.AbsolutePath, new_path);
                 }
-            }
+            }*/
         }
         [ContextMenuAttribute("Remove", "Icons/remove.ico", index: 4)]
         public void Remove()
@@ -412,8 +414,8 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
-            PropertiesWindow pw = new PropertiesWindow(Model);
-            pw.ShowDialog();
+            //PropertiesWindow pw = new PropertiesWindow(Model);
+            //pw.ShowDialog();
         }
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
@@ -427,7 +429,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             colorlistPath = colorlistPath ?? colorres.First();
             Workspace.CloseFile(projectpath);
             if (File.Exists(projectpath))
-                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}{Properties.Resources.ProjectExtension}"));
+                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}{MainWindow.ReadSetting("ProjectExtension")}"));
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
             newMainNode.colorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
@@ -550,7 +552,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
                 Color background = Colors.Transparent;
                 if (userDefinedExport)
                 {
-                    ExportOptions exp = new ExportOptions(DocumentModel.obj);
+                    /*ExportOptions exp = new ExportOptions(DocumentModel.obj);
                     if (exp.ShowDialog() == true)
                     {
                         var dc = exp.DataContext as ExportOptionsVM;
@@ -562,7 +564,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
                     else
                     {
                         return;
-                    }
+                    }*/
                 }
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 
@@ -589,10 +591,10 @@ namespace DominoPlanner.UI.UserControls.ViewModel
                 Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
                 return;
             }
-            ProtocolV protocolV = new ProtocolV();
+            /*ProtocolV protocolV = new ProtocolV();
             DocumentModel.obj.Generate(new System.Threading.CancellationToken());
             protocolV.DataContext = new ProtocolVM(DocumentModel.obj, Path.GetFileNameWithoutExtension(DocumentModel.relativePath));
-            protocolV.ShowDialog();
+            protocolV.ShowDialog();*/
         }
         [ContextMenuAttribute("Open", "Icons/folder_tar.ico", Index = 0)]
         public override void Open()
@@ -619,8 +621,8 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             try
             {
                 if (closeTab(this) &&
-                    MessageBox.Show($"Remove reference to file {Name} from project {parent.Name}?\n" +
-                    $"The file won't be permanently deleted.", "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    Task.Run(async() => await MessageBox.Show($"Remove reference to file {Name} from project {parent.Name}?\n" +
+                    $"The file won't be permanently deleted.", "Delete?", MessageBox.MessageBoxButtons.YesNo)).Result == MessageBox.MessageBoxResult.Yes)
                 {
                     parent.RemoveChild(this);
                     Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);
@@ -635,7 +637,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
         public void Rename()
         {
-            try
+            /*try
             {
                 RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
                 if (closeTab(this) && ro.ShowDialog() == true)
@@ -652,13 +654,13 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             catch
             {
                 Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
-            }
+            }*/
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
-            PropertiesWindow pw = new PropertiesWindow(Model);
-            pw.ShowDialog();
+            //PropertiesWindow pw = new PropertiesWindow(Model);
+            //pw.ShowDialog();
         }
     }
 }

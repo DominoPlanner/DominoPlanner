@@ -32,16 +32,16 @@ namespace DominoPlanner.UI
         }
         
 
-        protected override void OnRender(DrawingContext dc)
+        public override void Render(DrawingContext dc)
         {
-            BitmapSource bit = null;
+            IImage bit = null;
             if (opacity_value != 0)
             {
                 var reduced = OriginalImage.Clone();
                 Core.ImageExtensions.OpacityReduction(reduced, opacity_value);
-                bit = BitmapSourceConvert.ToBitmapSource(reduced);
+                //bit = BitmapSourceConvert.ToBitmapSource(reduced);
             }
-            base.OnRender(dc);
+            base.Render(dc);
 
 
             if (!above && bit != null)
@@ -56,12 +56,11 @@ namespace DominoPlanner.UI
                 StreamGeometry streamGeometry = new StreamGeometry();
                 using (StreamGeometryContext geometryContext = streamGeometry.Open())
                 {
-                    geometryContext.BeginFigure(point1, true, true);
-                    var points = new List<Avalonia.Point>
-                                             {
-                                                 point2, point3, point4
-                                             };
-                    geometryContext.PolyLineTo(points, true, true);
+                    geometryContext.BeginFigure(point1, true);
+                    geometryContext.LineTo(point2);
+                    geometryContext.LineTo(point3);
+                    geometryContext.LineTo(point4);
+                    geometryContext.EndFigure(true);
                 }
 
                 Pen pen = new Pen();
@@ -90,7 +89,7 @@ namespace DominoPlanner.UI
     }
     public static class BitmapSourceConvert
     {
-        [DllImport("gdi32")]
+        /*[DllImport("gdi32")]
         private static extern int DeleteObject(IntPtr o);
 
         public static BitmapSource ToBitmapSource(IImage image)
@@ -108,6 +107,6 @@ namespace DominoPlanner.UI
                 DeleteObject(ptr);
                 return bs;
             }
-        }
+        }*/
     }
 }

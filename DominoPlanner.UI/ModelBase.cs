@@ -102,9 +102,9 @@ namespace DominoPlanner.UI
             }
             Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
             Header = attr.Header;
-            if (!string.IsNullOrEmpty(attr.ImageSource))
+            /*if (!string.IsNullOrEmpty(attr.ImageSource))
                 Icon = new Image { 
-                Source = new Bitmap(attr.ImageSource) };
+                Source = new Bitmap(attr.ImageSource) };*/
             this.IsVisible = attr.IsVisible;
             IsEnabled = Activated;
         }

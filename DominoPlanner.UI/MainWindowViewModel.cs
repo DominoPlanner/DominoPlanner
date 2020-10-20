@@ -20,13 +20,18 @@ namespace DominoPlanner.UI
         #region CTOR
         public MainWindowViewModel()
         {
+            var share_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
             //Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
             if (MainWindow.ReadSetting("FirstStartup") == "1")
             {
-                MainWindow.AddUpdateAppSettings("StructureTemplates", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "colors" + MainWindow.ReadSetting("ColorExtension")));
-                MainWindow.AddUpdateAppSettings("StandardProjectPath", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner"));
-                MainWindow.AddUpdateAppSettings("OpenProjectList", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "OpenProjects.xml"));
-                Directory.CreateDirectory(Path.GetDirectoryName(MainWindow.ReadSetting("StandardColorArray")));
+                
+                MainWindow.AddUpdateAppSettings("StructureTemplates", Path.Combine(share_path, "colors" + MainWindow.ReadSetting("ColorExtension")));
+                MainWindow.AddUpdateAppSettings("StandardColorArray", Path.Combine(share_path, "colors" + MainWindow.ReadSetting("ColorExtension")));
+                var project_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "DominoPlanner");
+                MainWindow.AddUpdateAppSettings("StandardProjectPath", project_path);
+                MainWindow.AddUpdateAppSettings("OpenProjectList", Path.Combine(share_path, "OpenProjects.xml"));
+                Directory.CreateDirectory(project_path);
+                Directory.CreateDirectory(share_path); 
                 OpenProjectSerializer.Create();
                 MainWindow.AddUpdateAppSettings("FirstStartup", "0");
             }
@@ -128,8 +133,8 @@ namespace DominoPlanner.UI
                 }
             }
         }
-        private AssemblyNodeVM _SelectedProject;
-        public AssemblyNodeVM SelectedProject
+        private DominoWrapperNodeVM _SelectedProject;
+        public DominoWrapperNodeVM SelectedProject
         {
             get { return _SelectedProject; }
             set
@@ -454,20 +459,41 @@ namespace DominoPlanner.UI
         /// </summary>
         private void NewFieldStructure()
         {
-            if (SelectedProject == null)
+            if (SelectedAssembly == null)
             {
                 Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
                 return;
             }
-            SelectedProject.NewFieldStructure();
+            SelectedAssembly.NewFieldStructure();
+                       
+        }
+        AssemblyNodeVM SelectedAssembly
+        {
+            get {
+                if (SelectedProject == null)
+                {
+                    return null;
+                }
+                if (SelectedProject is AssemblyNodeVM ass)
+                    return ass;
+                else
+                {
+                    var cur = SelectedProject.parent;
+                    while (!(cur is AssemblyNodeVM))
+                    {
+                        cur = cur.parent;
+                    }
+                    return cur;
+                }
+            }
         }
 
-        private void AddProject_Exists()
+        private async void AddProject_Exists()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ProjectExtension") }, Name = MainWindow.ReadSetting("ProjectExtension") });
             //openFileDialog.RestoreDirectory = true;
-            var result = openFileDialog.ShowDialog();
+            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 {
@@ -479,17 +505,17 @@ namespace DominoPlanner.UI
 
         private void AddItem_Exists()
         {
-            if (SelectedProject == null)
+            if (SelectedAssembly == null)
             {
                 Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
                 return;
             }
-            SelectedProject.AddExistingItem();
+            SelectedAssembly.AddExistingItem();
         }
-        private void CreateNewProject()
+        private async void CreateNewProject()
         {
             NewProjectVM curNPVM = new NewProjectVM();
-            new NewProject(curNPVM).ShowDialog();
+            await new NewProject(curNPVM).ShowDialog(GetWindow());
             if (curNPVM.Close == true)
             {
                 OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}\{1}", curNPVM.SelectedPath, curNPVM.ProjectName));

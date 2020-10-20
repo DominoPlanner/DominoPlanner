@@ -1,6 +1,8 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Logging;
+using Serilog.Filters;
 
 namespace DominoPlanner.UI
 {
@@ -16,6 +18,8 @@ namespace DominoPlanner.UI
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .LogToDebug();
+                .LogToDebug(Avalonia.Logging.LogEventLevel.Verbose, areas: new string[] {"Binding"});
+        
+        
     }
 }

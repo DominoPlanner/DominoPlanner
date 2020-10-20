@@ -80,5 +80,11 @@
   <ItemGroup>
     <Content Include="License-LGPL.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DominoPlanner.Core\DominoPlanner.Core.csproj">
+      <Project>{05ac7367-0922-46e9-8eeb-2fe186bd4d09}</Project>
+      <Name>DominoPlanner.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

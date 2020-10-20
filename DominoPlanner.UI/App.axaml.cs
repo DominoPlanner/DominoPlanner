@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Logging;
+using System.Diagnostics;
 
 namespace DominoPlanner.UI
 {
@@ -9,6 +11,7 @@ namespace DominoPlanner.UI
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+            Debug.WriteLine(Logger.IsEnabled(LogEventLevel.Information, "Binding"));
         }
 
         public override void OnFrameworkInitializationCompleted()

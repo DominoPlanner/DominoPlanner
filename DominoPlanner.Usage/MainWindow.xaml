@@ -9,7 +9,7 @@
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="Domino Planner" Height="700" Width="1200" MinWidth="820" Icon="Icons/DominoCalculator.ico" Closing="Window_Closing">
+        Title="Domino Planner" Height="700" Width="1200" MinWidth="820" Icon="/Icons/DominoCalculator.ico" Closing="Window_Closing">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
             <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>

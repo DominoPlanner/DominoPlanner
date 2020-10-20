@@ -7,7 +7,7 @@ namespace DominoPlanner.UI
 {
     internal static class Errorhandler
     {
-        internal static void RaiseMessage(string message, string header, MessageType messageType)
+        internal static async void RaiseMessage(string message, string header, MessageType messageType)
         {
             /*MessageBoxImage image = System.Windows.MessageBoxImage.Information;
             switch (messageType)
@@ -24,7 +24,7 @@ namespace DominoPlanner.UI
                 default:
                     break;
             }*/
-            Task.Run(async() => await MessageBox.Show(message, header, MessageBox.MessageBoxButtons.Ok));
+            await MessageBox.Show(message, header, MessageBox.MessageBoxButtons.Ok);
         }
 
         internal enum MessageType { Info, Error, Warning }

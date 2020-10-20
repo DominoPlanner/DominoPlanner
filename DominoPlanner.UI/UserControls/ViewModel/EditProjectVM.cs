@@ -223,13 +223,13 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             }
         }
 
-        private ColumnConfig _colorColumnConfig;
+        /*private ColumnConfig _colorColumnConfig;
 
         public ColumnConfig ColorColumnConfig
         {
             get { return _colorColumnConfig; }
             set { _colorColumnConfig = value; }
-        }
+        }*/
 
         #endregion
 
@@ -592,18 +592,18 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             }
         }
 
-        private void Dic_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Dic_MouseDown(object sender, PointerPressedEventArgs e)
         {
             DominoInCanvas dic = (DominoInCanvas)sender;
-
-            if (e.LeftButton == MouseButtonState.Pressed)
+            var update = e.GetCurrentPoint(null).Properties;
+            if (update.IsLeftButtonPressed)
             {
                 if (IsSelected(dic.idx))
                 {
                     SelectionTool.Select(new int[] { dic.idx }, true);
                 }
             }
-            else if (e.RightButton == MouseButtonState.Pressed)
+            else if (update.IsRightButtonPressed)
             {
                 SelectionTool.Select(new int[] { dic.idx }, false);
             }
@@ -629,17 +629,17 @@ namespace DominoPlanner.UI.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        internal void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseDown(object sender, PointerPressedEventArgs e)
         {
             SelectedTool?.MouseDown(sender, e);
         }
 
-        internal void Canvas_MouseMove(object sender, MouseEventArgs e)
+        internal void Canvas_MouseMove(object sender, PointerEventArgs e)
         {
             SelectedTool?.MouseMove(sender, e);
         }
 
-        internal void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseUp(object sender, PointerReleasedEventArgs e)
         {
             SelectedTool?.MouseUp(sender, e);
             UpdateUIElements();

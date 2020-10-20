@@ -165,7 +165,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
 
         }
     }
-    public class ColorRestrictionTemplateSelector : DataTemplateSelector
+    /*public class ColorRestrictionTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -181,6 +181,6 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         public DataTemplate NoColorRestrictionTemplate { get; set; }
 
         public DataTemplate IterativeColorRestrictionTemplate { get; set; }
-    }
+    }*/
 
 }

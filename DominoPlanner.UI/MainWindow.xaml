@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DominoPlanner.UI"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="DominoPlanner.UI.MainWindow"
         Title="DominoPlanner.Avalonia">
@@ -14,10 +15,10 @@
     </DataTemplate>
     <DataTemplate DataType="{x:Type vm:DominoProviderVM}">
       <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-    </DataTemplate>
+    </DataTemplate>-->
     <local:PathToImageConverter x:Key="PathToImageConverter"/>
     <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
-  --></Window.Resources>
+  </Window.Resources>
   <Window.KeyBindings>
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewFieldStruct}"/>
     <KeyBinding Gesture="Alt+N" Command="{Binding NewProject}"/>
@@ -215,7 +216,7 @@
           <ColumnDefinition Width="3" />
           <ColumnDefinition Width="720*"/>
         </Grid.ColumnDefinitions>
-        <TreeView Grid.Column="0" Margin="0,0,0,0" Items="{Binding Projects}" Background="#34FFFFFF">
+        <TreeView Grid.Column="0" Margin="0,0,0,0" Items="{Binding Projects}" Background="#34FFFFFF" SelectedItem="{Binding SelectedProject}">
           <!--<TreeView.ItemContainerStyle>
             <Style TargetType="{x:Type TreeViewItem}">
               <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
@@ -230,13 +231,19 @@
                     <i:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
                   </i:EventTrigger>
                 </i:Interaction.Triggers>-->
-                <Grid ContextMenu="{Binding ContextMenu}" ToolTip.Tip="{Binding AbsolutePath}">
+                <Grid ToolTip.Tip="{Binding AbsolutePath}">
+                  <Grid.ContextMenu>
+                    <ContextMenu Items="{Binding ContextMenu}"/>
+                  </Grid.ContextMenu>
+                  <!-- ContextMenu="{Binding ContextMenu}"-->
+                  
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20"/>
                     <ColumnDefinition Width="*"/>
                   </Grid.ColumnDefinitions>
                   <Image Grid.Column="0" Source="{Binding ImagePath, Converter={StaticResource FilenameToThumbnailConverter}}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                  <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                  <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  </TextBlock>
                 </Grid>
               </ContentControl>
             </TreeDataTemplate>
