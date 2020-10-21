@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaction logic for NewObject.xaml
-    /// </summary>
-    public partial class NewObject : Window
+    public class NewObject : Window
     {
+        public NewObject()
+        {
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
+        }
         public NewObject(NewObjectVM novm)
         {
             InitializeComponent();
@@ -26,9 +20,14 @@ namespace DominoPlanner.Usage
             ((NewObjectVM)DataContext).CloseChanged += NewObject_CloseChanged;
         }
 
-        private void NewObject_CloseChanged(object sender, EventArgs e)
+        private void NewObject_CloseChanged(object sender, System.EventArgs e)
         {
             this.Close();
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

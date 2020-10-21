@@ -1,27 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaction logic for LiveBuildHelperV.xaml
-    /// </summary>
-    public partial class LiveBuildHelperV : Window
+    public class LiveBuildHelperV : Window
     {
         public LiveBuildHelperV()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
             this.KeyDown += LiveBuildHelperV_KeyDown;
         }
 
@@ -30,16 +21,18 @@ namespace DominoPlanner.Usage
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
             {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
-                CC.Focus();
-                Keyboard.Focus(CC);
+                var cc = this.Get<ContentControl>("CC");
+                cc.Focus();
+                //Keyboard.Focus(CC);
                 e.Handled = true;
             }
         }
 
-        private void ContentControl_MouseDown(object sender, MouseButtonEventArgs e)
+        public void ContentControl_MouseDown(object sender, PointerPressedEventArgs e)
         {
-            CC.Focus();
-            Keyboard.Focus(CC);
+            var cc = this.Get<ContentControl>("CC");
+            cc.Focus();
+            //Keyboard.Focus(CC);
         }
 
         private void IntegerUpDown_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -47,10 +40,16 @@ namespace DominoPlanner.Usage
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
             {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
-                CC.Focus();
-                Keyboard.Focus(CC);
+                var cc = this.Get<ContentControl>("CC");
+                cc.Focus();
+                //Keyboard.Focus(CC);
                 e.Handled = true;
             }
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

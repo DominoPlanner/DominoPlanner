@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using Emgu.CV;
@@ -7,9 +6,14 @@ using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows;
-using System.Windows.Controls;
+using Avalonia;
+using Avalonia.Controls;
 using System.Windows.Input;
+using Avalonia.Media;
+using System.Collections.Generic;
+using Avalonia.Markup.Xaml.Templates;
+using Avalonia.Controls.Templates;
+using Avalonia.Metadata;
 
 namespace DominoPlanner.Usage
 {
@@ -30,7 +34,7 @@ namespace DominoPlanner.Usage
         #region fields
         private DominoAssembly parentProject;
         #endregion
-        
+
         #region prop
         public IDominoWrapper ResultNode { get; private set; }
         public string ProjectPath { get; private set; }
@@ -105,7 +109,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private string _endung = Properties.Resources.ObjectExtension;
+        private string _endung = "." + MainWindow.ReadSetting("ObjectExtension");
         public string Extension
         {
             get { return _endung; }
@@ -142,7 +146,7 @@ namespace DominoPlanner.Usage
         private ICommand _CreateIt;
         public ICommand CreateIt { get { return _CreateIt; } set { if (value != _CreateIt) { _CreateIt = value; } } }
 
-        
+
         #endregion
         #region Methods
 
@@ -158,7 +162,7 @@ namespace DominoPlanner.Usage
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateFieldVM(
-                    new FieldParameters(50, 50, System.Windows.Media.Colors.Transparent, AbsoluteColorPath,
+                    new FieldParameters(50, 50, Colors.Transparent, AbsoluteColorPath,
                     8, 8, 24, 8, 5000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
@@ -169,7 +173,7 @@ namespace DominoPlanner.Usage
                 Icon = "/icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateRectangularStructureVM(
-                    new StructureParameters(5, 5, System.Windows.Media.Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
+                    new StructureParameters(5, 5, Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
                     2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
             });
             ViewModels.Add(new DominoProviderObjectEntry()
@@ -179,7 +183,7 @@ namespace DominoPlanner.Usage
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateCircleVM(
-                    new CircleParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
+                    new CircleParameters(5, 5, Colors.Transparent, 10,
                     AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
             });
             ViewModels.Add(new DominoProviderObjectEntry()
@@ -189,7 +193,7 @@ namespace DominoPlanner.Usage
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateSpiralVM(
-                    new SpiralParameters(5, 5, System.Windows.Media.Colors.Transparent, 10,
+                    new SpiralParameters(5, 5, Colors.Transparent, 10,
                     AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), false)
             });
             ViewModels.Add(new NewAssemblyEntry(parentProject)
@@ -225,10 +229,10 @@ namespace DominoPlanner.Usage
     {
         public SingleImageInformation()
         {
-            LoadNewImage = new RelayCommand(x => SetNewImage((DominoProviderVM)x));
+            LoadNewImage = new RelayCommand((x) => SetNewImage((DominoProviderVM)x));
         }
         private string DefaultPictureName { get; set; } = "/Icons/add.ico";
-        private string internPictureName;
+        private string internPictureName = "";
 
         public string InternPictureName
         {
@@ -240,7 +244,7 @@ namespace DominoPlanner.Usage
             }
         }
         private string finalImagePath;
-        
+
         #region Command
         private ICommand _LoadNewImage;
         public ICommand LoadNewImage { get { return _LoadNewImage; } set { if (value != _LoadNewImage) { _LoadNewImage = value; } } }
@@ -248,14 +252,16 @@ namespace DominoPlanner.Usage
 
         #region Methods
 
-        private void SetNewImage(DominoProviderVM provider)
+        private async void SetNewImage(DominoProviderVM provider)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.CheckPathExists = true;
-            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png)|*.jpg;*.jpeg;*.jpe;*.jfif;*.png|All Files|*.*";
-            if (openFileDialog.ShowDialog() == true)
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = "Image files" });
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All Files" });
+            openFileDialog.AllowMultiple = false;
+            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+            if (result != null && result.Length != 0 && File.Exists(result[0]))
             {
-                InternPictureName = openFileDialog.FileName;
+                InternPictureName = result[0];
             }
             try
             {
@@ -267,7 +273,7 @@ namespace DominoPlanner.Usage
             {
                 Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error);
             }
-            
+
         }
         public override void UpdateProvider(DominoProviderVM provider)
         {
@@ -347,7 +353,7 @@ namespace DominoPlanner.Usage
         public override object ViewModel => Provider;
         public DominoProviderVM Provider { get; set; }
 
-        public override string Extension => Properties.Resources.ObjectExtension;
+        public override string Extension => "." + MainWindow.ReadSetting("ObjectExtension");
 
         public bool Finalize(string filepath, DominoAssembly parentProject)
         {
@@ -404,7 +410,7 @@ namespace DominoPlanner.Usage
     }
     public class NewAssemblyEntry : NewObjectEntry
     {
-        public override string Extension => Properties.Resources.ProjectExtension;
+        public override string Extension => "." + MainWindow.ReadSetting("ProjectExtension");
         public override object ViewModel => this;
         public string ColorPath { get; set; }
         DominoAssembly parentProject;
@@ -421,12 +427,12 @@ namespace DominoPlanner.Usage
             string assemblyPath = Path.Combine(newProject, filename + Extension);
             try
             {
-                
+
                 if (Directory.Exists(ProjectPath))
                 {
                     if (Directory.Exists(newProject))
                     {
-                        Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error", 
+                        Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error",
                             Errorhandler.MessageType.Error);
                         return null;
                     }
@@ -438,7 +444,7 @@ namespace DominoPlanner.Usage
                     Directory.CreateDirectory(newProject);
                     Directory.CreateDirectory(PlannerFilesPath);
                     Directory.CreateDirectory(SourceImagesPath);
-                    
+
                     DominoAssembly dominoAssembly = new DominoAssembly() { };
                     dominoAssembly.Save(assemblyPath);
                     dominoAssembly.colorPath = Workspace.MakeRelativePath(assemblyPath,
@@ -459,10 +465,51 @@ namespace DominoPlanner.Usage
 
         public override void UpdateImageInformation()
         {
-            
+
         }
     }
-    public class ImageSelector : DataTemplateSelector
+    public class ImageTemplateSelector : IDataTemplate
+    {
+        public bool SupportsRecycling => false;
+
+        public DataTemplate EmptyImageTemplate { get; set; }
+        public DataTemplate ImageTemplate { get; set; }
+
+        public bool Match(object data)
+        {
+            return data is string;
+        }
+
+        public IControl Build(object param)
+        {
+            if (string.IsNullOrEmpty(param.ToString()))
+                return EmptyImageTemplate.Build(param);
+            else
+                return ImageTemplate.Build(param);
+
+            //return Templates[string.IsNullOrEmpty((param as SingleImageInformation).InternPictureName) ? "EmptyImageTemplate" : "ImageTemplate"].Build(param);
+        }
+
+    }
+    public class EmptyImageTemplate : DataTemplate, IDataTemplate
+    {
+        bool IDataTemplate.Match(object data)
+        {
+            if (string.IsNullOrEmpty(data?.ToString()))
+                return true;
+            return false;
+        }
+    }
+    public class ImageTemplate : DataTemplate, IDataTemplate
+    {
+        bool IDataTemplate.Match(object data)
+        {
+            if (string.IsNullOrEmpty(data?.ToString()))
+                return false;
+            return true;
+        }
+    }
+    /*public class ImageSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -472,5 +519,5 @@ namespace DominoPlanner.Usage
         }
         public DataTemplate EmptyImageTemplate { get; set; }
         public DataTemplate ImageTemplate { get; set; }
-    }
+    }*/
 }

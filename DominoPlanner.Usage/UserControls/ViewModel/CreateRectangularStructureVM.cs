@@ -1,10 +1,12 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -111,8 +113,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private BitmapSource[] _description_imgs;
-        public BitmapSource[] description_imgs
+        private IImage[] _description_imgs;
+        public IImage[] description_imgs
         {
             get { return _description_imgs; }
             set
@@ -153,7 +155,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var names = new List<string>();
             try
             {
-                XElement xElement = XElement.Parse(Properties.Resources.Structures);
+                string structurepath = MainWindow.ReadSetting("StructureTemplates");
+                StreamReader fr = new StreamReader(structurepath);
+                XElement xElement = XElement.Parse(fr.ReadToEnd());
                 structures = xElement.Elements().ToList();
 
                 foreach (var structure in structures)
@@ -172,7 +176,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void RefreshDescriptionImages()
         {
             WriteableBitmap[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
-            description_imgs = new BitmapSource[9];
+            description_imgs = new IBitmap[9];
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)

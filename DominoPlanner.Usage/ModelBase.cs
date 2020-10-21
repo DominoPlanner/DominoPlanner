@@ -1,15 +1,10 @@
-﻿using DominoPlanner.Usage.UserControls.ViewModel;
+﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage
 {
@@ -28,7 +23,7 @@ namespace DominoPlanner.Usage
             get { return this; }
         }
 
-        public BitmapImage ToBitmapSource(Bitmap source)
+        /*public BitmapImage ToBitmapSource(Bitmap source)
         {
             using (MemoryStream memory = new MemoryStream())
             {
@@ -42,7 +37,7 @@ namespace DominoPlanner.Usage
 
                 return bitmapimage;
             }
-        }
+        }*/
 
     }
 
@@ -70,12 +65,13 @@ namespace DominoPlanner.Usage
         {
             return CanExecuteAction(parameter);
         }
+        public event EventHandler CanExecuteChanged;
 
-        public event EventHandler CanExecuteChanged
+        /*public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
-        }
+        }*/
 
         public void Execute(object parameter)
         {
@@ -106,10 +102,10 @@ namespace DominoPlanner.Usage
             }
             Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
             Header = attr.Header;
-            if (!string.IsNullOrEmpty(attr.ImageSource))
-                Icon = new System.Windows.Controls.Image {
-                Source = new BitmapImage(new Uri(attr.ImageSource, UriKind.Relative)) };
-            Visibility = attr.Visibility;
+            /*if (!string.IsNullOrEmpty(attr.ImageSource))
+                Icon = new Image { 
+                Source = new Bitmap(attr.ImageSource) };*/
+            this.IsVisible = attr.IsVisible;
             IsEnabled = Activated;
         }
     }
@@ -118,7 +114,7 @@ namespace DominoPlanner.Usage
     {
         public string Activated { get; set; }
 
-        public Visibility Visibility { get; set; }
+        public bool IsVisible { get; set; }
 
         public string ImageSource { get; set; }
 
@@ -128,21 +124,21 @@ namespace DominoPlanner.Usage
 
         //public ICommand Command { get; set; }
         public ContextMenuAttribute(string header, string imageSource, 
-            string activated, Visibility visibility = Visibility.Visible, int index = 0)
+            string activated, bool isVisible = true, int index = 0)
         {
             Header = header;
             ImageSource = imageSource;
             Activated = activated;
-            Visibility = visibility;
+            IsVisible = isVisible;
             Index = index;
         }
         public ContextMenuAttribute(string header, string imageSource,
-            bool activated = true, Visibility visibility = Visibility.Visible, int index = 0)
+            bool activated = true, bool isVisible = true, int index = 0)
         {
             Header = header;
             ImageSource = imageSource;
             Activated = activated.ToString();
-            Visibility = visibility;
+            IsVisible = isVisible;
             Index = index;
         }
 

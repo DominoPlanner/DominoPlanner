@@ -6,13 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using System.Windows.Controls;
-using DominoPlanner.Usage.HelperClass;
-using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows;
+using Avalonia.Controls;
 using DominoPlanner.Usage.Serializer;
-using System.Windows.Threading;
+using Avalonia.Media;
+using MsgBox;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -97,12 +96,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_ContextMenu == null)
                 {
                     var ContextMenuEntries = BuildContextMenu();
-
                     _ContextMenu = new ContextMenu();
-                    foreach (var entry in ContextMenuEntries)
-                    {
-                        ContextMenu.Items.Add(entry);
-                    }
+                    _ContextMenu.Items = new List<Avalonia.Controls.MenuItem>(ContextMenuEntries);
+                    //RaisePropertyChanged();
                 }
                 return _ContextMenu;
             }
@@ -327,65 +323,65 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             // will be implemented when doing Masterplan
         }
         [ContextMenuAttribute("Add new object", "Icons/add.ico", index: 1)]
-        public void NewFieldStructure()
+        public async void NewFieldStructure()
         {
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.obj);
-            new NewObject(novm).ShowDialog();
+            await new NewObject(novm).ShowDialog(MainWindowViewModel.GetWindow()) ;
             if (!novm.Close || novm.ResultNode == null) return;
             Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
         }
         [ContextMenuAttribute("Add existing object", "Icons/add.ico", index: 2)]
         public void AddExistingItem()
         {
-            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = $"All DominoPlanner files|*{Properties.Resources.ObjectExtension};*{Properties.Resources.ProjectExtension}" +
-                $"|object files (*{Properties.Resources.ObjectExtension})|*{Properties.Resources.ObjectExtension}" +
-                $"|project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
-            openFileDialog.RestoreDirectory = true;
-            openFileDialog.CheckPathExists = true;
-            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filters.Add(
+                new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ProjectExtension"), MainWindow.ReadSetting("ObjectExtension") }, Name = "All DominoPlanner files" });
+            openFileDialog.Filters.Add(
+               new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ObjectExtension") }, Name = "Object files" });
+            openFileDialog.Filters.Add(
+                new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ProjectExtension") }, Name = "Project files" });
+            var result = openFileDialog.ShowDialog();
+            if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
-                if (File.Exists(openFileDialog.FileName))
+                string extension = Path.GetExtension(result[0]).ToLower();
+                if (extension == "." + MainWindow.ReadSetting("ObjectExtension").ToLower())
                 {
-                    string extension = Path.GetExtension(openFileDialog.FileName).ToLower();
-                    if (extension == Properties.Resources.ObjectExtension.ToLower())
+                    try
                     {
-                        try
-                        {
-                            IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, openFileDialog.FileName);
-                            AssemblyModel.Save();
-                            Children.Where(x => x.Model == node).FirstOrDefault()?.Open();
-                        }
-                        catch (FileNotFoundException)
-                        {
-                            // Unable to load project
-                        }
+                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, result[0]);
+                        AssemblyModel.Save();
+                        Children.Where(x => x.Model == node).FirstOrDefault()?.Open();
                     }
-                    else if (extension == Properties.Resources.ProjectExtension.ToLower())
+                    catch (FileNotFoundException)
                     {
-                        try
-                        {
-                            string relativePath = Workspace.MakeRelativePath(AbsolutePath, openFileDialog.FileName);
-                            var assy = Workspace.Load<DominoAssembly>(openFileDialog.FileName);
-                            if (assy == AssemblyModel.obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.obj))
-                            {
-                                Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
-                                return;
-                            }
-                            IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.obj);
-                            AssemblyModel.Save();
-                        }
-                        catch { }
+                        // Unable to load project
                     }
                 }
+                else if (extension == "." + MainWindow.ReadSetting("ProjectExtension").ToLower())
+                {
+                    try
+                    {
+                        string relativePath = Workspace.MakeRelativePath(AbsolutePath, result[0]);
+                        var assy = Workspace.Load<DominoAssembly>(result[0]);
+                        if (assy == AssemblyModel.obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.obj))
+                        {
+                            Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
+                            return;
+                        }
+                        IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.obj);
+                        AssemblyModel.Save();
+                    }
+                    catch { }
+                }
+
             }
         }
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
-        public void Rename()
+        public async void Rename()
         {
             var dn = (AssemblyNode)Model;
             RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
-            if (ro.ShowDialog() == true)
+            if (await ro.ShowDialog<bool>(MainWindowViewModel.GetWindow()) == true)
             {
                 Workspace.CloseFile(AbsolutePath);
                 var new_path = Path.Combine(Path.GetDirectoryName(AbsolutePath), ((RenameObjectVM)ro.DataContext).NewName);
@@ -419,13 +415,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
-            PropertiesWindow pw = new PropertiesWindow(Model);
-            pw.ShowDialog();
+            //PropertiesWindow pw = new PropertiesWindow(Model);
+            //pw.ShowDialog();
         }
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
-            var colorres = Directory.EnumerateFiles(colorpath, $"*{Properties.Resources.ColorExtension}");
+            var colorres = Directory.EnumerateFiles(colorpath, $"*.{MainWindow.ReadSetting("ColorExtension")}");
             // restore project if colorfile exists
             if (colorlistPath == null && colorres.First() == null)
             {
@@ -434,7 +430,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorlistPath = colorlistPath ?? colorres.First();
             Workspace.CloseFile(projectpath);
             if (File.Exists(projectpath))
-                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}{Properties.Resources.ProjectExtension}"));
+                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.{MainWindow.ReadSetting("ProjectExtension")}"));
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
             newMainNode.colorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
@@ -442,7 +438,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 try
                 {
-                    var assembly = Directory.EnumerateFiles(path, $"*{Properties.Resources.ProjectExtension}").
+                    var assembly = Directory.EnumerateFiles(path, $"*.{MainWindow.ReadSetting("ProjectExtension")}").
                         Where(x => Path.GetFileName(x).Contains("backup_")).FirstOrDefault();
                     if (string.IsNullOrEmpty(assembly)) continue;
                     AssemblyNode an = new AssemblyNode(Workspace.MakeRelativePath(projectpath, assembly), newMainNode);
@@ -450,7 +446,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 catch { } // if error on add assembly, don't add assembly
             }
-            foreach (string path in Directory.EnumerateFiles(colorpath, "*" + Properties.Resources.ObjectExtension))
+            foreach (string path in Directory.EnumerateFiles(colorpath, "*." + MainWindow.ReadSetting("ObjectExtension")))
             {
                 try
                 {
@@ -557,7 +553,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Color background = Colors.Transparent;
                 if (userDefinedExport)
                 {
-                    ExportOptions exp = new ExportOptions(DocumentModel.obj);
+                    /*ExportOptions exp = new ExportOptions(DocumentModel.obj);
                     if (exp.ShowDialog() == true)
                     {
                         var dc = exp.DataContext as ExportOptionsVM;
@@ -569,25 +565,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     else
                     {
                         return;
-                    }
+                    }*/
                 }
-                System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-                saveFileDialog.Filter = "png files (*.png)|*.png";
-                saveFileDialog.RestoreDirectory = true;
-
-                if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                
+                saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = "PNG files" });
+                //saveFileDialog.RestoreDirectory = true;
+                var result = saveFileDialog.ShowDialog();
+                if (result != "")
                 {
-                    if (File.Exists(saveFileDialog.FileName))
+                    if (File.Exists(result))
                     {
-                        File.Delete(saveFileDialog.FileName);
+                        File.Delete(result);
                     }
-                    DocumentModel.obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(saveFileDialog.FileName);
+                    DocumentModel.obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(result);
 
                 }
             }
             catch (Exception ex) { Errorhandler.RaiseMessage("Export failed" + ex, "Error", Errorhandler.MessageType.Error); }
         }
-        [ContextMenuAttribute("Show protocol", "Icons/file_export.ico", "HasFieldProtocol", Visibility.Visible, 6)]
+        [ContextMenuAttribute("Show protocol", "Icons/file_export.ico", "HasFieldProtocol", true, 6)]
         public void ShowProtocol()
         {
             if (!DocumentModel.obj.HasProtocolDefinition)
@@ -595,10 +592,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
                 return;
             }
-            ProtocolV protocolV = new ProtocolV();
+            /*ProtocolV protocolV = new ProtocolV();
             DocumentModel.obj.Generate(new System.Threading.CancellationToken());
             protocolV.DataContext = new ProtocolVM(DocumentModel.obj, Path.GetFileNameWithoutExtension(DocumentModel.relativePath));
-            protocolV.ShowDialog();
+            protocolV.ShowDialog();*/
         }
         [ContextMenuAttribute("Open", "Icons/folder_tar.ico", Index = 0)]
         public override void Open()
@@ -625,8 +622,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             try
             {
                 if (closeTab(this) &&
-                    MessageBox.Show($"Remove reference to file {Name} from project {parent.Name}?\n" +
-                    $"The file won't be permanently deleted.", "Delete?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    Task.Run(async() => await MessageBox.Show($"Remove reference to file {Name} from project {parent.Name}?\n" +
+                    $"The file won't be permanently deleted.", "Delete?", MessageBox.MessageBoxButtons.YesNo)).Result == MessageBox.MessageBoxResult.Yes)
                 {
                     parent.RemoveChild(this);
                     Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);
@@ -641,7 +638,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
         public void Rename()
         {
-            try
+            /*try
             {
                 RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
                 if (closeTab(this) && ro.ShowDialog() == true)
@@ -658,13 +655,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             catch
             {
                 Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
-            }
+            }*/
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
-            PropertiesWindow pw = new PropertiesWindow(Model);
-            pw.ShowDialog();
+            //PropertiesWindow pw = new PropertiesWindow(Model);
+            //pw.ShowDialog();
         }
     }
 }

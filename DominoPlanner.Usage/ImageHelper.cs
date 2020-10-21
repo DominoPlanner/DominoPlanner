@@ -26,9 +26,9 @@ namespace DominoPlanner.Usage
             //picturepath = Directory.GetFiles(picturepath).Where(x => Path.GetFileNameWithoutExtension(x).Equals(Path.GetFileNameWithoutExtension(projectpath))).FirstOrDefault();
             if (picturepath == null || !File.Exists(picturepath))
             {
-                if (Path.GetExtension(projectpath).ToLower() == Properties.Resources.ColorExtension.ToLower())
+                if (Path.GetExtension(projectpath).ToLower() == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
                     picturepath = @"Icons/colorLine.ico";
-                else if (Path.GetExtension(projectpath).ToLower() == Properties.Resources.ProjectExtension.ToLower())
+                else if (Path.GetExtension(projectpath).ToLower() == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
                     picturepath = @"Icons/folder_txt.ico";
                 else picturepath = @"./Icons/image.ico";
             }

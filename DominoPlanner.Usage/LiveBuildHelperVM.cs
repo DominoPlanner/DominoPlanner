@@ -5,10 +5,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
+using Avalonia.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia;
+using Avalonia.Layout;
+using Avalonia.Input;
 
 namespace DominoPlanner.Usage
 {
@@ -36,7 +39,7 @@ namespace DominoPlanner.Usage
             CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / blockSize)));
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { currentBlock.Focus(); });
-            ColumnConfig = new ColumnConfig();
+            /*ColumnConfig = new ColumnConfig();
 
             var columns = new ObservableCollection<Column>();
             columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
@@ -45,7 +48,7 @@ namespace DominoPlanner.Usage
             columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Remaining" });
             columns.Add(new Column() { DataField = "ProjectCount[2]", Header = "Next " + NextN });
 
-            ColumnConfig.Columns = columns;
+            ColumnConfig.Columns = columns;*/
 
             OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
         }
@@ -177,13 +180,13 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private ColumnConfig _columnConfig;
+        /*private ColumnConfig _columnConfig;
 
         public ColumnConfig ColumnConfig
         {
             get { return _columnConfig; }
             set { _columnConfig = value; RaisePropertyChanged(); }
-        }
+        }*/
         private ObservableCollection<ColorListEntry> _colors;
 
         public ObservableCollection<ColorListEntry> Colors
@@ -205,14 +208,14 @@ namespace DominoPlanner.Usage
         #region methods
         private void RefreshCanvas()
         {
-            BatState = "Battery: " + System.Windows.Forms.SystemInformation.PowerStatus.BatteryLifePercent * 100 + " % "
+            /*BatState = "Battery: " + System.Windows.Forms.SystemInformation.PowerStatus.BatteryLifePercent * 100 + " % "
             + (((System.Windows.Forms.SystemInformation.PowerStatus.BatteryChargeStatus & System.Windows.Forms.BatteryChargeStatus.Charging) == System.Windows.Forms.BatteryChargeStatus.Charging) ? ", charging" : "");
-
+            */
             currentBlock.Children.RemoveRange(0, currentBlock.Children.Count);
             
-            stoneWidth = (((int)currentBlock.ActualWidth) - (2 * 2 * space) - ((blockSize - 1) * space)) / blockSize;
+            stoneWidth = (((int)currentBlock.Bounds.Width) - (2 * 2 * space) - ((blockSize - 1) * space)) / blockSize;
             int stoneHeight = 250;
-            int marginHeight = (((int)currentBlock.ActualHeight) / 2);
+            int marginHeight = (((int)currentBlock.Bounds.Height) / 2);
 
             int firstBlockStone = blockSize * (SelectedBlock - 1);
 
@@ -259,14 +262,14 @@ namespace DominoPlanner.Usage
             TextBlock tb = new TextBlock();
             tb.FontSize = 16;
             tb.Text = colorName + Environment.NewLine + colorAmount;
-            tb.FontWeight = System.Windows.FontWeights.Bold;
-            tb.TextAlignment = System.Windows.TextAlignment.Center;
-            tb.Margin = new System.Windows.Thickness(margin_left, margin_top + 20, 0, 0);
-            tb.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            tb.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            tb.FontWeight = FontWeight.Bold;
+            tb.TextAlignment = TextAlignment.Center;
+            tb.Margin = new Thickness(margin_left, margin_top + 20, 0, 0);
+            tb.HorizontalAlignment = HorizontalAlignment.Left;
+            tb.VerticalAlignment = VerticalAlignment.Top;
             tb.Width = ((colorAmount + 1) * space) + (colorAmount * stoneWidth);
 
-            System.Drawing.Size textSize = System.Windows.Forms.TextRenderer.MeasureText(colorName, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
+            System.Drawing.Size textSize = new System.Drawing.Size(100, 10); //TextRenderer.MeasureText(colorName, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
 
             if (stonesWidth < textSize.Width)
             {
@@ -275,11 +278,11 @@ namespace DominoPlanner.Usage
                     tb.FontSize = stoneWidth / 1.4;
                 }
                 tb.Text = colorName + " " + colorAmount;
-                textSize = System.Windows.Forms.TextRenderer.MeasureText(tb.Text, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
-                tb.TextAlignment = System.Windows.TextAlignment.Left;
+                textSize = new System.Drawing.Size(100, 10);  //System.Windows.Forms.TextRenderer.MeasureText(tb.Text, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
+                tb.TextAlignment = TextAlignment.Left;
                 tb.Width = textSize.Width;
-                tb.TextWrapping = System.Windows.TextWrapping.NoWrap;
-                tb.Margin = new System.Windows.Thickness(margin_left + (stonesWidth / 2) + (tb.FontSize * 1.4 / 2), margin_top + 20, 0, 0);
+                tb.TextWrapping = TextWrapping.NoWrap;
+                tb.Margin = new Thickness(margin_left + (stonesWidth / 2) + (tb.FontSize * 1.4 / 2), margin_top + 20, 0, 0);
                 tb.RenderTransform = new RotateTransform() { Angle = 90 };
             }
 

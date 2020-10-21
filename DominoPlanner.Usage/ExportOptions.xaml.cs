@@ -1,25 +1,19 @@
-﻿using DominoPlanner.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaktionslogik für ExportOptions.xaml
-    /// </summary>
-    public partial class ExportOptions : Window
+    public class ExportOptions : Window
     {
+        public ExportOptions()
+        {
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
+        }
         public ExportOptions(IDominoProvider provider)
         {
             InitializeComponent();
@@ -32,9 +26,13 @@ namespace DominoPlanner.Usage
         {
             if (e.PropertyName.Equals("Close"))
             {
-                this.DialogResult = ((ExportOptionsVM)DataContext).result;
-                this.Close();
+                this.Close(((ExportOptionsVM)DataContext).result);
             }
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

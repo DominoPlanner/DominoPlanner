@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Avalonia.Controls;
+using Avalonia;
 using System.Linq;
 using System.IO;
+using Avalonia.Media;
 
 namespace DominoPlanner.Usage
 {
@@ -32,18 +32,19 @@ namespace DominoPlanner.Usage
         }
         
 
-        protected override void OnRender(DrawingContext dc)
+        public override void Render(DrawingContext dc)
         {
-            BitmapSource bit = null;
+            IImage bit = null;
             if (opacity_value != 0)
             {
                 var reduced = OriginalImage.Clone();
                 Core.ImageExtensions.OpacityReduction(reduced, opacity_value);
-                bit = BitmapSourceConvert.ToBitmapSource(reduced);
+                //bit = BitmapSourceConvert.ToBitmapSource(reduced);
             }
-            base.OnRender(dc);
+            base.Render(dc);
 
-
+            var unselectedBrush = new SolidColorBrush(UnselectedBorderColor);
+            var selectedBrush = new SolidColorBrush(SelectedBorderColor);
             if (!above && bit != null)
                 dc.DrawImage(bit, new Rect(0, 0, Width, Height));
             foreach (DominoInCanvas dic in Stones)
@@ -56,18 +57,17 @@ namespace DominoPlanner.Usage
                 StreamGeometry streamGeometry = new StreamGeometry();
                 using (StreamGeometryContext geometryContext = streamGeometry.Open())
                 {
-                    geometryContext.BeginFigure(point1, true, true);
-                    var points = new System.Windows.Media.PointCollection
-                                             {
-                                                 point2, point3, point4
-                                             };
-                    geometryContext.PolyLineTo(points, true, true);
+                    geometryContext.BeginFigure(point1, true);
+                    geometryContext.LineTo(point2);
+                    geometryContext.LineTo(point3);
+                    geometryContext.LineTo(point4);
+                    geometryContext.EndFigure(true);
                 }
 
                 Pen pen = new Pen();
                 if (dic.isSelected)
                 {
-                    pen.Brush = new SolidColorBrush(SelectedBorderColor);
+                    pen.Brush = selectedBrush;
                     pen.Thickness = BorderSize;
                 }
                 else if (dic.PossibleToPaste)
@@ -77,7 +77,7 @@ namespace DominoPlanner.Usage
                 }
                 else
                 {
-                    pen.Brush = new SolidColorBrush(UnselectedBorderColor);
+                    pen.Brush = unselectedBrush;
                     pen.Thickness = BorderSize / 2;
                 }
 
@@ -90,7 +90,7 @@ namespace DominoPlanner.Usage
     }
     public static class BitmapSourceConvert
     {
-        [DllImport("gdi32")]
+        /*[DllImport("gdi32")]
         private static extern int DeleteObject(IntPtr o);
 
         public static BitmapSource ToBitmapSource(IImage image)
@@ -108,6 +108,6 @@ namespace DominoPlanner.Usage
                 DeleteObject(ptr);
                 return bs;
             }
-        }
+        }*/
     }
 }

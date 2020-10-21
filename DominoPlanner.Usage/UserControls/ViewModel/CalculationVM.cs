@@ -7,7 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml.Templates;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -164,7 +165,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         }
     }
-    public class ColorRestrictionTemplateSelector : DataTemplateSelector
+    /*public class ColorRestrictionTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -180,6 +181,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public DataTemplate NoColorRestrictionTemplate { get; set; }
 
         public DataTemplate IterativeColorRestrictionTemplate { get; set; }
-    }
+    }*/
 
 }

@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using System;
@@ -11,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Controls;
 
 namespace DominoPlanner.Usage
 {
@@ -367,24 +366,24 @@ namespace DominoPlanner.Usage
         {
             LiveBuildHelperV lbhv = new LiveBuildHelperV();
             lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY);
-            lbhv.ShowDialog();
+            lbhv.Show();
         }
 
         public void SaveExcelFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+            SaveFileDialog dlg = new SaveFileDialog
             {
-                DefaultExt = ".xlsx",
-                Filter = "Excel Document (.xlsx)|*.xlsx",
-                FileName = Titel
+                DefaultExtension = ".xlsx",
+                InitialFileName = Titel
             };
-
-            if (dlg.ShowDialog() == true)
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = "Excel Document" });
+            var result = dlg.ShowDialog();
+            if (result != null && result != "")
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP); // Jojo hier Projektname einfügen
-                    Process.Start(dlg.FileName);
+                    DominoProvider.SaveXLSFieldPlan(result, currentOPP); // Jojo hier Projektname einfügen
+                    Process.Start(result);
                 }
                 catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
@@ -392,12 +391,15 @@ namespace DominoPlanner.Usage
 
         public void SaveHTMLFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.DefaultExt = ".html";
-            dlg.Filter = "Hypertext Markup Language (.html)|*.html";
-            if (dlg.ShowDialog() == true)
+            SaveFileDialog dlg = new SaveFileDialog
             {
-                string filename = dlg.FileName;
+                DefaultExtension = ".html",
+                InitialFileName = Titel
+            };
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = "Hypertext Markup Language" });
+            var filename = dlg.ShowDialog();
+            if (filename != null && filename != "")
+            {
 
                 try
                 {

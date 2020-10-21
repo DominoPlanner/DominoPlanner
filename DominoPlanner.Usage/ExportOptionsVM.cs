@@ -1,6 +1,6 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Media;
+using DominoPlanner.Core;
 using System.IO;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
@@ -20,7 +20,7 @@ namespace DominoPlanner.Usage
             width = provider.last.physicalLength;
             expanded_width = provider.last.physicalExpandedHeight;
             expanded_height = provider.last.physicalExpandedLength;
-            Expandable = provider is FieldParameters ? Visibility.Visible : Visibility.Hidden;
+            Expandable = provider is FieldParameters;
             if (provider is FieldParameters fp)
             {
                 Collapsed = true;
@@ -45,8 +45,8 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-        private Visibility _Expandable;
-        public Visibility Expandable
+        private bool _Expandable;
+        public bool Expandable
         {
             get { return _Expandable; }
             set
@@ -98,8 +98,8 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-        private System.Windows.Media.Color _backgroundColor;
-        public System.Windows.Media.Color BackgroundColor
+        private Color _backgroundColor;
+        public Color BackgroundColor
         {
             get { return _backgroundColor; }
             set

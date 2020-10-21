@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows;
 using DominoPlanner.Core;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia;
 
 namespace DominoPlanner.Usage
 {
     public class DominoInCanvas : Shape
     {
         public int idx;
-        public System.Windows.Point[] canvasPoints = new System.Windows.Point[4];
+        public Avalonia.Point[] canvasPoints = new Avalonia.Point[4];
         public ColorRepository colorRepository;
         public IDominoShape domino;
 
@@ -55,22 +56,18 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
-        protected override Geometry DefiningGeometry
+        protected override Geometry CreateDefiningGeometry()
         {
-            get
+            StreamGeometry geometry = new StreamGeometry();
+            //geometry.FillRule = FillRule.EvenOdd;
+
+            using (StreamGeometryContext context = geometry.Open())
             {
-                StreamGeometry geometry = new StreamGeometry();
-                geometry.FillRule = FillRule.EvenOdd;
-
-                using (StreamGeometryContext context = geometry.Open())
-                {
-                    DrawGeometry(context);
-                }
-
-                geometry.Freeze();
-                return geometry;
+                DrawGeometry(context);
             }
+
+            //geometry.Freeze();
+            return geometry;
         }
 
         public DominoInCanvas(int idx, IDominoShape domino, ColorRepository colorlist, bool showSpaces)
@@ -97,17 +94,17 @@ namespace DominoPlanner.Usage
                     stoneHeight = rectangleDomino.expanded_height;
                     stoneWidth = rectangleDomino.expanded_width;
                 }
-                canvasPoints[0] = new System.Windows.Point(rectangleDomino.x, rectangleDomino.y);
-                canvasPoints[1] = new System.Windows.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y);
-                canvasPoints[2] = new System.Windows.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y + stoneHeight);
-                canvasPoints[3] = new System.Windows.Point(rectangleDomino.x, rectangleDomino.y + stoneHeight);
+                canvasPoints[0] = new Avalonia.Point(rectangleDomino.x, rectangleDomino.y);
+                canvasPoints[1] = new Avalonia.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y);
+                canvasPoints[2] = new Avalonia.Point(rectangleDomino.x + stoneWidth, rectangleDomino.y + stoneHeight);
+                canvasPoints[3] = new Avalonia.Point(rectangleDomino.x, rectangleDomino.y + stoneHeight);
             }
             else
             {
-                canvasPoints[0] = new System.Windows.Point(rectangle.points[0].X, rectangle.points[0].Y);
-                canvasPoints[1] = new System.Windows.Point(rectangle.points[1].X, rectangle.points[1].Y);
-                canvasPoints[2] = new System.Windows.Point(rectangle.points[2].X, rectangle.points[2].Y);
-                canvasPoints[3] = new System.Windows.Point(rectangle.points[3].X, rectangle.points[3].Y);
+                canvasPoints[0] = new Avalonia.Point(rectangle.points[0].X, rectangle.points[0].Y);
+                canvasPoints[1] = new Avalonia.Point(rectangle.points[1].X, rectangle.points[1].Y);
+                canvasPoints[2] = new Avalonia.Point(rectangle.points[2].X, rectangle.points[2].Y);
+                canvasPoints[3] = new Avalonia.Point(rectangle.points[3].X, rectangle.points[3].Y);
             }
         }
 
@@ -125,20 +122,19 @@ namespace DominoPlanner.Usage
             StrokeThickness = 2;
             this.Margin = new Thickness(marginLeft, marginTop, 0, 0);
 
-            canvasPoints[0] = new System.Windows.Point(0, 0);
-            canvasPoints[1] = new System.Windows.Point(stoneWidth, 0);
-            canvasPoints[2] = new System.Windows.Point(stoneWidth, stoneHeight);
-            canvasPoints[3] = new System.Windows.Point(0, stoneHeight);
+            canvasPoints[0] = new Avalonia.Point(0, 0);
+            canvasPoints[1] = new Avalonia.Point(stoneWidth, 0);
+            canvasPoints[2] = new Avalonia.Point(stoneWidth, stoneHeight);
+            canvasPoints[3] = new Avalonia.Point(0, stoneHeight);
         }
 
         private void DrawGeometry(StreamGeometryContext context)
         {
-            context.BeginFigure(canvasPoints[0], true, true); //Top Left
-            IList<System.Windows.Point> points = new List<System.Windows.Point>();
-            points.Add(canvasPoints[1]); //Top Right
-            points.Add(canvasPoints[2]); // Bottom Right
-            points.Add(canvasPoints[3]); // Bottom Left
-            context.PolyLineTo(points, true, true);
+            context.BeginFigure(canvasPoints[0], true); //Top Left
+            context.LineTo(canvasPoints[1]); //Top Right
+            context.LineTo(canvasPoints[2]); // Bottom Right
+            context.LineTo(canvasPoints[3]); // Bottom Left
+            context.EndFigure(true);
         }
 
         public void DisposeStone()

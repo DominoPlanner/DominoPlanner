@@ -1,28 +1,27 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="200">
+             mc:Ignorable="d" d:DesignHeight="50" d:DesignWidth="200"
+             x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"      
+             >
     <UserControl.Resources>
         <parent:DiffusionModeToIntConverter x:Key="EnumToIntConverter"/>
         <parent:InterToStringConverter x:Key="InterToStringConverter"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox Header="{Binding ResizeMode, Converter={StaticResource InterToStringConverter}}" HeaderStringFormat="Resize Mode: {0}">
+        <HeaderedContentControl Header="{Binding ResizeMode, Converter={StaticResource InterToStringConverter}, StringFormat=Resize Mode: {0}}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" Value="{Binding ResizeMode, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
-                <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
-        </GroupBox>
+        </HeaderedContentControl>
     </Grid>
 </UserControl>

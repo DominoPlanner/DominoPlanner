@@ -1,14 +1,18 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Data.Converters;
+using DominoPlanner.Core;
 using Emgu.CV.CvEnum;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
+using Avalonia.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Data;
+using Avalonia;
+using Avalonia.Platform;
 
 namespace DominoPlanner.Usage
 {
@@ -17,17 +21,17 @@ namespace DominoPlanner.Usage
     }
     public class AmountToColorConverter : IMultiValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
             int anzahl = 0, gesamt = 0;
             if (int.TryParse(values[0].ToString(), out anzahl) && int.TryParse(values[1].ToString(), out gesamt))
             {
                 if (anzahl > gesamt)
                 {
-                    return System.Windows.Media.Brushes.Red;
+                    return Brushes.Red;
                 }
             }
-            return System.Windows.Media.Brushes.Black;
+            return Brushes.Black;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -40,7 +44,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is System.Windows.Media.Color)
+            if (value is Color)
             {
                 Color c = (Color)value;
                 return c.ToString();
@@ -59,7 +63,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is System.Windows.Media.Color)
+            if (value is Color)
             {
                 return new SolidColorBrush((Color)value);
             }
@@ -80,7 +84,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new Image() { Source = new BitmapImage(new Uri(ImageHelper.GetImageOfFile(value.ToString()), UriKind.RelativeOrAbsolute)) };
+            return new Image() { Source = new Bitmap(ImageHelper.GetImageOfFile(value.ToString())) };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -265,7 +269,7 @@ namespace DominoPlanner.Usage
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return value.Equals(true) ? parameter : Binding.DoNothing;
+            return value.Equals(true) ? parameter : BindingOperations.DoNothing;
         }
     }
     public class IterationInformationToBooleanConverter : IValueConverter
@@ -337,20 +341,13 @@ namespace DominoPlanner.Usage
 
             if (uri != null)
             {
-                BitmapImage image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                var ur = new Uri(uri, UriKind.RelativeOrAbsolute);
-                if (ur.IsAbsoluteUri == false)
+                try
                 {
-                    if (uri[0] == '/')
-                        uri = uri.Substring(1);
-                    ur = new Uri("pack://application:,,,/" + uri);
+                    Bitmap image = new Bitmap(uri);
+                    FileStream fs = new FileStream(uri, FileMode.Open);
+                    return Bitmap.DecodeToWidth(fs, 40, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.HighQuality);
                 }
-                image.UriSource = ur;
-                image.DecodePixelWidth = 40;
-                image.EndInit();
-                return image;
+                catch { }
             }
 
             return null;
@@ -374,6 +371,38 @@ namespace DominoPlanner.Usage
                 return parameter;
             else
                 return Enum.GetValues(targetType).GetValue(0);
+        }
+    }
+    public class BitmapValueConverter : IValueConverter
+    {
+        public static BitmapValueConverter Instance = new BitmapValueConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string && targetType == typeof(IImage))
+            {
+                var uri = new Uri((string)value, UriKind.RelativeOrAbsolute);
+                var scheme = uri.IsAbsoluteUri ? uri.Scheme : "file";
+
+                switch (scheme)
+                {
+                    case "file":
+                        return new Bitmap((string)value);
+
+                    default:
+                        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                        return new Bitmap(assets.Open(uri));
+                }
+            }
+            if (value == null)
+                return null;
+
+            throw new NotSupportedException();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }

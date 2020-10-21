@@ -1,33 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaction logic for ProtocolV.xaml
-    /// </summary>
-    public partial class ProtocolV : Window
+    public class ProtocolV : Window
     {
         public ProtocolV()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
-
-    public static class BrowserBehavior
+    /*public static class BrowserBehavior
     {
-        public static readonly DependencyProperty HtmlProperty = DependencyProperty.RegisterAttached(
+        public static readonly AvaloniaProperty HtmlProperty = AvaloniaProperty.RegisterAttached(
             "Html",
             typeof(string),
             typeof(BrowserBehavior),
@@ -50,5 +44,5 @@ namespace DominoPlanner.Usage
             if (wb != null)
                 wb.NavigateToString(e.NewValue as string);
         }
-    }
+    }*/
 }

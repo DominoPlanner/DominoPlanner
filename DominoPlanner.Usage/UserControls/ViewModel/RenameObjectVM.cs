@@ -6,10 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using System.Windows.Input;
+using Avalonia;
+using Avalonia.Input;
 
 namespace DominoPlanner.Usage
 {
@@ -95,25 +97,23 @@ namespace DominoPlanner.Usage
     // from https://www.codeproject.com/Tips/1249276/WPF-Select-All-Focus-Behavior
     public class SelectAllFocusBehavior
     {
-        public static bool GetEnable(FrameworkElement frameworkElement)
+        public static bool GetEnable(Control frameworkElement)
         {
             return (bool)frameworkElement.GetValue(EnableProperty);
         }
 
-        public static void SetEnable(FrameworkElement frameworkElement, bool value)
+        public static void SetEnable(Control frameworkElement, bool value)
         {
             frameworkElement.SetValue(EnableProperty, value);
         }
 
-        public static readonly DependencyProperty EnableProperty =
-                 DependencyProperty.RegisterAttached("Enable",
-                    typeof(bool), typeof(SelectAllFocusBehavior),
-                    new FrameworkPropertyMetadata(false, OnEnableChanged));
+        public static readonly AvaloniaProperty EnableProperty =
+                 AvaloniaProperty.RegisterAttached<TextBox, bool>("Enable", typeof(SelectAllFocusBehavior));
 
-        private static void OnEnableChanged
-                   (DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnEnableChanged(AvaloniaPropertyChangedEventArgs e)
         {
-            var frameworkElement = d as FrameworkElement;
+            
+            var frameworkElement = e.Sender as Control;
             if (frameworkElement == null) return;
 
             if (e.NewValue is bool == false) return;
@@ -121,29 +121,27 @@ namespace DominoPlanner.Usage
             if ((bool)e.NewValue)
             {
                 frameworkElement.GotFocus += SelectAll;
-                frameworkElement.PreviewMouseDown += IgnoreMouseButton;
+                frameworkElement.PointerPressed += IgnoreMouseButton;
             }
             else
             {
                 frameworkElement.GotFocus -= SelectAll;
-                frameworkElement.PreviewMouseDown -= IgnoreMouseButton;
+                frameworkElement.PointerPressed -= IgnoreMouseButton;
             }
         }
 
-        private static void SelectAll(object sender, RoutedEventArgs e)
+        private static void SelectAll(object sender, GotFocusEventArgs e)
         {
-            var frameworkElement = e.OriginalSource as FrameworkElement;
+            var frameworkElement = e.Source as Control;
             if (frameworkElement is TextBox)
-                ((TextBoxBase)frameworkElement).SelectAll();
-            else if (frameworkElement is PasswordBox)
-                ((PasswordBox)frameworkElement).SelectAll();
+                ((TextBox)frameworkElement).SelectAll();
         }
 
         private static void IgnoreMouseButton
-                (object sender, System.Windows.Input.MouseButtonEventArgs e)
+                (object sender, PointerPressedEventArgs e)
         {
-            var frameworkElement = sender as FrameworkElement;
-            if (frameworkElement == null || frameworkElement.IsKeyboardFocusWithin) return;
+            var frameworkElement = sender as Control;
+            if (frameworkElement == null) return;
             e.Handled = true;
             frameworkElement.Focus();
         }

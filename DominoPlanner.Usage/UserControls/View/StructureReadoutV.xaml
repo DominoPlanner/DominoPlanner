@@ -1,18 +1,17 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
-             mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="300">
     <UserControl.Resources>
         <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox DockPanel.Dock="Top" Header="Image readout">
+        <HeaderedContentControl DockPanel.Dock="Top" Header="Image readout">
             <DockPanel>
                 <Grid Grid.Row="4" DockPanel.Dock="Top">
                     <Grid.ColumnDefinitions>
@@ -24,6 +23,6 @@
                 </Grid>
                 <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
             </DockPanel>
-        </GroupBox>
+        </HeaderedContentControl>
     </Grid>
 </UserControl>

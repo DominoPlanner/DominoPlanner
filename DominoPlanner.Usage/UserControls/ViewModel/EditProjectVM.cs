@@ -1,15 +1,10 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using Avalonia.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -18,7 +13,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public EditProjectVM(IDominoProvider dominoProvider) : base()
         {
-            HaveBuildtools = dominoProvider.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.HasProtocolDefinition;
 
             UICursor = null;
             selectedDominoes = new List<int>();
@@ -48,7 +43,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RemoveColumns = new RelayCommand(o => { RemoveSelColumns(); });
             FlipHorizontallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
             FlipVerticallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
-            MouseInPicture = new RelayCommand(o => { UICursor = Cursors.Hand; });
+            MouseInPicture = new RelayCommand(o => { UICursor = new Cursor(StandardCursorType.Hand); });
             MouseOutPicture = new RelayCommand(o => { UICursor = null; });
             SelectAllCom = new RelayCommand(o => { SelectAll(); });
             UnsavedChanges = false;
@@ -109,8 +104,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
 
-        private Visibility _HaveBuildtools;
-        public Visibility HaveBuildtools
+        private bool _HaveBuildtools;
+        public bool HaveBuildtools
         {
             get { return _HaveBuildtools; }
             set
@@ -228,13 +223,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private ColumnConfig _colorColumnConfig;
+        /*private ColumnConfig _colorColumnConfig;
 
         public ColumnConfig ColorColumnConfig
         {
             get { return _colorColumnConfig; }
             set { _colorColumnConfig = value; }
-        }
+        }*/
 
         #endregion
 
@@ -300,7 +295,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void refreshList()
         {
-            // Setup Columns
+            /*// Setup Columns
             ColorColumnConfig = new ColumnConfig();
 
             var columns = new ObservableCollection<Column>();
@@ -323,7 +318,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _DominoList.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
-            }
+            }*/
         }
         private void SelectAll()
         {
@@ -597,18 +592,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private void Dic_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Dic_MouseDown(object sender, PointerPressedEventArgs e)
         {
             DominoInCanvas dic = (DominoInCanvas)sender;
-
-            if (e.LeftButton == MouseButtonState.Pressed)
+            var update = e.GetCurrentPoint(null).Properties;
+            if (update.IsLeftButtonPressed)
             {
                 if (IsSelected(dic.idx))
                 {
                     SelectionTool.Select(new int[] { dic.idx }, true);
                 }
             }
-            else if (e.RightButton == MouseButtonState.Pressed)
+            else if (update.IsRightButtonPressed)
             {
                 SelectionTool.Select(new int[] { dic.idx }, false);
             }
@@ -634,17 +629,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        internal void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseDown(object sender, PointerPressedEventArgs e)
         {
             SelectedTool?.MouseDown(sender, e);
         }
 
-        internal void Canvas_MouseMove(object sender, MouseEventArgs e)
+        internal void Canvas_MouseMove(object sender, PointerEventArgs e)
         {
             SelectedTool?.MouseMove(sender, e);
         }
 
-        internal void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseUp(object sender, PointerReleasedEventArgs e)
         {
             SelectedTool?.MouseUp(sender, e);
             UpdateUIElements();

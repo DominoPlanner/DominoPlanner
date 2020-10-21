@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
+using Avalonia.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -30,7 +30,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
-            ColorColumnConfig = new ColumnConfig();
+            /*ColorColumnConfig = new ColumnConfig();
 
             var columns = new ObservableCollection<Column>();
             columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
@@ -38,7 +38,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
             columns.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
             columns.Add(new Column() { DataField = "Weight", Header = "Weight" });
-            ColorColumnConfig.Columns = columns;
+            ColorColumnConfig.Columns = columns;*/
 
             AllowRegeneration = AllowRegenerate;
         }
@@ -46,7 +46,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         public string[] TargetSizeAffectedProperties;
-        public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
+        //public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
         {
@@ -167,8 +167,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
-        public System.Windows.Media.Color backgroundColor
+        private Avalonia.Media.Color _backgroundColor = Avalonia.Media.Color.FromArgb(0, 255, 255, 255);
+        public Avalonia.Media.Color backgroundColor
         {
             get { return _backgroundColor; }
             set
@@ -238,13 +238,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 _popupOpen = value; RaisePropertyChanged();
             }
         }
-        public System.Windows.Threading.Dispatcher dispatcher;
+        public Avalonia.Threading.Dispatcher dispatcher;
         protected void refreshPlanPic()
         {
             if (AllowRegeneration == true)
             {
                 System.Diagnostics.Debug.WriteLine(progress.ToString());
-                if (dispatcher == null)
+                /*if (dispatcher == null)
                 {
                     CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
                     cursor = null;
@@ -254,7 +254,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    dispatcher.BeginInvoke((Action)(() =>
+                    dispatcher.InvokeAsync((Action)(() =>
                     {
                         try
                         {
@@ -267,7 +267,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         }
                         catch { }
                     }));
-                }
+                }*/
             }
             else if (AllowRegeneration == null)
             {
@@ -287,7 +287,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cs?.Cancel();
                 cs = new CancellationTokenSource();
-                cursor = Cursors.Wait;
+                cursor = new Cursor(StandardCursorType.Wait);
                 refrshCounter++;
                 if (AllowRegeneration == true)
                 {
@@ -377,7 +377,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.ShowDialog();
+            protocolV.Show(MainWindowViewModel.GetWindow());
         }
         public void RefreshTargetSize()
         {

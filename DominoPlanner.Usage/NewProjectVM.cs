@@ -1,6 +1,5 @@
-﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
-using DominoPlanner.Usage.Serializer;
+﻿using Avalonia.Controls;
+using DominoPlanner.Core;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -15,8 +14,8 @@ namespace DominoPlanner.Usage
         #region CTOR
         public NewProjectVM()
         {
-            SelectedPath = Properties.Settings.Default.StandardProjectPath;
-            sPath = Properties.Settings.Default.StandardColorArray;
+            SelectedPath = MainWindow.ReadSetting("StandardProjectPath");
+            sPath = MainWindow.ReadSetting("StandardColorArray");
             ProjectName = "New Project";
             rbStandard = true;
             rbCustom = false; //damit die Labels passen
@@ -29,10 +28,11 @@ namespace DominoPlanner.Usage
         #region Methods
         private void SelectProjectFolder()
         {
-            System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
-            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFolderDialog ofd = new OpenFolderDialog();
+            var result = ofd.ShowDialog();
+            if (result != null && result != "")
             {
-                SelectedPath = fbd.SelectedPath;
+                SelectedPath = result;
             }
         }
 
@@ -52,18 +52,18 @@ namespace DominoPlanner.Usage
                 Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
                 DominoAssembly main = new DominoAssembly();
-                main.Save(Path.Combine(projectpath, ProjectName + Properties.Resources.ProjectExtension));
+                main.Save(Path.Combine(projectpath, ProjectName + "." + MainWindow.ReadSetting("ProjectExtension")));
 
                 if (File.Exists(sPath))
                 {
-                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors{Properties.Resources.ColorExtension}");
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors.{MainWindow.ReadSetting("ColorExtension")}");
                     File.Copy(sPath, colorPath);
-                    main.colorPath = Path.Combine("Planner Files", "colors" + Properties.Resources.ColorExtension);
+                    main.colorPath = Path.Combine("Planner Files", "colors." + MainWindow.ReadSetting("ColorExtension"));
                 }
 
                 main.Save();
 
-                Errorhandler.RaiseMessage($"The project {ProjectName}{Properties.Resources.ProjectExtension} has been created", "Created", Errorhandler.MessageType.Info);
+                Errorhandler.RaiseMessage($"The project {ProjectName}.{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)
@@ -77,14 +77,16 @@ namespace DominoPlanner.Usage
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.InitialDirectory = sPath;
-                openFileDialog.Filter = $"domino color files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|All files (*.*)|*.*";
+                openFileDialog.Directory = sPath;
+                openFileDialog.AllowMultiple = false;
+                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ColorExtension") }, Name = "Color files" });
+                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
             }
             catch (Exception) { }
-
-            if (openFileDialog.ShowDialog() == true)
+            var result = openFileDialog.ShowDialog();
+            if (result != null && result.Length == 1 && result[0] != "")
             {
-                sPath = openFileDialog.FileName;
+                sPath = result[0];
             }
         }
         #endregion
@@ -171,13 +173,13 @@ namespace DominoPlanner.Usage
                     RaisePropertyChanged();
                 }
                 if (value)
-                    ColorVisibility = Visibility.Visible;
+                    ColorVisibility = true;
                 else
-                    ColorVisibility = Visibility.Hidden;
+                    ColorVisibility = false;
             }
         }
-        private Visibility _ColorVisibility;
-        public Visibility ColorVisibility
+        private bool _ColorVisibility;
+        public bool ColorVisibility
         {
             get { return _ColorVisibility; }
             set

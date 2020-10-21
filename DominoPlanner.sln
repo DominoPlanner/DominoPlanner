@@ -18,8 +18,6 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlanner.PreviewHandler", "DominoPlanner.PreviewHandler\DominoPlanner.PreviewHandler.csproj", "{7FB0E775-DD0A-4517-8A7D-CE5C3900A697}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlanner.UI", "DominoPlanner.UI\DominoPlanner.UI.csproj", "{32AAB48F-E24C-481F-A649-83CF442AE92A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlanner.Core", "DominoPlanner.Core\DominoPlanner.Core.csproj", "{05AC7367-0922-46E9-8EEB-2FE186BD4D09}"
 EndProject
 Global

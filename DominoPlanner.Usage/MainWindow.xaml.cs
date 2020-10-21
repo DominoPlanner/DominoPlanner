@@ -1,22 +1,18 @@
-﻿using System;
-using System.Text;
-using System.Windows;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+using System;
+using System.Configuration;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public class MainWindow : Window
     {
-        NamedPipeManager PipeManager;
-        
-
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
-            PipeManager = new NamedPipeManager("DominoPlanner");
+            /*PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
             var args = Environment.GetCommandLineArgs();
@@ -30,20 +26,23 @@ namespace DominoPlanner.Usage
                 }
                 filesToOpen = sb.ToString();
             }
-            PipeManager.Write(filesToOpen);
+            PipeManager.Write(filesToOpen);*/
+#if DEBUG
+            //this.AttachDevTools();
+#endif
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(DataContext is MainWindowViewModel mwvm)
+            if (DataContext is MainWindowViewModel mwvm)
             {
                 if (!mwvm.CloseAllTabs())
                 {
                     e.Cancel = true;
                 }
             }
-            PipeManager.StopServer();
+            //PipeManager.StopServer();
         }
-        public void HandleNamedPipe_OpenRequest(string filesToOpen)
+        /*public void HandleNamedPipe_OpenRequest(string filesToOpen)
         {
             Dispatcher.Invoke(() =>
             {
@@ -56,6 +55,48 @@ namespace DominoPlanner.Usage
                 this.Activate();
                 Dispatcher.BeginInvoke(new Action(() => { this.Topmost = false; }));
             });
+        }*/
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+        public static string ReadSetting(string key)
+        {
+            try
+            {
+                var appSettings = ConfigurationManager.AppSettings;
+                string result = appSettings[key] ?? "";
+                return result;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error reading app settings");
+            }
+            return "";
+        }
+
+        public static void AddUpdateAppSettings(string key, string value)
+        {
+            try
+            {
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+                if (settings[key] == null)
+                {
+                    settings.Add(key, value);
+                }
+                else
+                {
+                    settings[key].Value = value;
+                }
+                configFile.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error writing app settings");
+            }
         }
     }
 }

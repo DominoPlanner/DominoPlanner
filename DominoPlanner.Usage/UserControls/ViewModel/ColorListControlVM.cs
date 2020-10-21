@@ -1,5 +1,5 @@
-﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
+﻿using Avalonia.Controls;
+using DominoPlanner.Core;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using System;
@@ -9,9 +9,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -90,7 +87,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ws.Cells["C3"].Value = "Available";
                 
                 // Write project titles
-                for (int i = 0; i < DifColumns.Count; i++)
+                /*for (int i = 0; i < DifColumns.Count; i++)
                 { 
                     ws.Cells[3, 4 + i].Value = DifColumns[i].Header;
                     
@@ -163,7 +160,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         Errorhandler.RaiseMessage("Save failed", "Fail", Errorhandler.MessageType.Error);
                     }
-                }
+                }*/
                     
             }
         }
@@ -210,7 +207,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddNewColor()
         {
-            colorRepository.Add(new DominoColor(System.Windows.Media.Colors.IndianRed, 0, "New Color"));
+            colorRepository.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color"));
             _ColorList.Add(new ColorListEntry() { DominoColor = colorRepository.RepresentionForCalculation.Last(), SortIndex = colorRepository.Anzeigeindizes.Last(),
              ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))});
 
@@ -222,12 +219,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if(FilePath == string.Empty)
             {
                 SaveFileDialog ofd = new SaveFileDialog();
-                ofd.Filter = $"Color repository files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|All files (*.*)|*.*";
-                if (ofd.ShowDialog() == true)
+                ofd.DefaultExtension = MainWindow.ReadSetting("ColorExtension");
+                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ColorExtension") }, Name = "Color files" });
+                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
+                var filename = ofd.ShowDialog();
+                if (filename != null && filename != "")
                 {
-                    if (ofd.FileName != string.Empty)
+                    if (filename != string.Empty)
                     {
-                        FilePath = ofd.FileName;
+                        FilePath = filename;
                     }
                     else
                     {
@@ -352,7 +352,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RaisePropertyChanged("ColorList");
         }
 
-        private ObservableCollection<DataGridColumn> _DifColumns;
+        /*private ObservableCollection<DataGridColumn> _DifColumns;
         public ObservableCollection<DataGridColumn> DifColumns
         {
             get { return _DifColumns; }
@@ -364,7 +364,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     //TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
-        }
+        }*/
 
         internal event EventHandler ShowProjectsChanged;
 
@@ -395,7 +395,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ShowProjects = true;
             //if (DifColumns == null)
-                DifColumns = new ObservableCollection<DataGridColumn>();
+                //DifColumns = new ObservableCollection<DataGridColumn>();
             //DifColumns.Clear();
             foreach(ColorListEntry cle in _ColorList)
             {
@@ -424,7 +424,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             _ColorList[i].ProjectCount.Add(0);
                         }
-                        AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
+                        //AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
                     }
                     catch
                     {
@@ -447,7 +447,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private void AddProjectCountsColumn(string projectName)
+        /*private void AddProjectCountsColumn(string projectName)
         {
             Binding amountBinding = new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString()));
             MultiBinding colorBinding = new MultiBinding();
@@ -470,7 +470,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             columnTemplate.VisualTree = textFactory;
             c.CellTemplate = columnTemplate;
             DifColumns.Add(c);
-        }
+        }*/
         #endregion
     }
     
