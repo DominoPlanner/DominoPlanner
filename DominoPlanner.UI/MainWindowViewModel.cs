@@ -25,8 +25,8 @@ namespace DominoPlanner.UI
             if (MainWindow.ReadSetting("FirstStartup") == "1")
             {
                 
-                MainWindow.AddUpdateAppSettings("StructureTemplates", Path.Combine(share_path, "colors" + MainWindow.ReadSetting("ColorExtension")));
-                MainWindow.AddUpdateAppSettings("StandardColorArray", Path.Combine(share_path, "colors" + MainWindow.ReadSetting("ColorExtension")));
+                //MainWindow.AddUpdateAppSettings("StructureTemplates", Path.Combine(share_path, "structures.xml"));
+                MainWindow.AddUpdateAppSettings("StandardColorArray", Path.Combine(share_path, "colors." + MainWindow.ReadSetting("ColorExtension")));
                 var project_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "DominoPlanner");
                 MainWindow.AddUpdateAppSettings("StandardProjectPath", project_path);
                 MainWindow.AddUpdateAppSettings("OpenProjectList", Path.Combine(share_path, "OpenProjects.xml"));
@@ -224,7 +224,7 @@ namespace DominoPlanner.UI
         {
             string path = param.ToString();
             string ex = Path.GetExtension(path).ToLower();
-            if (ex == MainWindow.ReadSetting("ColorExtension").ToLower() || ex == MainWindow.ReadSetting("ObjectExtension").ToLower())
+            if (ex == "." + MainWindow.ReadSetting("ColorExtension").ToLower() || ex == "." + MainWindow.ReadSetting("ObjectExtension").ToLower())
             {
                 OpenItem(GetTab(path) ?? new UserControls.ViewModel.TabItem(path));
             }
@@ -261,11 +261,11 @@ namespace DominoPlanner.UI
             {
                 var fn = s.Trim();
                 var ext = Path.GetExtension(fn).ToLower();
-                if (ext == MainWindow.ReadSetting("ObjectExtension").ToLower() || ext == MainWindow.ReadSetting("ColorExtension").ToLower())
+                if (ext == "." + MainWindow.ReadSetting("ObjectExtension").ToLower() || ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == MainWindow.ReadSetting("ColorExtension").ToLower())
+                else if (ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)
@@ -377,7 +377,7 @@ namespace DominoPlanner.UI
         private void loadProject(OpenProject newProject)
         {
             bool remove = true;
-            string projectpath = Path.Combine(newProject.path, $"{newProject.name}{MainWindow.ReadSetting("ProjectExtension")}");
+            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{MainWindow.ReadSetting("ProjectExtension")}");
             if (File.Exists(projectpath))
             {
                 remove = false;

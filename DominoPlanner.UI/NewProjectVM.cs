@@ -52,18 +52,18 @@ namespace DominoPlanner.UI
                 Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
                 DominoAssembly main = new DominoAssembly();
-                main.Save(Path.Combine(projectpath, ProjectName + MainWindow.ReadSetting("ProjectExtension")));
+                main.Save(Path.Combine(projectpath, ProjectName + "." + MainWindow.ReadSetting("ProjectExtension")));
 
                 if (File.Exists(sPath))
                 {
-                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors{MainWindow.ReadSetting("ColorExtension")}");
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors.{MainWindow.ReadSetting("ColorExtension")}");
                     File.Copy(sPath, colorPath);
-                    main.colorPath = Path.Combine("Planner Files", "colors" + MainWindow.ReadSetting("ColorExtension"));
+                    main.colorPath = Path.Combine("Planner Files", "colors." + MainWindow.ReadSetting("ColorExtension"));
                 }
 
                 main.Save();
 
-                Errorhandler.RaiseMessage($"The project {ProjectName}{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info);
+                Errorhandler.RaiseMessage($"The project {ProjectName}.{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)

@@ -109,7 +109,7 @@ namespace DominoPlanner.UI
             }
         }
 
-        private string _endung = MainWindow.ReadSetting("ObjectExtension");
+        private string _endung = "." + MainWindow.ReadSetting("ObjectExtension");
         public string Extension
         {
             get { return _endung; }
@@ -166,7 +166,7 @@ namespace DominoPlanner.UI
                     8, 8, 24, 8, 5000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
-            /*ViewModels.Add(new DominoProviderObjectEntry()
+            ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Structure",
                 Description = "Add a structure (e.g. Wall) based on an image",
@@ -175,7 +175,7 @@ namespace DominoPlanner.UI
                 Provider = new CreateRectangularStructureVM(
                     new StructureParameters(5, 5, Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
                     2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
-            });*/
+            });
             ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Circle",
@@ -353,7 +353,7 @@ namespace DominoPlanner.UI
         public override object ViewModel => Provider;
         public DominoProviderVM Provider { get; set; }
 
-        public override string Extension => MainWindow.ReadSetting("ObjectExtension");
+        public override string Extension => "." + MainWindow.ReadSetting("ObjectExtension");
 
         public bool Finalize(string filepath, DominoAssembly parentProject)
         {
@@ -410,7 +410,7 @@ namespace DominoPlanner.UI
     }
     public class NewAssemblyEntry : NewObjectEntry
     {
-        public override string Extension => MainWindow.ReadSetting("ProjectExtension");
+        public override string Extension => "." + MainWindow.ReadSetting("ProjectExtension");
         public override object ViewModel => this;
         public string ColorPath { get; set; }
         DominoAssembly parentProject;

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
              x:Class="DominoPlanner.UI.UserControls.View.RectangularSize">
   <Grid>
     <HeaderedContentControl>
@@ -18,11 +18,11 @@
       </HeaderedContentControl.Header>
       <DockPanel>
         <DockPanel DockPanel.Dock="Top">
-          <TextBlock DockPanel.Dock="Left" Text="Structure Size:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-          <NumericUpDown Minimum="1" Value="{Binding DominoCount}" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="120"/>
-          <TextBlock DockPanel.Dock="Left" Text="Dominoes" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+          <TextBlock DockPanel.Dock="Left" Text="Structure Size:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+          <NumericUpDown Minimum="1" Value="{Binding DominoCount}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"/>
+          <TextBlock DockPanel.Dock="Left" Text="Dominoes" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         </DockPanel>
-        <ComboBox DockPanel.Dock="Top" Items="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
+        <ComboBox DockPanel.Dock="Top" Items="{Binding list}" SelectedIndex="{Binding structure_index}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
         <Grid Margin="0, 5, 0, 0" Grid.IsSharedSizeScope="True">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -74,8 +74,8 @@
                        Margin="1" Source="{Binding Path=description_imgs[8]}"/>
           </Border>
 
-          <NumericUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength}" IsVisible="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="26" Margin="0, 5, 0, 0" Width="55"/>
-          <NumericUpDown Minimum="0" Value="{Binding sHeight}" IsVisible="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4" Height="26" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
+          <NumericUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength}" IsVisible="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Margin="0, 5, 0, 0" Width="55"/>
+          <NumericUpDown Minimum="0" Value="{Binding sHeight}" IsVisible="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
         </Grid>
       </DockPanel>
     </HeaderedContentControl>
