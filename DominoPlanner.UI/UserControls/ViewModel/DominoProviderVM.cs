@@ -375,9 +375,9 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         }
         protected void OpenBuildTools()
         {
-            /*ProtocolV protocolV = new ProtocolV();
+            ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.ShowDialog();*/
+            protocolV.Show(MainWindowViewModel.GetWindow());
         }
         public void RefreshTargetSize()
         {

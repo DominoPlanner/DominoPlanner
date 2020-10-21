@@ -1,0 +1,259 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:DominoPlanner.UI.UserControls.View"
+             xmlns:vm="clr-namespace:DominoPlanner.UI.UserControls.ViewModel"
+             xmlns:parent="clr-namespace:DominoPlanner.UI"
+             xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
+             
+             mc:Ignorable="d"
+             x:Class="DominoPlanner.UI.UserControls.View.EditProject"
+            d:DesignHeight="600" d:DesignWidth="1000" Cursor="{Binding UICursor}"
+           HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+ScrollViewer.VerticalScrollBarVisibility="Disabled">
+  <!--SizeChanged="UserControl_SizeChanged"-->
+  <UserControl.Styles>
+    <!--<Style BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton"/>-->
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+    <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
+    <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
+    <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
+    <local:ImageConverter x:Key="ImageConverter"/>
+  </UserControl.Resources>
+  <UserControl.DataTemplates>
+    <DataTemplate DataType="{x:Type vm:EditingToolVM}">
+      <TextBlock VerticalAlignment="Center">Coming soon!</TextBlock>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Mode:</TextBlock>
+        <RadioButton Width="24" Margin="0, 0" GroupName="SelectMode" ToolTip.Tip="Remove from selection"
+                     IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Add} }">
+          +
+        </RadioButton>
+        <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="Left mouse button: add, right mouse button: remove" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Neutral} }">
+          ±
+        </RadioButton>
+        <RadioButton Width="24" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="Remove from selection" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
+                    Converter={StaticResource EnumBooleanConverter}, 
+                    ConverterParameter={x:Static vm:SelectionMode.Remove} }">
+          -
+        </RadioButton>
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Selection Shape:</TextBlock>
+
+        <ListBox Background="Transparent" Margin="0, -2, 0, 0" Height="28"
+             BorderBrush="Transparent" Padding="0"
+             BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+             VerticalAlignment="Stretch" SelectedItem="{Binding CurrentSelectionDomain, Mode=TwoWay}"
+                 Items="{Binding SelectionTools}">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem">
+              <Setter Property="Margin" Value="2, 0, 0, 0"/>
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListBoxItem">
+                    <ContentPresenter/>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+
+          <ListBox.ItemTemplate>
+            <DataTemplate >
+              <RadioButton ToolTip.Tip="{Binding Name}"
+                       IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem, AncestorLevel=1}, Mode=TwoWay}"
+                       Height="24" Width="24" Margin="0, 1" GroupName="SelectionMode">
+                <Image Width="18" Height="18" Source="{Binding img}"/>
+              </RadioButton>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Boundary treatment:</TextBlock>
+        <RadioButton Width="24" Margin="0, 0" GroupName="Boundary" ToolTip.Tip="Include dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary}">
+          <Image Source="{StaticResource include_borderDrawingImage}" Width="18" Height="18"/>
+        </RadioButton>
+        <RadioButton Width="24" Margin="1, 0" GroupName="Boundary" ToolTip.Tip="Exclude dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
+          <Image Source="{StaticResource exclude_borderDrawingImage}" Width="18" Height="18"/>
+        </RadioButton>
+        <Button Width="24" Margin="30, 0, 1, 0" ToolTip.Tip="Undo last selection operation" Command="{Binding UndoSelectionOperation}">
+          <Image Source="{StaticResource undoDrawingImage}" Width="18" Height="18"/>
+        </Button>
+        <Button Width="24" Margin="1, 0" ToolTip.Tip="Redo selection operation" Command="{Binding RedoSelectionOperation}">
+          <Image Source="{StaticResource redoDrawingImage}" Width="18" Height="18"/>
+        </Button>
+        <Button Width="24" Margin="30, 0, 1, 0" ToolTip.Tip="Invert selection" Command="{Binding InvertSelection}">
+          <Image Source="{StaticResource invert_selectionDrawingImage}" Width="18" Height="18"/>
+        </Button>
+        <Button Width="24" Margin="30, 0, 1, 0" ToolTip.Tip="Clear selection" Command="{Binding DataContext.ClearSelection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
+          <Image Source="{StaticResource closeDrawingImage}" Width="18" Height="18"/>
+        </Button>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DisplaySettingsToolVM}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0">Background Color:</TextBlock>
+        <cp:ColorPicker Width="50" Margin="0, 0, 5, 0" Color="{Binding BackgroundColor }"/>
+        <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+
+        <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" IsVisible="{Binding Expandable}" IsChecked="{Binding Expanded}"/>
+        <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0" IsVisible="{Binding Expandable}"></Border>
+
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Color:</TextBlock>
+        <cp:ColorPicker Width="50" Margin="2, 0, 5, 0" Color="{Binding BorderColor}"/>
+        <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Border Size:</TextBlock>
+
+        <Slider Margin="5, 0, 0, 0" Width="50" Minimum="0" Maximum="5" Value="{Binding BorderSize}"></Slider>
+        <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Image overlay transparency:</TextBlock>
+        <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding ImageOpacity}" Minimum="0" Maximum="1"></Slider>
+        <RadioButton Width="24" Margin="0, 0" GroupName="ImagePosition" ToolTip.Tip="Display image below dominoes" IsChecked="{Binding Above, Converter={StaticResource BoolInverterConverter}}">
+          <Image Source="{StaticResource stack_image_belowDrawingImage}" Width="18" Height="18"/>
+        </RadioButton>
+        <RadioButton Width="24" Margin="1, 0" GroupName="ImagePosition" ToolTip.Tip="Display image above dominoes" IsChecked="{Binding Above}">
+          <Image Source="{StaticResource stack_image_aboveDrawingImage}" Width="18" Height="18"/>
+        </RadioButton>
+        <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>
+        <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Open Image:</TextBlock>
+        <Button Width="24" Margin="1, 0"  ToolTip.Tip="Open image" Command="{Binding ShowImageClick}">
+          <Image Source="{StaticResource openDrawingImage}" Width="18" Height="18"/>
+        </Button>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ZoomToolVM}">
+      <StackPanel Orientation="Horizontal" Margin="5, 0">
+        <Button Width="24" Margin="1, 0"  ToolTip.Tip="Zoom out" Command="{Binding ZoomOut}">
+          <Image Source="{StaticResource zoom_outDrawingImage}" Width="18" Height="18"/>
+        </Button>
+        <Slider HorizontalAlignment="Center" Minimum="1" Maximum="6" Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
+        <Button Width="24" Margin="1, 0"  ToolTip.Tip="Zoom in" Command="{Binding ZoomIn}">
+          <Image Source="{StaticResource zoom_inDrawingImage}" Width="18" Height="18"/>
+        </Button>
+      </StackPanel>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+  <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="40"/>
+    </Grid.RowDefinitions>
+    <Border BorderThickness="0, 0, 0, 1" BorderBrush="Gray">
+
+      <StackPanel Orientation="Horizontal" Margin="1, 1" Height="24">
+        <Border BorderBrush="Black" BorderThickness="1" Width="24">
+          <Image Source="{Binding SelectedTool.img}" Width="18" Height="18"/>
+        </Border>
+        <ContentControl Margin="2, 0, 0, 0" Content="{Binding SelectedTool}">
+          <!--ContentTemplate="{StaticResource DisplaySettingsTemplate}"-->
+
+        </ContentControl>
+
+      </StackPanel>
+    </Border>
+    <Grid x:Name="CanGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" >
+      <!--SizeChanged="Grid_SizeChanged_1"-->
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="25"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="320"/>
+      </Grid.ColumnDefinitions>
+
+      <DockPanel Margin="5, 0" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch">
+        <Button DockPanel.Dock="Top" Grid.Row="0" Margin="0, 2" Height="24" Content="Clear Selection" Command="{Binding ClearSelection}"/>
+        <Button DockPanel.Dock="Top" Grid.Row="1" Margin="0, 2" Height="24" Content="Select stones in selected color" Command="{Binding SelectColor}" ToolTip.Tip="Select all stones in the color selected in the list below. &#x0a; If some stones are selected this function only applies to the selected stones"/>
+        <!--<parent:ColorControl Grid.Row="1" Grid.Column="2" 
+                                         ClickCommand="{Binding MouseClickCommand}" 
+                                         ColumnConfig="{Binding ColorColumnConfig}" 
+                                         Colors="{Binding DominoList}" 
+                                         SelectedColor="{Binding SelectedColor}">
+                </parent:ColorControl>-->
+      </DockPanel>
+      <ScrollViewer Grid.Column="1" x:Name="ScrollViewer" Margin="0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <!--SizeChanged="Grid_SizeChanged" -->
+        <ContentControl Content="{Binding DisplaySettingsTool.DominoProject}" Margin="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" UseLayoutRounding="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+      </ScrollViewer>
+      <ListBox Background="Transparent"
+               BorderBrush="Transparent"
+               BorderThickness="0"
+               VerticalAlignment="Stretch"
+               Items="{Binding EditingTools}"
+               SelectedItem="{Binding SelectedTool, Mode=TwoWay}">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Margin" Value="2, 0, 0, 0"/>
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                  <ContentPresenter/>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ListBox.Styles>
+
+        <ListBox.ItemTemplate>
+          <DataTemplate >
+            <RadioButton ToolTip.Tip="{Binding Name}"
+                         IsChecked="{Binding IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Mode=TwoWay}"
+                         Height="25" Margin="0, 1" GroupName="A">
+              <Image Width="18" Height="18" Source="{Binding img}"/>
+            </RadioButton>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+
+    <Grid Grid.Row="2">
+      <StackPanel Grid.Row="2"  Orientation="Horizontal">
+        <Button Height="30" Width="120" Margin="5" HorizontalAlignment="Left" Command="{Binding RestoreBasicSettings}">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Image Height="20" Source="/Icons/draw_freehand.ico" Margin="2" />
+            <TextBlock Text="Basic Settings" />
+          </StackPanel>
+        </Button>
+        <Button Grid.Row="2" Height="30" Margin="5" Width="120" HorizontalAlignment="Left" IsVisible="{Binding VisibleFieldplan}" Command="{Binding BuildtoolsClick}">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+            <Image Height="20" Source="/Icons/file_export.ico"  Margin="2" />
+            <TextBlock Text="Buildtools" />
+          </StackPanel>
+        </Button>
+        <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Name: "/>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding name}"/>
+        <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Rows: "/>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>
+        <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Stones/Row: "/>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectWidth}"/>
+        <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Amount: "/>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectAmount}"/>
+        <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
+              <Binding Path="PhysicalLength"/>
+              <Binding Path="PhysicalHeight"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

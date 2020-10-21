@@ -18,7 +18,7 @@ namespace DominoPlanner.UI
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .LogToDebug(Avalonia.Logging.LogEventLevel.Verbose, areas: new string[] {"Binding"});
+                .LogToDebug(Avalonia.Logging.LogEventLevel.Verbose);
         
         
     }

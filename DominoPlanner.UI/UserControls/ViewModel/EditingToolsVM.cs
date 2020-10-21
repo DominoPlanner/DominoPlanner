@@ -31,7 +31,10 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         public string Image
         {
             get { return image; }
-            set { image = value; img = (DrawingImage)Application.Current.Resources[value]; }
+            set { image = value;
+                Application.Current.TryFindResource(value, out object temp);
+                img = (DrawingImage)temp;
+            }
         }
 
         public DrawingImage img { get; private set; }
@@ -197,7 +200,9 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         public string Image
         {
             get { return image; }
-            set { image = value; img = (DrawingImage)Application.Current.Resources[value]; }
+            set { image = value; Application.Current.TryFindResource(value, out object temp);
+                img = (DrawingImage)temp;
+            }
         }
        
 
@@ -711,7 +716,7 @@ namespace DominoPlanner.UI.UserControls.ViewModel
                         string absolutePath = Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject);
                         if (File.Exists(absolutePath))
                         {
-                            FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(absolutePath);
+                            //FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(absolutePath);
                             FilteredMat = new Image<Emgu.CV.Structure.Bgra, byte>(absolutePath);
                         }
                     }

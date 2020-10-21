@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Logging;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace DominoPlanner.UI
 {
@@ -11,6 +12,7 @@ namespace DominoPlanner.UI
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
+            Logger.Sink = new CustomLogSink(LogEventLevel.Information);
             Debug.WriteLine(Logger.IsEnabled(LogEventLevel.Information, "Binding"));
         }
 

@@ -87,17 +87,18 @@ namespace DominoPlanner.UI.UserControls.ViewModel
         internal string _AbsolutePath;
         public abstract string AbsolutePath { get; set; }
 
-        private ObservableCollection<MenuItem> _ContextMenu;
+        private ContextMenu _ContextMenu;
 
-        public ObservableCollection<MenuItem> ContextMenu
+        public ContextMenu ContextMenu
         {
             get
             {
                 if (_ContextMenu == null)
                 {
                     var ContextMenuEntries = BuildContextMenu();
-                    _ContextMenu = new ObservableCollection<Avalonia.Controls.MenuItem>(ContextMenuEntries);
-                    RaisePropertyChanged();
+                    _ContextMenu = new ContextMenu();
+                    _ContextMenu.Items = new List<Avalonia.Controls.MenuItem>(ContextMenuEntries);
+                    //RaisePropertyChanged();
                 }
                 return _ContextMenu;
             }

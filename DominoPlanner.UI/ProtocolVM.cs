@@ -364,9 +364,9 @@ namespace DominoPlanner.UI
         }
         private void ShowLiveHelper()
         {
-            /*LiveBuildHelperV lbhv = new LiveBuildHelperV();
+            LiveBuildHelperV lbhv = new LiveBuildHelperV();
             lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY);
-            lbhv.ShowDialog();*/
+            lbhv.Show();
         }
 
         public void SaveExcelFile()

@@ -43,7 +43,8 @@ namespace DominoPlanner.UI
             }
             base.Render(dc);
 
-
+            var unselectedBrush = new SolidColorBrush(UnselectedBorderColor);
+            var selectedBrush = new SolidColorBrush(SelectedBorderColor);
             if (!above && bit != null)
                 dc.DrawImage(bit, new Rect(0, 0, Width, Height));
             foreach (DominoInCanvas dic in Stones)
@@ -66,7 +67,7 @@ namespace DominoPlanner.UI
                 Pen pen = new Pen();
                 if (dic.isSelected)
                 {
-                    pen.Brush = new SolidColorBrush(SelectedBorderColor);
+                    pen.Brush = selectedBrush;
                     pen.Thickness = BorderSize;
                 }
                 else if (dic.PossibleToPaste)
@@ -76,7 +77,7 @@ namespace DominoPlanner.UI
                 }
                 else
                 {
-                    pen.Brush = new SolidColorBrush(UnselectedBorderColor);
+                    pen.Brush = unselectedBrush;
                     pen.Thickness = BorderSize / 2;
                 }
 

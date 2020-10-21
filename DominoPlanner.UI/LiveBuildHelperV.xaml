@@ -1,0 +1,86 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DominoPlanner.UI"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        
+        mc:Ignorable="d" 
+        x:Class="DominoPlanner.UI.LiveBuildHelperV"
+        Title="FieldBlockViewer"
+        Height="600" Width="800" 
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="PointerPressed">
+            <ia:InvokeCommandAction Command="{Binding MouseDown}"/>
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
+              <!-- PreviewKeyDown="IntegerUpDown_PreviewKeyDown"-->
+              <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+              <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
+              <!--PreviewKeyDown="IntegerUpDown_PreviewKeyDown"-->
+                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+            </Grid>
+            <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+            <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
+                    <StackPanel>
+                        <TextBlock>Show remaining colors</TextBlock>
+                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                          <!--<local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
+
+                            </local:ColorControl>-->
+                        </Popup>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+      <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding currentBlock}" >
+        <!--PointerPressed="ContentControl_MouseDown"-->
+        <!--
+          <i:Interaction.Behaviors>
+                <i:EventTrigger EventName="SizeChanged">
+                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="Loaded">
+                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
+                </i:EventTrigger>
+            </i:Interaction.Behaviors>-->
+      </ContentControl>
+    </Grid>
+</Window>
