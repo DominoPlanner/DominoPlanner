@@ -1,5 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -80,11 +82,12 @@ namespace DominoPlanner.Usage
 
         #endregion
     }
-    public class ContextMenuEntry : MenuItem
+    
+    public class ContextMenuEntry
     {
-
-        public ContextMenuEntry(ContextMenuAttribute attr, MethodInfo mi, object reference)
+        public static MenuItem GenerateMenuItem(ContextMenuAttribute attr, MethodInfo mi, object reference)
         {
+            MenuItem MI = new MenuItem();
             bool Activated = true;
             bool isMethod = !bool.TryParse(attr.Activated, out Activated);
             if (isMethod)
@@ -100,13 +103,19 @@ namespace DominoPlanner.Usage
                     Activated = false;
                 }
             }
-            Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
-            Header = attr.Header;
-            /*if (!string.IsNullOrEmpty(attr.ImageSource))
-                Icon = new Image { 
-                Source = new Bitmap(attr.ImageSource) };*/
-            this.IsVisible = attr.IsVisible;
-            IsEnabled = Activated;
+            MI.Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
+            MI.Header = attr.Header;
+            if (!string.IsNullOrEmpty(attr.ImageSource))
+            {
+                var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                MI.Icon = new Image
+                {
+                    Source = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage/" + attr.ImageSource, UriKind.Absolute)))
+            };
+            }
+            MI.IsVisible = attr.IsVisible;
+            MI.IsEnabled = Activated;
+            return MI;
         }
     }
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]

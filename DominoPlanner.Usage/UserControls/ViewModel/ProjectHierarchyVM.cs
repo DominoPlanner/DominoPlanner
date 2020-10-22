@@ -97,7 +97,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     var ContextMenuEntries = BuildContextMenu();
                     _ContextMenu = new ContextMenu();
-                    _ContextMenu.Items = new List<Avalonia.Controls.MenuItem>(ContextMenuEntries);
+                    _ContextMenu.Items = ContextMenuEntries;
                     //RaisePropertyChanged();
                 }
                 return _ContextMenu;
@@ -122,7 +122,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                       .Select(m => Tuple.Create(m, m.GetCustomAttributes(typeof(ContextMenuAttribute), false)))
                       .Where(tuple => tuple.Item2.Count() > 0)
                       .OrderBy(tuple => (tuple.Item2.First() as ContextMenuAttribute).Index)
-                      .Select(tuple => (MenuItem) new ContextMenuEntry(tuple.Item2.First() as ContextMenuAttribute, tuple.Item1, this))
+                      .Select(tuple => ContextMenuEntry.GenerateMenuItem(tuple.Item2.First() as ContextMenuAttribute, tuple.Item1, this))
                       .ToList();
         }
         public static NodeVM NodeVMFactory(IDominoWrapper node, AssemblyNodeVM parent)
@@ -331,7 +331,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
         }
         [ContextMenuAttribute("Add existing object", "Icons/add.ico", index: 2)]
-        public void AddExistingItem()
+        public async void AddExistingItem()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filters.Add(
@@ -340,7 +340,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ObjectExtension") }, Name = "Object files" });
             openFileDialog.Filters.Add(
                 new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ProjectExtension") }, Name = "Project files" });
-            var result = openFileDialog.ShowDialog();
+            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 string extension = Path.GetExtension(result[0]).ToLower();

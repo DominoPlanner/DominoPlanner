@@ -1,8 +1,13 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Geometry x:Key="fill_bucketGeometry1">F1 M50.799999,50.799999z M0,0z M11.868572,291.43615L3.7740352,283.33921C0.22505815,279.78918,0.13160368,274.16674,3.5644798,270.73283L25.243559,249.04729 31.649646,255.4553 39.744172,263.55224 46.150259,269.96023 24.47118,291.64577C21.038303,295.07968,15.417539,294.98618,11.868572,291.43615z</Geometry>
-    <Geometry x:Key="fill_bucketGeometry2">F1 M50.799999,50.799999z M0,0z M30.550941,265.50719C30.550941,265.50719 15.032968,262.40647 12.645757,257.89382 11.368036,255.47848 12.582867,253.48142 13.765808,252.86014 16.452494,251.4491 19.248816,254.83299 19.248816,254.83299</Geometry>
-    <Geometry x:Key="fill_bucketGeometry3">F1 M50.799999,50.799999z M0,0z M45.418383,278.86456C45.418383,278.86456 43.972763,282.93328 42.718916,285.54174 41.465069,288.1502 40.632277,289.1828 41.170086,290.62666 42.431805,294.01398 48.902438,294.29121 49.666679,290.62666 49.982129,289.11406 49.371698,288.1502 48.117851,285.54174 46.864003,282.93328 45.418383,278.86456 45.418383,278.86456z</Geometry>
+    <Geometry x:Key="fill_bucketGeometry1">M11.868572,291.43615L3.7740352,283.33921C0.22505815,279.78918,0.13160368,274.16674,3.5644798,270.73283L25.243559,249.04729 31.649646,255.4553 39.744172,263.55224 46.150259,269.96023 24.47118,291.64577C21.038303,295.07968,15.417539,294.98618,11.868572,291.43615z</Geometry>
+    <Geometry x:Key="fill_bucketGeometry2">M30.550941,265.50719C30.550941,265.50719 15.032968,262.40647 12.645757,257.89382 11.368036,255.47848 12.582867,253.48142 13.765808,252.86014 16.452494,251.4491 19.248816,254.83299 19.248816,254.83299</Geometry>
+    <Geometry x:Key="fill_bucketGeometry3">M45.418383,278.86456C45.418383,278.86456 43.972763,282.93328 42.718916,285.54174 41.465069,288.1502 40.632277,289.1828 41.170086,290.62666 42.431805,294.01398 48.902438,294.29121 49.666679,290.62666 49.982129,289.11406 49.371698,288.1502 48.117851,285.54174 46.864003,282.93328 45.418383,278.86456 45.418383,278.86456z</Geometry>
     <DrawingGroup x:Key="fill_bucketDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <GeometryDrawing Geometry="{StaticResource fill_bucketGeometry1}">
                 <GeometryDrawing.Pen>
@@ -22,10 +27,15 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="fill_bucketDrawingImage" Drawing="{StaticResource fill_bucketDrawingGroup}" />
-    <Geometry x:Key="add_somethingGeometry1">F1 M50.799999,50.799999z M0,0z M20.637499,264.72084L53.44583,264.72084</Geometry>
-    <Geometry x:Key="add_somethingGeometry2">F1 M50.799999,50.799999z M0,0z M37.041665,248.31667L37.041665,281.12501</Geometry>
-    <Geometry x:Key="add_somethingGeometry3">F1 M50.799999,50.799999z M0,0z M17.727082,264.41237L17.727082,290.51771 57.462498,290.51771 57.462498,250.7823 30.227742,250.7823</Geometry>
+    <Geometry x:Key="add_somethingGeometry1"> M20.637499,264.72084L53.44583,264.72084</Geometry>
+    <Geometry x:Key="add_somethingGeometry2"> M37.041665,248.31667L37.041665,281.12501</Geometry>
+    <Geometry x:Key="add_somethingGeometry3"> M17.727082,264.41237L17.727082,290.51771 57.462498,290.51771 57.462498,250.7823 30.227742,250.7823</Geometry>
     <DrawingGroup x:Key="add_somethingDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="1.198114,0,0,1.1981568,-19.10494,-52.246722">
                 <DrawingGroup Opacity="1" Transform="0,0.44577868,-0.44483798,0,141.89588,240.87092">
@@ -49,10 +59,15 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="add_somethingDrawingImage" Drawing="{StaticResource add_somethingDrawingGroup}" />
-    <Geometry x:Key="import_somethingGeometry1">F1 M50.799999,50.799999z M0,0z M57.279585,282.52582L51.588984,276.83522 57.279588,271.14462</Geometry>
-    <Geometry x:Key="import_somethingGeometry2">F1 M50.799999,50.799999z M0,0z M51.588984,276.83522L68.857809,276.83522</Geometry>
-    <Geometry x:Key="import_somethingGeometry3">F1 M50.799999,50.799999z M0,0z M1.8441914,264.20425L1.8441914,295.1567 48.955914,295.1567 48.955914,248.04341 16.665418,248.04341</Geometry>
+    <Geometry x:Key="import_somethingGeometry1"> M57.279585,282.52582L51.588984,276.83522 57.279588,271.14462</Geometry>
+    <Geometry x:Key="import_somethingGeometry2"> M51.588984,276.83522L68.857809,276.83522</Geometry>
+    <Geometry x:Key="import_somethingGeometry3"> M1.8441914,264.20425L1.8441914,295.1567 48.955914,295.1567 48.955914,248.04341 16.665418,248.04341</Geometry>
     <DrawingGroup x:Key="import_somethingDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="1.0333227,0,0,1.0333226,-0.84720562,-9.0504221">
                 <DrawingGroup Opacity="1" Transform="-0.707106781186547,-0.707106781186548,0.707106781186548,-0.707106781186547,-144.914472423555,493.235980138022">
@@ -76,9 +91,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="import_somethingDrawingImage" Drawing="{StaticResource import_somethingDrawingGroup}" />
-    <Geometry x:Key="settingsGeometry1">F1 M50.799999,50.799999z M0,0z M26.145273,254.2318C24.794976,254.2318,23.975576,255.34542,23.708175,256.66961L22.960889,260.37143A12.85506,12.861131,0,0,0,20.901249,261.22864L17.755913,259.13974C16.801114,258.18448,15.263778,258.18448,14.30897,259.13974L13.172107,260.27758C12.21731,261.23284,12.394233,262.62193,13.172107,263.72616L15.391975,266.87747A12.85506,12.861131,0,0,0,14.611476,268.78451L10.962113,269.52227C9.6118223,269.52227,8.5254689,270.61003,8.5254654,271.96097L8.5254654,273.5703C8.525468,274.92123,9.6316307,275.77804,10.962113,276.00855L14.704381,276.6565A12.85506,12.861131,0,0,0,15.471865,278.50831L13.330092,281.73596C12.375293,282.69121,12.375289,284.22927,13.330092,285.18453L14.467853,286.32238C15.422656,287.27763,16.811083,287.10062,17.914796,286.32238L21.105014,284.07318A12.85506,12.861131,0,0,0,22.963581,284.84327L23.708175,288.53297C23.708175,289.8839,24.794976,290.97167,26.145273,290.97167L27.753847,290.97167C29.104144,290.97167,29.960994,289.86408,30.191392,288.53297L30.832757,284.82531A12.85506,12.861131,0,0,0,32.634323,284.10102L35.691691,286.25727C36.646499,287.21253,38.183836,287.21252,39.138635,286.25727L40.275945,285.11942C41.230751,284.16416,41.022767,282.79635,40.275945,281.67085L38.245031,278.60934A12.85506,12.861131,0,0,0,39.075352,276.65606L42.810437,276.00855C44.160738,276.00855,45.248433,274.92123,45.248433,273.5703L45.248433,271.96097C45.24843,270.61003,44.133994,269.78979,42.810437,269.52227L39.147163,268.78182A12.85506,12.861131,0,0,0,38.341079,266.76386L40.434828,263.79216C41.389634,262.8369,41.389634,261.29884,40.434828,260.34359L39.297068,259.20574C38.342265,258.25049,36.975101,258.45857,35.850124,259.20574L32.832702,261.20977A12.85506,12.861131,0,0,0,30.831859,260.36828L30.191392,256.66961C30.191392,255.31867,29.104144,254.2318,27.753847,254.2318z</Geometry>
-    <Geometry x:Key="settingsGeometry2">F1 M50.799999,50.799999z M0,0z M124.99805,48.097656C119.12199,48.097656,115.55622,52.941474,114.39258,58.701172L110.08203,80.035156A51.265251,51.265251,0,0,0,95.050781,88.732422L75.068359,82.015625C69.979566,79.077609,63.51812,80.809606,60.580078,85.898438L57.080078,91.962891C54.142036,97.051722,56.450052,102.68793,60.962891,106.45117L77.376953,120.13867A51.265251,51.265251,0,0,0,76.734375,128A51.265251,51.265251,0,0,0,77.525391,136.6582L60.933594,151.29883C55.8448,154.23684,54.112747,160.69636,57.050781,165.78516L60.550781,171.84766C63.488812,176.93649,69.523589,177.75514,75.039062,175.72852L95.988281,168.03125A51.265251,51.265251,0,0,0,110.0918,176.00195L114.39258,197.29492C114.39258,203.17095,119.12199,207.90234,124.99805,207.90234L131.99805,207.90234C137.87411,207.90234,141.60285,203.08478,142.60547,197.29492L146.32422,175.81641A51.265251,51.265251,0,0,0,159.95898,168.01953L180.98633,175.74609C186.07517,178.68411,192.53851,176.95407,195.47656,171.86523L198.97656,165.80469C201.9146,160.71586,199.49998,155.20008,195.09375,151.3125L178.52148,136.69141A51.265251,51.265251,0,0,0,179.26562,128A51.265251,51.265251,0,0,0,178.59961,120.16406L195.06445,106.43359C200.15327,103.49554,201.8853,97.034144,198.94727,91.945312L195.44727,85.880859C192.50924,80.792028,186.5269,80.127887,180.95703,82L160.89453,88.744141A51.265251,51.265251,0,0,0,146.31641,80.132812L142.60547,58.701172C142.60547,52.825103,137.87411,48.097656,131.99805,48.097656z</Geometry>
+    <Geometry x:Key="settingsGeometry1"> M26.145273,254.2318C24.794976,254.2318,23.975576,255.34542,23.708175,256.66961L22.960889,260.37143A12.85506,12.861131,0,0,0,20.901249,261.22864L17.755913,259.13974C16.801114,258.18448,15.263778,258.18448,14.30897,259.13974L13.172107,260.27758C12.21731,261.23284,12.394233,262.62193,13.172107,263.72616L15.391975,266.87747A12.85506,12.861131,0,0,0,14.611476,268.78451L10.962113,269.52227C9.6118223,269.52227,8.5254689,270.61003,8.5254654,271.96097L8.5254654,273.5703C8.525468,274.92123,9.6316307,275.77804,10.962113,276.00855L14.704381,276.6565A12.85506,12.861131,0,0,0,15.471865,278.50831L13.330092,281.73596C12.375293,282.69121,12.375289,284.22927,13.330092,285.18453L14.467853,286.32238C15.422656,287.27763,16.811083,287.10062,17.914796,286.32238L21.105014,284.07318A12.85506,12.861131,0,0,0,22.963581,284.84327L23.708175,288.53297C23.708175,289.8839,24.794976,290.97167,26.145273,290.97167L27.753847,290.97167C29.104144,290.97167,29.960994,289.86408,30.191392,288.53297L30.832757,284.82531A12.85506,12.861131,0,0,0,32.634323,284.10102L35.691691,286.25727C36.646499,287.21253,38.183836,287.21252,39.138635,286.25727L40.275945,285.11942C41.230751,284.16416,41.022767,282.79635,40.275945,281.67085L38.245031,278.60934A12.85506,12.861131,0,0,0,39.075352,276.65606L42.810437,276.00855C44.160738,276.00855,45.248433,274.92123,45.248433,273.5703L45.248433,271.96097C45.24843,270.61003,44.133994,269.78979,42.810437,269.52227L39.147163,268.78182A12.85506,12.861131,0,0,0,38.341079,266.76386L40.434828,263.79216C41.389634,262.8369,41.389634,261.29884,40.434828,260.34359L39.297068,259.20574C38.342265,258.25049,36.975101,258.45857,35.850124,259.20574L32.832702,261.20977A12.85506,12.861131,0,0,0,30.831859,260.36828L30.191392,256.66961C30.191392,255.31867,29.104144,254.2318,27.753847,254.2318z</Geometry>
+    <Geometry x:Key="settingsGeometry2"> M124.99805,48.097656C119.12199,48.097656,115.55622,52.941474,114.39258,58.701172L110.08203,80.035156A51.265251,51.265251,0,0,0,95.050781,88.732422L75.068359,82.015625C69.979566,79.077609,63.51812,80.809606,60.580078,85.898438L57.080078,91.962891C54.142036,97.051722,56.450052,102.68793,60.962891,106.45117L77.376953,120.13867A51.265251,51.265251,0,0,0,76.734375,128A51.265251,51.265251,0,0,0,77.525391,136.6582L60.933594,151.29883C55.8448,154.23684,54.112747,160.69636,57.050781,165.78516L60.550781,171.84766C63.488812,176.93649,69.523589,177.75514,75.039062,175.72852L95.988281,168.03125A51.265251,51.265251,0,0,0,110.0918,176.00195L114.39258,197.29492C114.39258,203.17095,119.12199,207.90234,124.99805,207.90234L131.99805,207.90234C137.87411,207.90234,141.60285,203.08478,142.60547,197.29492L146.32422,175.81641A51.265251,51.265251,0,0,0,159.95898,168.01953L180.98633,175.74609C186.07517,178.68411,192.53851,176.95407,195.47656,171.86523L198.97656,165.80469C201.9146,160.71586,199.49998,155.20008,195.09375,151.3125L178.52148,136.69141A51.265251,51.265251,0,0,0,179.26562,128A51.265251,51.265251,0,0,0,178.59961,120.16406L195.06445,106.43359C200.15327,103.49554,201.8853,97.034144,198.94727,91.945312L195.44727,85.880859C192.50924,80.792028,186.5269,80.127887,180.95703,82L160.89453,88.744141A51.265251,51.265251,0,0,0,146.31641,80.132812L142.60547,58.701172C142.60547,52.825103,137.87411,48.097656,131.99805,48.097656z</Geometry>
     <DrawingGroup x:Key="settingsDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.86571625,0,0,0.86615044,-4.2620464,43.916161">
                 <GeometryDrawing Geometry="{StaticResource settingsGeometry1}">
@@ -115,11 +135,16 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="settingsDrawingImage" Drawing="{StaticResource settingsDrawingGroup}" />
-    <Geometry x:Key="import_projectGeometry1">F1 M50.799999,50.799999z M0,0z M29.797071,258.8065C29.797151,255.28035 26.893352,252.42178 23.311242,252.42169 19.728947,252.42152 16.824854,255.28017 16.824936,258.8065</Geometry>
-    <Geometry x:Key="import_projectGeometry2">F1 M50.799999,50.799999z M0,0z M46.381687,276.75978L46.381687,265.52684C46.381687,262.01996,43.561933,259.19621,40.059276,259.19621L7.3807405,259.19621C3.8780845,259.19621,1.0583297,262.01996,1.0583297,265.52684L1.0583297,284.44818C1.0583297,287.95505,3.8780845,290.77821,7.3807405,290.77821L32.740239,290.77821</Geometry>
-    <Geometry x:Key="import_projectGeometry3">F1 M50.799999,50.799999z M0,0z M39.113345,288.15763L33.897023,282.94605 39.113348,277.73447</Geometry>
-    <Geometry x:Key="import_projectGeometry4">F1 M50.799999,50.799999z M0,0z M33.897023,282.94605L49.72659,282.94605</Geometry>
+    <Geometry x:Key="import_projectGeometry1"> M29.797071,258.8065C29.797151,255.28035 26.893352,252.42178 23.311242,252.42169 19.728947,252.42152 16.824854,255.28017 16.824936,258.8065</Geometry>
+    <Geometry x:Key="import_projectGeometry2"> M46.381687,276.75978L46.381687,265.52684C46.381687,262.01996,43.561933,259.19621,40.059276,259.19621L7.3807405,259.19621C3.8780845,259.19621,1.0583297,262.01996,1.0583297,265.52684L1.0583297,284.44818C1.0583297,287.95505,3.8780845,290.77821,7.3807405,290.77821L32.740239,290.77821</Geometry>
+    <Geometry x:Key="import_projectGeometry3"> M39.113345,288.15763L33.897023,282.94605 39.113348,277.73447</Geometry>
+    <Geometry x:Key="import_projectGeometry4"> M33.897023,282.94605L49.72659,282.94605</Geometry>
     <DrawingGroup x:Key="import_projectDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <GeometryDrawing Geometry="{StaticResource import_projectGeometry1}">
                 <GeometryDrawing.Pen>
@@ -144,12 +169,17 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="import_projectDrawingImage" Drawing="{StaticResource import_projectDrawingGroup}" />
-    <Geometry x:Key="textGeometry1">F1 M50.799999,50.799999z M0,0z M34.367746,290.92005Q34.560823,291.40274 34.528644,291.72454 34.528644,292.01415 34.303387,292.17505 34.11031,292.33595 33.659797,292.36813 33.241464,292.43253 32.565694,292.43253 31.889925,292.43253 31.471591,292.36813 31.085437,292.33593 30.860181,292.23941 30.634924,292.14291 30.506206,291.98197 30.409666,291.82108 30.313129,291.59582L26.322872,280.49389 8.0449174,280.49389 4.2155572,291.53146Q4.1511982,291.75672 4.0224802,291.91762 3.8937623,292.07851 3.6685058,292.20723 3.4432493,292.30373 3.0249158,292.36813 2.6387619,292.43253 2.0273514,292.43253 1.351582,292.43253 0.901069019999999,292.36813 0.450556049999999,292.30373 0.225299569999999,292.14287 0.0322225899999993,291.98197 4.30941579993294E-05,291.69236 4.30941579993294E-05,291.40274 0.193120079999999,290.92005L14.770432,251.30709Q14.866972,251.04965 15.060048,250.88876 15.253125,250.69568 15.54274,250.59914 15.864535,250.50264 16.282869,250.47042 16.733382,250.40602 17.280433,250.40602 17.859664,250.40602 18.277997,250.47042 18.72851,250.50262 19.018126,250.59914 19.339921,250.69564 19.500818,250.88876 19.693895,251.04965 19.790434,251.30709z M17.087356,254.81466L17.055176,254.81466 9.2033793,277.21159 25.13223,277.21159z</Geometry>
-    <Geometry x:Key="textGeometry2">F1 M50.799999,50.799999z M0,0z M36.407291,247.54987L49.760189,247.54987</Geometry>
-    <Geometry x:Key="textGeometry3">F1 M50.799999,50.799999z M0,0z M36.407291,295.65015L49.760189,295.65015</Geometry>
-    <Geometry x:Key="textGeometry4">F1 M50.799999,50.799999z M0,0z M43.08374,247.40756L43.08374,295.79246</Geometry>
+    <Geometry x:Key="textGeometry1"> M34.367746,290.92005Q34.560823,291.40274 34.528644,291.72454 34.528644,292.01415 34.303387,292.17505 34.11031,292.33595 33.659797,292.36813 33.241464,292.43253 32.565694,292.43253 31.889925,292.43253 31.471591,292.36813 31.085437,292.33593 30.860181,292.23941 30.634924,292.14291 30.506206,291.98197 30.409666,291.82108 30.313129,291.59582L26.322872,280.49389 8.0449174,280.49389 4.2155572,291.53146Q4.1511982,291.75672 4.0224802,291.91762 3.8937623,292.07851 3.6685058,292.20723 3.4432493,292.30373 3.0249158,292.36813 2.6387619,292.43253 2.0273514,292.43253 1.351582,292.43253 0.901069019999999,292.36813 0.450556049999999,292.30373 0.225299569999999,292.14287 0.0322225899999993,291.98197 4.30941579993294E-05,291.69236 4.30941579993294E-05,291.40274 0.193120079999999,290.92005L14.770432,251.30709Q14.866972,251.04965 15.060048,250.88876 15.253125,250.69568 15.54274,250.59914 15.864535,250.50264 16.282869,250.47042 16.733382,250.40602 17.280433,250.40602 17.859664,250.40602 18.277997,250.47042 18.72851,250.50262 19.018126,250.59914 19.339921,250.69564 19.500818,250.88876 19.693895,251.04965 19.790434,251.30709z M17.087356,254.81466L17.055176,254.81466 9.2033793,277.21159 25.13223,277.21159z</Geometry>
+    <Geometry x:Key="textGeometry2"> M36.407291,247.54987L49.760189,247.54987</Geometry>
+    <Geometry x:Key="textGeometry3"> M36.407291,295.65015L49.760189,295.65015</Geometry>
+    <Geometry x:Key="textGeometry4"> M43.08374,247.40756L43.08374,295.79246</Geometry>
     <DrawingGroup x:Key="textDrawingGroup" >
-        <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+      <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.99991555,0,0,1.0000845,0,0">
                 <GeometryDrawing Brush="#FF000000" Geometry="{StaticResource textGeometry1}" />
             </DrawingGroup>
@@ -171,11 +201,16 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="textDrawingImage" Drawing="{StaticResource textDrawingGroup}" />
-    <Geometry x:Key="import_fileGeometry1">F1 M50.799999,50.799999z M0,0z M50.467838,273.01275L50.467838,247.08669 40.329438,236.94829 19.043917,236.94829C17.381917,236.94829,16.043583,238.28611,16.043583,239.9481L16.043583,285.39753C16.043583,287.05952,17.381917,288.39734,19.043917,288.39734L36.192742,288.39734</Geometry>
-    <Geometry x:Key="import_fileGeometry2">F1 M50.799999,50.799999z M0,0z M40.329439,236.94829L40.329439,246.9574 50.561567,246.9574</Geometry>
-    <Geometry x:Key="import_fileGeometry3">F1 M50.799999,50.799999z M0,0z M57.279585,282.52582L51.588984,276.83522 57.279588,271.14462</Geometry>
-    <Geometry x:Key="import_fileGeometry4">F1 M50.799999,50.799999z M0,0z M51.588984,276.83522L68.857809,276.83522</Geometry>
+    <Geometry x:Key="import_fileGeometry1"> M50.467838,273.01275L50.467838,247.08669 40.329438,236.94829 19.043917,236.94829C17.381917,236.94829,16.043583,238.28611,16.043583,239.9481L16.043583,285.39753C16.043583,287.05952,17.381917,288.39734,19.043917,288.39734L36.192742,288.39734</Geometry>
+    <Geometry x:Key="import_fileGeometry2"> M40.329439,236.94829L40.329439,246.9574 50.561567,246.9574</Geometry>
+    <Geometry x:Key="import_fileGeometry3"> M57.279585,282.52582L51.588984,276.83522 57.279588,271.14462</Geometry>
+    <Geometry x:Key="import_fileGeometry4"> M51.588984,276.83522L68.857809,276.83522</Geometry>
     <DrawingGroup x:Key="import_fileDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.94551067,0,0,0.94624153,-8.0017859,23.048021">
                 <GeometryDrawing Geometry="{StaticResource import_fileGeometry1}">
@@ -204,11 +239,16 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="import_fileDrawingImage" Drawing="{StaticResource import_fileDrawingGroup}" />
-    <Geometry x:Key="add_fileGeometry1">F1 M50.799999,50.799999z M0,0z M20.637499,264.72084L53.44583,264.72084</Geometry>
-    <Geometry x:Key="add_fileGeometry2">F1 M50.799999,50.799999z M0,0z M37.041665,248.31667L37.041665,281.12501</Geometry>
-    <Geometry x:Key="add_fileGeometry3">F1 M50.799999,50.799999z M0,0z M50.467838,273.01275L50.467838,247.08669 40.329438,236.94829 19.043917,236.94829C17.381917,236.94829,16.043583,238.28611,16.043583,239.9481L16.043583,285.39753C16.043583,287.05952,17.381917,288.39734,19.043917,288.39734L36.192742,288.39734</Geometry>
-    <Geometry x:Key="add_fileGeometry4">F1 M50.799999,50.799999z M0,0z M40.329439,236.94829L40.329439,246.9574 50.561567,246.9574</Geometry>
+    <Geometry x:Key="add_fileGeometry1"> M20.637499,264.72084L53.44583,264.72084</Geometry>
+    <Geometry x:Key="add_fileGeometry2"> M37.041665,248.31667L37.041665,281.12501</Geometry>
+    <Geometry x:Key="add_fileGeometry3"> M50.467838,273.01275L50.467838,247.08669 40.329438,236.94829 19.043917,236.94829C17.381917,236.94829,16.043583,238.28611,16.043583,239.9481L16.043583,285.39753C16.043583,287.05952,17.381917,288.39734,19.043917,288.39734L36.192742,288.39734</Geometry>
+    <Geometry x:Key="add_fileGeometry4"> M40.329439,236.94829L40.329439,246.9574 50.561567,246.9574</Geometry>
     <DrawingGroup x:Key="add_fileDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.92829059,0,0,0.92957991,-6.0386048,26.995957">
                 <DrawingGroup Opacity="1" Transform="0,0.44577868,-0.44483798,0,162.1365,265.47717">
@@ -237,58 +277,68 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="add_fileDrawingImage" Drawing="{StaticResource add_fileDrawingGroup}" />
-    <Geometry x:Key="zoom_outGeometry1">F1 M50.799999,50.799999z M0,0z M36.111153,265.37782L41.248856,270.51553</Geometry>
-    <Geometry x:Key="zoom_outGeometry2">F1 M50.799999,50.799999z M0,0z M37.135071,251.76354C36.770712,248.8298 35.435415,246.09425 33.342175,243.99324 31.239506,241.89232 28.49852,240.5519 25.558248,240.18672</Geometry>
-    <Geometry x:Key="zoom_outGeometry3">F1 M50.799999,50.799999z M0,0z M16.534423,253.30109L31.534423,253.30109</Geometry>
-    <DrawingGroup x:Key="zoom_outDrawingGroup" >
-        <DrawingGroup.Transform>
-            <TranslateTransform X="0" Y="246.641" />
-        </DrawingGroup.Transform>
-        <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
-            <DrawingGroup Opacity="1" Transform="0.90548337,0,0,0.90548337,-5.2354102,33.367441">
-                <DrawingGroup Transform="-0.707106781186547,0.707106781186548,-0.707106781186548,-0.707106781186547,0,0">
-                    <GeometryDrawing>
-                        <GeometryDrawing.Pen>
-                            <Pen Brush="#FF000000" Thickness="2.33760953" LineCap="Round" LineJoin="Round" />
-                        </GeometryDrawing.Pen>
-                        <GeometryDrawing.Geometry>
-                            <EllipseGeometry Rect="145.097,-68.1724, 34.038, 34.3272"/>
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
-                </DrawingGroup>
-                <GeometryDrawing Geometry="{StaticResource zoom_outGeometry1}">
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#FF000000" Thickness="2.33760953" LineCap="Flat" LineJoin="Miter" />
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-                <DrawingGroup Transform="-0.707106781186547,0.707106781186548,-0.707106781186548,-0.707106781186547,0,0">
-                    <GeometryDrawing>
-                        <GeometryDrawing.Pen>
-                            <Pen Brush="#FF000000" Thickness="2.33760953" LineCap="Round" LineJoin="Round" />
-                        </GeometryDrawing.Pen>
-                        <GeometryDrawing.Geometry>
-                            <RectangleGeometry  Rect="158.4138,-246.641,7.4045,27.1982" />
-                          <!--RadiusX="7.5972" RadiusY="4.4561"-->
-                        </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
-                </DrawingGroup>
-                <GeometryDrawing Geometry="{StaticResource zoom_outGeometry2}">
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#FF000000" Thickness="2.33760953" LineCap="Round" LineJoin="Round" />
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-                <GeometryDrawing Geometry="{StaticResource zoom_outGeometry3}">
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#FF000000" Thickness="2.33760953" LineCap="Round" LineJoin="Miter" />
-                    </GeometryDrawing.Pen>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingGroup>
+  <Geometry x:Key="zoom_inGeometry1"> M27.49095,273.66042L31.773704,277.94318</Geometry>
+  <Geometry x:Key="zoom_inGeometry2"> M28.416927,261.34838C28.08742,258.69526 26.879847,256.22137 24.986831,254.32133 23.085288,252.42136 20.606485,251.20916 17.947457,250.87891</Geometry>
+  <Geometry x:Key="zoom_inGeometry3"> M9.7867852,262.73885L23.351996,262.73885</Geometry>
+  <Geometry x:Key="zoom_inGeometry4"> M16.56939,255.95625L16.56939,269.52146</Geometry>
+  <DrawingGroup x:Key="zoom_outDrawingGroup" >
+    <GeometryDrawing>
+      <GeometryDrawing.Geometry>
+        <RectangleGeometry Rect="0, 0, 52.5, 52.5"/>
+      </GeometryDrawing.Geometry>
+    </GeometryDrawing>
+    <DrawingGroup.Transform>
+      <TranslateTransform X="0" Y="243.2021" />
+    </DrawingGroup.Transform>
+    <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
+      <DrawingGroup>
+        <GeometryDrawing>
+          <GeometryDrawing.Pen>
+            <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+          <GeometryDrawing.Geometry>
+            <EllipseGeometry Rect="1.677, 247.3456, 30.7822, 31.0436" />
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingGroup>
+      <GeometryDrawing Geometry="{StaticResource zoom_inGeometry1}">
+        <GeometryDrawing.Pen>
+          <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Flat" LineJoin="Miter" />
+        </GeometryDrawing.Pen>
+      </GeometryDrawing>
+      <DrawingGroup Transform="-0.707106781186547,0.707106781186548,-0.707106781186548,-0.707106781186547,0,0">
+        <GeometryDrawing>
+          <GeometryDrawing.Pen>
+            <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+          <GeometryDrawing.Geometry>
+            <RectangleGeometry Rect="170.72,-243.2021,6.6962,24.5967" />
+            <!--RadiusX="6.8792" RadiusY="4.0349" -->
+          </GeometryDrawing.Geometry>
+        </GeometryDrawing>
+      </DrawingGroup>
+      <GeometryDrawing Geometry="{StaticResource zoom_inGeometry2}">
+        <GeometryDrawing.Pen>
+          <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
+        </GeometryDrawing.Pen>
+      </GeometryDrawing>
+      <GeometryDrawing Geometry="{StaticResource zoom_inGeometry3}">
+        <GeometryDrawing.Pen>
+          <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Miter" />
+        </GeometryDrawing.Pen>
+      </GeometryDrawing>
+
     </DrawingGroup>
+  </DrawingGroup>
     <DrawingImage x:Key="zoom_outDrawingImage" Drawing="{StaticResource zoom_outDrawingGroup}" />
-    <Geometry x:Key="closeGeometry1">F1 M50.799999,50.799999z M0,0z M20.637499,264.72084L53.44583,264.72084</Geometry>
-    <Geometry x:Key="closeGeometry2">F1 M50.799999,50.799999z M0,0z M37.041665,248.31667L37.041665,281.12501</Geometry>
+    <Geometry x:Key="closeGeometry1"> M20.637499,264.72084L53.44583,264.72084</Geometry>
+    <Geometry x:Key="closeGeometry2"> M37.041665,248.31667L37.041665,281.12501</Geometry>
     <DrawingGroup x:Key="closeDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="1.483219,1.483219,-1.483219,1.483219,363.09808,-175.97988">
                 <GeometryDrawing Geometry="{StaticResource closeGeometry1}">
@@ -305,19 +355,24 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="closeDrawingImage" Drawing="{StaticResource closeDrawingGroup}" />
-    <Geometry x:Key="add_delete_rowGeometry1">F1 M50.799999,50.799998z M0,0z M32.534854,241.20049L32.534854,287.45848</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry2">F1 M50.799999,50.799998z M0,0z M23.531786,241.20049L23.531786,287.45848</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry3">F1 M50.799999,50.799998z M0,0z M13.696493,251.08708L42.429078,251.08708</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry4">F1 M50.799999,50.799998z M0,0z M13.696493,259.91535L42.429078,259.91535</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry5">F1 M50.799999,50.799998z M0,0z M13.696493,268.74362L42.429078,268.74362</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry6">F1 M50.799999,50.799998z M0,0z M13.696493,277.57188L42.429078,277.57188</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry7">F1 M50.799999,50.799998z M0,0z M0.239284,260.6286L10.952557,260.6286</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry8">F1 M50.799999,50.799998z M0,0z M0.239284,269.45687L10.952557,269.45687</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry9">F1 M50.799999,50.799998z M0,0z M0.239284,278.28514L10.952557,278.28514</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry10">F1 M50.799999,50.799998z M0,0z M0.239284,287.1134L10.952557,287.1134</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry11">F1 M50.799999,50.799998z M0,0z M49.718811,238.25416L49.718811,246.95379</Geometry>
-    <Geometry x:Key="add_delete_rowGeometry12">F1 M50.799999,50.799998z M0,0z M54.068626,242.60398L45.368996,242.60398</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry1"> M32.534854,241.20049L32.534854,287.45848</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry2"> M23.531786,241.20049L23.531786,287.45848</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry3"> M13.696493,251.08708L42.429078,251.08708</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry4"> M13.696493,259.91535L42.429078,259.91535</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry5"> M13.696493,268.74362L42.429078,268.74362</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry6"> M13.696493,277.57188L42.429078,277.57188</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry7"> M0.239284,260.6286L10.952557,260.6286</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry8"> M0.239284,269.45687L10.952557,269.45687</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry9"> M0.239284,278.28514L10.952557,278.28514</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry10"> M0.239284,287.1134L10.952557,287.1134</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry11"> M49.718811,238.25416L49.718811,246.95379</Geometry>
+    <Geometry x:Key="add_delete_rowGeometry12"> M54.068626,242.60398L45.368996,242.60398</Geometry>
     <DrawingGroup x:Key="add_delete_rowDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.80306615,0,0,0.79790539,-0.99386753,59.913652">
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,-3.1749999,-2.4473958">
@@ -406,9 +461,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="add_delete_rowDrawingImage" Drawing="{StaticResource add_delete_rowDrawingGroup}" />
-    <Geometry x:Key="redoGeometry1">F1 M50.799999,50.799999z M0,0z M37.14073,253.11093L49.741711,265.69447 37.140724,278.27801</Geometry>
-    <Geometry x:Key="redoGeometry2">F1 M50.799999,50.799999z M0,0z M29.121941,290.09964L14.149799,290.09964C6.8971275,290.09964 1.0583337,284.65608 1.0583337,277.89433 1.0583337,271.13261 6.8971275,265.68903 14.149799,265.68903L49.040629,265.68903</Geometry>
+    <Geometry x:Key="redoGeometry1"> M37.14073,253.11093L49.741711,265.69447 37.140724,278.27801</Geometry>
+    <Geometry x:Key="redoGeometry2"> M29.121941,290.09964L14.149799,290.09964C6.8971275,290.09964 1.0583337,284.65608 1.0583337,277.89433 1.0583337,271.13261 6.8971275,265.68903 14.149799,265.68903L49.040629,265.68903</Geometry>
     <DrawingGroup x:Key="redoDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <GeometryDrawing Geometry="{StaticResource redoGeometry1}">
                 <GeometryDrawing.Pen>
@@ -423,10 +483,15 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="redoDrawingImage" Drawing="{StaticResource redoDrawingGroup}" />
-    <Geometry x:Key="workspaceGeometry1">F1 M50.799999,50.799999z M0,0z M189.0918,49.119141C189.0918,40.743708,182.34809,34,173.97266,34L82.027344,34C73.651911,34,66.908203,40.743708,66.908203,49.119141</Geometry>
-    <Geometry x:Key="workspaceGeometry2">F1 M50.799999,50.799999z M0,0z M212.36328,78.5625L212.36328,68.615234C212.36328,60.239802,205.62153,53.496094,197.24609,53.496094L58.753906,53.496094C50.378474,53.496094,43.636719,60.239802,43.636719,68.615234L43.636719,78.5625</Geometry>
-    <Geometry x:Key="workspaceGeometry3">F1 M50.799999,50.799999z M0,0z M19.627184,264.42285L48.10615,264.42285</Geometry>
+    <Geometry x:Key="workspaceGeometry1"> M189.0918,49.119141C189.0918,40.743708,182.34809,34,173.97266,34L82.027344,34C73.651911,34,66.908203,40.743708,66.908203,49.119141</Geometry>
+    <Geometry x:Key="workspaceGeometry2"> M212.36328,78.5625L212.36328,68.615234C212.36328,60.239802,205.62153,53.496094,197.24609,53.496094L58.753906,53.496094C50.378474,53.496094,43.636719,60.239802,43.636719,68.615234L43.636719,78.5625</Geometry>
+    <Geometry x:Key="workspaceGeometry3"> M19.627184,264.42285L48.10615,264.42285</Geometry>
     <DrawingGroup x:Key="workspaceDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.8214234,0,0,0.82024418,-2.4188726,55.76649">
                 <DrawingGroup Transform="0.26458333,0,0,0.26458333,0,229.26667">
@@ -460,23 +525,28 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="workspaceDrawingImage" Drawing="{StaticResource workspaceDrawingGroup}" />
-    <Geometry x:Key="zoomGeometry1">F1 M50.799999,50.799999z M0,0z M27.460279,273.66028L31.743008,277.94301</Geometry>
-    <Geometry x:Key="zoomGeometry2">F1 M50.799999,50.799999z M0,0z M28.386252,261.34828C28.056746,258.69516 26.849178,256.22129 24.956167,254.32125 23.05463,252.42129 20.575833,251.20909 17.916814,250.87884</Geometry>
+    <Geometry x:Key="zoomGeometry1"> M27.460279,273.66028L31.743008,277.94301</Geometry>
+    <Geometry x:Key="zoomGeometry2"> M28.386252,261.34828C28.056746,258.69516 26.849178,256.22129 24.956167,254.32125 23.05463,252.42129 20.575833,251.20909 17.916814,250.87884</Geometry>
     <DrawingGroup x:Key="zoomDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 52.5, 52.5"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup.Transform>
             <TranslateTransform X="0" Y="243.1802" />
         </DrawingGroup.Transform>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
-            <DrawingGroup Transform="-0.707106781186547,0.707106781186548,-0.707106781186548,-0.707106781186547,0,0">
-                <GeometryDrawing>
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
-                    </GeometryDrawing.Pen>
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Rect="158.6986,-54.3022,30.7822,31.0436"/>
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
+          <DrawingGroup>
+            <GeometryDrawing>
+              <GeometryDrawing.Pen>
+                <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
+              </GeometryDrawing.Pen>
+              <GeometryDrawing.Geometry>
+                <EllipseGeometry Rect="1.677, 247.3456, 30.7822, 31.0436" />
+              </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+          </DrawingGroup>
             <GeometryDrawing Geometry="{StaticResource zoomGeometry1}">
                 <GeometryDrawing.Pen>
                     <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Flat" LineJoin="Miter" />
@@ -501,9 +571,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="zoomDrawingImage" Drawing="{StaticResource zoomDrawingGroup}" />
-    <Geometry x:Key="freehand_selectGeometry1">F1 M50.799999,50.799999z M0,0z M204.97656,137.34375C217.02952,124.39261 224.47405,110.33232 223.73438,95.570312 221.53408,51.65786 158.21851,23.744344 111.78711,23.439453 108.69168,23.419123 105.67225,23.521473 102.75,23.75 66.285311,26.601691 18.25,93.75 18.25,93.75 18.25,93.75 87.87921,77.979439 103,102 124.39964,135.995 61.666016,215.19922 61.666016,215.19922 61.666016,215.19922 100.61727,202.79637 140.33398,182.39258</Geometry>
-    <Geometry x:Key="freehand_selectGeometry2">F1 M50.799999,50.799999z M0,0z M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
+    <Geometry x:Key="freehand_selectGeometry1"> M204.97656,137.34375C217.02952,124.39261 224.47405,110.33232 223.73438,95.570312 221.53408,51.65786 158.21851,23.744344 111.78711,23.439453 108.69168,23.419123 105.67225,23.521473 102.75,23.75 66.285311,26.601691 18.25,93.75 18.25,93.75 18.25,93.75 87.87921,77.979439 103,102 124.39964,135.995 61.666016,215.19922 61.666016,215.19922 61.666016,215.19922 100.61727,202.79637 140.33398,182.39258</Geometry>
+    <Geometry x:Key="freehand_selectGeometry2"> M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
     <DrawingGroup x:Key="freehand_selectDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.83944708,0,0,0.83917335,-3.0084298,50.784167">
                 <DrawingGroup Transform="0.26458333,0,0,0.26458333,0,229.26667">
@@ -528,9 +603,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="freehand_selectDrawingImage" Drawing="{StaticResource freehand_selectDrawingGroup}" />
-    <Geometry x:Key="undoGeometry1">F1 M50.799999,50.799999z M0,0z M13.659706,253.11755L1.059191,265.69658 13.659711,278.27562</Geometry>
-    <Geometry x:Key="undoGeometry2">F1 M50.799999,50.799999z M0,0z M21.678197,290.09303L36.649785,290.09303C43.902188,290.09303 49.740765,284.65141 49.740765,277.89208 49.740765,271.13277 43.902188,265.69114 36.649785,265.69114L1.760247,265.69114</Geometry>
+    <Geometry x:Key="undoGeometry1"> M13.659706,253.11755L1.059191,265.69658 13.659711,278.27562</Geometry>
+    <Geometry x:Key="undoGeometry2"> M21.678197,290.09303L36.649785,290.09303C43.902188,290.09303 49.740765,284.65141 49.740765,277.89208 49.740765,271.13277 43.902188,265.69114 36.649785,265.69114L1.760247,265.69114</Geometry>
     <DrawingGroup x:Key="undoDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <GeometryDrawing Geometry="{StaticResource undoGeometry1}">
                 <GeometryDrawing.Pen>
@@ -545,9 +625,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="undoDrawingImage" Drawing="{StaticResource undoDrawingGroup}" />
-    <Geometry x:Key="poly_selectGeometry1">F1 M50.799999,50.799999z M0,0z M176.57812,130.37891L223.73438,95.570312 102.75,23.75 18.25,93.75 103,102 61.666016,215.19922 136.13672,160.22852</Geometry>
-    <Geometry x:Key="poly_selectGeometry2">F1 M50.799999,50.799999z M0,0z M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
+    <Geometry x:Key="poly_selectGeometry1"> M176.57812,130.37891L223.73438,95.570312 102.75,23.75 18.25,93.75 103,102 61.666016,215.19922 136.13672,160.22852</Geometry>
+    <Geometry x:Key="poly_selectGeometry2"> M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
     <DrawingGroup x:Key="poly_selectDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.83944734,0,0,0.83916481,-3.0084463,50.751647">
                 <DrawingGroup Transform="0.26458333,0,0,0.26458333,0,229.26667">
@@ -572,9 +657,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="poly_selectDrawingImage" Drawing="{StaticResource poly_selectDrawingGroup}" />
-    <Geometry x:Key="rect_selectGeometry1">F1 M50.799999,50.799999z M0,0z M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
-    <Geometry x:Key="rect_selectGeometry2">F1 M50.799999,50.799999z M0,0z M190.32422,133.75L190.32422,23.484375 18.498047,23.484375 18.498047,185.41211 140.90625,185.41211</Geometry>
+    <Geometry x:Key="rect_selectGeometry1"> M56.607107,290.78649L42.57518,275.98583 38.361212,284.02283 33.929739,260.62586 57.057336,266.29776 48.807219,270.07747 62.839148,284.87813z</Geometry>
+    <Geometry x:Key="rect_selectGeometry2"> M190.32422,133.75L190.32422,23.484375 18.498047,23.484375 18.498047,185.41211 140.90625,185.41211</Geometry>
     <DrawingGroup x:Key="rect_selectDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.84016712,0,0,0.83989839,-3.0536756,50.59473">
                 <GeometryDrawing Geometry="{StaticResource rect_selectGeometry1}">
@@ -599,11 +689,16 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="rect_selectDrawingImage" Drawing="{StaticResource rect_selectDrawingGroup}" />
-    <Geometry x:Key="add_projectGeometry1">F1 M50.799999,50.799999z M0,0z M115.99609,43.978516C115.99542,30.230559 104.67858,19.085976 90.71875,19.085938 76.758919,19.085973 65.442073,30.230557 65.441406,43.978516</Geometry>
-    <Geometry x:Key="add_projectGeometry2">F1 M50.799999,50.799999z M0,0z M47.792014,276.35681L47.792014,264.76882C47.792014,261.15109,44.884448,258.23809,41.272713,258.23809L7.576515,258.23809C3.9647807,258.23809,1.0572142,261.15109,1.0572142,264.76882L1.0572142,284.28823C1.0572142,287.90595,3.9647807,290.81833,7.576515,290.81833L33.725749,290.81833</Geometry>
-    <Geometry x:Key="add_projectGeometry3">F1 M50.799999,50.799999z M0,0z M20.637499,264.72084L53.44583,264.72084</Geometry>
-    <Geometry x:Key="add_projectGeometry4">F1 M50.799999,50.799999z M0,0z M37.041665,248.31667L37.041665,281.12501</Geometry>
+    <Geometry x:Key="add_projectGeometry1"> M115.99609,43.978516C115.99542,30.230559 104.67858,19.085976 90.71875,19.085938 76.758919,19.085973 65.442073,30.230557 65.441406,43.978516</Geometry>
+    <Geometry x:Key="add_projectGeometry2"> M47.792014,276.35681L47.792014,264.76882C47.792014,261.15109,44.884448,258.23809,41.272713,258.23809L7.576515,258.23809C3.9647807,258.23809,1.0572142,261.15109,1.0572142,264.76882L1.0572142,284.28823C1.0572142,287.90595,3.9647807,290.81833,7.576515,290.81833L33.725749,290.81833</Geometry>
+    <Geometry x:Key="add_projectGeometry3"> M20.637499,264.72084L53.44583,264.72084</Geometry>
+    <Geometry x:Key="add_projectGeometry4"> M37.041665,248.31667L37.041665,281.12501</Geometry>
     <DrawingGroup x:Key="add_projectDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Transform="0.26458333,0,0,0.26458333,0,246.2">
                 <GeometryDrawing Geometry="{StaticResource add_projectGeometry1}">
@@ -632,25 +727,27 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="add_projectDrawingImage" Drawing="{StaticResource add_projectDrawingGroup}" />
-    <Geometry x:Key="zoom_inGeometry1">F1 M50.799999,50.799999z M0,0z M27.49095,273.66042L31.773704,277.94318</Geometry>
-    <Geometry x:Key="zoom_inGeometry2">F1 M50.799999,50.799999z M0,0z M28.416927,261.34838C28.08742,258.69526 26.879847,256.22137 24.986831,254.32133 23.085288,252.42136 20.606485,251.20916 17.947457,250.87891</Geometry>
-    <Geometry x:Key="zoom_inGeometry3">F1 M50.799999,50.799999z M0,0z M9.7867852,262.73885L23.351996,262.73885</Geometry>
-    <Geometry x:Key="zoom_inGeometry4">F1 M50.799999,50.799999z M0,0z M16.56939,255.95625L16.56939,269.52146</Geometry>
+    
     <DrawingGroup x:Key="zoom_inDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 52.5, 52.5"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup.Transform>
             <TranslateTransform X="0" Y="243.2021" />
         </DrawingGroup.Transform>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
-            <DrawingGroup Transform="-0.707106781186547,0.707106781186548,-0.707106781186548,-0.707106781186547,0,0">
-                <GeometryDrawing>
-                    <GeometryDrawing.Pen>
-                        <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
-                    </GeometryDrawing.Pen>
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Rect="158.677, -54.3456, 30.7822, 31.0436" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
+          <DrawingGroup>
+            <GeometryDrawing>
+              <GeometryDrawing.Pen>
+                <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
+              </GeometryDrawing.Pen>
+              <GeometryDrawing.Geometry>
+                <EllipseGeometry Rect="1.677, 247.3456, 30.7822, 31.0436" />
+              </GeometryDrawing.Geometry>
+            </GeometryDrawing>
+          </DrawingGroup>
             <GeometryDrawing Geometry="{StaticResource zoom_inGeometry1}">
                 <GeometryDrawing.Pen>
                     <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Flat" LineJoin="Miter" />
@@ -685,18 +782,23 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="zoom_inDrawingImage" Drawing="{StaticResource zoom_inDrawingGroup}" />
-    <Geometry x:Key="ruler2Geometry1">F1 M50.799999,50.799999z M0,0z M40.139623,253.55843L46.434261,259.97805</Geometry>
-    <Geometry x:Key="ruler2Geometry2">F1 M50.799999,50.799999z M0,0z M40.112997,260.14603L43.126989,263.21986</Geometry>
-    <Geometry x:Key="ruler2Geometry3">F1 M50.799999,50.799999z M0,0z M36.805711,263.38786L39.819703,266.46169</Geometry>
-    <Geometry x:Key="ruler2Geometry4">F1 M50.799999,50.799999z M0,0z M33.498432,266.62968L36.512424,269.70352</Geometry>
-    <Geometry x:Key="ruler2Geometry5">F1 M50.799999,50.799999z M0,0z M30.191153,269.87151L33.205145,272.94534</Geometry>
-    <Geometry x:Key="ruler2Geometry6">F1 M50.799999,50.799999z M0,0z M23.603221,269.76756L29.897859,276.18717</Geometry>
-    <Geometry x:Key="ruler2Geometry7">F1 M50.799999,50.799999z M0,0z M23.576595,276.35516L26.590587,279.42899</Geometry>
-    <Geometry x:Key="ruler2Geometry8">F1 M50.799999,50.799999z M0,0z M20.269309,279.59699L23.283301,282.67082</Geometry>
-    <Geometry x:Key="ruler2Geometry9">F1 M50.799999,50.799999z M0,0z M16.96203,282.83881L19.976022,285.91265</Geometry>
-    <Geometry x:Key="ruler2Geometry10">F1 M50.799999,50.799999z M0,0z M13.654751,286.08064L16.668743,289.15447</Geometry>
-    <Geometry x:Key="ruler2Geometry11">F1 M50.799999,50.799999z M0,0z M7.0668268,285.97668L13.361464,292.39629</Geometry>
+    <Geometry x:Key="ruler2Geometry1"> M40.139623,253.55843L46.434261,259.97805</Geometry>
+    <Geometry x:Key="ruler2Geometry2"> M40.112997,260.14603L43.126989,263.21986</Geometry>
+    <Geometry x:Key="ruler2Geometry3"> M36.805711,263.38786L39.819703,266.46169</Geometry>
+    <Geometry x:Key="ruler2Geometry4"> M33.498432,266.62968L36.512424,269.70352</Geometry>
+    <Geometry x:Key="ruler2Geometry5"> M30.191153,269.87151L33.205145,272.94534</Geometry>
+    <Geometry x:Key="ruler2Geometry6"> M23.603221,269.76756L29.897859,276.18717</Geometry>
+    <Geometry x:Key="ruler2Geometry7"> M23.576595,276.35516L26.590587,279.42899</Geometry>
+    <Geometry x:Key="ruler2Geometry8"> M20.269309,279.59699L23.283301,282.67082</Geometry>
+    <Geometry x:Key="ruler2Geometry9"> M16.96203,282.83881L19.976022,285.91265</Geometry>
+    <Geometry x:Key="ruler2Geometry10"> M13.654751,286.08064L16.668743,289.15447</Geometry>
+    <Geometry x:Key="ruler2Geometry11"> M7.0668268,285.97668L13.361464,292.39629</Geometry>
     <DrawingGroup x:Key="ruler2DrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Transform="0.70012232,0.71402292,-0.71413827,0.70000467,0,0">
                 <GeometryDrawing>
@@ -766,9 +868,14 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="ruler2DrawingImage" Drawing="{StaticResource ruler2DrawingGroup}" />
-    <Geometry x:Key="round_selectGeometry1">F1 M50.799999,50.799999z M0,0z M181.75195,133.35156C193.86548,97.963479 181.28428,58.82169 150.82031,37.119141 137.62307,27.731856 122.00715,22.332891 105.83008,21.564453 77.080517,20.199508 49.611662,33.555296 32.929688,57.009766 5.8680373,95.057492 14.774279,147.83911 52.822266,174.90039 78.718556,193.27439 112.72686,195.58803 140.87305,180.89062</Geometry>
-    <Geometry x:Key="round_selectGeometry2">F1 M50.799999,50.799999z M0,0z M56.924769,291.31536L42.892842,276.5147 38.678874,284.5517 34.247401,261.15473 57.374998,266.82663 49.124881,270.60634 63.15681,285.407z</Geometry>
+    <Geometry x:Key="round_selectGeometry1"> M181.75195,133.35156C193.86548,97.963479 181.28428,58.82169 150.82031,37.119141 137.62307,27.731856 122.00715,22.332891 105.83008,21.564453 77.080517,20.199508 49.611662,33.555296 32.929688,57.009766 5.8680373,95.057492 14.774279,147.83911 52.822266,174.90039 78.718556,193.27439 112.72686,195.58803 140.87305,180.89062</Geometry>
+    <Geometry x:Key="round_selectGeometry2"> M56.924769,291.31536L42.892842,276.5147 38.678874,284.5517 34.247401,261.15473 57.374998,266.82663 49.124881,270.60634 63.15681,285.407z</Geometry>
     <DrawingGroup x:Key="round_selectDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <DrawingGroup Opacity="1" Transform="0.8310713,0,0,0.83082304,-2.7461015,52.984558">
                 <DrawingGroup Transform="0.26458333,0,0,0.26458333,0,229.26667">
@@ -793,12 +900,17 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="round_selectDrawingImage" Drawing="{StaticResource round_selectDrawingGroup}" />
-    <Geometry x:Key="saveGeometry1">F1 M50.799999,50.799999z M0,0z M4.8108194,247.25849C2.7374595,247.25849,1.0685185,248.92861,1.0685185,251.00282L1.0685185,292.19719C1.0685185,294.2714,2.7374595,295.94151,4.8108194,295.94151L45.988698,295.94151C48.062058,295.94151,49.731481,294.2714,49.731481,292.19719L49.731481,261.14699 35.848706,247.25849z</Geometry>
-    <Geometry x:Key="saveGeometry2">F1 M50.799999,50.799999z M0,0z M9.5568152,246.96495L9.5568152,257.52028 29.236876,257.52028 29.236876,247.1352</Geometry>
-    <Geometry x:Key="saveGeometry3">F1 M50.799999,50.799999z M0,0z M14.383904,273.85041L36.416096,273.85041</Geometry>
-    <Geometry x:Key="saveGeometry4">F1 M50.799999,50.799999z M0,0z M14.383904,278.80354L36.416096,278.80354</Geometry>
-    <Geometry x:Key="saveGeometry5">F1 M50.799999,50.799999z M0,0z M14.383904,283.75666L36.416096,283.75666</Geometry>
+    <Geometry x:Key="saveGeometry1"> M4.8108194,247.25849C2.7374595,247.25849,1.0685185,248.92861,1.0685185,251.00282L1.0685185,292.19719C1.0685185,294.2714,2.7374595,295.94151,4.8108194,295.94151L45.988698,295.94151C48.062058,295.94151,49.731481,294.2714,49.731481,292.19719L49.731481,261.14699 35.848706,247.25849z</Geometry>
+    <Geometry x:Key="saveGeometry2"> M9.5568152,246.96495L9.5568152,257.52028 29.236876,257.52028 29.236876,247.1352</Geometry>
+    <Geometry x:Key="saveGeometry3"> M14.383904,273.85041L36.416096,273.85041</Geometry>
+    <Geometry x:Key="saveGeometry4"> M14.383904,278.80354L36.416096,278.80354</Geometry>
+    <Geometry x:Key="saveGeometry5"> M14.383904,283.75666L36.416096,283.75666</Geometry>
     <DrawingGroup x:Key="saveDrawingGroup">
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
             <GeometryDrawing Geometry="{StaticResource saveGeometry1}">
                 <GeometryDrawing.Pen>
@@ -848,39 +960,44 @@
     <DrawingImage x:Key="display_settingsDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup >
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
                     <DrawingGroup Opacity="1" Transform="1.002611,0,0,1.0027365,-0.06631949,-0.74322882">
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M0.06614617,254.62165L7.4414065,254.62165 M13.229167,254.62165L38.066927,254.62165 50.733854,254.62165">
+                        <GeometryDrawing Geometry=" M0.06614617,254.62165L7.4414065,254.62165 M13.229167,254.62165L38.066927,254.62165 50.733854,254.62165">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Flat" LineJoin="Miter" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M7.2098853,249.59458L13.030739,249.59458 13.030739,257.6755 10.120312,261.85529 7.2098853,257.6755z">
+                        <GeometryDrawing Geometry=" M7.2098853,249.59458L13.030739,249.59458 13.030739,257.6755 10.120312,261.85529 7.2098853,257.6755z">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M0.06614617,270.49675L12.733073,270.49675 35.454167,270.49675 M41.241927,270.49675L50.733854,270.49675">
+                        <GeometryDrawing Geometry=" M0.06614617,270.49675L12.733073,270.49675 35.454167,270.49675 M41.241927,270.49675L50.733854,270.49675">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Flat" LineJoin="Miter" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M35.255734,265.46968L41.07659,265.46968 41.07659,273.5506 38.166163,277.73039 35.255734,273.5506z">
+                        <GeometryDrawing Geometry=" M35.255734,265.46968L41.07659,265.46968 41.07659,273.5506 38.166163,277.73039 35.255734,273.5506z">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M0.06614617,286.37185L17.495573,286.37185 M23.8125,286.37185L38.066927,286.37185 50.733854,286.37185">
+                        <GeometryDrawing Geometry=" M0.06614617,286.37185L17.495573,286.37185 M23.8125,286.37185L38.066927,286.37185 50.733854,286.37185">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Flat" LineJoin="Miter" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M17.793223,281.34478L23.614079,281.34478 23.614079,289.4257 20.703652,293.60549 17.793223,289.4257z">
+                        <GeometryDrawing Geometry=" M17.793223,281.34478L23.614079,281.34478 23.614079,289.4257 20.703652,293.60549 17.793223,289.4257z">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M7.2098853,249.59458L13.030739,249.59458 13.030739,257.6755 10.120312,261.85529 7.2098853,257.6755z">
+                        <GeometryDrawing Geometry=" M7.2098853,249.59458L13.030739,249.59458 13.030739,257.6755 10.120312,261.85529 7.2098853,257.6755z">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.11102223" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
@@ -893,6 +1010,11 @@
     <DrawingImage x:Key="exclude_borderDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup>
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
                     <DrawingGroup Opacity="1" Transform="0.97817195,0,0,0.97842417,-0.58447908,5.8601892">
                         <GeometryDrawing Brush="#FF000000">
@@ -919,7 +1041,7 @@
                                 <RectangleGeometry Rect="7.2099,262.7364,9.2604,17.7271" />
                             </GeometryDrawing.Geometry>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M45.640624,246.72917C17.2022,263.2942,14.765993,279.55096,45.905208,296.47083">
+                        <GeometryDrawing Geometry=" M45.640624,246.72917C17.2022,263.2942,14.765993,279.55096,45.905208,296.47083">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="2.16362143" LineCap="Round"  LineJoin="Miter">
                                   <!--DashCap="Round"-->
@@ -938,6 +1060,11 @@
     <DrawingImage x:Key="include_borderDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup >
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
                     <GeometryDrawing Brush="#FF000000">
                         <GeometryDrawing.Pen>
@@ -963,7 +1090,7 @@
                             <RectangleGeometry Rect="6.468,262.9279,9.0583,17.3446" />
                         </GeometryDrawing.Geometry>
                     </GeometryDrawing>
-                    <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M44.059899,247.26597C16.24223,263.4736,13.859201,279.37961,44.318708,295.93441">
+                    <GeometryDrawing Geometry=" M44.059899,247.26597C16.24223,263.4736,13.859201,279.37961,44.318708,295.93441">
                         <GeometryDrawing.Pen>
                             <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round"  LineJoin="Miter">
                               <!--DashCap="Round"-->
@@ -981,8 +1108,13 @@
     <DrawingImage x:Key="stack_image_belowDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup >
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
-                    <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M21.743718,261.86974L18.131285,264.38483 M7.7665556,271.60029L1.0584397,276.27042 25.399852,293.21595 49.741747,276.27042 43.033149,271.60029 M32.581493,264.32386L28.969063,261.80925">
+                    <GeometryDrawing Geometry=" M21.743718,261.86974L18.131285,264.38483 M7.7665556,271.60029L1.0584397,276.27042 25.399852,293.21595 49.741747,276.27042 43.033149,271.60029 M32.581493,264.32386L28.969063,261.80925">
                         <GeometryDrawing.Pen>
                             <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round">
                               <!--DashCap="Round" -->
@@ -993,7 +1125,7 @@
                             </Pen>
                         </GeometryDrawing.Pen>
                     </GeometryDrawing>
-                    <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M1.0582541,266.92997L11.335861,274.08494 21.700404,266.86944 11.422796,259.71447z M15.035324,257.19954L25.312931,264.35451 35.677474,257.13901 25.399866,249.98405z M14.948394,276.59986L25.39987,283.87588 35.764411,276.6604 25.312936,269.38438z M28.925464,266.86944L39.37694,274.14545 49.741481,266.92997 39.290006,259.65396z">
+                    <GeometryDrawing Geometry=" M1.0582541,266.92997L11.335861,274.08494 21.700404,266.86944 11.422796,259.71447z M15.035324,257.19954L25.312931,264.35451 35.677474,257.13901 25.399866,249.98405z M14.948394,276.59986L25.39987,283.87588 35.764411,276.6604 25.312936,269.38438z M28.925464,266.86944L39.37694,274.14545 49.741481,266.92997 39.290006,259.65396z">
                         <GeometryDrawing.Pen>
                             <Pen Brush="#FF000000" Thickness="2.11666656" LineCap="Round" LineJoin="Round" />
                         </GeometryDrawing.Pen>
@@ -1005,11 +1137,16 @@
     <DrawingImage x:Key="stack_image_aboveDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup >
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup.Transform>
                     <TranslateTransform X="0" Y="232.8529" />
                 </DrawingGroup.Transform>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
-                    <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M7.5685437,271.51228L1.2681696,275.90234 11.543114,283.0619 17.843487,278.67185 M32.870016,278.73185L39.170388,283.1219 49.531985,275.90232 43.231612,271.51226 M21.425268,281.16743L15.124895,285.55749 25.399839,292.71706 35.589084,285.61751 29.288235,281.22745">
+                    <GeometryDrawing Geometry=" M7.5685437,271.51228L1.2681696,275.90234 11.543114,283.0619 17.843487,278.67185 M32.870016,278.73185L39.170388,283.1219 49.531985,275.90232 43.231612,271.51226 M21.425268,281.16743L15.124895,285.55749 25.399839,292.71706 35.589084,285.61751 29.288235,281.22745">
                         <GeometryDrawing.Pen>
                             <Pen Brush="#FF000000" Thickness="2.1170001" LineCap="Round" LineJoin="Round" />
                         </GeometryDrawing.Pen>
@@ -1037,14 +1174,19 @@
     <DrawingImage x:Key="openDrawingImage">
         <DrawingImage.Drawing>
             <DrawingGroup>
+              <GeometryDrawing>
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
                 <DrawingGroup Opacity="1" Transform="1,0,0,1,0,-246.2">
                     <DrawingGroup Opacity="1" Transform="1.1359472,0,0,1.1379305,-0.13803394,-46.588599">
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M38.941808,277.95504L38.941808,271.42751C38.941808,269.79351,37.838337,268.47811,36.467542,268.47811L21.587313,268.47811C18.770045,268.48611,14.581844,263.34945,11.766207,263.30002L3.5326007,263.30002C2.1618044,263.30002,1.0583333,264.61543,1.0583333,266.24941L1.0583333,293.22647">
+                        <GeometryDrawing Geometry=" M38.941808,277.95504L38.941808,271.42751C38.941808,269.79351,37.838337,268.47811,36.467542,268.47811L21.587313,268.47811C18.770045,268.48611,14.581844,263.34945,11.766207,263.30002L3.5326007,263.30002C2.1618044,263.30002,1.0583333,264.61543,1.0583333,266.24941L1.0583333,293.22647">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="1.86172497" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
                         </GeometryDrawing>
-                        <GeometryDrawing Geometry="F1 M50.799999,50.799999z M0,0z M8.1049044,278.28785L41.091846,278.28785C42.59472,278.28785,44.386667,279.79907,43.804616,281.3768L39.571285,292.85184C38.989233,294.42958,38.36139,295.94081,36.858514,295.94081L3.8715731,295.94081C2.3686977,295.94081,0.57674976,294.42958,1.1588016,292.85184L5.3921329,281.3768C5.9741847,279.79907,6.602029,278.28785,8.1049044,278.28785z">
+                        <GeometryDrawing Geometry=" M8.1049044,278.28785L41.091846,278.28785C42.59472,278.28785,44.386667,279.79907,43.804616,281.3768L39.571285,292.85184C38.989233,294.42958,38.36139,295.94081,36.858514,295.94081L3.8715731,295.94081C2.3686977,295.94081,0.57674976,294.42958,1.1588016,292.85184L5.3921329,281.3768C5.9741847,279.79907,6.602029,278.28785,8.1049044,278.28785z">
                             <GeometryDrawing.Pen>
                                 <Pen Brush="#FF000000" Thickness="1.86172497" LineCap="Round" LineJoin="Round" />
                             </GeometryDrawing.Pen>
@@ -1054,9 +1196,14 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <Geometry x:Key="invert_selectionGeometry1">F1 M50.799999,50.799998z M0,0z M49.512833,247.48718L34.564927,262.43509C39.689824,267.5599 39.689823,275.86896 34.564929,280.99377 29.440113,286.11867 21.131058,286.11867 16.006242,280.99377L1.0583363,295.94168 49.512833,295.94168z</Geometry>
-    <Geometry x:Key="invert_selectionGeometry2">F1 M50.799999,50.799998z M0,0z M34.564857,262.43516A13.12287,13.12287,0,0,0,16.006168,262.43516A13.12287,13.12287,0,0,0,16.006167,280.99385z</Geometry>
+    <Geometry x:Key="invert_selectionGeometry1"> M49.512833,247.48718L34.564927,262.43509C39.689824,267.5599 39.689823,275.86896 34.564929,280.99377 29.440113,286.11867 21.131058,286.11867 16.006242,280.99377L1.0583363,295.94168 49.512833,295.94168z</Geometry>
+    <Geometry x:Key="invert_selectionGeometry2"> M34.564857,262.43516A13.12287,13.12287,0,0,0,16.006168,262.43516A13.12287,13.12287,0,0,0,16.006167,280.99385z</Geometry>
     <DrawingGroup x:Key="invert_selectionDrawingGroup" >
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 50.8, 50.8"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
         <DrawingGroup.Transform>
             <TranslateTransform X="49.7417" Y="295.9417" />
         </DrawingGroup.Transform>
