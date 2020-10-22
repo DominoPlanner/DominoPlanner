@@ -22,7 +22,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             field_templates.Add(new StandardSize("8mm", new Sizes(8, 8, 24, 8)));
             field_templates.Add(new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)));
             field_templates.Add(new StandardSize("User Size", new Sizes(10, 10, 10, 10)));
-            Click_Binding = new RelayCommand((x) => BindSize = !BindSize);  
             ReloadSizes();
             AllowRegeneration = AllowRegenerate;
             Refresh();
@@ -230,6 +229,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             PostUndoAction: () => { UpdateSizes(); Refresh(); }, ChangesSize: true);
                     }
                     _SelectedItem = value;
+                    if (SelectedItem == null)
+                        return;
                     if (SelectedItem.Name.Equals("User Size"))
                         CanChange = true;
                     else
@@ -292,10 +293,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void UpdateSizes()
         {
-            HorizontalDistance = SelectedItem.Sizes.a;
-            HorizontalSize = SelectedItem.Sizes.b;
-            VerticalSize = SelectedItem.Sizes.c;
-            VerticalDistance = SelectedItem.Sizes.d;
+            if (SelectedItem != null)
+            {
+                HorizontalDistance = SelectedItem.Sizes.a;
+                HorizontalSize = SelectedItem.Sizes.b;
+                VerticalSize = SelectedItem.Sizes.c;
+                VerticalDistance = SelectedItem.Sizes.d;
+            }
 
         }
 
@@ -321,8 +325,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         #endregion
 
-        private ICommand _Click_Binding;
-        public ICommand Click_Binding { get { return _Click_Binding; } set { if (value != _Click_Binding) { _Click_Binding = value; } } }
         
         
     }

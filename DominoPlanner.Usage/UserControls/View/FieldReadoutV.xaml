@@ -19,7 +19,7 @@
                     <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" Value="{Binding ResizeMode, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
+                <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding ResizeMode, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
                 <TextBlock Grid.Column="2" Text="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
         </HeaderedContentControl>

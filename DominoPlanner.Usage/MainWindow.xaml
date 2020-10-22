@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoPlanner.Usage"
+        xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
         xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View"
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -48,7 +49,7 @@
       <RowDefinition Height="247*"/>
       <RowDefinition Height="424*"/>
     </Grid.RowDefinitions>
-    <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" ><!--VerticalContentAlignment="Center"-->
+    <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" >
       <MenuItem>
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
@@ -56,13 +57,12 @@
             <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">New</TextBlock>
           </StackPanel>
         </MenuItem.Header>
-        <MenuItem Header="New Project" Command="{Binding NewProject}"> <!--InputGestureText="Alt+N"-->
+        <MenuItem Header="New Project" Command="{Binding NewProject}" InputGesture="Alt+N">
           <MenuItem.Icon>
             <Image Source="/Icons/new.ico"/>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" >
-          <!--InputGestureText="Ctrl+N"-->
+        <MenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" InputGesture="Ctrl+N" >
           <MenuItem.Icon>
             <Image Source="/Icons/new.ico"/>
           </MenuItem.Icon>
@@ -94,21 +94,18 @@
             <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Save</TextBlock>
           </StackPanel>
         </MenuItem.Header>
-        <MenuItem Header="Save" Command="{Binding SaveCurrentOpen}" >
-          <!--InputGestureText="Ctrl+S"-->
+        <MenuItem Header="Save" Command="{Binding SaveCurrentOpen}" InputGesture="Ctrl+S">
           <MenuItem.Icon>
             <Image Source="/Icons/Save.ico"/>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Save all" Command="{Binding SaveAll}" >
-          <!--InputGestureText="Ctrl+Alt+S"-->
+        <MenuItem Header="Save all" Command="{Binding SaveAll}" InputGesture="Ctrl+Alt+S" >
           <MenuItem.Icon>
             <Image Source="/Icons/Save_All.ico"/>
           </MenuItem.Icon>
         </MenuItem>
       </MenuItem>
-      <MenuItem Command="{Binding SelectedTab.Content.UndoComm}"  >
-        <!--InputGestureText="Ctrl+Z"-->
+      <MenuItem Command="{Binding SelectedTab.Content.UndoComm}" InputGesture="Ctrl+Z" >
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
             <Image Source="/Icons/edit_undo.ico" Margin="2"/>
@@ -117,7 +114,6 @@
         </MenuItem.Header>
       </MenuItem>
       <MenuItem Command="{Binding SelectedTab.Content.RedoComm}" >
-        <!--InputGestureText="Ctrl+Y"-->
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
             <Image Source="/Icons/edit_redo.ico" Margin="2"/>
@@ -125,8 +121,7 @@
           </StackPanel>
         </MenuItem.Header>
       </MenuItem>
-      <MenuItem Command="{Binding MenuSetStandard}" >
-        <!--InputGestureText="Ctrl+R"-->
+      <MenuItem Command="{Binding MenuSetStandard}" InputGesture="Ctrl+R" >
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
             <Image Source="/Icons/properties.ico" Margin="2"/>
@@ -134,32 +129,27 @@
           </StackPanel>
         </MenuItem.Header>
       </MenuItem>
-      <MenuItem>
+      <MenuItem Name="EditingMenuItem">
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
             <Image Source="/Icons/draw_freehand.ico" Margin="2"/>
             <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Editing</TextBlock>
           </StackPanel>
         </MenuItem.Header>
-        <!--
-        <MenuItem.Style>
-          <Style TargetType="{x:Type MenuItem}">
-            <Setter Property="Visibility" Value="Collapsed"/>
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding SelectedTab.Content.tabType}" Value="{x:Static vm:TabItemType.EditProject}">
-                <Setter Property="Visibility" Value="Visible"/>
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </MenuItem.Style>-->
-        <MenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" >
-          <!--InputGestureText="Ctrl+C"-->
+        <i:Interaction.Behaviors>
+          <ia:DataTriggerBehavior Binding="{Binding SelectedTab}" Value="{x:Null}">
+            <ia:ChangePropertyAction TargetObject="{Binding #EditingMenuItem}" PropertyName="IsVisible" Value="false"/>
+          </ia:DataTriggerBehavior>
+          <ia:DataTriggerBehavior Binding="{Binding SelectedTab.Content.tabType}" Value="{x:Static vm:TabItemType.EditProject}">
+            <ia:ChangePropertyAction TargetObject="{Binding #EditingMenuItem}" PropertyName="IsVisible" Value="true"/>
+          </ia:DataTriggerBehavior>
+        </i:Interaction.Behaviors>
+        <MenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" InputGesture="Ctrl+C">
           <MenuItem.Icon>
             <Image Source="/Icons/Copy.ico"/>
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" >
-          <!--InputGestureText="Ctrl+V"-->
+        <MenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" InputGesture="Ctrl+V">
           <MenuItem.Icon>
             <Image Source="/Icons/Paste.ico"/>
           </MenuItem.Icon>
@@ -180,40 +170,35 @@
           <MenuItem.Icon>
             <Image Source="/Icons/add.ico"/>
           </MenuItem.Icon>
-          <MenuItem Header="Add row above" ToolTip.Tip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}" />
-          <!--InputGestureText="Alt+W"-->
-          <MenuItem Header="Add row below" ToolTip.Tip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}" />
-          <!--InputGestureText="Alt+S"-->
-          <MenuItem Header="Add column right" ToolTip.Tip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}" /> <!--InputGestureText="Alt+D"-->
-          <MenuItem Header="Add column left" ToolTip.Tip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}" />
-          <!--InputGestureText="Alt+A"-->
+          <MenuItem Header="Add row above" ToolTip.Tip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}" InputGesture="Alt+W"/>
+          <MenuItem Header="Add row below" ToolTip.Tip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}" InputGesture="Alt+S"/>
+          <MenuItem Header="Add column right" ToolTip.Tip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}" InputGesture="Alt+D"/>
+          <MenuItem Header="Add column left" ToolTip.Tip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}" InputGesture="Alt+A" />
         </MenuItem>
         <MenuItem Header="Remove">
           <MenuItem.Icon>
             <Image Source="/Icons/remove.ico"/>
           </MenuItem.Icon>
-          <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" />
-          <!--InputGestureText="Alt+R"-->
-          <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" />
-          <!--InputGestureText="Alt+C"-->
+          <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" InputGesture="Alt+R"/>
+          <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGesture="Alt+C"/>
         </MenuItem>
       </MenuItem>
-      <!--<MenuItem ItemsSource="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
+      <MenuItem Name="Workspace" Items="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
+        <MenuItem.Styles>
+          <Style Selector="#Workspace > MenuItem">
+            <Setter Property="Icon" Value="{Binding Item1, Converter={StaticResource PathToImageConverter}}"/>
+            <Setter Property="Header" Value="{Binding Item1}"/>
+            <Setter Property="Command" Value="{Binding #Workspace.DataContext.FileListClickCommand}"/>
+            <Setter Property="CommandParameter" Value="{Binding Item1}"/>
+          </Style>
+        </MenuItem.Styles>
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
-            <Image Source="Icons/open.ico" Margin="2"/>
+            <Image Source="/Icons/open.ico" Margin="2"/>
             <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Workspace</TextBlock>
           </StackPanel>
         </MenuItem.Header>
-        <MenuItem.ItemContainerStyle>
-          <Style TargetType="{x:Type MenuItem}">
-            <Setter Property="Icon" Value="{Binding Item1, Converter={StaticResource PathToImageConverter}}"/>
-            <Setter Property="Header" Value="{Binding Item1}"/>
-            <Setter Property="Command" Value="{Binding Path=DataContext.FileListClickCommand, RelativeSource={RelativeSource AncestorLevel=1, AncestorType={x:Type MenuItem}}}"/>
-            <Setter Property="CommandParameter" Value="{Binding Item1}"/>
-          </Style>
-        </MenuItem.ItemContainerStyle>
-      </MenuItem>-->
+      </MenuItem>
     </Menu>
     <Border  Margin="0,25,0.286,0.428" BorderBrush="Red" BorderThickness="0" Grid.RowSpan="2">
       <Grid>
@@ -238,18 +223,7 @@
                     <ia:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
                   </ia:EventTriggerBehavior>
                 </i:Interaction.Behaviors>
-                <Grid ToolTip.Tip="{Binding AbsolutePath}" ContextMenu="{Binding ContextMenu}">
-                  <!--<Grid.ContextMenu>
-                    <ContextMenu>
-                      <MenuItem Header="{Binding AbsolutePath}"/>
-                    </ContextMenu>
-                  </Grid.ContextMenu>-->
-                  <!-- ContextMenu="{Binding ContextMenu}"-->
-                  
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="*"/>
-                  </Grid.ColumnDefinitions>
+                <Grid ToolTip.Tip="{Binding AbsolutePath}" ContextMenu="{Binding ContextMenu}" ColumnDefinitions="20,*">         
                   <Image Grid.Column="0" Source="{Binding ImagePath, Converter={StaticResource FilenameToThumbnailConverter}}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                   <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                   </TextBlock>
@@ -261,24 +235,14 @@
         <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#FFDDDDDD" Grid.Column="1"/>
         <TabControl Grid.Column="2" Items="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,5,0">
           <TabControl.ItemTemplate>
-            <!-- this is the header template-->
             <DataTemplate>
-              <Grid Background="#66FFFFFF" ToolTip.Tip="{Binding Path}">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="20"/>
-                  <ColumnDefinition Width="2"/>
-                  <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="2"/>
-                  <ColumnDefinition Width="20"/>
-                </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
-                <TextBlock Grid.Column="2" Text="{Binding Header}" VerticalAlignment="Center"/>
-                <Button Grid.Column="4" Margin="0" Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="20" Width="20">
-                  <Button.Background>
-                    <ImageBrush Source="Icons/closewindow.ico"/>
-                  </Button.Background>
+              <StackPanel Orientation="Horizontal" ToolTip.Tip="{Binding Path}" >
+                <Image  Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
+                <TextBlock Margin="5, 0" Text="{Binding Header}" VerticalAlignment="Center"/>
+                <Button  Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="24" Width="24" Background="Transparent">
+                    <Image Source="{StaticResource closeDrawingImage}"/>
                 </Button>
-              </Grid>
+              </StackPanel>
             </DataTemplate>
           </TabControl.ItemTemplate>
           <TabControl.ContentTemplate>

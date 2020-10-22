@@ -35,13 +35,9 @@
             <!--Length and Height Setters-->
             <TextBlock Text="Length:"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <NumericUpDown Margin="5, 0, 0, 0" Value="{Binding Length}" IsEnabled="{Binding EditState}" Minimum="0" HorizontalAlignment="Stretch"/>
-            <Image Source="{Binding BindSize, Converter={StaticResource LockedToImageConverter}}"  IsEnabled="{Binding EditState}" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-              <!--<i:Interaction.Behaviors>
-                <ia:EventTriggerBehavior EventName="PointerReleased">
-                  <ia:InvokeCommandAction Command="{Binding Click_Binding}"/>
-                </ia:EventTriggerBehavior>
-              </i:Interaction.Behaviors>-->
-            </Image>
+            <ToggleButton Background="Transparent" BorderBrush="Transparent" IsChecked="{Binding BindSize}" IsEnabled="{Binding EditState}" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Image Height="20" Width="20" Source="{Binding BindSize, Converter={StaticResource LockedToImageConverter}}"/>
+            </ToggleButton>
             <TextBlock Text="Height:" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <NumericUpDown Value="{Binding Height}" Margin="5, 0, 0, 0" IsEnabled="{Binding EditState}" Minimum="0" HorizontalAlignment="Stretch"/>
             </DockPanel>

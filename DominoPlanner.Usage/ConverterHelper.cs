@@ -13,6 +13,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Data;
 using Avalonia;
 using Avalonia.Platform;
+using Avalonia.Controls.Shapes;
 
 namespace DominoPlanner.Usage
 {
@@ -80,11 +81,30 @@ namespace DominoPlanner.Usage
             throw new NotImplementedException();
         }
     }
+
     public class PathToImageConverter : IValueConverter
     {
+        public static Bitmap GetIcon(string iconpath)
+        {
+            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            var bitmap = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage" + iconpath)));
+            return bitmap;
+
+        }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new Image() { Source = new Bitmap(ImageHelper.GetImageOfFile(value.ToString())) };
+            string path = ImageHelper.GetImageOfFile(value.ToString());
+            if (path.StartsWith("/Icons/"))
+            {
+                return new Image()
+                {
+                    Source = GetIcon(path)
+                };
+            }
+            else
+            {
+                return new Image() { Source = new Bitmap(ImageHelper.GetImageOfFile(value.ToString())) };
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -114,7 +134,7 @@ namespace DominoPlanner.Usage
 
             if (targetType.IsEnum)
             {
-                var val =(int)(double)value;
+                var val = (int)(double)value;
                 switch (val)
                 {
                     case 0: return Inter.Nearest;
@@ -160,7 +180,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch(value)
+            switch (value)
             {
                 case FloydSteinbergDithering d:
                     return "Floyd/Steinberg Dithering";
@@ -200,9 +220,9 @@ namespace DominoPlanner.Usage
                 case 1:
                     return new FloydSteinbergDithering();
                 case 2:
-                    return new JarvisJudiceNinkeDithering() ;
+                    return new JarvisJudiceNinkeDithering();
                 case 3:
-                    return new StuckiDithering() ;
+                    return new StuckiDithering();
                 default:
                     return new Dithering();
             }
@@ -295,10 +315,12 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            string path = "";
             if ((bool)value)
-                return "/Icons/ok.ico";
+                path = "/Icons/ok.ico";
             else
-                return "/Icons/closewindow.ico";
+                path = "/Icons/closewindow.ico";
+            return PathToImageConverter.GetIcon(path);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -310,10 +332,12 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            string path = "";
             if ((bool)value)
-                return "/Icons/lock.ico";
+                path = "/Icons/lock.ico";
             else
-                return "/Icons/unlock.ico";
+                path = "/Icons/unlock.ico";
+            return PathToImageConverter.GetIcon(path);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

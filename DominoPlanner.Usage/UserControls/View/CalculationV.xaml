@@ -15,9 +15,9 @@
                     <ColumnDefinition Width="36*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="26"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="2"/>
-                    <RowDefinition Height="26"/>
+                    <RowDefinition Height="Auto"/>
 
                 </Grid.RowDefinitions>
 
@@ -31,7 +31,7 @@
                     <Slider Value="{Binding Weight}" Grid.Column="1" Minimum="0" Maximum="0.5" Margin="0,5,0,0" SmallChange="0.01" TickFrequency="0" LargeChange="0.1" TickPlacement="BottomRight" />
                     <NumericUpDown Value="{Binding Weight}" Grid.Column="2" Minimum="0" Maximum="0.5" Increment="0.001" FormatString="F3"></NumericUpDown>
                 </Grid>
-                <Grid Grid.Row="2" IsEnabled="{Binding OnlyUse}" Grid.ColumnSpan="2" Margin="0,0.143,-0.143,0.286">
+                <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0.143,-0.143,0.286">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="*"/>
@@ -41,7 +41,9 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type local:NoColorRestrictionVM}"/>
+     <DataTemplate DataType="{x:Type local:NoColorRestrictionVM}">
+       <Grid></Grid>
+     </DataTemplate>
 </UserControl.DataTemplates>
     <UserControl.Resources>
         <parent:BoolToImageConverter x:Key="BoolToImageConverter"></parent:BoolToImageConverter>
@@ -92,7 +94,7 @@
                     <TextBlock Grid.Column="2" Text="255" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 </Grid>
             </HeaderedContentControl>
-            <HeaderedContentControl>
+            <HeaderedContentControl >
                 <HeaderedContentControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox VerticalAlignment="Center" IsChecked="{Binding IterationInformation, Converter={StaticResource IterationInformationToBooleanConverter}}">Try to match Available dominoes</CheckBox>
@@ -110,7 +112,7 @@
                     </StackPanel>
                 </HeaderedContentControl.Header>
                 <ContentControl Content="{Binding IterationInformationVM}"/>
-            </HeaderedContentControl>
+              </HeaderedContentControl>
         </StackPanel>
     </Grid>
 </UserControl>

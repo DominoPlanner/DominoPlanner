@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:conv="clr-namespace:DominoPlanner.Usage"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.UserControls.View.BasicSettings">
@@ -36,7 +37,7 @@
     <DataTemplate DataType="{x:Type vm:CreateSpiralVM}">
       <local:SpiralSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
     </DataTemplate>
-
+    
   </UserControl.DataTemplates>
   <Grid ShowGridLines="False" Cursor="{Binding cursor}" Background="#02FFFFFF">
     <Grid.RowDefinitions>
@@ -50,14 +51,11 @@
     <Image Grid.Row="0" Source="{Binding Path=CurrentPlan}"></Image>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch">
       <StackPanel Margin="3">
-        <Expander Header="Shape settings" IsExpanded="True">
-          <ContentPresenter Grid.Column="0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext}"/>
+        <Expander Header="Shape settings" IsExpanded="True" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext}">
         </Expander>
-        <Expander Header="Image treatment settings" IsExpanded="True">
-          <ContentControl Content="{Binding ImageTreatmentVM}"/>
+        <Expander Header="Image treatment settings" IsExpanded="True" Content="{Binding ImageTreatmentVM}">
         </Expander>
-        <Expander Header="Color search settings" IsExpanded="True">
-          <ContentPresenter Grid.Column="1" Content="{Binding CalculationVM}"/>
+        <Expander Header="Color search settings" IsExpanded="True" Content="{Binding CalculationVM}">
         </Expander>
         <Expander Header="Render options" HorizontalAlignment="Stretch" IsExpanded="True">
           <HeaderedContentControl Header="Preview options">

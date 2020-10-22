@@ -27,10 +27,10 @@ namespace DominoPlanner.Usage
             if (picturepath == null || !File.Exists(picturepath))
             {
                 if (Path.GetExtension(projectpath).ToLower() == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
-                    picturepath = @"Icons/colorLine.ico";
+                    picturepath = @"/Icons/colorLine.ico";
                 else if (Path.GetExtension(projectpath).ToLower() == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
-                    picturepath = @"Icons/folder_txt.ico";
-                else picturepath = @"./Icons/image.ico";
+                    picturepath = @"/Icons/folder_txt.ico";
+                else picturepath = @"/Icons/image.ico";
             }
             return picturepath;
         }
