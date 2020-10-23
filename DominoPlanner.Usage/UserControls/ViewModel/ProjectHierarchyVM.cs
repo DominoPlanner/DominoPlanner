@@ -542,7 +542,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ExportImage(true);
         }
-        public void ExportImage(bool userDefinedExport)
+        public async void ExportImage(bool userDefinedExport)
         {
             try
             {
@@ -552,8 +552,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Color background = Colors.Transparent;
                 if (userDefinedExport)
                 {
-                    /*ExportOptions exp = new ExportOptions(DocumentModel.obj);
-                    if (exp.ShowDialog() == true)
+                    ExportOptions exp = new ExportOptions(DocumentModel.obj);
+                    if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
                     {
                         var dc = exp.DataContext as ExportOptionsVM;
                         width = dc.ImageSize;
@@ -564,13 +564,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     else
                     {
                         return;
-                    }*/
+                    }
                 }
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 
                 saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = "PNG files" });
                 //saveFileDialog.RestoreDirectory = true;
-                var result = saveFileDialog.ShowDialog();
+                var result = await saveFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
                 if (result != "")
                 {
                     if (File.Exists(result))
@@ -591,10 +591,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
                 return;
             }
-            /*ProtocolV protocolV = new ProtocolV();
+            ProtocolV protocolV = new ProtocolV();
             DocumentModel.obj.Generate(new System.Threading.CancellationToken());
             protocolV.DataContext = new ProtocolVM(DocumentModel.obj, Path.GetFileNameWithoutExtension(DocumentModel.relativePath));
-            protocolV.ShowDialog();*/
+            protocolV.Show();
         }
         [ContextMenuAttribute("Open", "Icons/folder_tar.ico", Index = 0)]
         public override void Open()
@@ -635,12 +635,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             
         }
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
-        public void Rename()
+        public async void Rename()
         {
-            /*try
+            try
             {
                 RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
-                if (closeTab(this) && ro.ShowDialog() == true)
+                if (await closeTab(this) && await ro.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
                 {
                     Workspace.CloseFile(DocumentModel.AbsolutePath);
                     string old_path = AbsolutePath;
@@ -654,7 +654,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             catch
             {
                 Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
-            }*/
+            }
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
