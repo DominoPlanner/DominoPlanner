@@ -4,7 +4,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using DominoPlanner.Core;
-using MsgBox;
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -55,11 +56,11 @@ namespace DominoPlanner.Usage
             loadProjectList();
         }
 
-        internal bool CloseAllTabs()
+        internal async Task<bool> CloseAllTabs()
         {
             while (Tabs.Count > 0)
             {
-                if (!RemoveItem(Tabs.First()))
+                if (!(await RemoveItem(Tabs.First())))
                     return false;
             }
             return true;
@@ -310,36 +311,37 @@ namespace DominoPlanner.Usage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private bool MainWindowViewModel_CloseIt(UserControls.ViewModel.TabItem tabItem)
+        private async Task<bool> MainWindowViewModel_CloseIt(UserControls.ViewModel.TabItem tabItem)
         {
-            return RemoveItem(tabItem);
+            return await RemoveItem(tabItem);
         }
-        private bool RemoveFileFromTabs(string path)
+        private async Task<bool> RemoveFileFromTabs(string path)
         {
             bool result = true;
             foreach (UserControls.ViewModel.TabItem tabItem in Tabs.Where(x => x.Path == path).ToArray())
             {
-                result = result && RemoveItem(tabItem);
+                result = result && await RemoveItem(tabItem);
             }
             return result;
         }
-        private bool RemoveNodeFromTabs(NodeVM node)
+        private async Task<bool> RemoveNodeFromTabs(NodeVM node)
         {
-            return RemoveFileFromTabs(node.AbsolutePath);
+            return await RemoveFileFromTabs(node.AbsolutePath);
         }
-        private bool RemoveItem(UserControls.ViewModel.TabItem tabItem)
+        private async Task<bool> RemoveItem(UserControls.ViewModel.TabItem tabItem)
         {
             bool remove = false;
             if (tabItem.Content.UnsavedChanges)
             {
-                var result = Task.Run(async() => await MessageBox.Show($"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?",
-                    "Warning", MessageBox.MessageBoxButtons.YesNoCancel)).Result;
-                if (result == MessageBox.MessageBoxResult.Yes)
+                var msgbox = MessageBoxManager.GetMessageBoxStandardWindow("Warning", $"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?",
+                    ButtonEnum.YesNoCancel);
+                var result = await msgbox.ShowDialog(MainWindowViewModel.GetWindow());
+                if (result == ButtonResult.Yes)
                 {
                     tabItem.Content.Save();
                     remove = true;
                 }
-                if (result == MessageBox.MessageBoxResult.No)
+                if (result == ButtonResult.No)
                 {
                     remove = true;
                 }

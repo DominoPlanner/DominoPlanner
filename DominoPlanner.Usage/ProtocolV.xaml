@@ -48,39 +48,37 @@
       </HeaderedContentControl>
       <Expander DockPanel.Dock="Top" IsVisible="true" Header="Advanced Settings" Margin="2,2,2,2" >
         <!--Panel.ZIndex="3"-->
-        <Border BorderThickness="1" BorderBrush="Black" Margin="0,0,0,2">
-          <StackPanel >
-            <DockPanel Margin="2" VerticalAlignment="Center">
-              <TextBlock VerticalAlignment="Center">Cell content:</TextBlock>
-              <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextRegex}" ToolTip.Tip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
-            </DockPanel>
-            <DockPanel  Margin="2" VerticalAlignment="Center">
-              <TextBlock VerticalAlignment="Center">Text Format:</TextBlock>
-              <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip.Tip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
-            </DockPanel>
-            <!--<GroupBox Header="Border visibility">
+        <StackPanel >
+          <DockPanel Margin="2" VerticalAlignment="Center">
+            <TextBlock VerticalAlignment="Center">Cell content:</TextBlock>
+            <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextRegex}" ToolTip.Tip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
+          </DockPanel>
+          <DockPanel  Margin="2" VerticalAlignment="Center">
+            <TextBlock VerticalAlignment="Center">Text Format:</TextBlock>
+            <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip.Tip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
+          </DockPanel>
+          <!--<GroupBox Header="Border visibility">
                         <StackPanel Margin="2">
                             <RadioButton Margin="2" Content="Separate" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}"/>
                             <RadioButton Margin="2" Content="Collapsed" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}" />
                         </StackPanel>
 
                         </GroupBox>-->
-            <HeaderedContentControl Header="Cell background color" >
-              <StackPanel VerticalAlignment="Center" Margin="2">
-                <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
-                <RadioButton Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
-              </StackPanel>
-            </HeaderedContentControl>
-            <HeaderedContentControl Header="Text color">
-              <StackPanel Margin="2">
-                <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
-                <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedTextColor}"/>
-                <RadioButton Grid.Row="2" Content="Intelligent" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding IntelligentTextColor}"/>
+          <HeaderedContentControl Header="Cell background color" >
+            <StackPanel VerticalAlignment="Center" Margin="2">
+              <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
+              <RadioButton Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
+            </StackPanel>
+          </HeaderedContentControl>
+          <HeaderedContentControl Header="Text color">
+            <StackPanel Margin="2">
+              <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
+              <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedTextColor}"/>
+              <RadioButton Grid.Row="2" Content="Intelligent" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding IntelligentTextColor}"/>
 
-              </StackPanel>
-            </HeaderedContentControl>
-          </StackPanel>
-        </Border>
+            </StackPanel>
+          </HeaderedContentControl>
+        </StackPanel>
       </Expander>
 
       <Button VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="5" Command="{Binding SaveExcel}" >

@@ -11,7 +11,6 @@ using System.Windows;
 using Avalonia.Controls;
 using DominoPlanner.Usage.Serializer;
 using Avalonia.Media;
-using MsgBox;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -63,7 +62,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ContextMenu contextMenu { get; set; }
 
         public static Action<TabItem> openTab;
-        public static Func<NodeVM, bool> closeTab;
+        public static Func<NodeVM, Task<bool>> closeTab;
         public static Func<NodeVM, TabItem> getTab;
         
         public abstract string RelativePathFromParent { get; set; }
@@ -195,10 +194,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         public AssemblyNodeVM(AssemblyNode assembly, Action<TabItem> openTab,
-            Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab) : this(assembly, null, openTab, closeTab, getTab) { }
+            Func<NodeVM, Task<bool>> closeTab, Func<NodeVM, TabItem> getTab) : this(assembly, null, openTab, closeTab, getTab) { }
 
         public AssemblyNodeVM(AssemblyNode assembly, AssemblyNodeVM parent, Action<TabItem> openTab,
-            Func<NodeVM, bool> closeTab, Func<NodeVM, TabItem> getTab)
+            Func<NodeVM, Task<bool>> closeTab, Func<NodeVM, TabItem> getTab)
         {
             AssemblyModel = assembly;
             AssemblyModel.RelativePathChanged += (s, args) => RelativePathChanged();
@@ -617,13 +616,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             
         }
         [ContextMenuAttribute("Remove from project", "Icons/remove.ico", Index = 7)]
-        public void RemoveNodeFromProject()
+        public async void RemoveNodeFromProject()
         {
             try
             {
-                if (closeTab(this) &&
-                    Task.Run(async() => await MessageBox.Show($"Remove reference to file {Name} from project {parent.Name}?\n" +
-                    $"The file won't be permanently deleted.", "Delete?", MessageBox.MessageBoxButtons.YesNo)).Result == MessageBox.MessageBoxResult.Yes)
+                var msgbox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("Delete?", $"Remove reference to file {Name} from project {parent.Name}?\n" +
+                    $"The file won't be permanently deleted.", MessageBox.Avalonia.Enums.ButtonEnum.YesNo, MessageBox.Avalonia.Enums.Icon.Warning);
+                if (await closeTab(this) && await msgbox.ShowDialog(MainWindowViewModel.GetWindow())  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
                 {
                     parent.RemoveChild(this);
                     Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);

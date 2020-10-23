@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using System;
 using System.Configuration;
+using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage
 {
@@ -31,13 +33,23 @@ namespace DominoPlanner.Usage
             //this.AttachDevTools();
 #endif
         }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        // ugly hacky workaround for the fact that events don't wait if they are canceled asynchronously
+        private bool should_really_close = false;
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (!should_really_close)
+            {
+                e.Cancel = true;
+            }
             if (DataContext is MainWindowViewModel mwvm)
             {
-                if (!mwvm.CloseAllTabs())
+                if (await mwvm.CloseAllTabs())
                 {
-                    e.Cancel = true;
+                    if (!should_really_close)
+                    {
+                        should_really_close = true;
+                        this.Close();
+                    }
                 }
             }
             //PipeManager.StopServer();

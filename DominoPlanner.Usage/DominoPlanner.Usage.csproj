@@ -7,7 +7,6 @@
     <None Remove="ExportOptions.xaml" />
     <None Remove="LiveBuildHelperV.xaml" />
     <None Remove="MainWindow.xaml" />
-    <None Remove="MessageBox.xaml" />
     <None Remove="NewObject.xaml" />
     <None Remove="NewProject.xaml" />
     <None Remove="ProtocolV.xaml" />
@@ -32,9 +31,6 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </AvaloniaXaml>
-    <AvaloniaXaml Include="MessageBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="NewObject.xaml">
@@ -88,6 +84,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview5" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-preview5" />
     <PackageReference Include="EMGU.CV" Version="4.4.0.4099" />
+    <PackageReference Include="MessageBox.Avalonia" Version="0.10.0-prev2" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
@@ -105,9 +102,6 @@
     </Compile>
     <Compile Update="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="MessageBox.xaml.cs">
-      <DependentUpon>MessageBox.xaml</DependentUpon>
     </Compile>
     <Compile Update="NewObject.xaml.cs">
       <DependentUpon>NewObject.xaml</DependentUpon>

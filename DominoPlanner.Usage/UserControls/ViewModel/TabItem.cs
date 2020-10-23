@@ -125,7 +125,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region EventHandler
-        public delegate bool CloseDelegate(TabItem TI);
+        public delegate Task<bool> CloseDelegate(TabItem TI);
 
         public CloseDelegate CloseIt;
         #endregion
@@ -194,9 +194,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region METHODS
-        private void CloseThis()
+        private async void CloseThis()
         {
-            if (CloseIt?.Invoke(this) == true)
+            if (await CloseIt?.Invoke(this) == true)
             {
                 Content?.Close();
             }

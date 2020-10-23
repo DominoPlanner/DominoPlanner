@@ -16,7 +16,6 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
-using MsgBox;
 using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -993,7 +992,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             if (discrepancy)
             {
-                var res = MessageBox.Show("Discrepancy detected!", "Error", MessageBox.MessageBoxButtons.Ok).Result;
+                Errorhandler.RaiseMessage("Discrepancy detected!", "Error", Errorhandler.MessageType.Error);
             }
         }
         private void ShowImage()
