@@ -14,6 +14,7 @@ using Avalonia.Data;
 using Avalonia;
 using Avalonia.Platform;
 using Avalonia.Controls.Shapes;
+using ThemeEditor.Controls.ColorPicker;
 
 namespace DominoPlanner.Usage
 {
@@ -428,5 +429,9 @@ namespace DominoPlanner.Usage
         {
             throw new NotSupportedException();
         }
+    }
+    class PopupColorPicker : ColorPicker
+    {
+
     }
 }

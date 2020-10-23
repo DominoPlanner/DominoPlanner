@@ -1,9 +1,15 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
              x:Class="DominoPlanner.Usage.App">
+  <Application.Resources>
+    <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+  </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
         <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+      <StyleInclude Source="avares://ThemeEditor.Controls.ColorPicker/ColorPicker.xaml"/>
       <Style Selector="HeaderedContentControl">
         <Setter Property="Template">
           <Setter.Value>
@@ -174,7 +180,44 @@
         <Setter Property="Width" Value="24"/>
         <Setter Property="Height" Value="24"/>
       </Style>
-      
+      <Style Selector="local|PopupColorPicker">
+        <Style.Resources>
+          <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        </Style.Resources>
+        <Setter Property="Template">
+          <ControlTemplate>
+            <StackPanel>
+              <ToggleButton Name="PopupButton" Background="Transparent" Width="100" Height="24" DockPanel.Dock="Right" Margin="0, 0, 5, 0">
+                <Grid>
+                  <Rectangle Width="200" Height="{Binding #PopupButton.Bounds.Height}">
+                    <Rectangle.Fill>
+                      <VisualBrush TileMode="Tile" SourceRect="0, 0, 16, 16" DestinationRect="0, 0, 16, 16">
+                        <VisualBrush.Visual>
+                          <Path Data="M 0,0 L 0,8 L 8,8 L 8,0 Z M 8,8 L 8,16 L 16,16 L 16,8 Z" Fill="Gray"></Path>
+                        </VisualBrush.Visual>
+                      </VisualBrush>
+                    </Rectangle.Fill>
+                  </Rectangle>
+                  <Rectangle Fill="{TemplateBinding Color, Converter={StaticResource ColorToBrushConverter}}" Width="200" Height="200"></Rectangle>
+                </Grid>
+                <ToggleButton.Styles >
+                  <Style Selector="ToggleButton:checked /template/ ContentPresenter, ToggleButton:pressed /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+                  </Style>
+                  <Style Selector="ToggleButton:checked /template/ ContentPresenter">
+                    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+                  </Style>
+                </ToggleButton.Styles>
+              </ToggleButton>
+              <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" StaysOpen="False">
+                <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="5" CornerRadius="3" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                  <cp:ColorPicker Name="ColorPicker" Width="300" Color="{TemplateBinding Color, Mode=TwoWay}"/>
+                </Border>
+              </Popup>
+            </StackPanel>
+          </ControlTemplate>
+        </Setter>
+      </Style>
     </Application.Styles>
   <Application.Resources>
     <ResourceDictionary>
