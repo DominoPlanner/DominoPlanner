@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Avalonia.Media;
 using Emgu.CV;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -40,14 +41,18 @@ namespace DominoPlanner.Core
         {
             get
             {
-                System.Drawing.Bitmap b = new System.Drawing.Bitmap(256, 256);
+                SKSurface surf = SKSurface.Create(new SKImageInfo(256, 256));
                 if (last != null && last.colors != null)
-                    b = last.GenerateImage(256).ToImage<Emgu.CV.Structure.Bgra, byte>().ToBitmap();
+                {
+                    surf = last.GenerateImage(256);
+                }
+                var image = surf.Snapshot().Encode();
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    b.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    image.SaveTo(memoryStream);
                     return memoryStream.ToArray();
                 }
+
             }
         }
         [ProtoMember(3)]

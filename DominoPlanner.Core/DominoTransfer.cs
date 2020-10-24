@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using SkiaSharp;
+using System.Diagnostics;
 
 namespace DominoPlanner.Core
 {
@@ -80,12 +82,13 @@ namespace DominoPlanner.Core
             this.shapes = shapes;
             this.colors = colors;
         }
-        public Mat GenerateImage(int targetWidth = 0, bool borders = false)
+        public SKSurface GenerateImage(int targetWidth = 0, bool borders = false)
         {
             return GenerateImage(Colors.White, targetWidth, borders);
         }
-        public Mat GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false, int xShift = 5, int yShift = 5, int colorType = 0)
+        public SKSurface GenerateImage(Color background, int targetWidth = 0, bool borders = false, bool expanded = false, int xShift = 5, int yShift = 5, int colorType = 0)
         {
+            DateTime time = DateTime.Now;
             double scalingFactor = 1;
             int width = shapes.Max(s => s.GetContainer().x2);
             int heigth = shapes.Max(s => s.GetContainer().y2);
@@ -97,69 +100,71 @@ namespace DominoPlanner.Core
                 //int y_min = shapes.Min(s => s.GetContainer().y1);
                 scalingFactor = Math.Min((double)targetWidth / width, (double)targetWidth/heigth);
             }
-            Image<Emgu.CV.Structure.Bgra, byte> bitmap
-                = new Image<Emgu.CV.Structure.Bgra, byte>((int)(width * scalingFactor) + 2 * xShift, (int)(heigth * scalingFactor) + 2 * yShift,
-                new Emgu.CV.Structure.Bgra() { Alpha = background.A, Blue = background.B, Green = background.G, Red = background.R });
+            var info = new SKImageInfo((int)(width * scalingFactor) + 2 * xShift, (int)(heigth * scalingFactor) + 2 * yShift);
+            SKSurface surf = SKSurface.Create(info);
             
+                SKCanvas canvas = surf.Canvas;
+                canvas.Clear(new SKColor(background.R, background.G, background.B, background.A));
 
-            Parallel.For(0, shapes.Length, (i) =>
-            {
-                Color c;
-                if (colorType == 0)
+                Parallel.For(0, shapes.Length, (i) =>
                 {
-                    c = colors[shapes[i].color].mediaColor;
-                }
-                else if (colorType == 1)
-                {
-                    c = Color.FromArgb((byte)shapes[i].PrimaryDitherColor.Alpha, (byte)shapes[i].PrimaryDitherColor.Red,
-                    (byte)shapes[i].PrimaryDitherColor.Green, (byte)shapes[i].PrimaryDitherColor.Blue);
-                }
-                else
-                {
-                    c = Color.FromArgb((byte)shapes[i].PrimaryOriginalColor.Alpha, (byte)shapes[i].PrimaryOriginalColor.Red,
-                       (byte)shapes[i].PrimaryOriginalColor.Green, (byte)shapes[i].PrimaryOriginalColor.Blue);
-                }
-               if (shapes[i] is RectangleDomino)
-               {
-                   DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);
-                   if (c.A != 0)
-                   {
-                       CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
-                       {
-                           X = (int)rect.x + xShift,
-                           Y = (int)rect.y + yShift,
-                           Width = (int)rect.width,
-                           Height = (int)rect.height
-                       }, new Emgu.CV.Structure.MCvScalar(c.B, c.G, c.R, c.A), -1, Emgu.CV.CvEnum.LineType.AntiAlias);
-                   }
-                   if (borders)
-                   {
-                       CvInvoke.Rectangle(bitmap, new System.Drawing.Rectangle()
-                       {
-                           X = (int)rect.x + xShift,
-                           Y = (int)rect.y + yShift,
-                           Width = (int)rect.width,
-                           Height = (int)rect.height
-                       }, new Emgu.CV.Structure.MCvScalar(0, 0, 0, 255), 1, Emgu.CV.CvEnum.LineType.AntiAlias);
+                    Color c;
+                    if (colorType == 0)
+                    {
+                        c = colors[shapes[i].color].mediaColor;
+                    }
+                    else if (colorType == 1)
+                    {
+                        c = Color.FromArgb((byte)shapes[i].PrimaryDitherColor.Alpha, (byte)shapes[i].PrimaryDitherColor.Red,
+                        (byte)shapes[i].PrimaryDitherColor.Green, (byte)shapes[i].PrimaryDitherColor.Blue);
+                    }
+                    else
+                    {
+                        c = Color.FromArgb((byte)shapes[i].PrimaryOriginalColor.Alpha, (byte)shapes[i].PrimaryOriginalColor.Red,
+                           (byte)shapes[i].PrimaryOriginalColor.Green, (byte)shapes[i].PrimaryOriginalColor.Blue);
+                    }
+                    if (shapes[i] is RectangleDomino)
+                    {
+                        DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);
+                        if (c.A != 0)
+                        {
+                            canvas.DrawRect((int)rect.x + xShift, (int)rect.y + yShift, (int)rect.width, (int)rect.height, 
+                                new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true  });
+                        }
+                        if (borders)
+                        {
+                            canvas.DrawRect((int)rect.x + xShift, (int)rect.y + yShift, (int)rect.width, (int)rect.height,
+                                new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = true, IsStroke=true, StrokeWidth=1});
+                        }
+                    }
+                    else
+                    {
+                        DominoPath shape = shapes[i].GetPath(scalingFactor);
+                        var sdpoints = shape.getSDPath(xShift, yShift);
+                        if (sdpoints.Length != 0)
+                        {
+                            var path = new SKPath();
+                            path.MoveTo(sdpoints[0].X, sdpoints[0].Y);
+                            foreach (var line in sdpoints.Skip(0))
+                                path.LineTo(line.X, line.Y);
+                            path.Close();
 
-                   }
-               }
-               else
-               {
-                   DominoPath shape = shapes[i].GetPath(scalingFactor);
-                   if (c.A != 0)
-                   {
-                       bitmap.FillConvexPoly(shape.getSDPath(xShift, yShift),
-                           new Emgu.CV.Structure.Bgra(c.B, c.G, c.R, c.A), Emgu.CV.CvEnum.LineType.AntiAlias);
-                   }
-                   if (borders)
-                   {
-                       bitmap.DrawPolyline(shape.getSDPath(xShift, yShift), true, 
-                           new Emgu.CV.Structure.Bgra(0, 0, 0, 255), 1, Emgu.CV.CvEnum.LineType.AntiAlias);
-                   }
-               }
-           });
-            return bitmap.Mat;
+                            if (c.A != 0)
+                            {
+                                canvas.DrawPath(path,
+                                    new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
+                            }
+                            if (borders)
+                            {
+                                canvas.DrawPath(path,
+                                    new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = true, IsStroke = true, StrokeWidth = 1 });
+                            }
+                        }
+                    }
+                });
+            Debug.WriteLine("Image export took " + (DateTime.Now - time).TotalMilliseconds + "ms");
+                return surf;
+            
         }
 
         public object Clone()

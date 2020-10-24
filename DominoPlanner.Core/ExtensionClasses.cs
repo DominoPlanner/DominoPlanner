@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,5 +55,16 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        
+        public static void Save(this SkiaSharp.SKSurface surf, string filename)
+        {
+            using (var image = surf.Snapshot().Encode())
+            {
+                using (var stream = File.OpenWrite(filename))
+                {
+                    image.SaveTo(stream);
+                }
+            }
+        }
     }
 }
