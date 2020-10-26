@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia.Input;
+using Avalonia.Collections;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -223,13 +224,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        /*private ColumnConfig _colorColumnConfig;
+        private AvaloniaList<ColorControl.Column> _colorColumnConfig;
 
-        public ColumnConfig ColorColumnConfig
+        public AvaloniaList<ColorControl.Column> ColorColumnConfig
         {
             get { return _colorColumnConfig; }
             set { _colorColumnConfig = value; }
-        }*/
+        }
 
         #endregion
 
@@ -295,16 +296,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void refreshList()
         {
-            /*// Setup Columns
-            ColorColumnConfig = new ColumnConfig();
-
-            var columns = new ObservableCollection<Column>();
-            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
-            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
-            columns.Add(new Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField= "DominoColor.count" });
-            columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Selected" });
-            ColorColumnConfig.Columns = columns;
+            // Setup Columns
+            ColorColumnConfig = new AvaloniaList<ColorControl.Column>();
+            ColorColumnConfig.Add(new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class="Color"});
+            ColorColumnConfig.Add(new ColorControl.Column() { DataField = "DominoColor.name", Header = "Name" });
+            ColorColumnConfig.Add(new ColorControl.Column() { DataField = "DominoColor.count", Header = "Total" });
+            ColorColumnConfig.Add(new ColorControl.Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField= "DominoColor.count" });
+            ColorColumnConfig.Add(new ColorControl.Column() { DataField = "ProjectCount[1]", Header = "Selected" });
             
             _DominoList.Clear();
             int counter = 0;
@@ -318,7 +316,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _DominoList.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
-            }*/
+            }
         }
         private void SelectAll()
         {

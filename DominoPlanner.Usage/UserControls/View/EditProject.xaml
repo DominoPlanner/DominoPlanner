@@ -158,12 +158,12 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
       <DockPanel Margin="5, 0" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch">
         <Button DockPanel.Dock="Top" Grid.Row="0" Margin="0, 2" Content="Clear Selection" Command="{Binding ClearSelection}"/>
         <Button DockPanel.Dock="Top" Grid.Row="1" Margin="0, 2" Content="Select stones in selected color" Command="{Binding SelectColor}" ToolTip.Tip="Select all stones in the color selected in the list below. &#x0a; If some stones are selected this function only applies to the selected stones"/>
-        <!--<parent:ColorControl Grid.Row="1" Grid.Column="2" 
+        <parent:ColorControl Grid.Row="1" Grid.Column="2" 
                                          ClickCommand="{Binding MouseClickCommand}" 
                                          ColumnConfig="{Binding ColorColumnConfig}" 
                                          Colors="{Binding DominoList}" 
                                          SelectedColor="{Binding SelectedColor}">
-                </parent:ColorControl>-->
+                </parent:ColorControl>
       </DockPanel>
       <ScrollViewer Grid.Column="1" x:Name="ScrollViewer" Margin="0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
         <!--SizeChanged="Grid_SizeChanged" -->

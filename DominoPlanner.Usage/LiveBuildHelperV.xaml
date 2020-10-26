@@ -62,9 +62,9 @@
                     <StackPanel>
                         <TextBlock>Show remaining colors</TextBlock>
                         <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
-                          <!--<local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
+                          <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
 
-                            </local:ColorControl>-->
+                            </local:ColorControl>
                         </Popup>
                     </StackPanel>
                 </Button>

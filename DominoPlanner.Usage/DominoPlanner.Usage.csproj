@@ -51,6 +51,9 @@
     <AvaloniaXaml Include="UserControls\View\CircleSize.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\ColorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
     <AvaloniaXaml Include="UserControls\View\DominoDimensionsV.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -124,6 +127,9 @@
     </Compile>
     <Compile Update="UserControls\View\CircleSize.xaml.cs">
       <DependentUpon>CircleSize.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\ColorControl.xaml.cs">
+      <DependentUpon>ColorControl.xaml</DependentUpon>
     </Compile>
     <Compile Update="UserControls\View\DominoDimensionsV.xaml.cs">
       <DependentUpon>DominoDimensionsV.xaml</DependentUpon>

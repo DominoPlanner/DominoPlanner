@@ -12,6 +12,8 @@ using System.Windows;
 using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Input;
+using Avalonia.Collections;
+using static DominoPlanner.Usage.ColorControl;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -30,15 +32,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
-            /*ColorColumnConfig = new ColumnConfig();
 
-            var columns = new ObservableCollection<Column>();
-            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
-            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
-            columns.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
-            columns.Add(new Column() { DataField = "Weight", Header = "Weight" });
-            ColorColumnConfig.Columns = columns;*/
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class="Color" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
+            ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
+            ColorColumnConfig.Add(new Column() { DataField = "Weight", Header = "Weight" });
 
             AllowRegeneration = AllowRegenerate;
         }
@@ -46,7 +45,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         public string[] TargetSizeAffectedProperties;
-        //public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
+        public AvaloniaList<Column> ColorColumnConfig { get; set; } = new AvaloniaList<Column>();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
         {

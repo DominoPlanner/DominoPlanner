@@ -12,6 +12,8 @@ using Avalonia.Media.Imaging;
 using Avalonia;
 using Avalonia.Layout;
 using Avalonia.Input;
+using Avalonia.Collections;
+using static DominoPlanner.Usage.ColorControl;
 
 namespace DominoPlanner.Usage
 {
@@ -39,16 +41,12 @@ namespace DominoPlanner.Usage
             CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / blockSize)));
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { currentBlock.Focus(); });
-            /*ColumnConfig = new ColumnConfig();
-
-            var columns = new ObservableCollection<Column>();
-            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
-            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            columns.Add(new Column() { DataField = "ProjectCount[0]", Header = "Total used" });
-            columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Remaining" });
-            columns.Add(new Column() { DataField = "ProjectCount[2]", Header = "Next " + NextN });
-
-            ColumnConfig.Columns = columns;*/
+            ColumnConfig = new AvaloniaList<Column>();
+            ColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
+            ColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
+            ColumnConfig.Add(new Column() { DataField = "ProjectCount[0]", Header = "Total used" });
+            ColumnConfig.Add(new Column() { DataField = "ProjectCount[1]", Header = "Remaining" });
+            ColumnConfig.Add(new Column() { DataField = "ProjectCount[2]", Header = "Next " + NextN });
 
             OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
         }
@@ -180,13 +178,13 @@ namespace DominoPlanner.Usage
             }
         }
 
-        /*private ColumnConfig _columnConfig;
+        private AvaloniaList<Column> _columnConfig;
 
-        public ColumnConfig ColumnConfig
+        public AvaloniaList<Column> ColumnConfig
         {
             get { return _columnConfig; }
             set { _columnConfig = value; RaisePropertyChanged(); }
-        }*/
+        }
         private ObservableCollection<ColorListEntry> _colors;
 
         public ObservableCollection<ColorListEntry> Colors
@@ -323,10 +321,13 @@ namespace DominoPlanner.Usage
                 int startj = (i == firstRow) ? firstBlockStone : 0; 
                 for (int j = startj; j < intField.GetLength(0); j++)
                 {
-                    if (counter < NextN)
+                    if (counter < NextN && intField[j, i] != 0)
+                    {
                         NextNCount[intField[j, i]]++;
+                        counter++;
+                    }
                     RemainingCount[intField[j, i]]++;
-                    counter++;
+                    
                 }
             }
             for (int i = 0; i < Colors.Count; i++)
