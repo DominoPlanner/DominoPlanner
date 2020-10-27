@@ -344,9 +344,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void OpenBuildTools()
         {
-            /*ProtocolV protocolV = new ProtocolV();
+            ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.Show();*/
+            protocolV.Show();
         }
         public override bool Save()
         {
