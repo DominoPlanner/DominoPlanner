@@ -1,0 +1,212 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:vm="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="DominoPlanner.Usage.PropertiesWindow" Icon="/Icons/DominoCalculator.ico"
+        Title="Properties">
+  <Border Margin="2" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1">
+    <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *">
+      <Grid.Styles>
+        <Style Selector="TreeView">
+          <Setter Property="BorderThickness" Value="0"></Setter>
+        </Style>
+      </Grid.Styles>
+
+      <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="0 0 0 1">
+        <Border.Styles>
+          <Style Selector="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="5 2"/>
+          </Style>
+        </Border.Styles>
+        <Grid Grid.Row="0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="A" MinWidth="200"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="B" MinWidth="100"/>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="C" MinWidth="200"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Grid.Column="0" Text="Element"/>
+          <GridSplitter Width="2" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
+          <TextBlock Grid.Column="1" Text="Type"/>
+          <GridSplitter Width="2" Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
+          <TextBlock Grid.Column="2" Text="Value"/>
+        </Grid>
+      </Border>
+      <ScrollViewer Grid.Row="1">
+        <TreeView Items="{Binding Children}">
+          <TreeView.Styles>
+            <Style Selector="TreeViewItem">
+
+            </Style>
+            <Style Selector="TreeViewItem">
+              <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+              <Style.Resources>
+                <converters:MarginMultiplierConverter Indent="16" Left="True" x:Key="LeftMarginConverter" />
+              </Style.Resources>
+              <Setter Property="Padding" Value="2"/>
+              <Setter Property="Background" Value="Transparent"/>
+              <Setter Property="Template">
+                <ControlTemplate>
+                  <StackPanel>
+                    <Border Name="SelectionBorder"
+                            Focusable="True"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            TemplatedControl.IsTemplateFocusTarget="True">
+
+                      <Grid Name="PART_Header">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                          <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid ColumnDefinitions="16, *" Margin="{TemplateBinding Level, Mode=OneWay, Converter={StaticResource LeftMarginConverter}}">
+                          <ToggleButton Classes="expander"
+                                                          Focusable="False" IsVisible="{Binding HasChildren}"
+                                                          IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">Hello</ToggleButton>
+                          <ContentControl Grid.Column="1" Content="{Binding .}">
+                            <ContentControl.Resources>
+
+                              <DrawingImage x:Key="FieldDI">
+                                <DrawingGroup>
+                                  <GeometryDrawing>
+                                    <GeometryDrawing.Geometry>
+                                      <RectangleGeometry Rect="0, 0, 20 20"/>
+                                    </GeometryDrawing.Geometry>
+                                  </GeometryDrawing>
+                                  <GeometryDrawing Brush="#0055a1">
+                                    <GeometryDrawing.Pen>
+                                      <Pen Brush="#0055a1" Thickness="2" LineJoin="Round"></Pen>
+                                    </GeometryDrawing.Pen>
+                                    <Geometry>
+                                      m 1.4397291,6.2081478 v 7.0535352 l 6.1725874,3.738332 8.9479545,-4.81484 V 5.2005265 L 7.7209156,9.8826704 1.4397291,6.2081478 10.382487,0.99998204 16.560271,5.2005265 10.382487,0.99998204 Z
+                                    </Geometry>
+                                  </GeometryDrawing>
+                                </DrawingGroup>
+                              </DrawingImage>
+                              <DrawingImage x:Key="PropertyDI">
+                                <DrawingGroup>
+                                  <GeometryDrawing>
+                                    <GeometryDrawing.Geometry>
+                                      <RectangleGeometry Rect="0, 0, 20 20"/>
+                                    </GeometryDrawing.Geometry>
+                                  </GeometryDrawing>
+                                  <GeometryDrawing Brush="#434343">
+                                    <Geometry>
+                                      M 11.515196,9.9999998e-8 A 5.3749058,5.3746656 0 0 0 8.9746553,1.4244967 5.3749058,5.3746656 0 0 0 7.7195663,7.0505099 L 0.67194377,14.097826 c -0.8948551,0.894784 -0.8964609,2.336258 -0.0016,3.231086 0.89485903,0.894784 2.33797553,0.894784 3.23282953,0 L 10.950794,10.281594 A 5.3749058,5.3746656 0 0 0 16.57544,9.0249329 5.3749058,5.3746656 0 0 0 18,6.4845269 l -1.122347,-1.122342 -1.916974,1.916932 -3.402322,-0.911278 -0.911324,-3.4021575 1.916991,-1.9169319 z
+                                    </Geometry>
+                                  </GeometryDrawing>
+                                </DrawingGroup>
+                              </DrawingImage>
+                            </ContentControl.Resources>
+                            <ContentControl.DataTemplates>
+                              <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                  <Image Width="15" Height="15" VerticalAlignment="Top" Margin="0, 5, 0, 0">
+                                    <i:Interaction.Behaviors>
+                                      <ia:DataTriggerBehavior Binding="{Binding Type}" Value="Prop">
+                                        <ia:ChangePropertyAction PropertyName="Source" Value="{StaticResource PropertyDI}"/>
+                                      </ia:DataTriggerBehavior>
+                                      <ia:DataTriggerBehavior Binding="{Binding Type}" Value="Field">
+                                        <ia:ChangePropertyAction PropertyName="Source" Value="{StaticResource FieldDI}"/>
+                                      </ia:DataTriggerBehavior>
+                                      <ia:DataTriggerBehavior Binding="{Binding Type}" Value="Item">
+                                        <ia:ChangePropertyAction PropertyName="Source" Value="{StaticResource FieldDI}"/>
+                                      </ia:DataTriggerBehavior>
+                                    </i:Interaction.Behaviors>
+                                  </Image>
+                                  <TextBlock Margin="2" Text="{Binding Name}"/>
+                                </StackPanel>
+                              </DataTemplate>
+
+                            </ContentControl.DataTemplates>
+                          </ContentControl>
+                        </Grid>
+                        <TextBlock Grid.Column="1" Text="{Binding FullType}" Margin="2"/>
+                        <ContentControl Grid.Column="2" Content="{Binding Value}">
+                          <ContentControl.Resources>
+                            <vm:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
+                            <DrawingImage x:Key="ExceptionDI">
+                              <DrawingGroup>
+                                <GeometryDrawing>
+                                  <GeometryDrawing.Geometry>
+                                    <RectangleGeometry Rect="0, 0, 20 20"/>
+                                  </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing>
+                                  <GeometryDrawing.Pen>
+                                    <Pen Brush="#d40000" Thickness="2" LineJoin="Round"></Pen>
+                                  </GeometryDrawing.Pen>
+                                  <Geometry>
+                                    M 17.759075,16.684706 H 0.24092525 L 9.0000007,1.3152697 Z
+                                  </Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="Black">
+                                  <Geometry>
+                                    m 8.475486,12.871887 h 1.0490282 v 1.312577 H 8.475486 Z m 0,-6.4026893 H 9.5245142 V 9.8539932 L 9.4211617,11.698836 H 8.5840061 L 8.475486,9.8539932 Z
+                                  </Geometry>
+                                </GeometryDrawing>
+                              </DrawingGroup>
+                            </DrawingImage>
+
+                          </ContentControl.Resources>
+                          <ContentControl.DataTemplates>
+                            <DataTemplate DataType="{x:Type System:Exception}">
+                              <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal" ToolTip.Tip="{Binding ., Converter={StaticResource ObjectToStringConverter}}">
+                                  <Image Width="15" Height="15" VerticalAlignment="Top" Margin="0, 5, 0, 0"  Source="{StaticResource ExceptionDI}">
+                                  </Image>
+                                  <TextBlock Margin="2" Text="An Exception occured while evaluating this expression."/>
+                                </StackPanel>
+                              </StackPanel>
+                            </DataTemplate>
+                            <DataTemplate>
+                              <TextBlock Margin="2" Text="{Binding ., Converter={StaticResource ObjectToStringConverter}}"/>
+                            </DataTemplate>
+                          </ContentControl.DataTemplates>
+                        </ContentControl>
+                      </Grid>
+                    </Border>
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    IsVisible="{TemplateBinding IsExpanded}"
+                                    Items="{Binding Children}"
+                                    ItemsPanel="{TemplateBinding ItemsPanel}"></ItemsPresenter>
+                  </StackPanel>
+                </ControlTemplate>
+              </Setter>
+            </Style>
+            <Style Selector="TreeViewItem /template/ ToggleButton.expander">
+              <Setter Property="Template">
+                <ControlTemplate>
+                  <Border Background="Transparent"
+                          Width="14"
+                          Height="12"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                    <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="M 0 2 L 4 6 L 0 10 Z"/>
+                  </Border>
+                </ControlTemplate>
+              </Setter>
+            </Style>
+            <Style Selector="TreeViewItem /template/ ToggleButton.expander:checked">
+              <Setter Property="RenderTransform">
+                <RotateTransform Angle="45"/>
+              </Setter>
+            </Style>
+          </TreeView.Styles>
+        </TreeView>
+      </ScrollViewer>
+
+    </Grid>
+  </Border>
+</Window>

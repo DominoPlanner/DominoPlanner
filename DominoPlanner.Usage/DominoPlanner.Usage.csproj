@@ -9,6 +9,7 @@
     <None Remove="MainWindow.xaml" />
     <None Remove="NewObject.xaml" />
     <None Remove="NewProject.xaml" />
+    <None Remove="Properties.xaml" />
     <None Remove="ProtocolV.xaml" />
     <None Remove="UserControls\View\BasicSettings.xaml" />
     <None Remove="UserControls\View\CalculationV.xaml" />
@@ -37,6 +38,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="NewProject.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="Properties.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="ProtocolV.xaml">
@@ -115,6 +119,9 @@
     </Compile>
     <Compile Update="NewProject.xaml.cs">
       <DependentUpon>NewProject.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Properties.xaml.cs">
+      <DependentUpon>Properties.xaml</DependentUpon>
     </Compile>
     <Compile Update="ProtocolV.xaml.cs">
       <DependentUpon>ProtocolV.xaml</DependentUpon>

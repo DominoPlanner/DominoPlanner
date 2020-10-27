@@ -414,8 +414,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
-            //PropertiesWindow pw = new PropertiesWindow(Model);
-            //pw.ShowDialog();
+            PropertiesWindow pw = new PropertiesWindow(Model);
+            pw.ShowDialog(MainWindowViewModel.GetWindow());
         }
         public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
         {
@@ -657,10 +657,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
-        public void ShowProperties()
+        public async void ShowProperties()
         {
-            //PropertiesWindow pw = new PropertiesWindow(Model);
-            //pw.ShowDialog();
+            PropertiesWindow pw = new PropertiesWindow(Model);
+            await pw.ShowDialog(MainWindowViewModel.GetWindow());
         }
     }
 }
