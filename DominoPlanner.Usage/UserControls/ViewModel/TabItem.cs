@@ -58,7 +58,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public TabItem(ColorNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         { 
-            Content = new ColorListControlVM(project.parent.AssemblyModel.obj);
+            Content = new ColorListControlVM(project.parent.AssemblyModel);
             ResetContent();
         }
         public static TabItem TabItemGenerator(NodeVM project)

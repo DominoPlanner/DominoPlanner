@@ -229,7 +229,7 @@ namespace DominoPlanner.Usage
     {
         public SingleImageInformation()
         {
-            LoadNewImage = new RelayCommand((x) => SetNewImage((DominoProviderVM)x));
+            LoadNewImage = new RelayCommand((x) => { if (x is DominoProviderVM vm) SetNewImage(vm); });
         }
         private string DefaultPictureName { get; set; } = "/Icons/add.ico";
         private string internPictureName = "";
@@ -421,6 +421,11 @@ namespace DominoPlanner.Usage
         }
         public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
         {
+            if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
+            {
+                Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
+                return null;
+            }
             string newProject = Path.Combine(ProjectPath, "Planner Files", filename);
             string PlannerFilesPath = Path.Combine(newProject, "Planner Files");
             string SourceImagesPath = Path.Combine(newProject, "Source Image");
@@ -434,11 +439,6 @@ namespace DominoPlanner.Usage
                     {
                         Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error",
                             Errorhandler.MessageType.Error);
-                        return null;
-                    }
-                    if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
-                    {
-                        Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
                         return null;
                     }
                     Directory.CreateDirectory(newProject);

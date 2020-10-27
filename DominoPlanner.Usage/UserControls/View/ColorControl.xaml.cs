@@ -20,6 +20,7 @@ using Avalonia.Data.Converters;
 using System.Reflection.Emit;
 using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Controls.Templates;
+using ThemeEditor.Controls.ColorPicker;
 
 namespace DominoPlanner.Usage
 {
@@ -55,14 +56,29 @@ namespace DominoPlanner.Usage
             get { return (AvaloniaList<Column>)GetValue(ColumnConfigProperty); }
             set { SetValue(ColumnConfigProperty, value); }
         }
-
-        private void UpdateLayout()
+        protected int HeaderRow = 0;
+        internal virtual void UpdateLayout()
         {
             
 
             var header = this.Find<Grid>("HeaderGrid");
             header.ColumnDefinitions.Clear();
 
+            FillHeader(header);
+
+            var itemscontrol = this.Find<ItemsControl>("ItemsControl");
+            // for content, we have to define it inside a lambda function
+            var template = new FuncDataTemplate<ColorListEntry>((x, _) =>
+            {
+                Grid g = new Grid();
+                FillTemplate(g);
+                return g;
+            }) ;
+            itemscontrol.ItemTemplate = template;
+
+        }
+        public void FillHeader(Grid header)
+        {
             int counter = 0;
             foreach (var column in this.ColumnConfig)
             {
@@ -71,50 +87,47 @@ namespace DominoPlanner.Usage
                 header.ColumnDefinitions.Add(cdef);
                 cdef.SharedSizeGroup = "COL_" + counter;
                 // set header
-                var tb = new TextBlock() { Text = column.Header };
+                var tb = new ContentControl() { Content = column.Header };
                 tb.Classes.Add("Header");
                 Grid.SetColumn(tb, counter);
+                Grid.SetRow(tb, 0);
+                Grid.SetRowSpan(tb, HeaderRow+1);
                 header.Children.Add(tb);
-                var splitter = new GridSplitter() { ResizeDirection = GridResizeDirection.Columns, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
-                Grid.SetColumn(splitter, counter);
-                header.Children.Add(splitter);
+                if (column.CanResize)
+                {
+                    var splitter = new GridSplitter() { ResizeDirection = GridResizeDirection.Columns, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
+                    Grid.SetColumn(splitter, counter);
+                    Grid.SetRow(splitter, HeaderRow);
+                    header.Children.Add(splitter);
+                }
                 counter++;
 
             }
-
-           var itemscontrol = this.Find<ItemsControl>("ItemsControl");
-            // for content, we have to define it inside a lambda function
-            var template = new FuncDataTemplate<ColorListEntry>((x, _) =>
+        }
+        public void FillTemplate(Grid g)
+        {
+            int counter = 0;
+            foreach (var column in this.ColumnConfig)
             {
-                Grid g = new Grid();
-                int counter = 0;
-                foreach (var column in this.ColumnConfig)
+                var cdef2 = new ColumnDefinition() { Width = GridLength.Auto };
+                g.ColumnDefinitions.Add(cdef2);
+                cdef2.SharedSizeGroup = "COL_" + counter;
                 {
-                    var cdef2 = new ColumnDefinition() { Width = GridLength.Auto };
-                    g.ColumnDefinitions.Add(cdef2);
-                    cdef2.SharedSizeGroup = "COL_" + counter;
+                    var cc = new ContentControl()
                     {
-                        var cc = new ContentControl()
-                        {
-                            [!ContentProperty] = new Binding(column.DataField)
-                        };
-                        
-                        cc.Classes.Add(column.Class);
-                        Grid.SetColumn(cc, counter);
-                        g.Children.Add(cc);
-                    }
-                    counter++;
-                }
-                g.DoubleTapped += (o, e) =>
-                {
-                    
-                    ClickCommand.Execute(o);
-                };
-                return g;
-               
-            }) ;
-            itemscontrol.ItemTemplate = template;
+                        [!ContentProperty] = new Binding(column.DataField, BindingMode.TwoWay)
+                    };
 
+                    cc.Classes.Add(column.Class);
+                    Grid.SetColumn(cc, counter);
+                    g.Children.Add(cc);
+                }
+                counter++;
+            }
+            g.DoubleTapped += (o, e) =>
+            {
+                ClickCommand?.Execute(o);
+            };
         }
 
         // Using a DependencyProperty as the backing store for ColumnConfig.  This enables animation, styling, binding, etc...
@@ -173,6 +186,7 @@ namespace DominoPlanner.Usage
             public string DataField { get; set; }
             public string HighlightDataField { get; set; }
             public string Class { get; set; } = "";
+            public bool CanResize { get; set; } = false;
         }
         /*public class ConfigToDynamicGridConverter : IValueConverter
         {
@@ -233,6 +247,17 @@ namespace DominoPlanner.Usage
                 throw new NotSupportedException();
             }
         }*/
-
+        
+        public void OnScrollChanged(object control, ScrollChangedEventArgs args)
+        {
+            this.Find<ScrollViewer>("OuterScrollViewer").Offset = new Vector(this.Find<ScrollViewer>("InnerScrollViewer").Offset.X, 0);
+        }
+    }
+    public class OffsetConverter : ValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return new Vector(((Vector)value).X, 0);
+        }
     }
 }

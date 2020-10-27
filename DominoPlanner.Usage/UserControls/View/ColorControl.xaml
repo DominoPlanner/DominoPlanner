@@ -4,40 +4,44 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.View;assembly=DominoPlanner.Usage"
+             xmlns:vm="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.ColorControl">
+  <UserControl.Resources>
+    <vm:OffsetConverter x:Key="OffsetConverter"/>
+  </UserControl.Resources>
   <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
-  <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">
-    <Grid.Styles>
-      <Style Selector="ListBox">
-        <Setter Property="BorderThickness" Value="0"/>
-      </Style>
-      <Style Selector="ListBox ContentControl">
-        <Setter Property="Margin" Value="2,0"/>
-      </Style>
-      <Style Selector="TextBlock.Header">
-        <Setter Property="Margin" Value="2,0"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-      </Style>
-      <Style Selector="ListBox ContentControl.Color">
-        <Setter Property="Template">
-          <ControlTemplate>
-            <Rectangle Width="40" Height="20">
-              <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-              </Rectangle.Fill>
-            </Rectangle>
-          </ControlTemplate>
-        </Setter>
-      </Style>
-    </Grid.Styles>
-    <Border BorderThickness="0 0 0 1" BorderBrush="{StaticResource ThemeBorderMidBrush}"></Border>
-    <Grid Grid.Row="0" Name="HeaderGrid"></Grid>
-    <ScrollViewer Grid.Row="1">
-      <ListBox Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}">
-      </ListBox>
+    <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
+      <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">
+        <Grid.Styles>
+          <Style Selector="ListBox">
+            <Setter Property="BorderThickness" Value="0"/>
+          </Style>
+          <Style Selector="ListBox ContentControl">
+            <Setter Property="Margin" Value="2,0"/>
+          </Style>
+          <Style Selector="TextBlock.Header">
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+          </Style>
+          <Style Selector="ListBox ContentControl.Color">
+            <Setter Property="Template">
+              <ControlTemplate>
+                <Rectangle Width="40" Height="20">
+                  <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                  </Rectangle.Fill>
+                </Rectangle>
+              </ControlTemplate>
+            </Setter>
+          </Style>
+        </Grid.Styles>
+        <Border BorderThickness="0 0 0 1" BorderBrush="{StaticResource ThemeBorderMidBrush}"></Border>
+        <Grid Grid.Row="0" Name="HeaderGrid"></Grid>
+          <ListBox Grid.Row="1" Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+          </ListBox>
+      </Grid>
     </ScrollViewer>
-  </Grid>
   </Border>
+  
 </UserControl>

@@ -1,9 +1,11 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Media;
+using DominoPlanner.Core;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace DominoPlanner.Usage
 {
+    // Viewmodel for DominoColor
     public class ColorListEntry : ModelBase
     {
         public ColorListEntry()
@@ -31,6 +33,26 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public string Name
+        {
+            get { return DominoColor.name; }
+            set { DominoColor.name = value; RaisePropertyChanged(); }
+        }
+
+
+        public int Count
+        {
+            get { return DominoColor.count; }
+            set { DominoColor.count = value; RaisePropertyChanged(); }
+        }
+
+        public Color Color
+        {
+            get { return DominoColor.mediaColor; }
+            set { DominoColor.mediaColor = value; RaisePropertyChanged(); }
+        }
+
 
         private int _SortIndex;
         public int SortIndex

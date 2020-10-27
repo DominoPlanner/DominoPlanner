@@ -1,0 +1,184 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             
+             xmlns:main="clr-namespace:DominoPlanner.Usage"
+xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl">
+    <UserControl.Resources>
+        <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
+        <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
+      <parent:IntToStringConverter x:Key="IntToStringConverter"/>
+      <parent:IsNotNullConverter x:Key="IsNotNullConverter"/>
+      
+    </UserControl.Resources>
+    <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+        <local:ProjectColorList Colors="{Binding ColorList}" ColumnConfig="{Binding ColumnConfig}" Project="{Binding DominoAssembly}" SelectedColor="{Binding SelectedStone, Mode=TwoWay}" Margin="5,5,5,5">
+          <local:ProjectColorList.Styles>
+            <Style Selector="ContentControl.Header">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate>
+                    <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
+                      <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                    </Border>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+            <Style Selector="ContentControl.Header.Sum, ContentControl.Header.Project">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate>
+                    <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
+                      <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Normal"  HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                    </Border>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+            <Style Selector="ContentControl.Header.Sum /template/ TextBlock">
+              <Setter Property="FontStyle" Value="Italic"/> 
+            </Style>
+            <Style Selector="ContentControl.RGB">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate>
+                      <TextBlock Text="{TemplateBinding Content, Converter={StaticResource ColorToHTMLConverter}}"/>
+
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+            <!--infinite render loop
+            <Style Selector="ContentControl.Name:not(.Header)">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate>
+                    <TextBox Text="{TemplateBinding Content, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Visible"/>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>-->
+              
+            <Style Selector="ContentControl.Header.Different">
+                <Setter Property="Template">
+                  <Setter.Value>
+                    <ControlTemplate>
+                      <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
+                        <StackPanel Orientation="Horizontal">
+                          <Image VerticalAlignment="Bottom" Margin="5" Width="15" Source="{StaticResource ExceptionDI}" ToolTip.Tip="This subproject uses a different color list"/>
+                          <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                        </StackPanel>
+                      </Border>
+                    </ControlTemplate>
+                  </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <!-- Can lead to problems in the first row. Put this off for later
+            <Style Selector="ListBox ContentControl.ColorEditable">
+              <Setter Property="Template">
+                <ControlTemplate>
+                      <main:PopupColorPicker Color="{TemplateBinding Content, Mode=TwoWay}">
+                        
+                      </main:PopupColorPicker>
+                </ControlTemplate>
+              </Setter>
+            </Style>-->
+            <Style Selector="ContentControl.Content">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate>
+                    <TextBlock Margin="5 2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{TemplateBinding Content, Converter={StaticResource IntToStringConverter}}">
+                      <TextBlock.Foreground>
+                            <MultiBinding Converter="{StaticResource AmountToColorConverter}">
+                              <TemplateBinding Property="Content"/>
+                              <Binding RelativeSource="{RelativeSource AncestorType=ListBoxItem}" Path="DataContext.Count"/>
+                            </MultiBinding>
+                      </TextBlock.Foreground>
+                    </TextBlock>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+            <Style Selector="ContentControl.Content.Sum /template/ TextBlock">
+              <Setter Property="FontWeight" Value="Bold"/>
+              
+            </Style>
+
+            
+            
+          </local:ProjectColorList.Styles>
+        </local:ProjectColorList>
+        <Grid Grid.Row="1">
+          <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" IsVisible="{Binding SelectedStone, Converter={StaticResource IsNotNullConverter}}" LastChildFill="False">
+            <main:PopupColorPicker Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
+
+            <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
+            <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="200"></TextBox>
+            <TextBlock VerticalAlignment="Center" Margin="5" >Color Amout:</TextBlock>
+            <NumericUpDown Text="{Binding SelectedStone.Count, Mode=TwoWay}" Width="200"/>
+
+          </DockPanel>
+          <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
+            <DockPanel.Styles>
+              <Style Selector="Button">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Padding" Value="10,5"/>
+              </Style>
+            </DockPanel.Styles>
+            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnMoveUp}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/up.ico" Height="20" />
+                    <TextBlock Text="Move up" />
+                </StackPanel>
+            </Button>
+            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnMoveDown}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/down.ico" Height="20" />
+                    <TextBlock Text="Move Down" />
+                </StackPanel>
+            </Button>
+            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnAddColor}">
+              <StackPanel Orientation="Horizontal">
+                <Image Source="/Icons/add.ico" Height="20" />
+                <TextBlock Text="Add Color" />
+              </StackPanel>
+            </Button>
+            
+            
+            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnRemove}" IsVisible="false">
+              <StackPanel Orientation="Horizontal">
+                <Image Source="/Icons/remove.ico" Height="20" />
+                <TextBlock Text="Remove Selected" />
+              </StackPanel>
+            </Button>
+            <Button DockPanel.Dock="Right" Height="30" Command="{Binding BtnExportXLSX}">
+              <StackPanel Orientation="Horizontal">
+                <Image  Source="/Icons/document_save.ico" Height="20" />
+                <TextBlock Text="Export to Excel" />
+              </StackPanel>
+            </Button>
+            <Button DockPanel.Dock="Right"  Height="30" Command="{Binding BtnSaveColors}">
+              <StackPanel Orientation="Horizontal">
+                <Image  Source="/Icons/document_save.ico" Height="20" />
+                <TextBlock Text="Save Colors" />
+              </StackPanel>
+            </Button>
+            
+          </DockPanel>
+        </Grid>
+    </Grid>
+</UserControl>

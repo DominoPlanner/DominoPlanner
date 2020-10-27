@@ -488,7 +488,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             TabItem tabItem = NodeVM.getTab(this);
             if (tabItem != null && tabItem.Content is ColorListControlVM c) 
-                c.DominoAssembly = parent.AssemblyModel.obj;
+                c.DominoAssembly = parent.AssemblyModel;
             NodeVM.openTab(tabItem ?? new TabItem(this));
         }
         public override string AbsolutePath {

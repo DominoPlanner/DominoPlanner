@@ -1,4 +1,9 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using DominoPlanner.Core;
 using Microsoft.Win32;
 using OfficeOpenXml;
@@ -10,9 +15,220 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using static DominoPlanner.Usage.ColorControl;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    public class ProjectColorList : ColorControl
+    {
+        public ProjectColorList()
+        {
+            ProjectProperty.Changed.AddClassHandler<ColorControl>(ProjectChanged);
+        }
+
+        private void ProjectChanged(ColorControl sender, AvaloniaPropertyChangedEventArgs args)
+        {
+            var header = this.Find<Grid>("HeaderGrid");
+            header.ColumnDefinitions.Clear();
+
+            UpdateLayout();
+        }
+        internal override void UpdateLayout()
+        {
+            var header = this.Find<Grid>("HeaderGrid");
+            header.ColumnDefinitions.Clear();
+            if (Project != null)
+                HeaderRow = GetDepth(Project);
+            header.Children.Clear();
+            FillHeader(header);
+            if (Project != null)
+                PopulateHeaderColumns(header, Project, 0, ColumnConfig.Count);
+
+            var itemscontrol = this.Find<ItemsControl>("ItemsControl");
+            // for content, we have to define it inside a lambda function
+            var template = new FuncDataTemplate<ColorListEntry>((x, _) =>
+            {
+                Grid g = new Grid();
+                g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+                FillTemplate(g);
+                if (Project != null)
+                    PopulateColumns(g, Project, ColumnConfig.Count, 0);
+                return g;
+            });
+            itemscontrol.ItemTemplate = template;
+        }
+        static void AddEmptyContentControl(Grid g, int row, int column, bool header = true)
+        {
+            var contentblock = new ContentControl();
+            if (header)
+                contentblock.Classes.Add("Header");
+            contentblock.Classes.Add("Empty");
+            Grid.SetColumn(contentblock, column);
+            Grid.SetRow(contentblock, row);
+            g.Children.Add(contentblock);
+        }
+        int GetDepth(AssemblyNode assy)
+        {
+            if (assy.obj.children.OfType<AssemblyNode>().Count() == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return assy.obj.children.OfType<AssemblyNode>().Max(o => GetDepth(o)) + 1;
+            }
+        }
+        int PopulateHeaderColumns(Grid g, AssemblyNode assy, int level, int start_column)
+        {
+            if (g.RowDefinitions == null)
+                g.RowDefinitions = new RowDefinitions();
+            while (g.RowDefinitions.Count <= level + 1)
+                g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            int index = start_column;
+            foreach (var p in assy.obj.children)
+            {
+                if (p is AssemblyNode ass_child) {
+                    if (ass_child.ColorPathMatches(assy))
+                    {
+                        index += PopulateHeaderColumns(g, ass_child, level + 1, index);
+                    }
+                    else
+                    {
+                        g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+                        var errorheader = new ContentControl()
+                        {
+                            Content = Path.GetFileNameWithoutExtension(ass_child.Path)
+                        };
+                        errorheader.Classes.Add("Header");
+                        errorheader.Classes.Add("Different");
+                        errorheader.Classes.Add("Assembly");
+                        g.Children.Add(errorheader);
+                        Grid.SetColumn(errorheader, index);
+                        Grid.SetRow(errorheader, level + 1);
+                        Grid.SetRowSpan(errorheader, HeaderRow - level + 1);
+                        index++;
+                    }
+                    
+                }
+                if (p is DocumentNode dn)
+                {
+                    var contentblock = new ContentControl();
+                    contentblock.Classes.Add("Header");
+                    contentblock.Classes.Add("Project");
+                    g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+                    Grid.SetColumn(contentblock, index);
+                    Grid.SetRow(contentblock, level + 1);
+                    Grid.SetRowSpan(contentblock, HeaderRow - (level));
+                    g.Children.Add(contentblock);
+                    contentblock.Content = Path.GetFileNameWithoutExtension(dn.relativePath);
+                    
+                    if (!dn.ColorPathMatches(assy))
+                    {
+                        contentblock.Classes.Add("Different");
+                    }
+                    index++;
+                }
+            }
+            
+            // this is the title
+            var cp = new ContentControl()
+            {
+                Content = Path.GetFileNameWithoutExtension(assy.Path)
+                
+            };
+            cp.Classes.Add("Header");
+            cp.Classes.Add("Assembly");
+            g.Children.Add(cp);
+            Grid.SetColumn(cp, start_column);
+            Grid.SetRow(cp, level);
+            // this is the sum column
+            g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+            var tb = new ContentControl()
+            {
+                Content = "Sum"
+            };
+            tb.Classes.Add("Header");
+            tb.Classes.Add("Sum");
+            Grid.SetColumn(tb, index);
+            Grid.SetRow(tb, level+1);
+            Grid.SetRowSpan(tb, HeaderRow - (level));
+            g.Children.Add(tb);
+            index++;
+            //finish positioning
+            var colspan = index - start_column; // +1 for sum column
+            Grid.SetColumnSpan(cp, colspan);
+            
+
+            return colspan;
+        }
+        Tuple<int, int> PopulateColumns(Grid g, AssemblyNode assy, int start_column, int projectcount_startindex)
+        {
+            int index = start_column;
+            int projectindex = projectcount_startindex;
+            foreach (var p in assy.obj.children)
+            {
+                if (p is AssemblyNode ass_child)
+                {
+                    if (ass_child.ColorPathMatches(assy))
+                    {
+                        var columns = PopulateColumns(g, ass_child, index, projectindex);
+                        index += columns.Item1;
+                        projectindex += columns.Item2;
+                    }
+                    else
+                    {
+                        g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+                        index++;
+                    }
+                }
+                if (p is DocumentNode dn)
+                {
+                    g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+                    if (dn.ColorPathMatches(assy))
+                    {
+                        var contentblock = new ContentControl()
+                        {
+                            [!ContentControl.ContentProperty] = new Binding("ProjectCount[" + (projectindex) + "]")
+                        };
+                        contentblock.Classes.Add("Content");
+                        contentblock.Classes.Add("Project");
+                        Grid.SetColumn(contentblock, index);
+                        g.Children.Add(contentblock);
+                        projectindex++;
+                    }
+                    index++;
+                }
+            }
+
+            // this is the sum column
+            g.ColumnDefinitions.Add(new ColumnDefinition { SharedSizeGroup = "col_" + (index), Width = GridLength.Auto });
+            var tb = new ContentControl()
+            {
+                [!ContentControl.ContentProperty] = new Binding("ProjectCount[" + (projectindex) + "]")
+            };
+            tb.Classes.Add("Content");
+            tb.Classes.Add("Sum");
+            Grid.SetColumn(tb, index);
+            g.Children.Add(tb);
+            index++;
+            projectindex++;
+
+            return new Tuple<int, int>(index - start_column, projectindex - projectcount_startindex);
+        }
+        
+
+        public AssemblyNode Project
+        {
+            get { return (AssemblyNode)GetValue(ProjectProperty); }
+            set { SetValue(ProjectProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Project.  This enables animation, styling, binding, etc...
+        public static readonly StyledProperty<AssemblyNode> ProjectProperty =
+            AvaloniaProperty.Register<ColorControl, AssemblyNode>("Project");
+
+
+    }
     public class ColorListControlVM : TabBaseVM
     {
         #region CTOR
@@ -29,11 +245,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             BtnMoveUp = new RelayCommand(o => { MoveUp(); });
             BtnExportXLSX = new RelayCommand(o => { ExportXLSX(); });
             base.UnsavedChanges = false;
-            
+
+            ColumnConfig = new AvaloniaList<Column>();
+            ColumnConfig.Add(new Column() { DataField = "Color", Header = "", Class = "Color", CanResize =false });
+            ColumnConfig.Add(new Column() { DataField = "Name", Header = "Name", Class="Name", CanResize = false });
+            ColumnConfig.Add(new Column() { DataField = "Color", Header = "RGB", Class = "RGB", CanResize = false });
+            ColumnConfig.Add(new Column() { DataField = "Count", Header = "Count", CanResize = false });
+
             ShowProjects = false;
         }
         
-        public ColorListControlVM(DominoAssembly dominoAssembly) : this(Workspace.AbsolutePathFromReferenceLoseUpdate(dominoAssembly.colorPath, dominoAssembly))
+        public ColorListControlVM(AssemblyNode dominoAssembly) : this(Workspace.AbsolutePathFromReferenceLoseUpdate(dominoAssembly.obj.colorPath, dominoAssembly.obj))
         {
             this.DominoAssembly = dominoAssembly;
         }
@@ -282,12 +504,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region prop
-        private DominoAssembly dominoAssembly;
+        private AvaloniaList<Column> _columnConfig;
 
-        public DominoAssembly DominoAssembly
+        public AvaloniaList<Column> ColumnConfig
+        {
+            get { return _columnConfig; }
+            set { _columnConfig = value; RaisePropertyChanged(); }
+        }
+
+        private AssemblyNode dominoAssembly;
+
+        public AssemblyNode DominoAssembly
         {
             get { return dominoAssembly; }
-            set { dominoAssembly = value; ResetContent();  }
+            set { dominoAssembly = value; ResetContent(); RaisePropertyChanged();  }
         }
         private ColorListEntry _SelectedStone;
         public ColorListEntry SelectedStone
@@ -352,19 +582,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RaisePropertyChanged("ColorList");
         }
 
-        /*private ObservableCollection<DataGridColumn> _DifColumns;
-        public ObservableCollection<DataGridColumn> DifColumns
-        {
-            get { return _DifColumns; }
-            set
-            {
-                if (_DifColumns != value)
-                {
-                    _DifColumns = value;
-                    //TabPropertyChanged(ProducesUnsavedChanges: false);
-                }
-            }
-        }*/
 
         internal event EventHandler ShowProjectsChanged;
 
@@ -389,7 +606,51 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _warningLabelText; }
             set { _warningLabelText = value; TabPropertyChanged(ProducesUnsavedChanges: false); }
         }
-
+        int[] AddProjectCounts(AssemblyNode assy)
+        {
+            int[] sum = new int[assy.obj.colors.Length];
+            foreach (var child in assy?.obj.children)
+            {
+                if (child is AssemblyNode child_as)
+                {
+                    try
+                    {
+                        if (Path.GetFullPath(child_as.obj.AbsoluteColorPath) == Path.GetFullPath(assy.obj.AbsoluteColorPath))
+                        {
+                            sum = sum.Zip(AddProjectCounts(child_as), (x, y) => x + y).ToArray();
+                        }
+                    }
+                    catch
+                    {
+                        Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(child_as.Path)}.", "Error", Errorhandler.MessageType.Warning);
+                    }
+                }
+                if (child is DocumentNode dn)
+                {
+                    try
+                    {
+                        var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(dn.relativePath, assy.obj);
+                        if (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.obj.AbsoluteColorPath))
+                        {
+                            sum = sum.Zip(counts2.Item2, (x, y) => x + y).ToArray();
+                            for (int i = 0; i < counts2.Item2.Length; i++)
+                            {
+                                _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
+                    }
+                }
+            }
+            for (int i = 0; i < sum.Length; i++)
+            {
+                _ColorList[i].ProjectCount.Add(sum[i]);
+            }
+            return sum;
+        }
 
         internal override void ResetContent()
         {
@@ -401,76 +662,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cle.ProjectCount.Clear();
             }
+            AddProjectCounts(DominoAssembly);
             
-            List<string> warningfiles = new List<string>();
-            if (DominoAssembly != null)
-            {
-                foreach (DocumentNode project in DominoAssembly?.children.OfType<DocumentNode>())
-                {
-                    try
-                    {
-                        var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(project.relativePath, DominoAssembly);
-                        if (Path.GetFullPath(counts2.Item1) != Path.GetFullPath(FilePath))
-                        {
-                            //Errorhandler.RaiseMessage($"The file {Path.GetFileNameWithoutExtension(project.relativePath)} uses a different color table. It is not shown in this view.", "Different colors", Errorhandler.MessageType.Warning);
-                            warningfiles.Add(Path.GetFileNameWithoutExtension(project.relativePath));
-                            continue;
-                        }
-                        for (int i = 0; i < counts2.Item2.Length; i++)
-                        {
-                            _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
-                        }
-                        for (int i = counts2.Item2.Length; i < _ColorList.Count; i++)
-                        {
-                            _ColorList[i].ProjectCount.Add(0);
-                        }
-                        //AddProjectCountsColumn(Path.GetFileNameWithoutExtension(project.relativePath));
-                    }
-                    catch
-                    {
-                        Errorhandler.RaiseMessage($"Unable to load counts from file {Path.GetFileNameWithoutExtension(project.relativePath)}.", "Error", Errorhandler.MessageType.Warning);
-                    }
-                }
-                for (int i = 0; i < warningfiles.Count; i++)
-                {
-                    warningfiles[i] = "\"" + warningfiles[i] + "\"";
-                }
-                if (warningfiles.Count == 1)
-                {
-                    WarningLabelText = $"The file {warningfiles[0]} uses a different color table and is not shown in this view.";
-                }
-                else if (warningfiles.Count > 1)
-                {
-                    WarningLabelText = $"The files {string.Join(", ", warningfiles.ToArray())} use a different color table and are not shown in this view.";
-
-                }
-            }
         }
-
-        /*private void AddProjectCountsColumn(string projectName)
-        {
-            Binding amountBinding = new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString()));
-            MultiBinding colorBinding = new MultiBinding();
-            colorBinding.Bindings.Add(new Binding(string.Format("ProjectCount[{0}]", DifColumns.Count.ToString())));
-            colorBinding.Bindings.Add(new Binding("DominoColor.count"));
-            colorBinding.Converter = new AmountToColorConverter();
-
-            amountBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-
-            DataTemplate amountLabel = new DataTemplate();
-            FrameworkElementFactory _textboxFactory = new FrameworkElementFactory(typeof(TextBlock));
-
-            DataGridTemplateColumn c = new DataGridTemplateColumn();
-            c.Header = projectName;
-            FrameworkElementFactory textFactory = new FrameworkElementFactory(typeof(Label));
-            textFactory.SetValue(ContentControl.ContentProperty, amountBinding);
-            textFactory.SetValue(Control.ForegroundProperty, colorBinding);
-
-            DataTemplate columnTemplate = new DataTemplate();
-            columnTemplate.VisualTree = textFactory;
-            c.CellTemplate = columnTemplate;
-            DifColumns.Add(c);
-        }*/
         #endregion
     }
     

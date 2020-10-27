@@ -73,6 +73,13 @@ namespace DominoPlanner.Core
                 colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
         }
+        public string AbsoluteColorPath
+        {
+            get
+            {
+                return Workspace.AbsolutePathFromReference(ref _colorPath, this);
+            }
+        }
         public ColorRepository colors { get; private set; }
         public DominoAssembly()
         {
@@ -167,7 +174,12 @@ namespace DominoPlanner.Core
             if (parent != null) // rootnode
                 parent.children.Add(this);
         }
-        
+
+        public bool ColorPathMatches(AssemblyNode assy)
+        {
+            var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(relativePath, assy.obj);
+            return (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.obj.AbsoluteColorPath));
+        }
     }
     [ProtoContract(SkipConstructor = true)]
     public class FieldNode : DocumentNode
@@ -290,6 +302,13 @@ namespace DominoPlanner.Core
         public void Save()
         {
             Workspace.Save(obj);
+        }
+
+        public bool ColorPathMatches(AssemblyNode other)
+        {
+            if (System.IO.Path.GetFullPath(this.obj.AbsoluteColorPath) == System.IO.Path.GetFullPath(other.obj.AbsoluteColorPath))
+                return true;
+            return false;
         }
     }
     [ProtoContract]

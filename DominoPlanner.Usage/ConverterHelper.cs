@@ -26,6 +26,8 @@ namespace DominoPlanner.Usage
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
             int anzahl = 0, gesamt = 0;
+            if (values[0] == null || values[1] == null)
+                return Brushes.Black;
             if (int.TryParse(values[0].ToString(), out anzahl) && int.TryParse(values[1].ToString(), out gesamt))
             {
                 if (anzahl > gesamt)
@@ -46,10 +48,12 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+                return "";
             if (value is Color)
             {
                 Color c = (Color)value;
-                return c.ToString();
+                return string.Format("#{1:X2}{2:X2}{3:X2}", c.A, c.R, c.G, c.B);
             }
             System.Drawing.Color c2 = (System.Drawing.Color)value;
             return System.Drawing.ColorTranslator.ToHtml(c2);
@@ -428,6 +432,35 @@ namespace DominoPlanner.Usage
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
+        }
+    }
+    public class IsNotNullConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+                return true;
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class IntToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return "";
+
+            return value.ToString();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
     class PopupColorPicker : ColorPicker

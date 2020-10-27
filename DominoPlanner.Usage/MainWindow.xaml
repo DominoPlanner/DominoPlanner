@@ -18,11 +18,11 @@
     <DataTemplate DataType="{x:Type vm:DominoProviderVM}">
       <View:BasicSettings HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ColorListControlVM}">
+      <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
+    </DataTemplate>
   </Window.DataTemplates>
   <Window.Resources>
-    <!--<DataTemplate DataType="{x:Type vm:ColorListControlVM}">
-      <View:ColorListControl HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
-    </DataTemplate>-->
     <local:PathToImageConverter x:Key="PathToImageConverter"/>
     <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
   </Window.Resources>
@@ -219,7 +219,7 @@
             <TreeDataTemplate ItemsSource="{Binding Children}">
               <ContentControl Height="20">
                 <i:Interaction.Behaviors>
-                  <ia:EventTriggerBehavior EventName="PointerPressed">
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
                     <ia:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
                   </ia:EventTriggerBehavior>
                 </i:Interaction.Behaviors>

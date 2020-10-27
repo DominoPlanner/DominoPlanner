@@ -1223,4 +1223,27 @@
         </DrawingGroup>
     </DrawingGroup>
     <DrawingImage x:Key="invert_selectionDrawingImage" Drawing="{StaticResource invert_selectionDrawingGroup}" />
+  <DrawingImage x:Key="ExceptionDI">
+    <DrawingGroup>
+      <GeometryDrawing>
+        <GeometryDrawing.Geometry>
+          <RectangleGeometry Rect="0, 0, 20 20"/>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+      <GeometryDrawing>
+        <GeometryDrawing.Pen>
+          <Pen Brush="#d40000" Thickness="2" LineJoin="Round"></Pen>
+        </GeometryDrawing.Pen>
+        <Geometry>
+          M 17.759075,16.684706 H 0.24092525 L 9.0000007,1.3152697 Z
+        </Geometry>
+      </GeometryDrawing>
+      <GeometryDrawing Brush="Black">
+        <Geometry>
+          m 8.475486,12.871887 h 1.0490282 v 1.312577 H 8.475486 Z m 0,-6.4026893 H 9.5245142 V 9.8539932 L 9.4211617,11.698836 H 8.5840061 L 8.475486,9.8539932 Z
+        </Geometry>
+      </GeometryDrawing>
+    </DrawingGroup>
+  </DrawingImage>
+
 </ResourceDictionary>

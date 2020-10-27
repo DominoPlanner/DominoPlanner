@@ -14,6 +14,7 @@
     <None Remove="UserControls\View\BasicSettings.xaml" />
     <None Remove="UserControls\View\CalculationV.xaml" />
     <None Remove="UserControls\View\CircleSize.xaml" />
+    <None Remove="UserControls\View\ColorListControl.xaml" />
     <None Remove="UserControls\View\DominoDimensionsV.xaml" />
     <None Remove="UserControls\View\EditProject.xaml" />
     <None Remove="UserControls\View\FieldReadoutV.xaml" />
@@ -56,6 +57,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="UserControls\View\ColorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="UserControls\View\ColorListControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="UserControls\View\DominoDimensionsV.xaml">
@@ -137,6 +141,9 @@
     </Compile>
     <Compile Update="UserControls\View\ColorControl.xaml.cs">
       <DependentUpon>ColorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="UserControls\View\ColorListControl.xaml.cs">
+      <DependentUpon>ColorListControl.xaml</DependentUpon>
     </Compile>
     <Compile Update="UserControls\View\DominoDimensionsV.xaml.cs">
       <DependentUpon>DominoDimensionsV.xaml</DependentUpon>
