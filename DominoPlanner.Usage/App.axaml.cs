@@ -12,7 +12,6 @@ namespace DominoPlanner.Usage
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
-            Logger.Sink = new CustomLogSink(LogEventLevel.Information);
             Debug.WriteLine(Logger.IsEnabled(LogEventLevel.Information, "Binding"));
         }
 

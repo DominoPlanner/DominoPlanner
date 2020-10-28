@@ -57,16 +57,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             });
             itemscontrol.ItemTemplate = template;
         }
-        static void AddEmptyContentControl(Grid g, int row, int column, bool header = true)
-        {
-            var contentblock = new ContentControl();
-            if (header)
-                contentblock.Classes.Add("Header");
-            contentblock.Classes.Add("Empty");
-            Grid.SetColumn(contentblock, column);
-            Grid.SetRow(contentblock, row);
-            g.Children.Add(contentblock);
-        }
         int GetDepth(AssemblyNode assy)
         {
             if (assy.obj.children.OfType<AssemblyNode>().Count() == 0)
