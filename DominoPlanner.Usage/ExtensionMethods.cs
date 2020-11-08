@@ -12,7 +12,7 @@ namespace DominoPlanner.Usage
     {
         public static string[] ShowDialog(this OpenFileDialog ofd)
         {
-            return Task.Run(async () => await ofd.ShowAsync(MainWindowViewModel.GetWindow())).Result;
+            return ofd.ShowAsync(MainWindowViewModel.GetWindow()).GetAwaiter().GetResult();
         }
         /*public async static Task<string[]> ShowDialog(this OpenFileDialog ofd)
         {

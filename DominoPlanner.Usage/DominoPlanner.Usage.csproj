@@ -13,6 +13,7 @@
     <None Remove="NewProject.xaml" />
     <None Remove="Properties.xaml" />
     <None Remove="ProtocolV.xaml" />
+    <None Remove="ReferenceManager.xaml" />
     <None Remove="UserControls\View\BasicSettings.xaml" />
     <None Remove="UserControls\View\CalculationV.xaml" />
     <None Remove="UserControls\View\CircleSize.xaml" />
@@ -47,6 +48,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="ProtocolV.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="ReferenceManager.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="UserControls\View\BasicSettings.xaml">
@@ -131,6 +135,9 @@
     </Compile>
     <Compile Update="ProtocolV.xaml.cs">
       <DependentUpon>ProtocolV.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="ReferenceManager.xaml.cs">
+      <DependentUpon>ReferenceManager.xaml</DependentUpon>
     </Compile>
     <Compile Update="UserControls\View\BasicSettings.xaml.cs">
       <DependentUpon>BasicSettings.xaml</DependentUpon>

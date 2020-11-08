@@ -215,22 +215,47 @@
               <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
             </Style>
           </TreeView.Styles>
-          <TreeView.ItemTemplate>
-            <TreeDataTemplate ItemsSource="{Binding Children}">
+          <TreeView.DataTemplates>
+            <TreeDataTemplate DataType="{x:Type vm:AssemblyNodeVM}" ItemsSource="{Binding Children}">
               <ContentControl Height="20">
                 <i:Interaction.Behaviors>
                   <ia:EventTriggerBehavior EventName="DoubleTapped">
                     <ia:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
                   </ia:EventTriggerBehavior>
                 </i:Interaction.Behaviors>
-                <Grid ToolTip.Tip="{Binding AbsolutePath}" ContextMenu="{Binding ContextMenu}" ColumnDefinitions="20,*">         
+                <Grid ToolTip.Tip="{Binding AbsolutePath}" ColumnDefinitions="20,*" ContextMenu="{Binding ContextMenu}">         
+                  <Image Grid.Column="0" Source="/Icons/folder_txt.ico"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                  <Image Grid.Column="0" Margin="10, 10, 0, 0" Width="8" Height="8" Source="/Icons/remove.ico" IsVisible="{Binding BrokenReference}"></Image>
+                  <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  </TextBlock>
+                  <!--<Grid.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Open Folder" Command="{Binding OpenFolderCommand}">
+                        <MenuItem.Icon>
+                          <Image Source="/Icons/folder_tar.ico"/>
+                        </MenuItem.Icon>
+                      </MenuItem>
+                    </ContextMenu>
+                  </Grid.ContextMenu>-->
+                </Grid>
+              </ContentControl>
+            </TreeDataTemplate>
+            <TreeDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type vm:DocumentNodeVM}">
+              <ContentControl Height="20">
+                <i:Interaction.Behaviors>
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
+                    <ia:InvokeCommandAction Command="{Binding MouseClickCommand}"/>
+                  </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+                <Grid ToolTip.Tip="{Binding AbsolutePath}" ContextMenu="{Binding ContextMenu}" ColumnDefinitions="20,*">
                   <Image Grid.Column="0" Source="{Binding ImagePath, Converter={StaticResource FilenameToThumbnailConverter}}"  Width="18" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                  <Image Grid.Column="0" Margin="10, 10, 0, 0" Width="8" Height="8" Source="/Icons/remove.ico" IsVisible="{Binding BrokenReference}"></Image>
                   <TextBlock Grid.Column="1" Margin="5, 0, 0, 0"  Text="{Binding Name}" FontSize="14" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                   </TextBlock>
                 </Grid>
               </ContentControl>
             </TreeDataTemplate>
-          </TreeView.ItemTemplate>
+          </TreeView.DataTemplates>
         </TreeView>
         <GridSplitter HorizontalAlignment="Center" Margin="0" Width="3" Background="#FFDDDDDD" Grid.Column="1"/>
         <TabControl Grid.Column="2" Items="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Background="#33FFFFFF" Margin="0,0,5,0">

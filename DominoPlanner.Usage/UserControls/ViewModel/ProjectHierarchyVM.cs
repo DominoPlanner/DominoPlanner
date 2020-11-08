@@ -19,6 +19,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
         public ObservableCollection<DominoWrapperNodeVM> Children { get; set; }
 
+        private bool brokenReference;
+
+        public bool BrokenReference
+        {
+            get { return brokenReference; }
+            set { brokenReference = value; RaisePropertyChanged(); }
+        }
+
+
         private bool _isSelected;
         public bool IsSelected
         {
@@ -95,19 +104,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_ContextMenu == null)
                 {
                     var ContextMenuEntries = BuildContextMenu();
-                    _ContextMenu = new ContextMenu();
-                    _ContextMenu.Items = ContextMenuEntries;
-                    //RaisePropertyChanged();
+                    if (ContextMenuEntries != null)
+                    {
+                        _ContextMenu = new ContextMenu();
+                        _ContextMenu.Items = ContextMenuEntries;
+                    }
                 }
                 return _ContextMenu;
             }
         }
 
-        public string Name { get => Path.GetFileNameWithoutExtension(RelativePathFromParent); }
+        public string Name
+        {
+            get =>
+   Path.GetFileNameWithoutExtension(RelativePathFromParent);
+        }
+
 
         public NodeVM()
         {
-            MouseClickCommand = new RelayCommand((o) => Open());
+            MouseClickCommand = new RelayCommand((o) => OpenInternal());
         }
         private ICommand _MouseClickCommand;
         public ICommand MouseClickCommand
@@ -117,6 +133,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public List<MenuItem> BuildContextMenu()
         {
+            if (BrokenReference)
+                return null;
             return this.GetType().GetMethods()
                       .Select(m => Tuple.Create(m, m.GetCustomAttributes(typeof(ContextMenuAttribute), false)))
                       .Where(tuple => tuple.Item2.Count() > 0)
@@ -140,6 +158,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{ AbsolutePath}\"");
         }
+        public async void OpenInternal()
+        {
+            if (brokenReference)
+            {
+                await new ReferenceManager().ShowDialog(MainWindowViewModel.GetWindow());
+                parent?.AssemblyModel.Save();
+                PostReferenceRestoration();
+            }
+            Open();
+        }
+
+        internal virtual void PostReferenceRestoration()
+        {
+            _ContextMenu = null;
+            RaisePropertyChanged("ContextMenu");
+            RaisePropertyChanged("ImagePath");
+        }
+
         public abstract void Open();
         
     }
@@ -177,7 +213,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override string RelativePathFromParent
         {
-            get => AssemblyModel.Path;
+            get
+            {
+                try
+                {
+                    var result = AssemblyModel.Path;
+                    if (BrokenReference)
+                    {
+                        if (File.Exists(_AbsolutePath))
+                            BrokenReference = false;
+                    }
+                    return result;
+                }
+                catch (FileNotFoundException)
+                {
+                    BrokenReference = true;
+                    return "";
+                }
+            }
             set
             {
                 AssemblyModel.Path = value;
@@ -207,50 +260,71 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorNode = new ColorNodeVM(this);
             LoadChildren();
         }
+        public void Initialize()
+        {
+            colorNode = new ColorNodeVM(this);
+            LoadChildren();
+        }
         public void LoadChildren()
         {
-            Children = new ObservableCollection<DominoWrapperNodeVM>();
-            Children.CollectionChanged -= ChildrenAddDelegates;
-            Children.CollectionChanged += ChildrenAddDelegates;
-            
-            for (int i = 0; i < AssemblyModel.obj.children.Count; i++)
+            try
             {
-                var node = AssemblyModel.obj.children[i];
-                try
+                Children = new ObservableCollection<DominoWrapperNodeVM>();
+                Children.CollectionChanged -= ChildrenAddDelegates;
+                Children.CollectionChanged += ChildrenAddDelegates;
+
+                for (int i = 0; i < AssemblyModel.obj.children.Count; i++)
                 {
-                    if (node is IDominoWrapper idw && (idw is AssemblyNode || idw is DocumentNode) )
+                    var node = AssemblyModel.obj.children[i];
+                    try
                     {
-                        var vm = NodeVMFactory(idw, this);
-                        vm.parent = this;
-                        Children.Add(vm as DominoWrapperNodeVM);
+                        if (node is IDominoWrapper idw && (idw is AssemblyNode || idw is DocumentNode))
+                        {
+                            var vm = NodeVMFactory(idw, this);
+                            vm.parent = this;
+                            Children.Add(vm as DominoWrapperNodeVM);
+                        }
+                    }
+                    catch (Exception ex) when (ex is InvalidDataException || ex is ProtoBuf.ProtoException)
+                    {
+                        // broken Subassembly
+                        var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
+                        {
+                            restored.parent = AssemblyModel.obj;
+                            // make color path relative
+                            restored.Path = Workspace.MakeRelativePath(AbsolutePath, restored.Path);
+                            AssemblyModel.obj.children[i] = restored;
+                            Children.Add(NodeVMFactory(restored, this) as AssemblyNodeVM);
+                            AssemblyModel.Save();
+                        }
+
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // missing subassembly
+                        /*string path = "";
+                        if (node is AssemblyNode asn) path = asn.Path;
+                        Errorhandler.RaiseMessage($"The project file {path} does not exist at the current location. " +
+                            $"It will be removed from the project.", "Error", Errorhandler.MessageType.Error);*/
+                        // Remove file from Assembly and decrease counter
+                        /*AssemblyModel.obj.children.RemoveAt(i--);
+                        AssemblyModel.Save();*/
                     }
                 }
-                catch (Exception ex) when (ex is InvalidDataException || ex is ProtoBuf.ProtoException)
-                {
-                    // broken Subassembly
-                    var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
-                    {
-                        restored.parent = AssemblyModel.obj;
-                        // make color path relative
-                        restored.Path = Workspace.MakeRelativePath(AbsolutePath, restored.Path);
-                        AssemblyModel.obj.children[i] = restored;
-                        Children.Add(NodeVMFactory(restored, this) as AssemblyNodeVM);
-                        AssemblyModel.Save();
-                    }
-                    
-                }
-                catch (FileNotFoundException)
-                {
-                    string path = "";
-                    if (node is AssemblyNode asn) path = asn.Path;
-                    Errorhandler.RaiseMessage($"The project file {path} does not exist at the current location. " +
-                        $"It will be removed from the project.", "Error", Errorhandler.MessageType.Error);
-                    // Remove file from Assembly and decrease counter
-                    AssemblyModel.obj.children.RemoveAt(i--);
-                    AssemblyModel.Save();
-                }
+                AssemblyModel.obj.children.CollectionChanged += AssemblyModelChildren_CollectionChanged;
+                this.BrokenReference = false;
             }
-            AssemblyModel.obj.children.CollectionChanged += AssemblyModelChildren_CollectionChanged;
+            catch (FileNotFoundException)
+            {
+                this.BrokenReference = true;
+            }
+        }
+        internal override void PostReferenceRestoration()
+        {
+            this.LoadChildren();
+            RaisePropertyChanged("Children");
+            this.AssemblyModel.Save();
+            base.PostReferenceRestoration();
         }
         private void ChildrenAddDelegates(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -265,14 +339,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     else if (i is AssemblyNodeVM an)
                     {
                         an.AssemblyModel.RelativePathChanged += (s, args) => an.RelativePathChanged();
-                    }
-                    if (!i.CheckPath())
-                    {
-                        if (i is DominoWrapperNodeVM dwnvm)
-                        {
-                            Children.Remove(dwnvm);
-                            Errorhandler.RaiseMessage($"The file {RelativePathFromParent} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
-                        }
                     }
                 }
 
@@ -315,7 +381,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Open color list", "Icons/colorLine.ico", index: 0)]
         public void OpenColorList()
         {
-            colorNode.Open();
+            try
+            {
+                colorNode.Open();
+                BrokenReference = false;
+            }
+            catch (FileNotFoundException)
+            {
+                BrokenReference = true;
+            }
         }
         public override void Open()
         {
@@ -353,7 +427,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch (FileNotFoundException)
                     {
-                        // Unable to load project
+                        Errorhandler.RaiseMessage("Error loading file", "Error", Errorhandler.MessageType.Error);
                     }
                 }
                 else if (extension == "." + MainWindow.ReadSetting("ProjectExtension").ToLower())
@@ -464,8 +538,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             get
             {
-                _AbsolutePath = AssemblyModel.AbsolutePath;
-                return _AbsolutePath;
+                try
+                {
+                    _AbsolutePath = AssemblyModel.AbsolutePath;
+                    if (BrokenReference)
+                    {
+                        if (File.Exists(_AbsolutePath))
+                            BrokenReference = false;
+                    }
+                    return _AbsolutePath;
+                }
+                catch (FileNotFoundException)
+                {
+                    BrokenReference = true;
+                    return "";
+                }
             }
             set
             {
@@ -519,8 +606,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             get
             {
-                _AbsolutePath = DocumentModel.AbsolutePath;
-                return _AbsolutePath;
+                try
+                {
+                    _AbsolutePath = DocumentModel.AbsolutePath;
+                    BrokenReference = false;
+                    return _AbsolutePath;
+                }
+                catch (FileNotFoundException)
+                {
+                    BrokenReference = true;
+                    return "";
+                }
             }
             set { }
         }
@@ -530,7 +626,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public bool HasFieldProtocol()
         {
-            return Workspace.LoadHasProtocolDefinition<IWorkspaceLoadColorList>(AbsolutePath);
+            try
+            {
+                var result = Workspace.LoadHasProtocolDefinition<IWorkspaceLoadColorList>(AbsolutePath);
+                BrokenReference = false;
+                return result;
+            }
+            catch (FileNotFoundException)
+            {
+                BrokenReference = true;
+                return false;
+            }
         }
         [ContextMenuAttribute("Export as Image", "Icons/image.ico", index: 4 )]
         public void ExportImage()
@@ -605,7 +711,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (FileNotFoundException)
             {
-                RemoveNodeFromProject();
+                BrokenReference = true;
             }
             catch (InvalidDataException)
             {

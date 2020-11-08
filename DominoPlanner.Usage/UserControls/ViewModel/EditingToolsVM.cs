@@ -717,6 +717,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             //FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(absolutePath);
                             FilteredMat = new Image<Emgu.CV.Structure.Bgra, byte>(absolutePath);
+                            bff.FilePath = relativePath;
                         }
                     }
                 }

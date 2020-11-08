@@ -1,6 +1,4 @@
-﻿
-
-using MessageBox.Avalonia.Enums;
+﻿using MessageBox.Avalonia.Enums;
 using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage
@@ -24,7 +22,8 @@ namespace DominoPlanner.Usage
                     break;
             }
             var box = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(header, message, ButtonEnum.Ok, image);
-            await box.ShowDialog(MainWindowViewModel.GetWindow());
+            if (MainWindowViewModel.GetWindow() != null)
+                await box.Show();
         }
 
         internal enum MessageType { Info, Error, Warning }

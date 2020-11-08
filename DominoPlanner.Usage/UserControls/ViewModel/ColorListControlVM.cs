@@ -619,7 +619,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     try
                     {
-                        var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(dn.relativePath, assy.obj);
+                        string relpath = dn.relativePath;
+                        var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(ref relpath, assy.obj);
+                        dn.relativePath = relpath;
                         if (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.obj.AbsoluteColorPath))
                         {
                             sum = sum.Zip(counts2.Item2, (x, y) => x + y).ToArray();

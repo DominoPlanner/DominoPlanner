@@ -98,18 +98,27 @@ namespace DominoPlanner.Usage
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = ImageHelper.GetImageOfFile(value.ToString());
-            if (path.StartsWith("/Icons/"))
+            try
             {
-                return new Image()
+                string path = ImageHelper.GetImageOfFile(value.ToString());
+                if (path.StartsWith("/Icons/"))
                 {
-                    Source = GetIcon(path)
-                };
+                    return new Image()
+                    {
+                        Source = GetIcon(path)
+                    };
+                }
+                else
+                {
+                    return new Image() { Source = new Bitmap(ImageHelper.GetImageOfFile(value.ToString())) };
+                }
             }
-            else
+            catch (IOException)
             {
-                return new Image() { Source = new Bitmap(ImageHelper.GetImageOfFile(value.ToString())) };
+                // we're probably still writing the file - not a good idea.
+                return null;
             }
+            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

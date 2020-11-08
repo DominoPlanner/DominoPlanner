@@ -139,10 +139,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                string _oldpath = _relativePath;
-                var result = Workspace.AbsolutePathFromReference(ref _relativePath, parent);
-                if (_oldpath != _relativePath) RelativePathChanged?.Invoke(this, null);
-                return result;
+                return Workspace.AbsolutePathFromReference(ref _relativePath, parent);
             }
         }
         private IDominoProvider _obj;
@@ -177,7 +174,7 @@ namespace DominoPlanner.Core
 
         public bool ColorPathMatches(AssemblyNode assy)
         {
-            var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(relativePath, assy.obj);
+            var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(ref _relativePath, assy.obj);
             return (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.obj.AbsoluteColorPath));
         }
     }
@@ -248,35 +245,41 @@ namespace DominoPlanner.Core
 
         }
     }
+    public class FileNotFoundEventArgs : EventArgs
+    {
+        public FileNotFoundException ex;
+        public FileNotFoundEventArgs(FileNotFoundException ex)
+        {
+            this.ex = ex;
+        }
+    }
     [ProtoContract(SkipConstructor = true)]
     public class AssemblyNode : IDominoWrapper
     {
-        [ProtoMember(1)]
+        
         private string path;
-
+        [ProtoMember(1)]
         public string Path
         {
-            get { return path; }
+            get
+            {
+                // update relative path in case it changed
+                var a = AbsolutePath;
+                return path;
+            }
             set
             {
                 if (_obj != null) Workspace.CloseFile(obj);
                 path = value;
                 RelativePathChanged?.Invoke(this, null);
                 _obj = null;
-                var res = obj;
             }
         }
         public string AbsolutePath
         {
             get
             {
-                string _oldpath = path;
-                var result = Workspace.AbsolutePathFromReference(ref path, parent);
-                if (_oldpath != path)
-                {
-                    RelativePathChanged?.Invoke(this, null);
-                }
-                return result;
+                return Workspace.AbsolutePathFromReference(ref path, parent);
             }
         }
 

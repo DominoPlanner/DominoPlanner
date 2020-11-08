@@ -219,7 +219,15 @@ namespace DominoPlanner.Usage
         /// <param name="e"></param>
         private void Item_IsClicked(object sender, EventArgs e)
         {
-            OpenItem(UserControls.ViewModel.TabItem.TabItemGenerator(sender as NodeVM));
+            try
+            {
+                OpenItem(UserControls.ViewModel.TabItem.TabItemGenerator(sender as NodeVM));
+                (sender as NodeVM).BrokenReference = false;
+            }
+            catch (FileNotFoundException)
+            {
+                (sender as NodeVM).BrokenReference = true;
+            }
         }
         private void OpenItemFromPath(object param)
         {
@@ -392,7 +400,7 @@ namespace DominoPlanner.Usage
                     // check if the file can be deserialized properly
                     node = new AssemblyNodeVM(mainnode, OpenItem, RemoveNodeFromTabs, GetTab);
                 }
-                catch
+                catch (Exception ex)
                 {
                     try
                     {
