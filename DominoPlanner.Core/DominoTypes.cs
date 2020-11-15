@@ -58,8 +58,10 @@ namespace DominoPlanner.Core
             };
         }
 
-        public override DominoPath GetPath(double scaling_x, double scaling_y)
+        public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
+            width = (expanded ? expanded_width : this.width) * scaling_x;
+            height = (expanded ? expanded_height : this.height) * scaling_y;
             return new DominoPath()
             {
                 points = new Point[] {
@@ -145,7 +147,7 @@ namespace DominoPlanner.Core
             return new DominoRectangle() { x = xmin * scaling_x, y = ymin * scaling_y, width = (xmax - xmin) * scaling_x, height = (ymax - ymin) * scaling_y };
         }
 
-        public override DominoPath GetPath(double scaling_x, double scaling_y)
+        public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
             return new DominoPath()
             {

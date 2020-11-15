@@ -17,6 +17,8 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
 using System.Threading.Tasks;
+using SkiaSharp;
+using Avalonia.Data.Converters;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -38,13 +40,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public DrawingImage img { get; private set; }
 
-        public virtual void MouseMove(object sender, PointerEventArgs e) { }
+        public virtual void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e) { }
 
-        public virtual void MouseDown(object sender, PointerPressedEventArgs e) { }
+        public virtual void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e) { }
 
-        public virtual void MouseUp(object sender, PointerReleasedEventArgs e) { }
+        public virtual void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e) { }
 
-        public virtual void KeyPressed(Key key) { }
+        public virtual void KeyPressed(KeyEventArgs key) { }
+
+        public virtual void MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e) { }
     }
     public enum SelectionMode
     {
@@ -99,8 +103,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Image = "rect_selectDrawingImage";
             Name = "Select";
             SelectionTools = new ObservableCollection<SelectionDomain>() {
-                new RectangleSelection(), new CircleSelectionDomain(),
-                new PolygonSelectionDomain(), new FreehandSelectionDomain() };
+                new RectangleSelection(parent), new CircleSelectionDomain(parent),
+                new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent) };
             CurrentSelectionDomain = SelectionTools[0];
             UndoSelectionOperation = new RelayCommand((o) => {
                 parent.UndoInternal(true);
@@ -139,17 +143,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set { selectionTools = value; RaisePropertyChanged();  }
         }
 
-        public override void MouseDown(object sender, PointerPressedEventArgs e)
+        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
-            CurrentSelectionDomain?.MouseDown(sender, e, sender as ProjectCanvas);   
+            CurrentSelectionDomain?.MouseDown(dominoPoint, e);   
         }
-        public override void MouseMove(object sender, PointerEventArgs e)
+        public override void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
         {
-            CurrentSelectionDomain?.MouseMove(sender, e, sender as ProjectCanvas);
+            CurrentSelectionDomain?.MouseMove(dominoPoint, e);
         }
-        public override void MouseUp(object sender, PointerReleasedEventArgs e)
+        public override void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            var result = CurrentSelectionDomain?.MouseUp(sender, e, sender as ProjectCanvas);
+            var result = CurrentSelectionDomain?.MouseUp(dominoPoint, e);
             if (result.Count == 0) return;
             if (CurrentSelectionDomain?.CurrentSelectionMode == SelectionMode.Add)
             {
@@ -161,9 +165,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             parent.UpdateUIElements();
         }
-        public override void KeyPressed(Key key)
+        public override void KeyPressed(KeyEventArgs key)
         {
-            if (key == Key.Escape)
+            if (key.Key == Key.Escape)
             {
                 parent.ClearFullSelection(true);
             }
@@ -190,8 +194,35 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand InvertSelection { get { return _InvertSelection; } set { if (value != _InvertSelection) { _InvertSelection = value; } } }
 
     }
+    public class SelectionModeColorConverter : IValueConverter
+    {
+        static Color AddColor = Colors.LightBlue;
+        static Color RemoveColor = Colors.IndianRed;
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is SelectionMode sm)
+            {
+                if (sm == SelectionMode.Add)
+                {
+                    return AddColor;
+                }
+                else return RemoveColor;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public abstract class SelectionDomain : ModelBase
     {
+        internal EditProjectVM parent;
+        internal SelectionDomain(EditProjectVM parent)
+        {
+            this.parent = parent;
+        }
         public string Name { get; internal set; }
         public DrawingImage img { get; private set; }
         private string image;
@@ -203,8 +234,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 img = (DrawingImage)temp;
             }
         }
-       
-
         private bool includeBoundary = true;
 
         public bool IncludeBoundary
@@ -223,92 +252,90 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RaisePropertyChanged();
             }
         }
-
-        public ISolidColorBrush SelectionColor
-        {
-            get
-            {
-                if (CurrentSelectionMode == SelectionMode.Add)
-                {
-                    return AddColor;
-                }
-                else return RemoveColor;
-            }
-        }
-
-        ISolidColorBrush AddColor = Brushes.LightBlue;
-        ISolidColorBrush RemoveColor = Brushes.IndianRed;
-
         protected bool ResetFlag = false;
 
-        public SelectionMode CurrentSelectionMode;
-        public Shape s;
-        
-        public void RemoveSelectionDomain(ProjectCanvas pc)
+        private SelectionMode _currentSelectionMode;
+        public SelectionMode CurrentSelectionMode
         {
-            s.IsVisible = false;
-            
-            (s.GetVisualParent() as Canvas)?.Children.Remove(s);
+         get { return _currentSelectionMode; }
+            set { _currentSelectionMode = value; RaisePropertyChanged(); }
         }
-        public void AddSelectionDomain(ProjectCanvas pc)
+        private SKPath selectionshape;
+        public SKPath SelectionShape
         {
-            pc.Children.Remove(s);
-            s.IsVisible = true;
-            pc.Children.Add(s);
+            get { return selectionshape; }
+            set
+            {
+                selectionshape = value;
+                RaisePropertyChanged();
+            }
         }
-        public abstract void MouseMove(object sender, PointerEventArgs e, ProjectCanvas pc);
+        private bool _selectionVisible;
 
-        public abstract void MouseDown(object sender, PointerPressedEventArgs e, ProjectCanvas pc);
+        public bool SelectionPathVisible
+        {
+            get { return _selectionVisible; }
+            set { _selectionVisible = value; RaisePropertyChanged(); }
+        }
+        private Color selectionFill;
 
-        public virtual List<int> MouseUp(object sender, PointerReleasedEventArgs e, ProjectCanvas pc)
+        public Color  SelectionFillColor
+        {
+            get { return selectionFill; }
+            set { selectionFill = value; RaisePropertyChanged(); }
+        }
+
+
+        public void RemoveSelectionDomain()
+        {
+            SelectionPathVisible = false;
+        }
+        public void AddSelectionDomain()
+        {
+            SelectionPathVisible = true;
+        }
+        public abstract void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e);
+
+        public abstract void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e);
+
+        public virtual List<int> MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
             return new List<int>();
         }
-        public abstract Rect GetBoundingBox();
-
-        public bool IsInsideBoundingBox(Rect BoundingBox, DominoInCanvas dic, bool includeBoundary)
+        public Rect GetBoundingBox()
         {
+            SKRect rect;
+            SelectionShape.GetBounds(out rect);
+            return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
+        }
+
+        public bool IsInsideBoundingBox(Rect BoundingBox, EditingDominoVM dic, bool includeBoundary)
+        {
+            var points = dic.domino.GetPath(expanded: dic.expanded).points;
             if (includeBoundary)
             {
-                return dic.canvasPoints.Max(x => x.X) > BoundingBox.Left &&
-                    dic.canvasPoints.Min(x => x.X) < BoundingBox.Right &&
-                    dic.canvasPoints.Min(x => x.Y) < BoundingBox.Bottom &&
-                    dic.canvasPoints.Max(x => x.Y) > BoundingBox.Top;
+                return points.Max(x => x.X) > BoundingBox.Left &&
+                    points.Min(x => x.X) < BoundingBox.Right &&
+                    points.Min(x => x.Y) < BoundingBox.Bottom &&
+                    points.Max(x => x.Y) > BoundingBox.Top;
             }
             else
             {
-                return dic.canvasPoints.Min(x => x.X) > BoundingBox.Left &&
-                    dic.canvasPoints.Max(x => x.X) < BoundingBox.Right &&
-                    dic.canvasPoints.Max(x => x.Y) < BoundingBox.Bottom &&
-                    dic.canvasPoints.Min(x => x.Y) > BoundingBox.Top;
+                return points.Min(x => x.X) > BoundingBox.Left &&
+                    points.Max(x => x.X) < BoundingBox.Right &&
+                    points.Max(x => x.Y) < BoundingBox.Bottom &&
+                    points.Min(x => x.Y) > BoundingBox.Top;
                 
             }
         }
 
-        public abstract bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary);
+        public abstract bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary);
 
         public void ResetSelectionArea()
         {
             ResetFlag = true;
         }
-        public static bool IsPointInPolygon(IList<Avalonia.Point> polygon, Avalonia.Point testPoint)
-        {
-            bool result = false;
-            int j = polygon.Count() - 1;
-            for (int i = 0; i < polygon.Count(); i++)
-            {
-                if (polygon[i].Y < testPoint.Y && polygon[j].Y >= testPoint.Y || polygon[j].Y < testPoint.Y && polygon[i].Y >= testPoint.Y)
-                {
-                    if (polygon[i].X + (testPoint.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) * (polygon[j].X - polygon[i].X) < testPoint.X)
-                    {
-                        result = !result;
-                    }
-                }
-                j = i;
-            }
-            return result;
-        }
-        public bool CheckBoundary(DominoInCanvas dic, int pointsInsideSelection)
+        public bool CheckBoundary(EditingDominoVM dic, int pointsInsideSelection)
         {
             if (IncludeBoundary)
             {
@@ -317,7 +344,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else
             {
-                if (pointsInsideSelection == dic.canvasPoints.Length)
+                if (pointsInsideSelection == dic.domino.GetPath().points.Length)
                     return true;
             }
             return false;
@@ -325,11 +352,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public abstract class TwoClickSelection : SelectionDomain
     {
-        public TwoClickSelection()
+        public TwoClickSelection(EditProjectVM parent) : base(parent)
         {
             MouseDownPoint = new Avalonia.Point(-1, -1);
         }
         protected Avalonia.Point MouseDownPoint;
+        protected Avalonia.Point currentPoint;
         public void UpdateSelectionMode(PointerPressedEventArgs e) // called on Mouse down
         {
             var update = e.GetCurrentPoint(null).Properties.PointerUpdateKind;
@@ -352,37 +380,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public abstract void UpdateShapeProperties(Avalonia.Point pos);
         public abstract void Initialize();
 
-        public override void MouseDown(object sender, PointerPressedEventArgs e, ProjectCanvas pc)
+        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
             UpdateSelectionMode(e);
 
-            MouseDownPoint = e.GetPosition((Canvas)sender);
-
-            s.Stroke = SelectionColor;
-            s.StrokeThickness = 8;
-
+            MouseDownPoint = dominoPoint;
             Initialize();
             ResetFlag = false;
             
-            AddSelectionDomain(pc);
+            AddSelectionDomain();
         }
-        public override void MouseMove(object sender, PointerEventArgs e, ProjectCanvas pc)
+        public override void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
         {
             var props = e.GetCurrentPoint(null).Properties;
             if (!props.IsLeftButtonPressed && !props.IsRightButtonPressed)
             {
-                RemoveSelectionDomain(pc);
+                RemoveSelectionDomain();
                 return;
             }
-            if (s == null) return;
+            if (SelectionShape == null) return;
             
-            UpdateShapeProperties(e.GetPosition((Canvas)sender));
+            UpdateShapeProperties(dominoPoint);
 
             
         }
-        public override List<int> MouseUp(object sender, PointerReleasedEventArgs e, ProjectCanvas pc)
+        public override List<int> MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            
             List<int> result = new List<int>();
             var props = e.GetCurrentPoint(null).Properties;
             if ((props.IsLeftButtonPressed || props.IsRightButtonPressed)
@@ -392,70 +415,67 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             Rect boundingBox = GetBoundingBox();
             bool SingleClickFlag = false;
-            var pos = e.GetPosition(pc);
+            var pos = dominoPoint;
             if ((pos.X - MouseDownPoint.X) * (pos.X - MouseDownPoint.X) + (pos.Y - MouseDownPoint.Y) * (pos.Y - MouseDownPoint.Y) < 5)
             {
                 // single click 
-                boundingBox = new Rect(e.GetPosition(pc).X, e.GetPosition(pc).Y, 0, 0);
+                boundingBox = new Rect(dominoPoint.X, dominoPoint.Y, 0, 0);
                 SingleClickFlag = true;
             }
             if (!ResetFlag)
             {
-                for (int i = 0; i < pc.Stones.Count; i++)
+                for (int i = 0; i < parent.Dominoes.Count; i++)
                 {
-                    if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, SingleClickFlag ? true : IncludeBoundary))
+                    if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, SingleClickFlag ? true : IncludeBoundary))
                     {
                         result.Add(i);
                     }
                 }
             }
             ResetFlag = false;
-            RemoveSelectionDomain(pc);
+            RemoveSelectionDomain();
             MouseDownPoint = new Avalonia.Point(-1, -1);
             return result;
         }
         
         
     }
-    public abstract class WidthHeightSelection: TwoClickSelection
+    public abstract class WidthHeightSelection : TwoClickSelection
     {
+        internal WidthHeightSelection(EditProjectVM parent) : base(parent) { }
+        
         public override void Initialize()
         {
-            Canvas.SetLeft(s, MouseDownPoint.X);
-            Canvas.SetTop(s, MouseDownPoint.Y);
-            s.Width = 0;
-            s.Height = 0;
+            SelectionShape = new SKPath();
         }
         public abstract Rect GetCurrentDimensions(Avalonia.Point pos);
 
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
+            currentPoint = pos;
             var dims = GetCurrentDimensions(pos);
-            s.Width = dims.Width;
-            s.Height = dims.Height;
-
             if (dims.Width > 10 || dims.Height > 10)
-                s.IsVisible = true;
+                SelectionPathVisible = true;
             else
-                s.IsVisible = false;
+                SelectionPathVisible = false;
 
-            Canvas.SetLeft(s, dims.X);
-            Canvas.SetTop(s, dims.Y);
-        }
-        public override Rect GetBoundingBox()
-        {
-            double left = Canvas.GetLeft(s);
-            double top = Canvas.GetTop(s);
-            return new Rect(left, top, s.Width, s.Height);
         }
     }
     public class RectangleSelection : WidthHeightSelection
     {
-        public RectangleSelection()
+        
+        public RectangleSelection(EditProjectVM parent) : base(parent)
         {
-            s = new Rectangle();
             Image = "rect_selectDrawingImage";
             Name = "Rectangle";
+        }
+        public override void UpdateShapeProperties(Avalonia.Point pos)
+        {
+            var p = new SKPath();
+            var dims = GetCurrentDimensions(pos);
+            p.AddRect(new SKRect() { Left = (float)dims.X, Top = (float)dims.Y, Size = new SKSize() { Width = (float)dims.Width, Height = (float)dims.Height } });
+            SelectionShape = p;
+            base.UpdateShapeProperties(pos);
         }
         public override Rect GetCurrentDimensions(Avalonia.Point pos)
         {
@@ -467,18 +487,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return new Rect(x, y, w, h);
 
         }
-        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        public override bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary)
         {
             return IsInsideBoundingBox(boundingBox, dic, includeBoundary);
         }
     }
     public class CircleSelectionDomain : WidthHeightSelection
     {
-        public CircleSelectionDomain()
+        public CircleSelectionDomain(EditProjectVM parent) : base(parent)
         {
-            s = new Ellipse();
             Image = "round_selectDrawingImage";
             Name = "Circle";
+        }
+        public override void UpdateShapeProperties(Avalonia.Point pos)
+        {
+            base.UpdateShapeProperties(pos);
+            var p = new SKPath();
+            var dims = GetCurrentDimensions(pos);
+            p.AddCircle((float)MouseDownPoint.X, (float)MouseDownPoint.Y, (float)dims.Width/2);
+            SelectionShape = p;
         }
         public override Rect GetCurrentDimensions(Avalonia.Point pos)
         {
@@ -486,7 +513,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return new Rect(MouseDownPoint.X - radius, MouseDownPoint.Y - radius, 2 * radius, 2*radius);
         }
 
-        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        public override bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary)
         {
             var radius = boundingBox.Width / 2;
             var center = new Avalonia.Point(boundingBox.X + radius, boundingBox.Y + radius);
@@ -505,45 +532,33 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     {
         public List<Avalonia.Point> points;
         public PointerUpdateKind? firstButton;
-        public PolygonSelectionDomain()
+        public PolygonSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "poly_selectDrawingImage";
             Name = "Polygon";
-            s = new Polyline();
             points = new List<Avalonia.Point>();
-            var poly = s as Polyline;
-            poly.Fill = new SolidColorBrush(Color.FromArgb(50, 100, 100, 100));
-            Canvas.SetLeft(poly, 0);
-            Canvas.SetTop(poly, 0);
+            SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
             
         }
 
-        public override Rect GetBoundingBox()
-        {
-            double left = points.Min(x => x.X);
-            double top = points.Min(x => x.Y);
-            double bottom = points.Max(x => x.Y);
-            double right = points.Max(x => x.X);
-            return new Rect(left, top, right - left, bottom - top);
-        }
-
-        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        public override bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary)
         {
             if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
             {
-                var insidePoly = dic.canvasPoints.Count(x => IsPointInPolygon(points, new Avalonia.Point(x.X, x.Y)));
+                var pts = dic.domino.GetPath(expanded: dic.expanded).points;
+                var insidePoly = pts.Count(x => SelectionShape.Contains((float)x.X, (float)x.Y));
                 return CheckBoundary(dic, insidePoly);
             }
             return false;
         }
         bool DoubleClickFlag;
-        public override void MouseDown(object sender, PointerPressedEventArgs e, ProjectCanvas pc)
+        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
             var props = e.GetCurrentPoint(null).Properties;
             if (!((props.PointerUpdateKind ==  PointerUpdateKind.LeftButtonPressed || props.PointerUpdateKind == PointerUpdateKind.RightButtonPressed) &&
                 (props.IsLeftButtonPressed ^ props.IsRightButtonPressed)))
                 return;
-            
+            Debug.WriteLine(points.Count);
             if (points.Count == 0)
             {
                 firstButton = props.PointerUpdateKind;
@@ -555,7 +570,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     CurrentSelectionMode = SelectionMode;
                 }
-                AddSelectionDomain(pc);
+                AddSelectionDomain();
+                points.Add(dominoPoint);
             }
             else if (e.ClickCount == 2)
             {
@@ -565,43 +581,47 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 // selection canceled, clear polygon
                 points.Clear();
-                RemoveSelectionDomain(pc);
+                RemoveSelectionDomain();
                 return;
             }
-            s.Stroke = SelectionColor;
-            s.StrokeThickness = 8;
-            points.Add(e.GetPosition(pc));
-            var poly = s as Polyline;
-            poly.Points = points;
+            points.Add(dominoPoint);
+            UpdatePath();
             
         }
-
-        public override void MouseMove(object sender, PointerEventArgs e, ProjectCanvas pc)
+        private void UpdatePath()
         {
-            if (s == null) return;
-
-            var poly = s as Polyline;
-            if (poly.Points.Count == points.Count)
-                poly.Points.Add(e.GetPosition(pc));
-            else
-                poly.Points[poly.Points.Count - 1] = e.GetPosition(pc);
+            var p = new SKPath();
+            if (points != null && points.Count > 0)
+            {
+                p.MoveTo((float)points[0].X, (float)points[0].Y);
+                foreach (Avalonia.Point point in points.Skip(1))
+                    p.LineTo((float)point.X, (float)point.Y);
+            }
+            SelectionShape = p;
+        }
+        public override void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
+        {
+            if (SelectionShape == null) return;
+            if (points.Count >= SelectionShape.PointCount - 1 && points.Count > 0)
+                points[SelectionShape.PointCount - 1] = dominoPoint;
+            UpdatePath();
         }
 
-        public override List<int> MouseUp(object sender, PointerReleasedEventArgs e, ProjectCanvas pc)
+        public override List<int> MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
             var result = new List<int>();
             if (!DoubleClickFlag)
                 return result;
             DoubleClickFlag = false;
             var boundingBox = GetBoundingBox();
-            for (int i = 0; i < pc.Stones.Count; i++)
+            for (int i = 0; i < parent.Dominoes.Count; i++)
             {
-                if (pc.Stones[i] is DominoInCanvas dic && IsInside(dic, boundingBox, IncludeBoundary))
+                if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, IncludeBoundary))
                 {
                     result.Add(i);
                 }
             }
-            RemoveSelectionDomain(pc);
+            RemoveSelectionDomain();
             points = new List<Avalonia.Point>();
             firstButton = null;
             return result;
@@ -609,32 +629,40 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class FreehandSelectionDomain : TwoClickSelection
     {
-        public FreehandSelectionDomain()
+        List<Avalonia.Point> points;
+        public FreehandSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "freehand_selectDrawingImage";
             Name = "Freehand";
-            s = new Polyline();
+            SelectionShape = new SKPath();
             MouseDownPoint = new Avalonia.Point(-1, -1);
-            var poly = s as Polyline;
-            poly.Fill = new SolidColorBrush(Color.FromArgb(50, 100, 100, 100));
-            Canvas.SetLeft(poly, 0);
-            Canvas.SetTop(poly, 0);
+            SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
+            points = new List<Avalonia.Point>();
 
         }
         public override void Initialize()
         {
-            var poly = s as Polyline;
-            poly.Points = new List<Avalonia.Point>();
-            poly.Points.Add(MouseDownPoint);
+            points.Clear();
+            points.Add(MouseDownPoint);
+            UpdatePath();
+        }
+        private void UpdatePath()
+        {
+            var p = new SKPath();
+            if (points != null && points.Count > 1)
+            {
+                p.MoveTo((float)points[0].X, (float)points[0].Y);
+                foreach (Avalonia.Point point in points.Skip(1))
+                    p.LineTo((float)point.X, (float)point.Y);
+            }
+            SelectionShape = p;
         }
 
-        public override bool IsInside(DominoInCanvas dic, Rect boundingBox, bool includeBoundary)
+        public override bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary)
         {
-            var poly = s as Polyline;
-            var points = poly.Points.ToList();
             if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
             {
-                var insidePoly = dic.canvasPoints.Count(x => IsPointInPolygon(points, new Avalonia.Point(x.X, x.Y)));
+                var insidePoly = dic.canvasPoints.Count(x => SelectionShape.Contains((float)x.X, (float)x.Y));
                 return CheckBoundary(dic, insidePoly);
             }
             return false;
@@ -642,24 +670,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
-            var poly = s as Polyline;
-            var last = poly.Points.Last();
-            Debug.WriteLine("Hit, Length: " + poly.Points.Count);
+            var last = points.Last();
+            Debug.WriteLine("Hit, Length: " + points.Count);
             if ((last.X - pos.X) * (last.X - pos.X) + (last.Y - pos.Y) * (last.Y - pos.Y) > 3)
             {
-                
-                poly.Points.Add(pos);
+                points.Add(pos);
+                UpdatePath();
             }
-        }
-        public override Rect GetBoundingBox()
-        {
-            var poly = s as Polyline;
-            var points = poly.Points;
-            double left = points.Min(x => x.X);
-            double top = points.Min(x => x.Y);
-            double bottom = points.Max(x => x.Y);
-            double right = points.Max(x => x.X);
-            return new Rect(left, top, right - left, bottom - top);
         }
     }
     public class DisplaySettingsToolVM : EditingToolVM
@@ -671,7 +688,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private Image<Emgu.CV.Structure.Bgra, byte> FilteredMat;
 
         private ProjectCanvas _DominoProject;
-        public ProjectCanvas DominoProject
+        /*public ProjectCanvas DominoProject
         {
             get { return _DominoProject; }
             set
@@ -686,17 +703,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     RaisePropertyChanged();
                     //_DominoProject.SizeChanged += _DominoProject_SizeChanged;
 
-                    _DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    _DominoProject.VerticalAlignment = VerticalAlignment.Stretch;
+                    //_DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    //_DominoProject.VerticalAlignment = VerticalAlignment.Stretch;
                 }
             }
-        }
+        }*/
         public DisplaySettingsToolVM(EditProjectVM parent)
         {
             Image = "display_settingsDrawingImage";
             Name = "View Properties";
             this.parent = parent;
-            PossiblePastePositions = new List<DominoInCanvas>();
             ShowImageClick = new RelayCommand(o => { ShowImage(); });
 
             if (parent.CurrentProject != null && parent.CurrentProject.PrimaryImageTreatment != null)
@@ -749,7 +765,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _Expanded = value;
                     RaisePropertyChanged();
-                    ResetCanvas();
+                    parent.ResetCanvas();
                 }
             }
         }
@@ -773,7 +789,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 backgroundColor = value;
-                DominoProject.Background = new SolidColorBrush(value);
+                //DominoProject.Background = new SolidColorBrush(value);
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -785,8 +801,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 borderColor = value;
-                DominoProject.UnselectedBorderColor = BorderColor;
-                DominoProject.SelectedBorderColor = Colors.Blue;
+                RaisePropertyChanged();
+                Redraw();
+            }
+        }
+        private Color selectedColor = Colors.Blue;
+        public Color SelectedColor
+        {
+            get => selectedColor;
+            set
+            {
+                selectedColor = value;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -800,7 +825,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 borderSize = value;
-                DominoProject.BorderSize = BorderSize;
+                //DominoProject.BorderSize = BorderSize;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -813,7 +838,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 opacity = value;
-                DominoProject.OpacityValue = opacity;
+               // DominoProject.OpacityValue = opacity;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -826,7 +851,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 above = value;
-                DominoProject.above = above;
+                //DominoProject.above = above;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -839,14 +864,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (_ZoomValue != value)
                 {
-                    /*if (value < 1) value = 1;
-                    double scale = _DominoProject.LayoutTransform.Value.M11 / _ZoomValue * value;
                     _ZoomValue = value;
-                    _DominoProject.LayoutTransform = new ScaleTransform(scale, scale);
-                    RaisePropertyChanged();*/
+                    RaisePropertyChanged();
                 }
             }
         }
+        private double horizontalOffset;
+
+        public double HorizontalOffset
+        {
+            get { return horizontalOffset; }
+            set { horizontalOffset = value; RaisePropertyChanged(); }
+        }
+
+        private double verticalOffset;
+
+        public double VerticalOffset
+        {
+            get { return verticalOffset; }
+            set { verticalOffset = value; RaisePropertyChanged(); }
+        }
+
         private string PreviewPath
         {
             get
@@ -875,113 +913,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 _DominoProject.RenderTransform = new ScaleTransform(ScaleY, ScaleY);
             _DominoProject.InvalidateVisual();
         }
-        internal void ResetCanvas()
-        {
-            var selectedIndices = parent.selectedDominoes.ToList();
-            parent.selectedDominoes.Clear();
-            if (DominoProject != null)
-            {
-                RemoveStones();
-                DominoProject.PointerPressed -= parent.Canvas_MouseDown;
-                DominoProject.PointerMoved -= parent.Canvas_MouseMove;
-                DominoProject.PointerReleased -= parent.Canvas_MouseUp;
-            }
-            
-            DominoProject = new ProjectCanvas();
-            parent.dominoTransfer = parent.CurrentProject.Generate(new System.Threading.CancellationToken());
-            largestX = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).x2);
-            largestY = parent.dominoTransfer.shapes.Max(x => x.GetContainer(expanded: Expanded).y2);
-            DominoProject.Width = largestX;
-            DominoProject.Height = largestY;
-            DominoProject.PointerPressed += parent.Canvas_MouseDown;
-            DominoProject.PointerMoved += parent.Canvas_MouseMove;
-            DominoProject.PointerReleased += parent.Canvas_MouseUp;
-            DominoProject.Background = new SolidColorBrush(BackgroundColor);
-            DominoProject.UnselectedBorderColor = BorderColor;
-            DominoProject.SelectedBorderColor = Colors.Blue;
-            DominoProject.BorderSize = BorderSize;
-            DominoProject.OriginalImage = FilteredMat;
-            DominoProject.OpacityValue = ImageOpacity;
-            DominoProject.above = above;
-            
-
-            for (int i = 0; i < parent.dominoTransfer.shapes.Count(); i++)
-            {
-                DominoInCanvas dic = new DominoInCanvas(i, parent.dominoTransfer[i], parent.CurrentProject.colors, !Expanded);
-                DominoProject.Stones.Add(dic);
-            }
-            
-            selectedIndices.ForEach(x => parent.AddToSelectedDominoes(x));
-            
-
-            parent.UpdateUIElements();
-        }
+        
         internal void SizeChanged(double width, double height)
         {
             visibleWidth = width;
             visibleHeight = height;
             RefreshTransformation();
         }
-        internal void RemoveStones()
-        {
-            while (DominoProject.Stones.Count > 0)
-            {
-                if (DominoProject.Stones[0] is DominoInCanvas dic)
-                    dic.DisposeStone();
-                DominoProject.Stones.RemoveAt(0);
-            }
-        }
-        public void cleanEvents()
-        {
-            foreach (DominoInCanvas dic in DominoProject.Stones)
-            {
-                dic.DisposeStone();
-            }
-        }
-        public bool SelectDominoVisual(int position)
-        {
-            var dic = DominoProject.Stones[position];
-            if (dic.isSelected == false)
-            {
-                dic.isSelected = true;
-                return true;
-            }
-            return false;
-        }
-        public bool DeSelectDominoVisual(int position)
-        {
-            var dic = DominoProject.Stones[position];
-            if (dic.isSelected == true)
-            {
-                dic.isSelected = false;
-                return true;
-            }
-            return false;
-        }
-        private List<DominoInCanvas> PossiblePastePositions;
-        public void HighlightPastePositions(int[] validPositions)
-        {
-            PossiblePastePositions = new List<DominoInCanvas>();
-            foreach (int i in validPositions)
-            {
-                var dic = DominoProject.Stones[i];
-                dic.PossibleToPaste = true;
-                PossiblePastePositions.Add(dic);
-            }
-            Redraw();
-        }
-        public void ClearPastePositions()
-        {
-            foreach (DominoInCanvas dic in PossiblePastePositions)
-            {
-                dic.PossibleToPaste = false;
-            }
-            PossiblePastePositions.Clear();
-            Redraw();
-        }
+        
         public void Redraw()
         {
-            DominoProject?.InvalidateVisual();
+            /*DominoProject?.InvalidateVisual();
             bool discrepancy = false;
             if (DominoProject?.Stones == null) return;
             for (int i = 0; i < DominoProject.Stones.Count; i++)
@@ -994,7 +936,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (discrepancy)
             {
                 Errorhandler.RaiseMessage("Discrepancy detected!", "Error", Errorhandler.MessageType.Error);
-            }
+            }*/
         }
         private void ShowImage()
         {
@@ -1021,7 +963,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public bool IsSelected(int i)
         {
-            return DominoProject.Stones[i].isSelected;
+            //return DominoProject.Stones[i].isSelected;
+            return false;
         }
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
@@ -1029,17 +972,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class RulerTool : EditingToolVM
     {
-        public override void KeyPressed(Key key)
+        public override void KeyPressed(KeyEventArgs key)
         {
             base.KeyPressed(key);
         }
-        public override void MouseUp(object sender, PointerReleasedEventArgs e)
+        public override void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            base.MouseUp(sender, e);
+            base.MouseUp(dominoPoint, e);
         }
-        public override void MouseDown(object sender, PointerPressedEventArgs e)
+        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
-            base.MouseDown(sender, e);
+            base.MouseDown(dominoPoint, e);
         }
     }
     public class ZoomToolVM : EditingToolVM

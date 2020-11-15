@@ -50,13 +50,13 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract DominoPath GetPath(double scaling_x, double scaling_y);
+        public abstract DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false);
         /// <summary>
         /// Gibt die Grenze eines Steins als Punktliste zurück, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public DominoPath GetPath(double scaling = 1) { return GetPath(scaling, scaling); }
+        public DominoPath GetPath(double scaling = 1, bool expanded = false) { return GetPath(scaling, scaling, expanded); }
         /// <summary>
         /// 
         /// </summary>

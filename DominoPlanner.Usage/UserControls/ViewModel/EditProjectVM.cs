@@ -17,11 +17,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             HaveBuildtools = dominoProvider.HasProtocolDefinition;
 
             UICursor = null;
-            selectedDominoes = new List<int>();
+            Dominoes = new AvaloniaList<EditingDominoVM>();
+            PossiblePastePositions = new List<int>();
+            selectedDominoes = new AvaloniaList<int>();
             UnsavedChanges = false;
             CurrentProject = dominoProvider;
-            
-            _DominoList = new ObservableCollection<ColorListEntry>();
+            dominoTransfer = dominoProvider.last;
+
+            _DominoList = new AvaloniaList<ColorListEntry>();
 
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
@@ -67,12 +70,29 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
-        internal List<int> selectedDominoes;
-        private int[] selectedColors;
-        private int startindex;
+
+
         internal DominoTransfer dominoTransfer;
 
-        private SelectionToolVM SelectionTool;
+        internal AvaloniaList<int> selectedDominoes;
+        public AvaloniaList<int> SelectedDominoes
+        {
+            get { return selectedDominoes; }
+            set { selectedDominoes = value; RaisePropertyChanged(); }
+        }
+        private int[] selectedColors;
+        private int startindex;
+
+        private AvaloniaList<EditingDominoVM> dominoes;
+
+        public AvaloniaList<EditingDominoVM> Dominoes
+        {
+            get { return dominoes; }
+            set { dominoes = value; RaisePropertyChanged(); }
+        }
+
+
+        private SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
         public ZoomToolVM ZoomTool;
         #endregion
@@ -103,8 +123,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             }
         }
-
-
         private bool _HaveBuildtools;
         public bool HaveBuildtools
         {
@@ -141,10 +159,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return TabItemType.EditProject;
             }
         }
-        private ObservableCollection<ColorListEntry> _DominoList;
-        public ObservableCollection<ColorListEntry> DominoList
+        private AvaloniaList<ColorListEntry> _DominoList;
+        public AvaloniaList<ColorListEntry> DominoList
         {
-            get { return new ObservableCollection<ColorListEntry>(_DominoList.OrderBy(x => x.SortIndex)); }
+            get { return new AvaloniaList<ColorListEntry>(_DominoList.OrderBy(x => x.SortIndex)); }
             set
             {
                 if (_DominoList != value)
@@ -246,10 +264,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         internal void ClearCanvas(bool ClearSelection = true)
         {
-            DisplaySettingsTool.ClearPastePositions();
+            ClearPastePositions();
             if (ClearSelection) ClearFullSelection(true);
-            if (DisplaySettingsTool.DominoProject != null)
-                DisplaySettingsTool.RemoveStones();
+            /*if (DisplaySettingsTool.DominoProject != null)
+                DisplaySettingsTool.RemoveStones();*/
         }
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -326,7 +344,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void Copy()
         {
             if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
-            DisplaySettingsTool.ClearPastePositions();
+            ClearPastePositions();
             if (selectedDominoes.Count < 0)
             {
                 Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
@@ -338,7 +356,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             try
             {
                 int[] validPositions = ((ICopyPasteable)this.CurrentProject).GetValidPastePositions(startindex);
-                DisplaySettingsTool.HighlightPastePositions(validPositions);
+                HighlightPastePositions(validPositions);
             }
             catch (InvalidOperationException ex)
             {
@@ -359,7 +377,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
                 paste.Apply();
                 undoStack.Push(paste);
-                DisplaySettingsTool.ClearPastePositions();
+                ClearPastePositions();
                 UpdateUIElements();
             }
             catch (InvalidOperationException ex)
@@ -392,7 +410,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(undoFilter is EditingActivatedOperation || undoFilter is SelectionOperation || undoFilter is SetColorOperation) )
             {
                 ClearCanvas(false);
-                DisplaySettingsTool.ResetCanvas();
+                ResetCanvas();
                 if (undoStack.Count == 0) UnsavedChanges = false;
             }
             else
@@ -420,16 +438,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(redoFilter is EditingDeactivatedOperation || redoFilter is SelectionOperation || redoFilter is SetColorOperation))
             {
                 ClearCanvas(false);
-                DisplaySettingsTool.ResetCanvas();
+                ResetCanvas();
             }
             else
             {
                 UpdateUIElements();
             }
         }
-        internal void PressedKey(Key key)
+        internal void PressedKey(object sender, KeyEventArgs args)
         {
-            SelectedTool.KeyPressed(key);
+            SelectedTool.KeyPressed(args);
         }
         internal override void ResetContent()
         {
@@ -459,7 +477,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(addRows);
                         
-                        DisplaySettingsTool.ResetCanvas();
+                        ResetCanvas();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
                     }
@@ -488,7 +506,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(addRows);
                        
-                        DisplaySettingsTool.ResetCanvas();
+                        ResetCanvas();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
                     }
@@ -516,7 +534,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(deleteRows);
                         
-                        DisplaySettingsTool.ResetCanvas();
+                        ResetCanvas();
                     }
                 }
                 else
@@ -541,7 +559,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
                         ClearCanvas();
                         ExecuteOperation(deleteColumns);
-                        DisplaySettingsTool.ResetCanvas();
+                        ResetCanvas();
                     }
                 }
                 else
@@ -589,23 +607,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 PhysicalHeight = dominoTransfer.physicalHeight;
             }
         }
-
-        private void Dic_MouseDown(object sender, PointerPressedEventArgs e)
-        {
-            DominoInCanvas dic = (DominoInCanvas)sender;
-            var update = e.GetCurrentPoint(null).Properties;
-            if (update.IsLeftButtonPressed)
-            {
-                if (IsSelected(dic.idx))
-                {
-                    SelectionTool.Select(new int[] { dic.idx }, true);
-                }
-            }
-            else if (update.IsRightButtonPressed)
-            {
-                SelectionTool.Select(new int[] { dic.idx }, false);
-            }
-        }
         private void SelectAllStonesWithColor()
         {
             if (SelectedColor == null) return;
@@ -627,24 +628,29 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        internal void Canvas_MouseDown(object sender, PointerPressedEventArgs e)
+        internal void Canvas_MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
-            SelectedTool?.MouseDown(sender, e);
+            SelectedTool?.MouseDown(dominoPoint, e);
         }
 
-        internal void Canvas_MouseMove(object sender, PointerEventArgs e)
+        internal void Canvas_MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
         {
-            SelectedTool?.MouseMove(sender, e);
+            SelectedTool?.MouseMove(dominoPoint, e);
         }
 
-        internal void Canvas_MouseUp(object sender, PointerReleasedEventArgs e)
+        internal void Canvas_MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            SelectedTool?.MouseUp(sender, e);
+            SelectedTool?.MouseUp(dominoPoint, e);
             UpdateUIElements();
+        }
+        internal void Canvas_MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e)
+        {
+            SelectedTool?.MouseWheel(dominoPoint, e);
+            
         }
         public void AddToSelectedDominoes(int i)
         {
-            if (DisplaySettingsTool.SelectDominoVisual(i))
+            if (SelectDominoVisual(i))
             { 
                 selectedDominoes.Add(i);
                 selectedColors[dominoTransfer[i].color]++;
@@ -652,7 +658,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void RemoveFromSelectedDominoes(int i)
         {
-            if (DisplaySettingsTool.DeSelectDominoVisual(i))
+            if (DeSelectDominoVisual(i))
             {
                 selectedDominoes.Remove(i);
                 selectedColors[dominoTransfer[i].color]--;
@@ -661,6 +667,64 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public bool IsSelected(int i)
         {
             return DisplaySettingsTool.IsSelected(i);
+        }
+        internal void ResetCanvas()
+        {
+            if (CurrentProject.last == null)
+            {
+                return;
+            }
+            for (int i = 0; i < CurrentProject.last.shapes.Count(); i++)
+            {
+                EditingDominoVM dic = new EditingDominoVM(i, CurrentProject.last[i], CurrentProject.colors, DisplaySettingsTool.Expanded);
+                Dominoes.Add(dic);
+            }
+            Dominoes = Dominoes;
+        }
+        internal void Redraw()
+        {
+            Dominoes = Dominoes;
+        }
+        private List<int> PossiblePastePositions;
+        public void HighlightPastePositions(int[] validPositions)
+        {
+            PossiblePastePositions = new List<int>();
+            foreach (int i in validPositions)
+            {
+                var dic = Dominoes[i];
+                dic.PossibleToPaste = true;
+                PossiblePastePositions.Add(i);
+            }
+            Redraw();
+        }
+        public void ClearPastePositions()
+        {
+            foreach (int i in PossiblePastePositions)
+            {
+                Dominoes[i].PossibleToPaste = false;
+            }
+            PossiblePastePositions.Clear();
+            Redraw();
+        }
+        public bool SelectDominoVisual(int position)
+        {
+            var dic = Dominoes[position];
+            if (dic.isSelected == false)
+            {
+                dic.isSelected = true;
+                return true;
+            }
+            return false;
+        }
+        public bool DeSelectDominoVisual(int position)
+        {
+            var dic = Dominoes[position];
+            if (dic.isSelected == true)
+            {
+                dic.isSelected = false;
+                return true;
+            }
+            return false;
         }
         #endregion
 
@@ -721,6 +785,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand MouseOutPicture { get { return _MouseOutPicture; } set { if (value != _MouseOutPicture) { _MouseOutPicture = value; } } }
 
         private ICommand _SelectAllCom;
+
         public ICommand SelectAllCom { get { return _SelectAllCom; } set { if (value != _SelectAllCom) { _SelectAllCom = value; } } }
 
         #endregion

@@ -229,12 +229,12 @@ namespace DominoPlanner.Usage
                     if(ShowHistory && SelectedRow - 2 >= 0)
                     {
                         int oldStoneIndex = intField[firstBlockStone + i, SelectedRow - 2];
-                        currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight / 4, ((i + 2) * space) + (i * stoneWidth), 10, fParameters.colors[oldStoneIndex].mediaColor));
+                        //currentBlock.Children.Add(new EditingDominoVM(stoneWidth, stoneHeight / 4, ((i + 2) * space) + (i * stoneWidth), 10, fParameters.colors[oldStoneIndex].mediaColor));
                     }
 
                     int stoneindex = intField[firstBlockStone + i, SelectedRow - 1];
                     if (stoneindex < 0) continue;
-                    currentBlock.Children.Add(new DominoInCanvas(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[stoneindex].mediaColor));
+                    //currentBlock.Children.Add(new EditingDominoVM(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[stoneindex].mediaColor));
                     
                     if (lastColor != intField[firstBlockStone + i, SelectedRow - 1])
                     {
