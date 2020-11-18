@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 { 
@@ -54,7 +55,7 @@ namespace DominoPlanner.Core
             OnPropertyChanged(propertyName);
             return true;
         }
-        public abstract void Apply(Image<Emgu.CV.Structure.Bgra, byte> input);
+        public abstract void Apply(SKBitmap input);
         public void OnPropertyChanged(string propertyname)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));

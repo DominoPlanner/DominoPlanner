@@ -34,9 +34,7 @@ namespace DominoPlanner.Core
 
         public void AddToPixel(IDominoShape shape, int r, int g, int b)
         {
-            shape.PrimaryDitherColor.Red = Saturate(shape.PrimaryDitherColor.Red + r);
-            shape.PrimaryDitherColor.Blue = Saturate(shape.PrimaryDitherColor.Blue + b);
-            shape.PrimaryDitherColor.Green = Saturate(shape.PrimaryDitherColor.Green + g);
+            shape.PrimaryDitherColor = new SkiaSharp.SKColor((byte)Saturate(shape.PrimaryDitherColor.Red + r), (byte)Saturate(shape.PrimaryDitherColor.Blue + b), (byte)Saturate(shape.PrimaryDitherColor.Green + g));
         }
         double Saturate(double input)
         {

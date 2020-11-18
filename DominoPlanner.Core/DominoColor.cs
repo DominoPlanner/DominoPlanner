@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using ProtoBuf;
 using System.IO;
 using System.ComponentModel;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -26,8 +27,8 @@ namespace DominoPlanner.Core
             }
             set { mediaColor = Color.Parse(value); }
         }
-        internal Emgu.CV.Structure.Lab labColor;
-        public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
+        internal Lab labColor;
+        public abstract double distance(SKColor color, IColorComparison comp, byte transparencyThreshold);
         private Color _mediacolor;
         [DisplayName ("Color")]
         public Color mediaColor
@@ -89,7 +90,7 @@ namespace DominoPlanner.Core
         {
             get { return true; }
         }
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
+        public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {
             if (color.Alpha < transparencyThreshold)
                 return 0;
@@ -109,11 +110,11 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor = true)]
     public class DominoColor : IDominoColor
     {
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
+        public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {
             if (count == 0)
                 return Int32.MaxValue;
-            return comp.Distance(color.ToLab(), labColor);
+            return comp.Distance(color.SKToLab(), labColor);
         }
         public DominoColor(XElement source, int old_version)
         {

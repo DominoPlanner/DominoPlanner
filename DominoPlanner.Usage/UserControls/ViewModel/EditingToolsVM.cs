@@ -720,7 +720,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (parent.CurrentProject.PrimaryImageTreatment.FilteredImage != null)
                 {
                     FilteredImage = parent.CurrentProject.PrimaryImageTreatment.FilteredImage;
-                    FilteredMat = parent.CurrentProject.PrimaryImageTreatment.imageFiltered.ToImage<Emgu.CV.Structure.Bgra, byte>();
                 }
                 else
                 {
@@ -731,8 +730,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         string absolutePath = Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject);
                         if (File.Exists(absolutePath))
                         {
-                            //FilteredImage = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(absolutePath);
-                            FilteredMat = new Image<Emgu.CV.Structure.Bgra, byte>(absolutePath);
+                            FilteredImage = SKBitmap.Decode(absolutePath);
                             bff.FilePath = relativePath;
                         }
                     }
@@ -740,16 +738,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             Expandable = parent.CurrentProject is FieldParameters;
         }
-        private System.Drawing.Bitmap _FilteredImage;
+        private SKBitmap _FilteredImage;
 
-        public System.Drawing.Bitmap FilteredImage
+        public SKBitmap FilteredImage
         {
             get { return _FilteredImage; }
             set
             {
                 if (_FilteredImage != value)
                 {
+                    
                     _FilteredImage = value;
+                    
                     RaisePropertyChanged();
                 }
             }
@@ -838,7 +838,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 opacity = value;
-               // DominoProject.OpacityValue = opacity;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -851,7 +850,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 above = value;
-                //DominoProject.above = above;
                 RaisePropertyChanged();
                 Redraw();
             }
@@ -944,7 +942,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (!File.Exists(PreviewPath))
                 {
-                    FilteredImage.Save(PreviewPath);
+                    using (var image = SKImage.FromBitmap(FilteredImage))
+                    using (var data = image.Encode(SKEncodedImageFormat.Png, 80))
+                    {
+                        // save the data to a stream
+                        using (var stream = File.OpenWrite(PreviewPath))
+                        {
+                            data.SaveTo(stream);
+                        }
+                    }
                 }
                 Process.Start(PreviewPath);
             }
@@ -968,7 +974,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
-
     }
     public class RulerTool : EditingToolVM
     {

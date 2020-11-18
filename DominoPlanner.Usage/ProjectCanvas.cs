@@ -121,9 +121,28 @@ namespace DominoPlanner.Usage
             get { return (AvaloniaList<int>)GetValue(SelectedDominoesProperty); }
             set { SetValue(SelectedDominoesProperty, value); }
         }
-
         public static readonly StyledProperty<AvaloniaList<int>> SelectedDominoesProperty = AvaloniaProperty.Register<ProjectCanvas, AvaloniaList<int>>(nameof(SelectedDominoes));
 
+        public SKBitmap SourceImage
+        {
+            get { return GetValue(SourceImageProperty); }
+            set { SetValue(SourceImageProperty, value); }
+        }
+        public static readonly StyledProperty<SKBitmap> SourceImageProperty = AvaloniaProperty.Register<ProjectCanvas, SKBitmap>(nameof(SourceImage));
+
+        public float SourceImageOpacity
+        {
+            get { return GetValue(SourceImageOpacityProperty); }
+            set { SetValue(SourceImageOpacityProperty, value); }
+        }
+        public static readonly StyledProperty<float> SourceImageOpacityProperty = AvaloniaProperty.Register<ProjectCanvas, float>(nameof(SourceImageOpacity), 0.2f);
+
+        public bool SourceImageAbove
+        {
+            get { return GetValue(SourceImageAboveProperty); }
+            set { SetValue(SourceImageAboveProperty, value); }
+        }
+        public static readonly StyledProperty<bool> SourceImageAboveProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof(SourceImageAbove));
 
         public double ProjectHeight { get; set; }
 
@@ -133,7 +152,7 @@ namespace DominoPlanner.Usage
 
         public double BorderSize;
 
-        public Image<Emgu.CV.Structure.Bgra, byte> OriginalImage;
+        public SKBitmap OriginalImage;
 
         public bool above;
         private double opacity_value;
@@ -157,10 +176,22 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(SelectionDomainProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainVisibleProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainColorProperty);
-            
+            ProjectProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => ProjectChanged(o, e));
+            SourceImageProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged(o, e));
+            SourceImageOpacityProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged(o, e));
         }
 
+        private void SourceImageChanged(ProjectCanvas o, object e)
+        {
+            OriginalImage = SourceImage.Copy();
+            ImageExtensions.OpacityReduction(OriginalImage, SourceImageOpacity);
+        }
 
+        private void ProjectChanged(ProjectCanvas o, object e)
+        {
+            this.ProjectHeight = Project.Max(x => x.canvasPoints.Max(y => y.Y));
+            this.ProjectWidth = Project.Max(x => x.canvasPoints.Max(y => y.X));
+        }
 
         private void SubscribeEvents(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
         {
@@ -332,6 +363,9 @@ namespace DominoPlanner.Usage
         private SKColor selectionColor;
         private AvaloniaList<EditingDominoVM> project;
         private AvaloniaList<int> selected;
+        private SKBitmap bitmap;
+        private float ProjectHeight;
+        private float ProjectWidth; 
 
         public Rect Bounds { get; set; }
         public TransformedBounds? TightBounds { get; set; }
@@ -356,9 +390,13 @@ namespace DominoPlanner.Usage
             this.project = pc.Project;
             // Transform the selection path into screen coordinates
             var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
+            this.ProjectHeight = (float)pc.ProjectHeight;
+            this.ProjectWidth = (float)pc.ProjectWidth;
+            this.
 
             selectionPath?.Transform(transform);
             selectionVisible = pc.SelectionDomainVisible;
+            bitmap = pc.OriginalImage;
         }
 
         public void Dispose()
@@ -371,6 +409,7 @@ namespace DominoPlanner.Usage
 
         public void Render(IDrawingContextImpl context)
         {
+            
             var canvas = (context as ISkiaDrawingContextImpl)?.SkCanvas;
             if (canvas == null)
             {
@@ -382,6 +421,7 @@ namespace DominoPlanner.Usage
                 return;
 
             canvas.Save();
+            DrawImage(canvas);
             for (int i = 0; i < project.Count; i++)
             {
                 DrawDomino(canvas, project[i]);
@@ -391,9 +431,21 @@ namespace DominoPlanner.Usage
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
             }
+            
+            
             canvas.Restore();
 
 
+        }
+        private void DrawImage(SKCanvas canvas)
+        {
+            if (bitmap == null)
+                return;
+            var height = Bounds.Height / ProjectHeight / zoom * bitmap.Height;
+            var width = Bounds.Width / ProjectWidth / zoom * bitmap.Width;
+            var x = shift_x / ProjectWidth * bitmap.Width;
+            var y = shift_y / ProjectHeight * bitmap.Height;
+            canvas.DrawBitmap(bitmap, new SKRect(x, y, (float)(width + x), (float)(height+y)), new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height));
         }
         public SKPoint PointToDisplaySkiaPoint(Avalonia.Point p)
         {

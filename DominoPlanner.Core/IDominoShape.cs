@@ -1,6 +1,7 @@
 ﻿using DominoPlanner.Core.RTree;
 using Emgu.CV.Structure;
 using ProtoBuf;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,13 +166,13 @@ namespace DominoPlanner.Core
         {
             return GetContainer();
         }
-        Bgra _originalColor;
-        public Bgra PrimaryOriginalColor
+        SKColor _originalColor;
+        public SKColor PrimaryOriginalColor
         {
             get { return _originalColor; }
             set { _originalColor = value;  PrimaryDitherColor = PrimaryOriginalColor; }
         }
-        public Bgra PrimaryDitherColor;
+        public SKColor PrimaryDitherColor;
 
         private int _color;
         public event EventHandler ColorChanged;

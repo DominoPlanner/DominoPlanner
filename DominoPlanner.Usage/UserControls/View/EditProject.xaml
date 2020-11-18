@@ -183,7 +183,11 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
                             UnselectedBorderColor="{Binding DisplaySettingsTool.BorderColor}"
                             SelectionDomain="{Binding SelectionTool.CurrentSelectionDomain.SelectionShape}" 
                             SelectionDomainColor="{Binding SelectionTool.CurrentSelectionDomain.CurrentSelectionMode, Converter={StaticResource SelectionModeColorConverter}}"
-                            SelectionDomainVisible="{Binding SelectionTool.CurrentSelectionDomain.SelectionPathVisible}" x:Name="ProjectCanvas"/>
+                            SelectionDomainVisible="{Binding SelectionTool.CurrentSelectionDomain.SelectionPathVisible}" 
+                            SourceImage="{Binding DisplaySettingsTool.FilteredImage}"
+                            SourceImageOpacity="{Binding DisplaySettingsTool.ImageOpacity}"
+                            SourceImageAbove="{Binding DisplaySettingsTool.Above}"
+                              x:Name="ProjectCanvas"/>
         </Border>
       </Grid>
       <!--

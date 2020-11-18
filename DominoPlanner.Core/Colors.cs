@@ -1,15 +1,23 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {
+    public struct Lab
+    {
+        public double X, Y, Z;
+        public Lab(double X, double Y, double Z)
+        {
+            this.X = X; this.Y = Y; this.Z = Z;
+        }
+    }
     static class ColorExtension
     {
-        private static Lab ToLab(this Bgr color)
+        public static Lab SKToLab(this SKColor color)
         {
             double r = color.Red / 255,
                 g = color.Green / 255,
@@ -33,11 +41,7 @@ namespace DominoPlanner.Core
         }
         public static Lab ToLab(this Avalonia.Media.Color color)
         {
-            return new Bgr(color.B, color.G, color.R).ToLab();
-        }
-        public static Lab ToLab(this Bgra color)
-        {
-            return new Bgr(color.Blue, color.Green, color.Red).ToLab();
+            return new SKColor(color.R, color.G, color.B).SKToLab();
         }
     }
     public interface IColorComparison
@@ -185,7 +189,7 @@ namespace DominoPlanner.Core
 
         private readonly double _lightness = 2;
         private readonly double _chroma = 1;
-        public double Distance(Emgu.CV.Structure.Lab lab1, Emgu.CV.Structure.Lab lab2)
+        public double Distance(Lab lab1, Lab lab2)
         {
             var deltaL = lab1.X - lab2.X;
             var h = Math.Atan2(lab1.Z, lab1.Y);
