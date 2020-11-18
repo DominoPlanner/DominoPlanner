@@ -782,16 +782,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private Color backgroundColor = Colors.Transparent;
+        private Color backgroundColor = Color.FromArgb(255, 255, 255, 0);
         public Color BackgroundColor
         {
             get => backgroundColor;
             set
             {
                 backgroundColor = value;
-                //DominoProject.Background = new SolidColorBrush(value);
                 RaisePropertyChanged();
-                Redraw();
             }
         }
         private Color borderColor = Color.FromArgb(50, 0, 0, 255);

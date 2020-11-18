@@ -674,6 +674,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 return;
             }
+            Dominoes.Clear();
             for (int i = 0; i < CurrentProject.last.shapes.Count(); i++)
             {
                 EditingDominoVM dic = new EditingDominoVM(i, CurrentProject.last[i], CurrentProject.colors, DisplaySettingsTool.Expanded);

@@ -144,24 +144,28 @@ namespace DominoPlanner.Usage
         }
         public static readonly StyledProperty<bool> SourceImageAboveProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof(SourceImageAbove));
 
+        public Color BackgroundColor
+        {
+            get { return GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
+        }
+        public static readonly StyledProperty<Color> BackgroundColorProperty = AvaloniaProperty.Register<ProjectCanvas, Color>(nameof(BackgroundColor), Colors.Transparent);
+
+        public float BorderSize
+        {
+            get { return GetValue(BorderSizeProperty); }
+            set { SetValue(BorderSizeProperty, value); }
+        }
+
+        public static readonly StyledProperty<float> BorderSizeProperty = AvaloniaProperty.Register<ProjectCanvas, float>(nameof(BorderSize));
+
+
         public double ProjectHeight { get; set; }
 
         public double ProjectWidth { get; set; }
 
-
-
-        public double BorderSize;
-
         public SKBitmap OriginalImage;
 
-        public bool above;
-        private double opacity_value;
-
-        public double OpacityValue
-        {
-            get { return opacity_value; }
-            set { opacity_value = value; }
-        }
         public ProjectCanvas()
         {
             AffectsRender<ProjectCanvas>(ShiftXProperty);
@@ -176,21 +180,31 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(SelectionDomainProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainVisibleProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainColorProperty);
+            AffectsRender<ProjectCanvas>(SourceImageOpacityProperty);
+            AffectsRender<ProjectCanvas>(SourceImageProperty);
+            AffectsRender<ProjectCanvas>(SourceImageAboveProperty);
             ProjectProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => ProjectChanged(o, e));
             SourceImageProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged(o, e));
             SourceImageOpacityProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged(o, e));
+            SourceImageAboveProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged(o, e));
+            AffectsRender<ProjectCanvas>(BackgroundColorProperty);
+            AffectsRender<ProjectCanvas>(UnselectedBorderColorProperty);
+            AffectsRender<ProjectCanvas>(BorderSizeProperty);
         }
 
         private void SourceImageChanged(ProjectCanvas o, object e)
         {
-            OriginalImage = SourceImage.Copy();
-            ImageExtensions.OpacityReduction(OriginalImage, SourceImageOpacity);
+            if (SourceImage!= null)
+                OriginalImage = SourceImage.Copy();
         }
 
         private void ProjectChanged(ProjectCanvas o, object e)
         {
-            this.ProjectHeight = Project.Max(x => x.canvasPoints.Max(y => y.Y));
-            this.ProjectWidth = Project.Max(x => x.canvasPoints.Max(y => y.X));
+            if (Project != null)
+            {
+                this.ProjectHeight = Project.Max(x => x.canvasPoints.Max(y => y.Y));
+                this.ProjectWidth = Project.Max(x => x.canvasPoints.Max(y => y.X));
+            }
         }
 
         private void SubscribeEvents(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
@@ -240,6 +254,7 @@ namespace DominoPlanner.Usage
 
             base.OnPointerWheelChanged(e);
             var delta = e.Delta.Y;
+            Debug.WriteLine("Delta = " + e.Delta);
             if (e.KeyModifiers == KeyModifiers.Control)
             {
                 Debug.WriteLine("Raw position: " + e.GetPosition(this));
@@ -255,9 +270,9 @@ namespace DominoPlanner.Usage
                 
                 newy = (p.Y - e.GetPosition(this).Y / Zoom);
             }
-            else if (e.KeyModifiers == KeyModifiers.Shift)
+            else if (e.KeyModifiers == KeyModifiers.Shift || e.Delta.X != 0)
             {
-                newx = oldx - 100 * delta;
+                newx = oldx - 100 * (e.Delta.X + e.Delta.Y);
             }
             else
             {
@@ -365,7 +380,11 @@ namespace DominoPlanner.Usage
         private AvaloniaList<int> selected;
         private SKBitmap bitmap;
         private float ProjectHeight;
-        private float ProjectWidth; 
+        private float ProjectWidth;
+        private byte bitmapopacity;
+        private bool above;
+        private SKColor background;
+        private float BorderSize;
 
         public Rect Bounds { get; set; }
         public TransformedBounds? TightBounds { get; set; }
@@ -392,11 +411,14 @@ namespace DominoPlanner.Usage
             var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
             this.ProjectHeight = (float)pc.ProjectHeight;
             this.ProjectWidth = (float)pc.ProjectWidth;
-            this.
+            this.above = pc.SourceImageAbove;
+            this.background = new SKColor(pc.BackgroundColor.R, pc.BackgroundColor.G, pc.BackgroundColor.B, pc.BackgroundColor.A);
 
             selectionPath?.Transform(transform);
             selectionVisible = pc.SelectionDomainVisible;
             bitmap = pc.OriginalImage;
+            bitmapopacity = (byte)(pc.SourceImageOpacity * 255);
+            BorderSize = pc.BorderSize;
         }
 
         public void Dispose()
@@ -421,7 +443,13 @@ namespace DominoPlanner.Usage
                 return;
 
             canvas.Save();
-            DrawImage(canvas);
+
+            if (background.Alpha != 0)
+            {
+                canvas.DrawRect(new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), new SKPaint() { Color = background });
+            }
+
+            if (!above) DrawImage(canvas);
             for (int i = 0; i < project.Count; i++)
             {
                 DrawDomino(canvas, project[i]);
@@ -431,8 +459,10 @@ namespace DominoPlanner.Usage
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
             }
-            
-            
+
+
+            if (above) DrawImage(canvas);
+                    
             canvas.Restore();
 
 
@@ -445,7 +475,12 @@ namespace DominoPlanner.Usage
             var width = Bounds.Width / ProjectWidth / zoom * bitmap.Width;
             var x = shift_x / ProjectWidth * bitmap.Width;
             var y = shift_y / ProjectHeight * bitmap.Height;
-            canvas.DrawBitmap(bitmap, new SKRect(x, y, (float)(width + x), (float)(height+y)), new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height));
+            canvas.DrawBitmap(bitmap, 
+            new SKRect(x, y, (float)(width + x), (float)(height+y)), 
+            new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), 
+            new SKPaint() { ColorFilter = SKColorFilter.CreateBlendMode(SKColors.White.WithAlpha(bitmapopacity), SKBlendMode.DstIn) });
+           
+
         }
         public SKPoint PointToDisplaySkiaPoint(Avalonia.Point p)
         {
@@ -464,26 +499,26 @@ namespace DominoPlanner.Usage
         {
             var shape = vm.domino;
             var c = vm.StoneColor;
-            var dp = shape.GetPath(1, false);
+            var dp = vm.canvasPoints;
             // is the domino visible at all?
-            var inside = dp.points.Select(x => new Avalonia.Point(x.X, x.Y)).Sum(x => Bounds.Contains(PointToDisplayAvaloniaPoint(x)) ? 1 : 0);
-            if (inside == dp.points.Length)
+            var inside = dp.Select(x => new Avalonia.Point(x.X, x.Y)).Sum(x => Bounds.Contains(PointToDisplayAvaloniaPoint(x)) ? 1 : 0);
+            if (inside > 0)
             {
                 var path = new SKPath();
-                path.MoveTo(PointToDisplaySkiaPoint(dp.points[0]));
-                foreach (var line in dp.points.Skip(0))
+                path.MoveTo(PointToDisplaySkiaPoint(dp[0]));
+                foreach (var line in dp.Skip(0))
                     path.LineTo(PointToDisplaySkiaPoint(line));
                 path.Close();
 
                 canvas.DrawPath(path, new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
                 if (vm.isSelected)
                 {
-                    canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = 2 * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom}, 10 * zoom) });
+                    canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom}, 10 * zoom) });
                 }
                 else
                 {
 
-                    canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = 1 * zoom });
+                    canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom });
                 }
             }
         }

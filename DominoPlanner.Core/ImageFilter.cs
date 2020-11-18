@@ -309,23 +309,20 @@ namespace DominoPlanner.Core
         }
         public static void OpacityReduction(this SKBitmap input, double opacity)
         {
-
-            IntPtr pixelsAddr = input.GetPixels();
             unsafe
             {
+                var pixels = input.GetPixels(out var length);
+                var ptr = (byte*) pixels.ToPointer();
                 int height = input.Height;
                 int width = input.Width;
-                byte* ptr = (byte*)pixelsAddr.ToPointer();
-                ptr += 3;
                 for (int row = 0; row < height; row++)
                 {
                     for (var col = 0; col < width; col++)
                     {
-                        input.Pixels[row * width ]
-                        var new_opacity = (double)*ptr * opacity;
-                        *ptr = (byte)(new_opacity > 255 ? 255 : new_opacity);
-                        //Debug.Print(*ptr + "");
-                        ptr+=4;
+                        var adress = (ptr + (row * width + col) * 4 + 3);
+                        var value = *adress;
+                        var new_opacity = (double)value * opacity;
+                        *adress = (byte)(new_opacity > 255 ? 255 : new_opacity);
                     }
                 }
             }
