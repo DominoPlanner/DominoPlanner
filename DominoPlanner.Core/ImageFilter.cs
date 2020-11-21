@@ -125,7 +125,15 @@ namespace DominoPlanner.Core
         public string FilePath
         {
             get => _filepath;
-            set { if (SetField(ref _filepath, value)) { mat_valid = false; } }
+            set
+            {
+                if (value.Contains("\\")) value = value.Replace("\\", "/");
+
+                if (SetField(ref _filepath, value))
+                {
+                    mat_valid = false;
+                }
+            }
         }
         public override void UpdateMat()
         {

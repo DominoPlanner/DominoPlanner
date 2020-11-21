@@ -299,14 +299,14 @@ namespace DominoPlanner.Usage
 
             finalImagePath = string.Format("{0}{1}", Path.GetFileNameWithoutExtension(savepath), Path.GetExtension(finalImagePath));
             int counter = 1;
-            while (File.Exists(Path.Combine(Path.GetDirectoryName(savepath), @"..\Source Image", finalImagePath)))
+            while (File.Exists(Path.Combine(Path.GetDirectoryName(savepath), @"../Source Image", finalImagePath)))
             {
                 finalImagePath = $"{Path.GetFileName(savepath)} ({counter}){Path.GetExtension(finalImagePath)}";
                 counter++;
             }
             try
             {
-                File.Copy(InternPictureName, Path.Combine(Path.GetDirectoryName(savepath), @"..\Source Image", finalImagePath));
+                File.Copy(InternPictureName, Path.Combine(Path.GetDirectoryName(savepath), @"../Source Image", finalImagePath));
             }
             catch (IOException)
             {

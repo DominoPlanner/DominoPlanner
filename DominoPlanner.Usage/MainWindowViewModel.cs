@@ -530,7 +530,7 @@ namespace DominoPlanner.Usage
             await new NewProject(curNPVM).ShowDialog(GetWindow());
             if (curNPVM.Close == true)
             {
-                OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}\{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
+                OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}/{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
                 if (newProj == null)
                 {
                     Errorhandler.RaiseMessage("Could not create new Project!", "Error!", Errorhandler.MessageType.Error);

@@ -62,6 +62,8 @@ namespace DominoPlanner.Core
             get => _colorPath;
             set
             {
+                if (value.Contains("\\")) value = value.Replace("\\", "/");
+
                 _colorPath = value;
                 colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
@@ -696,8 +698,20 @@ namespace DominoPlanner.Core
         [ProtoMember(4)]
         public bool Editing { get; private set; }
 
+        private string _ColorPath;
         [ProtoMember(7)]
-        public string ColorPath { get; private set; }
+        public string ColorPath
+        {
+            get
+            {
+                return _ColorPath;
+            }
+
+            private set
+            {
+                _ColorPath = value.Replace("\\", "/");
+            }
+        }
 
         [ProtoMember(3)]
         public bool HasProtocolDefinition { get; private set; }

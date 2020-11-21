@@ -1,4 +1,4 @@
-﻿using ProtoBuf;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -66,6 +66,7 @@ namespace DominoPlanner.Core
             }
             set
             {
+                if (value.Contains("\\")) value = value.Replace("\\", "/");
                 _colorPath = value;
                 Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
@@ -123,6 +124,8 @@ namespace DominoPlanner.Core
             get => _relativePath;
             set
             {
+                if (value.Contains("\\")) value = value.Replace("\\", "/");
+
                 if (value != _relativePath)
                 {
                     if (_obj != null) Workspace.CloseFile(Obj);
@@ -267,7 +270,10 @@ namespace DominoPlanner.Core
             }
             set
             {
-                if (_obj != null) Workspace.CloseFile(Obj);
+               if (value.Contains("\\")) value = value.Replace("\\", "/");
+               
+               if (_obj != null) Workspace.CloseFile(Obj);
+
                 path = value;
                 RelativePathChanged?.Invoke(this, null);
                 _obj = null;

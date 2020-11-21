@@ -348,9 +348,17 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    Bitmap image = new Bitmap(uri);
-                    FileStream fs = new FileStream(uri, FileMode.Open);
-                    return Bitmap.DecodeToWidth(fs, 40, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.HighQuality);
+                    if (uri.StartsWith("/Icons/"))
+                    {
+                        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                        Uri test = new Uri($"avares://DominoPlanner.Usage/Icons/image.ico");
+                        return new Bitmap(assets.Open(test));
+                    }
+                    else
+                    {
+                        FileStream fs = new FileStream(uri, FileMode.Open);
+                        return Bitmap.DecodeToWidth(fs, 40, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.HighQuality);
+                    }
                 }
                 catch { }
             }

@@ -82,13 +82,13 @@ namespace DominoPlanner.Core
             return Instance.resolvedPaths.Where(x => x.reference == reference && x.RelativePath == relativePath).FirstOrDefault();
         }
         public static string AbsolutePathFromReference(ref string relativePath, IWorkspaceLoadable reference)
-        {
+        {   
             bool resolved = false;
             bool createResolution = false;
             string absolutePath = "";
             
             var referenceTuple = Instance.openedFiles.Where(x => x.Item2 == reference).FirstOrDefault();
-            if (new Uri(relativePath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
+            if (Path.IsPathRooted(relativePath))
             {
                 absolutePath = relativePath;
                 resolved = true;
@@ -231,7 +231,7 @@ namespace DominoPlanner.Core
             else
             {
                 // Datei neu erstellt
-                if (!new Uri(filepath, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
+                if (!Path.IsPathRooted(filepath))
                 {
                     throw new IOException("If file will be newly created, save needs an absolute path");
                 }
@@ -260,7 +260,7 @@ namespace DominoPlanner.Core
                 a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.Counts),
                 a => new Tuple<string, int[]>(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(absolutePath), a.ColorPath)), a.Counts)
                 );
-        }
+        } 
         public static Tuple<string, int[]> LoadColorList<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
             return LoadColorList<T>(AbsolutePathFromReference(ref relativePath, reference));
@@ -288,7 +288,7 @@ namespace DominoPlanner.Core
         }
         public static void CloseFile(string path)
         {
-            if (new Uri(path, UriKind.RelativeOrAbsolute).IsAbsoluteUri)
+            if (Path.IsPathRooted(path))
             {
                 Instance.openedFiles.RemoveAll(x => x.Item1 == path);
             }
@@ -320,25 +320,11 @@ namespace DominoPlanner.Core
             if (result.Count() == 0) return null;
             return result.First().Item1;
         }
-        public static String MakeRelativePath(String fromPath, String toPath)
+        public static string MakeRelativePath(string fromPath, string toPath)
         {
-            if (String.IsNullOrEmpty(fromPath)) return toPath;
-            if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
-
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(toPath);
-
-            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
-
-            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
-            {
-                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-            }
-
-            return relativePath;
+            if (string.IsNullOrEmpty(fromPath)) return toPath;
+            if (string.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
+            return Path.GetRelativePath(Path.GetDirectoryName(fromPath), toPath);
         }
         
     }
