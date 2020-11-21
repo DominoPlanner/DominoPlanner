@@ -15,7 +15,7 @@ namespace DominoPlanner.Usage
 
         public Color StoneColor
         {
-            get { return colorRepository[domino.color].mediaColor; }
+            get { return colorRepository[domino.Color].mediaColor; }
         }
 
         private bool _PossibleToPaste;
@@ -33,7 +33,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _isSelected;
-        public bool isSelected
+        public bool IsSelected
         {
             get { return _isSelected; }
             set
@@ -45,7 +45,7 @@ namespace DominoPlanner.Usage
             }
         }
         public bool expanded;
-        public Core.Point[] canvasPoints
+        public Core.Point[] CanvasPoints
         {
             get
             {

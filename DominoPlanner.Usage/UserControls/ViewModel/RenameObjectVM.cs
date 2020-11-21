@@ -112,9 +112,7 @@ namespace DominoPlanner.Usage
 
         private static void OnEnableChanged(AvaloniaPropertyChangedEventArgs e)
         {
-            
-            var frameworkElement = e.Sender as Control;
-            if (frameworkElement == null) return;
+            if (!(e.Sender is Control frameworkElement)) return;
 
             if (e.NewValue is bool == false) return;
 
@@ -133,15 +131,14 @@ namespace DominoPlanner.Usage
         private static void SelectAll(object sender, GotFocusEventArgs e)
         {
             var frameworkElement = e.Source as Control;
-            if (frameworkElement is TextBox)
-                ((TextBox)frameworkElement).SelectAll();
+            if (frameworkElement is TextBox box)
+                box.SelectAll();
         }
 
         private static void IgnoreMouseButton
                 (object sender, PointerPressedEventArgs e)
         {
-            var frameworkElement = sender as Control;
-            if (frameworkElement == null) return;
+            if (!(sender is Control frameworkElement)) return;
             e.Handled = true;
             frameworkElement.Focus();
         }

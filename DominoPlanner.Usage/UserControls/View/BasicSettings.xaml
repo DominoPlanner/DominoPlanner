@@ -39,7 +39,7 @@
     </DataTemplate>
     
   </UserControl.DataTemplates>
-  <Grid ShowGridLines="False" Cursor="{Binding cursor}" Background="#02FFFFFF">
+  <Grid ShowGridLines="False" Cursor="{Binding Cursor}" Background="#02FFFFFF">
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
       <RowDefinition Height="40"/>
@@ -60,10 +60,10 @@
         <Expander Header="Render options" HorizontalAlignment="Stretch" IsExpanded="True">
           <HeaderedContentControl Header="Preview options">
             <local:RenderOptions ShowImageSize="false"
-                                 BackgroundColor="{Binding backgroundColor}"
+                                 BackgroundColor="{Binding BackgroundColor}"
                                  Collapsible="{Binding Collapsible, Mode=OneWay}"
                                  Collapse="{Binding Collapsed}"
-                                 DrawBorders="{Binding draw_borders}"
+                                 DrawBorders="{Binding Draw_borders}"
                                              ></local:RenderOptions>
           </HeaderedContentControl>
         </Expander>

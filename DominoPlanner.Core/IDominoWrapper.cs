@@ -20,15 +20,17 @@ namespace DominoPlanner.Core
     {
         [ProtoMember(3, AsReference = true)]
         public DominoAssembly parent;
-        public virtual int[] counts {get;}
+        public virtual int[] Counts {get;}
         [ProtoMember(1)]
-        List<DominoConnector> outnodes { get; set; }
+        List<DominoConnector> Outnodes { get; set; }
         [ProtoMember(2)]
-        DominoConnector innode { get; set; }
+        DominoConnector Innode { get; set; }
         public IDominoWrapper(DominoAssembly parent)
         {
-            innode = new DominoConnector();
-            innode.next = this;
+            Innode = new DominoConnector
+            {
+                next = this
+            };
             this.parent = parent;
             
         }
@@ -37,19 +39,14 @@ namespace DominoPlanner.Core
             var parentPath = Workspace.Find(futureParent);
             var relPath = Workspace.MakeRelativePath(parentPath, path);
             var deserialized = Workspace.Load<IDominoProvider>(path);
-            switch (deserialized)
+            return deserialized switch
             {
-                case FieldParameters p:
-                    return new FieldNode(relPath, futureParent);
-                case StructureParameters p:
-                    return new StructureNode(relPath, futureParent);
-                case SpiralParameters p:
-                    return new SpiralNode(relPath, futureParent);
-                case CircleParameters p:
-                    return new CircleNode(relPath, futureParent);
-                default:
-                    throw new ArgumentException("Path is not loadable");
-            }
+                FieldParameters _ => new FieldNode(relPath, futureParent),
+                StructureParameters _ => new StructureNode(relPath, futureParent),
+                SpiralParameters _ => new SpiralNode(relPath, futureParent),
+                CircleParameters _ => new CircleNode(relPath, futureParent),
+                _ => throw new ArgumentException("Path is not loadable"),
+            };
         }
     }
     [ProtoContract]
@@ -61,7 +58,7 @@ namespace DominoPlanner.Core
         List<Constraint> constraints;
         private string _colorPath;
         [ProtoMember(3)]
-        public string colorPath
+        public string ColorPath
         {
             get
             {
@@ -70,7 +67,7 @@ namespace DominoPlanner.Core
             set
             {
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
+                Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
             }
         }
         public string AbsoluteColorPath
@@ -80,7 +77,7 @@ namespace DominoPlanner.Core
                 return Workspace.AbsolutePathFromReference(ref _colorPath, this);
             }
         }
-        public ColorRepository colors { get; private set; }
+        public ColorRepository Colors { get; private set; }
         public DominoAssembly()
         {
             children = new ObservableCollection<IDominoWrapper>();
@@ -91,9 +88,10 @@ namespace DominoPlanner.Core
             Workspace.Save(this, relativePath);
         }
         [ProtoAfterDeserialization]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "called by Protobuf.net after Deserialization")]
         private void CheckIntegrity()
         {
-            if (colorPath == null || colors == null)
+            if (ColorPath == null || Colors == null)
             {
                 throw new InvalidDataException("File invalid");
             }
@@ -104,7 +102,7 @@ namespace DominoPlanner.Core
             bool result = false;
             foreach (var s in children.OfType<AssemblyNode>())
             {
-                if (s.obj == assembly) return true;
+                if (s.Obj == assembly) return true;
                 else result = result && ContainsReferenceTo(assembly);
             }
             return result;
@@ -120,18 +118,18 @@ namespace DominoPlanner.Core
     {
         [ProtoMember(1)]
         private string _relativePath;
-        public string relativePath
+        public string RelativePath
         {
             get => _relativePath;
             set
             {
                 if (value != _relativePath)
                 {
-                    if (_obj != null) Workspace.CloseFile(obj);
+                    if (_obj != null) Workspace.CloseFile(Obj);
                     _relativePath = value;
                     _obj = null;
                     RelativePathChanged?.Invoke(this, null);
-                    var res = obj;
+                    _ = Obj;
                 }
             }
         }
@@ -143,7 +141,7 @@ namespace DominoPlanner.Core
             }
         }
         private IDominoProvider _obj;
-        public IDominoProvider obj
+        public IDominoProvider Obj
         {
             get
             {
@@ -154,19 +152,19 @@ namespace DominoPlanner.Core
                 return _obj;
             }
         }
-        public override int[] counts
+        public override int[] Counts
         {
             get
             {
                 if (_obj == null)
                     return Workspace.LoadColorList<IDominoProviderPreview>(AbsolutePath).Item2;
-                return obj.Counts;
+                return Obj.Counts;
             }
         }
         public event EventHandler RelativePathChanged;
         public DocumentNode(string relativePath, DominoAssembly parent) : base(parent)
         {
-            this.relativePath = relativePath;
+            this.RelativePath = relativePath;
             RelativePathChanged += (sender, args) => parent?.Save();
             if (parent != null) // rootnode
                 parent.children.Add(this);
@@ -174,8 +172,8 @@ namespace DominoPlanner.Core
 
         public bool ColorPathMatches(AssemblyNode assy)
         {
-            var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(ref _relativePath, assy.obj);
-            return (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.obj.AbsoluteColorPath));
+            var counts2 = Workspace.LoadColorList<IDominoProviderPreview>(ref _relativePath, assy.Obj);
+            return (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.Obj.AbsoluteColorPath));
         }
     }
     [ProtoContract(SkipConstructor = true)]
@@ -264,12 +262,12 @@ namespace DominoPlanner.Core
             get
             {
                 // update relative path in case it changed
-                var a = AbsolutePath;
+                _ = AbsolutePath;
                 return path;
             }
             set
             {
-                if (_obj != null) Workspace.CloseFile(obj);
+                if (_obj != null) Workspace.CloseFile(Obj);
                 path = value;
                 RelativePathChanged?.Invoke(this, null);
                 _obj = null;
@@ -284,7 +282,7 @@ namespace DominoPlanner.Core
         }
 
         private DominoAssembly _obj;
-        public DominoAssembly obj
+        public DominoAssembly Obj
         {
             get
             {
@@ -304,12 +302,12 @@ namespace DominoPlanner.Core
         }
         public void Save()
         {
-            Workspace.Save(obj);
+            Workspace.Save(Obj);
         }
 
         public bool ColorPathMatches(AssemblyNode other)
         {
-            if (System.IO.Path.GetFullPath(this.obj.AbsoluteColorPath) == System.IO.Path.GetFullPath(other.obj.AbsoluteColorPath))
+            if (System.IO.Path.GetFullPath(this.Obj.AbsoluteColorPath) == System.IO.Path.GetFullPath(other.Obj.AbsoluteColorPath))
                 return true;
             return false;
         }

@@ -1,18 +1,10 @@
-﻿using DominoPlanner.Core;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
+﻿using Avalonia.Controls;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Controls;
 
 namespace DominoPlanner.Usage
 {
@@ -37,7 +29,7 @@ namespace DominoPlanner.Usage
 
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        private ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
+        private readonly ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
         IDominoProvider DominoProvider;
         DominoTransfer dominoTransfer;
         #endregion
@@ -364,8 +356,10 @@ namespace DominoPlanner.Usage
         }
         private void ShowLiveHelper()
         {
-            LiveBuildHelperV lbhv = new LiveBuildHelperV();
-            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY);
+            LiveBuildHelperV lbhv = new LiveBuildHelperV
+            {
+                DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY)
+            };
             lbhv.Show();
         }
 

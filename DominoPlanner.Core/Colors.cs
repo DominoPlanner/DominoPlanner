@@ -48,11 +48,11 @@ namespace DominoPlanner.Core
     {
         double Distance(Lab lab1, Lab lab2);
 
-        ColorComparisonMode colorComparisonMode { get; }
+        ColorComparisonMode ColorComparisonMode { get; }
     }
     public class CieDe2000Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -179,7 +179,7 @@ namespace DominoPlanner.Core
     }
     public class CmcComparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -228,7 +228,7 @@ namespace DominoPlanner.Core
     }
     public class Cie94Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -236,9 +236,9 @@ namespace DominoPlanner.Core
             }
         }
 
-        double Kl = 1.0;
-        double K1 = .045;
-        double K2 = .015;
+        readonly double Kl = 1.0;
+        readonly double K1 = .045;
+        readonly double K2 = .015;
         public double Distance(Lab lab1, Lab lab2)
         {
 
@@ -269,7 +269,7 @@ namespace DominoPlanner.Core
     }
     public class Cie1976Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode {
+        ColorComparisonMode IColorComparison.ColorComparisonMode {
             get
             {
                 return ColorComparisonMode.Cie76;

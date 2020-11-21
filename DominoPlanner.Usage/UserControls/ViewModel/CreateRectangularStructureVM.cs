@@ -137,7 +137,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 _selectedStructureElement = value;
-                currentStructure.structureDefinitionXML = value;
+                currentStructure.StructureDefinitionXML = value;
             }
         }
         #endregion

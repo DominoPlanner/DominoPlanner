@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using Avalonia.Media;
-using Emgu.CV;
 using SkiaSharp;
 
 namespace DominoPlanner.Core
@@ -22,14 +21,14 @@ namespace DominoPlanner.Core
         {
             get
             {
-                if (last == null) return null;
+                if (Last == null) return null;
                 //if (!Editing && !lastValid) throw new InvalidOperationException("Unreflected changes in this object, please recalculate to get counts");
                 int[] counts = new int[colors.Length];
-                if (last != null)
+                if (Last != null)
                 {
-                    foreach (var shape in last.shapes)
+                    foreach (var shape in Last.shapes)
                     {
-                        counts[shape.color]++;
+                        counts[shape.Color]++;
                     }
                 }
                 return counts;
@@ -42,16 +41,14 @@ namespace DominoPlanner.Core
             get
             {
                 SKSurface surf = SKSurface.Create(new SKImageInfo(256, 256));
-                if (last != null && last.colors != null)
+                if (Last != null && Last.colors != null)
                 {
-                    surf = last.GenerateImage(256);
+                    surf = Last.GenerateImage(256);
                 }
                 var image = surf.Snapshot().Encode();
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    image.SaveTo(memoryStream);
-                    return memoryStream.ToArray();
-                }
+                using MemoryStream memoryStream = new MemoryStream();
+                image.SaveTo(memoryStream);
+                return memoryStream.ToArray();
 
             }
         }
@@ -134,9 +131,9 @@ namespace DominoPlanner.Core
                 {
                     _primaryCalculation = value;
                     _primaryCalculation.LastValid = false;
-                    if (_primaryCalculation is UncoupledCalculation)
+                    if (_primaryCalculation is UncoupledCalculation calculation)
                     {
-                        ((UncoupledCalculation)_primaryCalculation).StateReference = StateReference.Before;
+                        calculation.StateReference = StateReference.Before;
                     }
                     if (_primaryCalculation is CoupledCalculation)
                     {
@@ -156,22 +153,22 @@ namespace DominoPlanner.Core
                 {
                     _secondaryCalculation = value;
                     _secondaryCalculation.LastValid = false;
-                    if (_secondaryCalculation is UncoupledCalculation)
+                    if (_secondaryCalculation is UncoupledCalculation calculation)
                     {
-                        ((UncoupledCalculation)_secondaryCalculation).StateReference = StateReference.After;
+                        calculation.StateReference = StateReference.After;
                     }
                 }
             }
         }
         [ProtoMember(23)]
         public Orientation FieldPlanDirection { get; set; } = Orientation.Horizontal;
-        protected bool lastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
+        protected bool LastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
         #endregion
         #region internal vars
         protected int charLength;
         private DominoTransfer _last;
         [ProtoMember(2)]
-        public DominoTransfer last
+        public DominoTransfer Last
         {
             get => _last;
             set
@@ -206,7 +203,7 @@ namespace DominoPlanner.Core
         /// <returns>Einen DominoTransfer, der alle Informationen über das fertige Objekt erhält.</returns>
         public virtual DominoTransfer Generate(CancellationToken ct, IProgress<string> progressIndicator = null)
         {
-            if (Editing) return last;
+            if (Editing) return Last;
             ct.ThrowIfCancellationRequested();
             if (!shapesValid)
             {
@@ -217,14 +214,14 @@ namespace DominoPlanner.Core
                 if (SecondaryImageTreatment != null)
                     SecondaryImageTreatment.colorsValid = false;
             }
-            last.colors = colors;
+            Last.colors = colors;
 
             ct.ThrowIfCancellationRequested();
             if (SecondaryImageTreatment != null && !SecondaryImageTreatment.colorsValid)
             {
 
                 SecondaryImageTreatment.parent = this;
-                SecondaryImageTreatment.FillDominos(last);
+                SecondaryImageTreatment.FillDominos(Last);
                 SecondaryCalculation.LastValid = false;
                 if (PrimaryCalculation is CoupledCalculation)
                 {
@@ -236,23 +233,23 @@ namespace DominoPlanner.Core
             if (!PrimaryImageTreatment.colorsValid)
             {
                 PrimaryImageTreatment.parent = this;
-                PrimaryImageTreatment.FillDominos(last);
+                PrimaryImageTreatment.FillDominos(Last);
                 PrimaryImageTreatment.colorsValid = true;
                 PrimaryCalculation.LastValid = false;
             }
             ct.ThrowIfCancellationRequested();
             if (!PrimaryCalculation.LastValid)
             {
-                PrimaryCalculation.Calculate(last, charLength, ct);
+                PrimaryCalculation.Calculate(Last, charLength, ct);
                 PrimaryCalculation.LastValid = true;
             }
             ct.ThrowIfCancellationRequested();
             if (!SecondaryCalculation.LastValid)
             {
-                SecondaryCalculation.Calculate(last, charLength, ct);
+                SecondaryCalculation.Calculate(Last, charLength, ct);
                 SecondaryCalculation.LastValid = true;
             }
-            return last;
+            return Last;
         }
         public DominoTransfer Generate()
         {
@@ -298,11 +295,13 @@ namespace DominoPlanner.Core
         public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             int[,] dominoes = GetBaseField(o, MirrorX, MirrorY);
-            
-            ProtocolTransfer d = new ProtocolTransfer();
-            d.dominoes = new List<List<Tuple<int, int>>>[dominoes.GetLength(1)];
-            d.orientation = o;
-            d.colors = colors;
+
+            ProtocolTransfer d = new ProtocolTransfer
+            {
+                dominoes = new List<List<Tuple<int, int>>>[dominoes.GetLength(1)],
+                orientation = o,
+                colors = colors
+            };
             for (int i = 0; i < dominoes.GetLength(1); i++) // foreach line
             {
                 int posX = 0;
@@ -341,8 +340,8 @@ namespace DominoPlanner.Core
         public virtual int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!HasProtocolDefinition) throw new InvalidOperationException("This object does not have a protocol definition.");
-            if (!Editing && (!lastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
-            int[,] basefield = new int[last.FieldPlanLength, last.FieldPlanHeight];
+            if (!Editing && (!LastValid || !shapesValid)) throw new InvalidOperationException("This object has unreflected changes.");
+            int[,] basefield = new int[Last.FieldPlanLength, Last.FieldPlanHeight];
             for (int i = 0; i < basefield.GetLength(0); i++)
             {
                 for (int j = 0; j < basefield.GetLength(1); j++)
@@ -350,11 +349,11 @@ namespace DominoPlanner.Core
                     basefield[i, j] = -2; // set all values to no domino
                 }
             }
-            for (int i = 0; i < last.length; i++)
+            for (int i = 0; i < Last.Length; i++)
             {
-                if (last[i].position != null)
+                if (Last[i].position != null)
                 {
-                    basefield[last[i].position.x, last[i].position.y] = last[i].color;
+                    basefield[Last[i].position.x, Last[i].position.y] = Last[i].Color;
                 }
             }
             if (o == Orientation.Vertical) basefield = TransposeArray(basefield);
@@ -426,14 +425,15 @@ namespace DominoPlanner.Core
         #endregion
         #region private methods
         [ProtoAfterDeserialization]
-        private void restoreShapes()
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "called by protobuf after serialization")]
+        private void RestoreShapes()
         {
             if (PrimaryImageTreatment == null || PrimaryCalculation == null)
             {
                 throw new InvalidDataException();
             }
             Generate();
-            last.colors = colors;
+            Last.colors = colors;
         }
         #endregion
 
@@ -615,8 +615,10 @@ namespace DominoPlanner.Core
             IterationInformation iterationInformation)
         {
             ColorPath = colorPath;
-            PrimaryImageTreatment = new NormalReadout(this, imageWidth, imageHeight, averageMode, allowStretch);
-            PrimaryImageTreatment.Background = background;
+            PrimaryImageTreatment = new NormalReadout(this, imageWidth, imageHeight, averageMode, allowStretch)
+            {
+                Background = background
+            };
             PrimaryCalculation = new UncoupledCalculation(colorMode, ditherMode, iterationInformation);
         }
         protected GeneralShapesProvider() { }

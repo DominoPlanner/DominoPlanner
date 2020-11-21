@@ -14,7 +14,7 @@ namespace DominoPlanner.Usage
             SumAll = 0;
         }
 
-        private void _ProjectCount_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ProjectCount_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             SumAll = ProjectCount.Sum();
         }
@@ -103,10 +103,10 @@ namespace DominoPlanner.Usage
                 if (_ProjectCount != value)
                 {
                     if (_ProjectCount != null)
-                        _ProjectCount.CollectionChanged -= _ProjectCount_CollectionChanged; 
+                        _ProjectCount.CollectionChanged -= ProjectCount_CollectionChanged; 
                     _ProjectCount = value;
                     if(_ProjectCount != null)
-                        _ProjectCount.CollectionChanged += _ProjectCount_CollectionChanged;
+                        _ProjectCount.CollectionChanged += ProjectCount_CollectionChanged;
                     RaisePropertyChanged();
                 }
             }

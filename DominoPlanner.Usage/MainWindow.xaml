@@ -262,7 +262,7 @@
           <TabControl.ItemTemplate>
             <DataTemplate>
               <StackPanel Orientation="Horizontal" ToolTip.Tip="{Binding Path}" >
-                <Image  Source="{Binding picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
+                <Image  Source="{Binding Picture, Converter={StaticResource FilenameToThumbnailConverter}}" VerticalAlignment="Center" MaxHeight="25"/>
                 <TextBlock Margin="5, 0" Text="{Binding Header}" VerticalAlignment="Center"/>
                 <Button  Command="{Binding Close}" BorderBrush="{x:Null}" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="24" Width="24" Background="Transparent">
                     <Image Source="{StaticResource closeDrawingImage}"/>

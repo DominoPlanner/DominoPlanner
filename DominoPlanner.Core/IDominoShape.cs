@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core.RTree;
-using Emgu.CV.Structure;
 using ProtoBuf;
 using SkiaSharp;
 using System;
@@ -19,24 +18,24 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(10, typeof(RectangleDomino))]
     [ProtoInclude(11, typeof(PathDomino))]
-    public abstract class IDominoShape : IEquatable<IDominoShape>, Geometry
+    public abstract class IDominoShape : IEquatable<IDominoShape>, IGeometry
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
         /// </summary>
         
-        public bool hasTransformableProtocolDefinition
+        public bool HasTransformableProtocolDefinition
         {
             get
             {
                 return (position != null && position.xParams != null && position.yParams != null);
             }
         }
-        public string midpoint
+        public string Midpoint
         {
             get
             {
-                var rect = getBoundingRectangle();
+                var rect = GetBoundingRectangle();
                 return "x: " + (rect.x + rect.width / 2) + ", y: " + (rect.y + rect.height/2);
             }
         }
@@ -96,7 +95,7 @@ namespace DominoPlanner.Core
         public bool Equals(IDominoShape other)
         {
             bool shapeEquals = ShapeEquals(other);
-            bool primaryColorEquals = color == other.color;
+            bool primaryColorEquals = Color == other.Color;
             bool secondaryColorEquals = SecondaryDomino.Equals(other.SecondaryDomino);
             return shapeEquals && primaryColorEquals && secondaryColorEquals;
         }
@@ -130,7 +129,7 @@ namespace DominoPlanner.Core
         /// <returns></returns>
         internal ProtocolDefinition TransformProtocol(int i, int j, int width, int height)
         {
-            if (hasTransformableProtocolDefinition)
+            if (HasTransformableProtocolDefinition)
             {
                 return position.FinalizeProtocol(i, j, width, height);
             }
@@ -162,7 +161,7 @@ namespace DominoPlanner.Core
             return GetContainer().Intersects(rect);
         }
 
-        public DominoRectangle getBoundingRectangle()
+        public DominoRectangle GetBoundingRectangle()
         {
             return GetContainer();
         }
@@ -177,7 +176,7 @@ namespace DominoPlanner.Core
         private int _color;
         public event EventHandler ColorChanged;
         [ProtoMember(2)]
-        public int color
+        public int Color
         {
             get { return _color; }
             set

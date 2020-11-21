@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Emgu.CV;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {

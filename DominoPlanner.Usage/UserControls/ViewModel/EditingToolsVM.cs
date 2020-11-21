@@ -8,7 +8,6 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Diagnostics;
-using Emgu.CV;
 using DominoPlanner.Core;
 using Avalonia.Media;
 using Avalonia.Input;
@@ -34,11 +33,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return image; }
             set { image = value;
                 Application.Current.TryFindResource(value, out object temp);
-                img = (DrawingImage)temp;
+                Img = (DrawingImage)temp;
             }
         }
 
-        public DrawingImage img { get; private set; }
+        public DrawingImage Img { get; private set; }
 
         public virtual void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e) { }
 
@@ -58,10 +57,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class SelectionOperation : PostFilter
     {
-        SelectionToolVM reference;
-        IList<int> ToSelect;
-        bool positiveselect;
-        bool[] oldState;
+        readonly SelectionToolVM reference;
+        readonly IList<int> ToSelect;
+        readonly bool positiveselect;
+        readonly bool[] oldState;
         public SelectionOperation(SelectionToolVM reference, IList<int> ToSelect, bool select )
         {
             this.reference = reference;
@@ -179,7 +178,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void InvertSelectionOperation()
         {
             var current = parent.selectedDominoes.ToList();
-            var n = Enumerable.Range(0, parent.dominoTransfer.length).Except(current).ToList();
+            var n = Enumerable.Range(0, parent.dominoTransfer.Length).Except(current).ToList();
             Select(current, false);
             Select(n, true);
             parent.UpdateUIElements();
@@ -196,8 +195,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class SelectionModeColorConverter : IValueConverter
     {
-        static Color AddColor = Colors.LightBlue;
-        static Color RemoveColor = Colors.IndianRed;
+        static readonly Color AddColor = Colors.LightBlue;
+        static readonly Color RemoveColor = Colors.IndianRed;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is SelectionMode sm)
@@ -224,14 +223,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             this.parent = parent;
         }
         public string Name { get; internal set; }
-        public DrawingImage img { get; private set; }
+        public DrawingImage Img { get; private set; }
         private string image;
 
         public string Image
         {
             get { return image; }
             set { image = value; Application.Current.TryFindResource(value, out object temp);
-                img = (DrawingImage)temp;
+                Img = (DrawingImage)temp;
             }
         }
         private bool includeBoundary = true;
@@ -304,8 +303,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public Rect GetBoundingBox()
         {
-            SKRect rect;
-            SelectionShape.GetBounds(out rect);
+            SelectionShape.GetBounds(out SKRect rect);
             return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
         }
 
@@ -426,7 +424,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 for (int i = 0; i < parent.Dominoes.Count; i++)
                 {
-                    if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, SingleClickFlag ? true : IncludeBoundary))
+                    if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, SingleClickFlag || IncludeBoundary))
                     {
                         result.Add(i);
                     }
@@ -520,7 +518,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
             {
-                var insideCircle = dic.canvasPoints.Count(x =>
+                var insideCircle = dic.CanvasPoints.Count(x =>
                 Math.Sqrt((x.X - center.X) * (x.X - center.X) + (x.Y - center.Y) * (x.Y - center.Y)) < radius);
                 return CheckBoundary(dic, insideCircle);
             }
@@ -629,7 +627,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class FreehandSelectionDomain : TwoClickSelection
     {
-        List<Avalonia.Point> points;
+        readonly List<Avalonia.Point> points;
         public FreehandSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "freehand_selectDrawingImage";
@@ -662,7 +660,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (IsInsideBoundingBox(boundingBox, dic, includeBoundary))
             {
-                var insidePoly = dic.canvasPoints.Count(x => SelectionShape.Contains((float)x.X, (float)x.Y));
+                var insidePoly = dic.CanvasPoints.Count(x => SelectionShape.Contains((float)x.X, (float)x.Y));
                 return CheckBoundary(dic, insidePoly);
             }
             return false;
@@ -683,31 +681,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     {
         private double visibleWidth = 0;
         private double visibleHeight = 0;
-        private double largestX = 0;
-        private double largestY = 0;
-        private Image<Emgu.CV.Structure.Bgra, byte> FilteredMat;
+        private readonly double largestX = 0;
+        private readonly double largestY = 0;
 
-        private ProjectCanvas _DominoProject;
-        /*public ProjectCanvas DominoProject
-        {
-            get { return _DominoProject; }
-            set
-            {
-                if (_DominoProject != value)
-                {
-                    if (_DominoProject != null)
-                    {
-                        //_DominoProject.SizeChanged -= _DominoProject_SizeChanged;
-                    }
-                    _DominoProject = value;
-                    RaisePropertyChanged();
-                    //_DominoProject.SizeChanged += _DominoProject_SizeChanged;
-
-                    //_DominoProject.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    //_DominoProject.VerticalAlignment = VerticalAlignment.Stretch;
-                }
-            }
-        }*/
         public DisplaySettingsToolVM(EditProjectVM parent)
         {
             Image = "display_settingsDrawingImage";
@@ -890,49 +866,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return imagepath;
             }
         }
-        /*private void _DominoProject_SizeChanged(object sender,  e)
-        {
-            RefreshTransformation();
-        }*/
-        internal void RefreshTransformation()
-        {
-            if (_DominoProject == null)
-                return;
-            double ScaleX, ScaleY;
-
-            ScaleX = visibleWidth / largestX * ZoomValue;
-            ScaleY = visibleHeight / largestY * ZoomValue;
-
-            if (ScaleX < ScaleY)
-                _DominoProject.RenderTransform = new ScaleTransform(ScaleX, ScaleX);
-            else
-                _DominoProject.RenderTransform = new ScaleTransform(ScaleY, ScaleY);
-            _DominoProject.InvalidateVisual();
-        }
         
         internal void SizeChanged(double width, double height)
         {
             visibleWidth = width;
             visibleHeight = height;
-            RefreshTransformation();
+            //RefreshTransformation();
         }
         
         public void Redraw()
         {
-            /*DominoProject?.InvalidateVisual();
-            bool discrepancy = false;
-            if (DominoProject?.Stones == null) return;
-            for (int i = 0; i < DominoProject.Stones.Count; i++)
-            {
-                if (DominoProject.Stones[i].isSelected != parent.selectedDominoes.Contains(i))
-                {
-                    discrepancy = true;
-                }
-            }
-            if (discrepancy)
-            {
-                Errorhandler.RaiseMessage("Discrepancy detected!", "Error", Errorhandler.MessageType.Error);
-            }*/
+
         }
         private void ShowImage()
         {
@@ -940,15 +884,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (!File.Exists(PreviewPath))
                 {
-                    using (var image = SKImage.FromBitmap(FilteredImage))
-                    using (var data = image.Encode(SKEncodedImageFormat.Png, 80))
-                    {
-                        // save the data to a stream
-                        using (var stream = File.OpenWrite(PreviewPath))
-                        {
-                            data.SaveTo(stream);
-                        }
-                    }
+                    using var image = SKImage.FromBitmap(FilteredImage);
+                    using var data = image.Encode(SKEncodedImageFormat.Png, 80);
+                    // save the data to a stream
+                    using var stream = File.OpenWrite(PreviewPath);
+                    data.SaveTo(stream);
                 }
                 Process.Start(PreviewPath);
             }
@@ -964,11 +904,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (File.Exists(PreviewPath)) File.Delete(PreviewPath);
             }
             catch (Exception) { }
-        }
-        public bool IsSelected(int i)
-        {
-            //return DominoProject.Stones[i].isSelected;
-            return false;
         }
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }

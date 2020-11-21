@@ -17,11 +17,11 @@ namespace DominoPlanner.Core
         {
             for (int i = 0; i < domain.Length; i++)
             {
-                int color = reference.last[domain[i]].color;
+                int color = reference.Last[domain[i]].Color;
                 if (color == to_replace)
                 {
                     old_colors[i] = color;
-                    reference.last[domain[i]].color = new_color;
+                    reference.Last[domain[i]].Color = new_color;
                 }
             }
         }
@@ -29,7 +29,7 @@ namespace DominoPlanner.Core
         {
             for (int i = 0; i < domain.Length; i++)
             {
-                reference.last[domain[i]].color = old_colors[i];
+                reference.Last[domain[i]].Color = old_colors[i];
             }
         }
         public ReplaceColorOperation(IDominoProvider reference, int[] domain, int toReplace, int newColor)
@@ -52,15 +52,15 @@ namespace DominoPlanner.Core
             for (int i = 0; i < domain.Length; i++)
             {
 
-                old_colors[i] = reference.last[domain[i]].color;
-                reference.last[domain[i]].color = new_color;
+                old_colors[i] = reference.Last[domain[i]].Color;
+                reference.Last[domain[i]].Color = new_color;
             }
         }
         public override void Undo()
         {
             for (int i = 0; i < domain.Length; i++)
             {
-                reference.last[domain[i]].color = old_colors[i];
+                reference.Last[domain[i]].Color = old_colors[i];
             }
         }
         public SetColorOperation(IDominoProvider reference, int[] domain, int newColor)
@@ -121,12 +121,12 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             // get an array 
-            ((IDominoProvider) reference).last.shapes = 
+            ((IDominoProvider) reference).Last.shapes = 
                 AddDeleteHelper.AddRowColumn(reference, false, position, below, count, color, out added_indizes);
         }
         public override void Undo()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
         }
     }
@@ -143,13 +143,13 @@ namespace DominoPlanner.Core
         }
         public override void Apply()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, positions), 
                 out remaining_positions, out oldShapes);
         }
         public override void Undo()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.AddRowColumn(reference, false, remaining_positions, oldShapes, out _);
         }
     }
@@ -172,12 +172,12 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             // get an array 
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.AddRowColumn(reference, true, position, right, count, color, out added_indizes);
         }
         public override void Undo()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
         }
     }
@@ -195,12 +195,12 @@ namespace DominoPlanner.Core
         }
         public override void Apply()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, positions), out remaining_positions, out oldShapes);
         }
         public override void Undo()
         {
-            ((IDominoProvider)reference).last.shapes =
+            ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.AddRowColumn(reference, true, remaining_positions, oldShapes, out _);
         }
     }
@@ -392,14 +392,14 @@ namespace DominoPlanner.Core
             // Quellfarben müssen separat ausgelesen werden
             for (int i = 0; i < paste_target.Length; i++)
             {
-                paste_colors[i] = field.last[paste_source[i]].color;
+                paste_colors[i] = field.Last[paste_source[i]].Color;
             }
             for (int i = 0; i < paste_target.Length; i++)
             {
-                if (paste_target[i] < field.last.length)
+                if (paste_target[i] < field.Last.Length)
                 {
-                    original_colors[i] = field.last[paste_target[i]].color;
-                    field.last[paste_target[i]].color = paste_colors[i];
+                    original_colors[i] = field.Last[paste_target[i]].Color;
+                    field.Last[paste_target[i]].Color = paste_colors[i];
                 }
             }
         }
@@ -408,9 +408,9 @@ namespace DominoPlanner.Core
             var field = (IDominoProvider)reference;
             for (int i = 0; i < paste_target.Length; i++)
             {
-                if (paste_target[i] < field.last.length)
+                if (paste_target[i] < field.Last.Length)
                 {
-                    field.last[paste_target[i]].color = original_colors[i];
+                    field.Last[paste_target[i]].Color = original_colors[i];
                 }
             }
         }

@@ -253,11 +253,4 @@ namespace DominoPlanner.Usage
             this.Find<ScrollViewer>("OuterScrollViewer").Offset = new Vector(this.Find<ScrollViewer>("InnerScrollViewer").Offset.X, 0);
         }
     }
-    public class OffsetConverter : ValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return new Vector(((Vector)value).X, 0);
-        }
-    }
 }

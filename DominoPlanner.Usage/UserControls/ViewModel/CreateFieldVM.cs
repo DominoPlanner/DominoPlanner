@@ -1,13 +1,7 @@
 ﻿using DominoPlanner.Core;
-using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Avalonia.Media.Imaging;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -18,10 +12,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             // Regeneration kurz sperren, dann wieder auf Ursprungswert setzen
             AllowRegeneration = false;
-            field_templates = new List<StandardSize>();
-            field_templates.Add(new StandardSize("8mm", new Sizes(8, 8, 24, 8)));
-            field_templates.Add(new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)));
-            field_templates.Add(new StandardSize("User Size", new Sizes(10, 10, 10, 10)));
+            Field_templates = new List<StandardSize>
+            {
+                new StandardSize("8mm", new Sizes(8, 8, 24, 8)),
+                new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)),
+                new StandardSize("User Size", new Sizes(10, 10, 10, 10))
+            };
             ReloadSizes();
             AllowRegeneration = AllowRegenerate;
             Refresh();
@@ -32,7 +28,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region fields
-        Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+        private readonly Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters
         {
             get { return CurrentProject as FieldParameters; }
@@ -178,7 +174,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         private List<StandardSize> _field_templates;
-        public List<StandardSize> field_templates
+        public List<StandardSize> Field_templates
         {
             get { return _field_templates; }
             set
@@ -307,7 +303,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Sizes currentSize = new Sizes(HorizontalDistance, HorizontalSize, VerticalSize, VerticalDistance);
             bool found = false;
-            foreach (StandardSize sSize in field_templates)
+            foreach (StandardSize sSize in Field_templates)
             {
                 if (sSize.Sizes.a == currentSize.a && sSize.Sizes.b == currentSize.b && sSize.Sizes.c == currentSize.c && sSize.Sizes.d == currentSize.d)
                 {
@@ -318,8 +314,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             if (!found)
             {
-                field_templates.Last<StandardSize>().Sizes = currentSize;
-                SelectedItem = field_templates.Last<StandardSize>();
+                Field_templates.Last<StandardSize>().Sizes = currentSize;
+                SelectedItem = Field_templates.Last<StandardSize>();
             }
             UnsavedChanges = true;
         }

@@ -15,14 +15,14 @@ namespace DominoPlanner.Core
         }
         [ProtoMember(50)]
         public int current_width { get; set; }
-        public int current_height { get => last.length / current_width; set { } }
+        public int current_height { get => Last.Length / current_width; set { } }
         public bool IsValidPastePosition(int source_position, int target_position)
         {
             return true;
         }
         public int[] GetValidPastePositions(int source_position)
         {
-            return Enumerable.Range(0, last.length).ToArray();
+            return Enumerable.Range(0, Last.Length).ToArray();
         }
         public int[] PasteTarget(int reference, int[] source_domain, int target_reference)
         {
@@ -35,7 +35,7 @@ namespace DominoPlanner.Core
                 int row = source_domain[i] / current_width;
                 int col = source_domain[i] % current_width;
                 target_domain[i] = (row + rowshift < current_height && col + colshift < current_width) ? 
-                    (row + rowshift) * (current_width) + (col + colshift) : last.length;
+                    (row + rowshift) * (current_width) + (col + colshift) : Last.Length;
             }
             return target_domain;
         }
@@ -69,7 +69,7 @@ namespace DominoPlanner.Core
                 {
                     int target_index = getIndexFromPosition(target_y, target_x, 0, target_width, target_height);
                     int source_index = getIndexFromPosition(source_y, source_x, 0);
-                    target[target_index].color = this.last.shapes[source_index].color;
+                    target[target_index].Color = this.Last.shapes[source_index].Color;
                 }
             }
             
@@ -87,8 +87,8 @@ namespace DominoPlanner.Core
                     {
                         x = (HorizontalDistance + HorizontalSize) * xi,
                         y = (VerticalDistance + VerticalSize) * yi,
-                        width = HorizontalSize,
-                        height = VerticalSize,
+                        Width = HorizontalSize,
+                        Height = VerticalSize,
                         expanded_width = HorizontalDistance + HorizontalSize,
                         expanded_height = VerticalDistance + VerticalSize,
                         position = new ProtocolDefinition() { x = xi, y = yi }
@@ -104,7 +104,7 @@ namespace DominoPlanner.Core
             int[] result = new int[getLengthOfTypicalRowColumn(column)];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = last.shapes[getIndexFromPosition(index, i, 0, column)].color;
+                result[i] = Last.shapes[getIndexFromPosition(index, i, 0, column)].Color;
             }
             return result;
         }
@@ -114,7 +114,7 @@ namespace DominoPlanner.Core
             for (int i = 0; i < rowcolumn.Length; i++)
             {
                 int targetindex = getIndexFromPosition(index, i, 0, target_width, target_height, column);
-                target[targetindex].color
+                target[targetindex].Color
                     = rowcolumn[i];
             }
         }

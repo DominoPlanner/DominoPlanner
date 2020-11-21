@@ -1,12 +1,6 @@
-﻿using Emgu.CV;
+﻿using Avalonia.Media;
 using ProtoBuf;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Core
@@ -25,7 +19,7 @@ namespace DominoPlanner.Core
             set
             {
                 __structureDefXML = value;
-                structureDefinitionXML = XElement.Parse(value);
+                StructureDefinitionXML = XElement.Parse(value);
             }
             get
             {
@@ -36,7 +30,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Das XElement, das die Strukturdefinition beinhaltet.
         /// </summary>
-        public XElement structureDefinitionXML
+        public XElement StructureDefinitionXML
         {
             set
             {
@@ -163,7 +157,7 @@ namespace DominoPlanner.Core
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false) :
             base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
-            structureDefinitionXML = definition;
+            StructureDefinitionXML = definition;
             this.Length = length;
             this.Height = height;
         }
@@ -191,7 +185,7 @@ namespace DominoPlanner.Core
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, allowStretch, iterationInformation)
         {
-            structureDefinitionXML = definition;
+            StructureDefinitionXML = definition;
             TargetCount = targetSize;
         }
         private StructureParameters() : base() { }
@@ -199,7 +193,7 @@ namespace DominoPlanner.Core
         #region private helper methods
         public override void RegenerateShapes()
         {
-            last = GenerateStructure(Length, Height);
+            Last = GenerateStructure(Length, Height);
             shapesValid = true;
         }
 

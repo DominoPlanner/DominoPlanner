@@ -1,5 +1,4 @@
-﻿using Emgu.CV.CvEnum;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using Avalonia.Media;
 
@@ -184,8 +183,10 @@ namespace DominoPlanner.Core
             HorizontalSize = horizontalSize;
             VerticalSize = verticalSize;
             VerticalDistance = verticalDistance;
-            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode);
-            PrimaryImageTreatment.Background = background;
+            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode)
+            {
+                Background = background
+            };
             TargetCount = targetSize;
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
@@ -195,20 +196,20 @@ namespace DominoPlanner.Core
         #region overrides
         public override void RegenerateShapes()
         {
-            last = new DominoTransfer(getNewShapes(Length, Height), colors);
+            Last = new DominoTransfer(getNewShapes(Length, Height), colors);
             shapesValid = true;
         }
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
-            if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            current_width = last.FieldPlanLength;
-            current_height = last.FieldPlanHeight;
+            if (!LastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
+            current_width = Last.FieldPlanLength;
+            current_height = Last.FieldPlanHeight;
             int[,] result = new int[current_width, current_height];
             for (int i = 0; i < current_width; i++)
             {
                 for (int j = 0; j < current_height; j++)
                 {
-                    result[i, j] = last.shapes[j * current_width + i].color;
+                    result[i, j] = Last.shapes[j * current_width + i].Color;
                 }
             }
             if (o == Orientation.Vertical) result = TransposeArray(result);

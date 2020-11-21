@@ -1,7 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,6 +38,7 @@ namespace DominoPlanner.Core
         }
         private Color _background;
         [ProtoMember(3)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _background")]
         private string BackgroundSurrogate
         {
             get
@@ -215,15 +213,15 @@ namespace DominoPlanner.Core
         public override void ReadoutColors(DominoTransfer shapes)
         {
             var img = FilteredImage;
-            double scalingX = (double)(Width - 1) / shapes.physicalLength;
-            double scalingY = (double)(Height - 1) / shapes.physicalHeight;
+            double scalingX = (double)(Width - 1) / shapes.PhysicalLength;
+            double scalingY = (double)(Height - 1) / shapes.PhysicalHeight;
             if (!AllowStretch)
             {
                 if (scalingX > scalingY) scalingX = scalingY;
                 else scalingY = scalingX;
             }
             // tatsächlich genutzte Farben auslesen
-            Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i) =>
+            Parallel.For(0, shapes.Length, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i) =>
             {
                 SKColor result = new SKColor();
                 if (Average == AverageMode.Corner)
@@ -278,6 +276,15 @@ namespace DominoPlanner.Core
         #endregion
         
 
+    }
+    public enum Inter
+    {
+        Nearest = 0,
+        Linear = 1,
+        LinearExact = 1,
+        Cubic = 2,
+        Area = 3,
+        Lanczos4 = 3
     }
     [ProtoContract(SkipConstructor =true)]
     public class FieldReadout : ImageTreatment

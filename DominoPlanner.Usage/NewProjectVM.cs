@@ -58,7 +58,7 @@ namespace DominoPlanner.Usage
                 {
                     string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors.{MainWindow.ReadSetting("ColorExtension")}");
                     File.Copy(sPath, colorPath);
-                    main.colorPath = Path.Combine("Planner Files", "colors." + MainWindow.ReadSetting("ColorExtension"));
+                    main.ColorPath = Path.Combine("Planner Files", "colors." + MainWindow.ReadSetting("ColorExtension"));
                 }
 
                 main.Save();

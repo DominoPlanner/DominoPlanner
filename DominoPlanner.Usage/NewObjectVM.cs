@@ -1,7 +1,6 @@
 ﻿using DominoPlanner.Core;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
-using Emgu.CV;
 using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
@@ -26,13 +25,13 @@ namespace DominoPlanner.Usage
             this.parentProject = parentProject;
             FillObjects();
             ProjectPath = folderpath;
-            CreateIt = new RelayCommand(o => { mCreateIt(); });
+            CreateIt = new RelayCommand(o => { MCreateIt(); });
             SelectedType = 0;
         }
         #endregion
 
         #region fields
-        private DominoAssembly parentProject;
+        private readonly DominoAssembly parentProject;
         #endregion
 
         #region prop
@@ -96,7 +95,7 @@ namespace DominoPlanner.Usage
             }
         }
         private string _filename;
-        public string filename
+        public string Filename
         {
             get { return _filename; }
             set
@@ -154,7 +153,7 @@ namespace DominoPlanner.Usage
         {
             ViewModels = new ObservableCollection<NewObjectEntry>();
             CurrentImageInformation = new SingleImageInformation();
-            string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject);
+            string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject);
             ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = "Field",
@@ -163,7 +162,7 @@ namespace DominoPlanner.Usage
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateFieldVM(
                     new FieldParameters(50, 50, Colors.Transparent, AbsoluteColorPath,
-                    8, 8, 24, 8, 5000, Emgu.CV.CvEnum.Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
+                    8, 8, 24, 8, 5000, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
             ViewModels.Add(new DominoProviderObjectEntry()
@@ -204,9 +203,9 @@ namespace DominoPlanner.Usage
                 ImageInformation = new NoImageInformation()
             });
         }
-        private void mCreateIt()
+        private void MCreateIt()
         {
-            ResultNode = ViewModels[SelectedType].CreateIt(parentProject, filename, ProjectPath);
+            ResultNode = ViewModels[SelectedType].CreateIt(parentProject, Filename, ProjectPath);
             if (ResultNode != null)
             {
                 Close = true;
@@ -265,8 +264,8 @@ namespace DominoPlanner.Usage
             }
             try
             {
-                var img = new Emgu.CV.Mat(InternPictureName, Emgu.CV.CvEnum.ImreadModes.Unchanged);
-                img.Dispose();
+                //var img = new Emgu.CV.Mat(InternPictureName, Emgu.CV.CvEnum.ImreadModes.Unchanged);
+                //img.Dispose();
                 UpdateProvider(provider);
             }
             catch
@@ -282,7 +281,7 @@ namespace DominoPlanner.Usage
                 provider.CurrentProject.PrimaryImageTreatment = new NormalReadout(provider.CurrentProject, InternPictureName, AverageMode.Corner, true);
                 if (provider.DominoCount > 0)
                 {
-                    provider.DominoCount = provider.DominoCount + 1; // if equal, setter would reject changes
+                    provider.DominoCount += 1; // if equal, setter would reject changes
                 }
             }
 
@@ -318,7 +317,7 @@ namespace DominoPlanner.Usage
             string relPicturePath = $@"..\Source Image\{finalImagePath}";
             if (provider is FieldParameters f)
             {
-                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, Emgu.CV.CvEnum.Inter.Lanczos4);
+                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, Inter.Lanczos4);
             }
             else
             {
@@ -335,6 +334,7 @@ namespace DominoPlanner.Usage
 
     public abstract class NewObjectEntry
     {
+        internal DominoAssembly parentProject;
         public ImageInformation ImageInformation { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -358,7 +358,7 @@ namespace DominoPlanner.Usage
         public bool Finalize(string filepath, DominoAssembly parentProject)
         {
             Provider.CurrentProject.Save(filepath);
-            string colorlist = parentProject.colorPath;
+            string colorlist = parentProject.ColorPath;
             Provider.CurrentProject.ColorPath = $@"..\{colorlist}";
             return ImageInformation.FinalizeProvider(Provider.CurrentProject, filepath);
         }
@@ -413,11 +413,11 @@ namespace DominoPlanner.Usage
         public override string Extension => "." + MainWindow.ReadSetting("ProjectExtension");
         public override object ViewModel => this;
         public string ColorPath { get; set; }
-        DominoAssembly parentProject;
+
         public NewAssemblyEntry(DominoAssembly parentProject)
         {
             this.parentProject = parentProject;
-            ColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject);
+            ColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject);
         }
         public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
         {
@@ -447,8 +447,8 @@ namespace DominoPlanner.Usage
 
                     DominoAssembly dominoAssembly = new DominoAssembly() { };
                     dominoAssembly.Save(assemblyPath);
-                    dominoAssembly.colorPath = Workspace.MakeRelativePath(assemblyPath,
-                        Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.colorPath, parentProject));
+                    dominoAssembly.ColorPath = Workspace.MakeRelativePath(assemblyPath,
+                        Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject));
                     dominoAssembly.Save();
                     AssemblyNode asn = new AssemblyNode(Workspace.MakeRelativePath(ProjectPath + "\\", assemblyPath), parentProject);
                     parentProject.Save();

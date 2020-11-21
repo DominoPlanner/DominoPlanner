@@ -1,5 +1,4 @@
 ﻿
-using Emgu.CV;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -98,7 +97,7 @@ namespace DominoPlanner.Core
             IterationInformation iterationInformation, bool allowStretch = false) :
             base(filepath, imagepath, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
-            init(circles);
+            Init(circles);
         }
         public CircleParameters(int imageWidth, int imageHeight, Color background, int circles,
             string colors, IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode,
@@ -106,9 +105,9 @@ namespace DominoPlanner.Core
             base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
 
-            init(circles);
+            Init(circles);
         }
-        private void init(int circles)
+        private void Init(int circles)
         {
             
             Circles = circles;
@@ -157,7 +156,7 @@ namespace DominoPlanner.Core
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
 
             });
-            last = new DominoTransfer(dominoes, colors);
+            Last = new DominoTransfer(dominoes, colors);
             shapesValid = true;
         }
         private PathDomino GenerateDomino(int diameter, double angle)

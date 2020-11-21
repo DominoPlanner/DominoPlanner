@@ -1,14 +1,9 @@
-﻿using Emgu.CV;
+﻿using Avalonia.Media;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using System.Xml.Linq;
 
 namespace DominoPlanner.Core
 {
@@ -249,7 +244,7 @@ namespace DominoPlanner.Core
         /// <summary>
         /// Der Parameter a in der Spiralformel, a.k.a. Abstand zwischen zwei Umdrehungen
         /// </summary>
-        private double a
+        private double A
         {
             get
             {
@@ -281,16 +276,16 @@ namespace DominoPlanner.Core
             base(filepath, bitmap, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             HasProtocolDefinition = false;
-            init(rotations);
+            Init(rotations);
         }
         public SpiralParameters(int imageWidth, int imageHeight, Color background, int rotations, string colors,
             IColorComparison colorMode, Dithering ditherMode, AverageMode averageMode, IterationInformation iterationInformation, bool allowStretch = false)
             : base(imageWidth, imageHeight, background, colors, colorMode, ditherMode, averageMode, iterationInformation, allowStretch)
         {
             HasProtocolDefinition = false;
-            init(rotations);
+            Init(rotations);
         }
-        private void init(int rotations)
+        private void Init(int rotations)
         {
             ThetaMax = rotations * 2 * Math.PI + ThetaMin;
             DominoWidth = 8;
@@ -303,20 +298,20 @@ namespace DominoPlanner.Core
         #region private methods
         public override void RegenerateShapes()
         {
-            Point endpoint = getPoint(ThetaMax, nGroup * (DominoLength + NormalDistance) / a);
+            Point endpoint = GetPoint(ThetaMax, nGroup * (DominoLength + NormalDistance) / A);
             double end_radius = Math.Sqrt(endpoint.X * endpoint.X + endpoint.Y * endpoint.Y);
             List<PathDomino> dominolist = new List<PathDomino>();
             double pi2 = 1 / (2d * Math.PI); // spart ein paar Gleitkommadivisionen
             for (int i = 0; i < nGroup; i++)
             {
-                double shift = i * (DominoLength + NormalDistance) / a;
-                shift = shift - shiftfactor * nGroup * (DominoLength + NormalDistance) / a;
+                double shift = i * (DominoLength + NormalDistance) / A;
+                shift -= shiftfactor * nGroup * (DominoLength + NormalDistance) / A;
                 double theta = ThetaMin;
                 int ycounter = 0;
                 double current_radius = 0;
                 while (closeEnds ? current_radius < end_radius : theta < ThetaMax) 
                 {
-                    Point current_point = getPoint(theta, i * (DominoLength + NormalDistance) / a);
+                    Point current_point = GetPoint(theta, i * (DominoLength + NormalDistance) / A);
                     current_radius = Math.Sqrt(current_point.X * current_point.X + current_point.Y * current_point.Y);
                     for (int k = 0; k < nArms; k++)
                     {
@@ -331,7 +326,7 @@ namespace DominoPlanner.Core
                     do
                     {
                         start_value += 0.01d;
-                        theta_new = approximate_archimedean(theta, start_value, TangentialDistance + DominoWidth, shift);
+                        theta_new = Approximate_archimedean(theta, start_value, TangentialDistance + DominoWidth, shift);
                     }
                     while (theta_new < theta);
                     ycounter++;
@@ -352,7 +347,7 @@ namespace DominoPlanner.Core
                 dominoes[i] = dominoes[i].TransformDomino(-x_min, -y_min, 0, 0, 0, 0);
 
             });
-            last = new DominoTransfer(dominoes, colors);
+            Last = new DominoTransfer(dominoes, colors);
             shapesValid = true;
         }
         /// <summary>
@@ -362,14 +357,14 @@ namespace DominoPlanner.Core
         /// <param name="startwert">Der letzte Wert</param>
         /// <param name="abstand">Zu erzielender Abstand zwischen dem Punkt mit dem alten und dem Punkt mit dem neuen Winkel.</param>
         /// <returns>Der neue Winkel.</returns>
-        private double newton_archimedean(double theta, double startwert, double abstand, double shift)
+        private double Newton_archimedean(double theta, double startwert, double abstand, double shift)
         {
             
             double cos = Math.Cos(theta - startwert);
-            double result2 = startwert - (Math.Sqrt(a * a * (theta * theta - 2 * theta * startwert * cos + startwert * startwert)) 
+            /*double result2 = startwert - (Math.Sqrt(A * A * (theta * theta - 2 * theta * startwert * cos + startwert * startwert)) 
                 * abstand -
-              a * a * (theta * theta - 2 * theta * startwert * cos + startwert * startwert)) /
-              (a * a * (theta * startwert * Math.Sin(theta - startwert) + theta * cos - startwert));
+              A * A * (theta * theta - 2 * theta * startwert * cos + startwert * startwert)) /
+              (A * A * (theta * startwert * Math.Sin(theta - startwert) + theta * cos - startwert));*/
             // alte Implementierung ohne Shift
             /*double result = startwert -
                 (Math.Sqrt(-2 * theta * cos * (startwert + shift) + theta * theta + (startwert + shift) * (startwert + shift)) * abstand
@@ -378,25 +373,25 @@ namespace DominoPlanner.Core
                     */
             double wurzel = -(2 * (theta + shift)) * (startwert + shift) * cos
                 + 2 * shift * shift + (2 * theta + 2 * startwert) * shift + startwert * startwert + theta * theta;
-            double result = startwert - (Math.Sqrt(wurzel) * abstand - a * wurzel)
-                / (a * ((theta + shift) * cos + (startwert + shift) * (-1 + (theta + shift) * Math.Sin(theta - startwert))));
+            double result = startwert - (Math.Sqrt(wurzel) * abstand - A * wurzel)
+                / (A * ((theta + shift) * cos + (startwert + shift) * (-1 + (theta + shift) * Math.Sin(theta - startwert))));
             if (Math.Abs((result - startwert)) < 0.001) return result;
-            else return newton_archimedean(theta, result, abstand, shift);
+            else return Newton_archimedean(theta, result, abstand, shift);
         }
         // berechnet die Ableitung nur approximativ. Scheint nicht wirklich Performance-Unterschiede zu machen, 
         // aber ist einfacher zu verändern
-        private double approximate_archimedean(double theta, double startwert, double abstand, double shift)
+        private double Approximate_archimedean(double theta, double startwert, double abstand, double shift)
         {
-            double dist = distance(startwert, theta, shift);
-            double ableitung = (distance(startwert + 0.0001d, theta, shift) -dist) / 0.0001d;
+            double dist = Distance(startwert, theta, shift);
+            double ableitung = (Distance(startwert + 0.0001d, theta, shift) -dist) / 0.0001d;
             double result = startwert - (dist - abstand) / ableitung;
             if (Math.Abs((result - startwert)) < 0.001) return result;
-            else return approximate_archimedean(theta, result, abstand, shift);
+            else return Approximate_archimedean(theta, result, abstand, shift);
         }
-        private double distance(double theta1, double theta2, double shift)
+        private double Distance(double theta1, double theta2, double shift)
         {
-            var point1 = getPoint(theta1, shift);
-            var point2 = getPoint(theta2, shift);
+            var point1 = GetPoint(theta1, shift);
+            var point2 = GetPoint(theta2, shift);
             return Math.Sqrt((point1.X - point2.X) * (point1.X - point2.X) + (point1.Y - point2.Y) * (point1.Y - point2.Y));
         }
         /// <summary>
@@ -404,9 +399,9 @@ namespace DominoPlanner.Core
         /// </summary>
         /// <param name="theta">Ein Winkel.</param>
         /// <returns>Der Punkt, der sich für den angegebenen Winkel aus der Polarfunktion ergibt.</returns>
-        private Point getPoint(double theta, double shift, double rotate = 0)
+        private Point GetPoint(double theta, double shift, double rotate = 0)
         {
-            Point result = new Point((theta+shift) * Math.Cos(theta) * a, (theta+shift) * Math.Sin(theta) * a);
+            Point result = new Point((theta+shift) * Math.Cos(theta) * A, (theta+shift) * Math.Sin(theta) * A);
             if (rotate == 0) return result;
             Point gedreht = new Point(result.X * Math.Cos(rotate) - result.Y * Math.Sin(rotate),
                 result.X * Math.Sin(rotate) + result.Y * Math.Cos(rotate));
@@ -420,8 +415,8 @@ namespace DominoPlanner.Core
         private PathDomino CreateDomino(double theta, double shift, double rotate)
         {
             double normal_angle = GetTangentialAngle(theta, shift, rotate);
-            double x1 = getPoint(theta, shift, rotate).X;
-            double y1 = getPoint(theta, shift, rotate).Y;
+            double x1 = GetPoint(theta, shift, rotate).X;
+            double y1 = GetPoint(theta, shift, rotate).Y;
             return CreateDominoAtCoordinates(x1, y1, normal_angle, 1, 1);
         }
         /// <summary>
@@ -431,8 +426,8 @@ namespace DominoPlanner.Core
         /// <returns>Ein Winkel, normal zur Spirale.</returns>
         private double GetTangentialAngle(double theta, double shift, double rotate = 0)
         {
-            Point point = getPoint(theta, shift, rotate);
-            Point point2 = getPoint(theta + 0.00001, shift, rotate);
+            Point point = GetPoint(theta, shift, rotate);
+            Point point2 = GetPoint(theta + 0.00001, shift, rotate);
             return -Math.Atan((point.Y - point2.Y) / (point2.X - point.X));
         }
         #endregion

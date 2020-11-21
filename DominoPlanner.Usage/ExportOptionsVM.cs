@@ -16,10 +16,10 @@ namespace DominoPlanner.Usage
         {
             Cancel = new RelayCommand((o) => { result = false; Close = true; });
             OK = new RelayCommand((o) => { result = true; Close = true; });
-            height = provider.last.physicalHeight;
-            width = provider.last.physicalLength;
-            expanded_width = provider.last.physicalExpandedHeight;
-            expanded_height = provider.last.physicalExpandedLength;
+            height = provider.Last.PhysicalHeight;
+            width = provider.Last.PhysicalLength;
+            expanded_width = provider.Last.PhysicalExpandedHeight;
+            expanded_height = provider.Last.PhysicalExpandedLength;
             Expandable = provider is FieldParameters;
             if (provider is FieldParameters fp)
             {

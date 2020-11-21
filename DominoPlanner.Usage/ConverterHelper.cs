@@ -1,6 +1,5 @@
 ﻿using Avalonia.Data.Converters;
 using DominoPlanner.Core;
-using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,10 +24,9 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            int anzahl = 0, gesamt = 0;
             if (values[0] == null || values[1] == null)
                 return Brushes.Black;
-            if (int.TryParse(values[0].ToString(), out anzahl) && int.TryParse(values[1].ToString(), out gesamt))
+            if (int.TryParse(values[0].ToString(), out int anzahl) && int.TryParse(values[1].ToString(), out int gesamt))
             {
                 if (anzahl > gesamt)
                 {
@@ -50,9 +48,8 @@ namespace DominoPlanner.Usage
         {
             if (value == null)
                 return "";
-            if (value is Color)
+            if (value is Color c)
             {
-                Color c = (Color)value;
                 return string.Format("#{1:X2}{2:X2}{3:X2}", c.A, c.R, c.G, c.B);
             }
             System.Drawing.Color c2 = (System.Drawing.Color)value;
@@ -69,9 +66,9 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Color)
+            if (value is Color color)
             {
-                return new SolidColorBrush((Color)value);
+                return new SolidColorBrush(color);
             }
             else
             {
@@ -149,31 +146,27 @@ namespace DominoPlanner.Usage
             if (targetType.IsEnum)
             {
                 var val = (int)(double)value;
-                switch (val)
+                return val switch
                 {
-                    case 0: return Inter.Nearest;
-                    case 1: return Inter.Linear;
-                    case 2: return Inter.LinearExact;
-                    case 3: return Inter.Area;
-                    case 4: return Inter.Cubic;
-                    case 5: return Inter.Lanczos4;
-                    default: return Inter.Nearest;
-                }
+                    0 => Inter.Nearest,
+                    1 => Inter.Linear,
+                    3 => Inter.Area,
+                    4 => Inter.Cubic,
+                    _ => Inter.Nearest,
+                };
             }
 
             if (value.GetType().IsEnum)
             {
                 var val = (Inter)value;
-                switch (val)
+                return val switch
                 {
-                    case Inter.Nearest: return 0;
-                    case Inter.Linear: return 1;
-                    case Inter.LinearExact: return 2;
-                    case Inter.Area: return 3;
-                    case Inter.Cubic: return 4;
-                    case Inter.Lanczos4: return 5;
-                    default: return 0;
-                }
+                    Inter.Nearest => 0,
+                    Inter.Linear => 1,
+                    Inter.Area => 3,
+                    Inter.Cubic => 4,
+                    _ => 0,
+                };
             }
             return null;
         }
@@ -194,17 +187,13 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch (value)
+            return value switch
             {
-                case FloydSteinbergDithering d:
-                    return "Floyd/Steinberg Dithering";
-                case JarvisJudiceNinkeDithering d:
-                    return "Jarvis/Judice/Ninke Dithering";
-                case StuckiDithering d:
-                    return "Stucki Dithering";
-                default:
-                    return "No Dithering";
-            }
+                FloydSteinbergDithering _ => "Floyd/Steinberg Dithering",
+                JarvisJudiceNinkeDithering _ => "Jarvis/Judice/Ninke Dithering",
+                StuckiDithering _ => "Stucki Dithering",
+                _ => "No Dithering",
+            };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -215,48 +204,36 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch (value)
+            return value switch
             {
-                case FloydSteinbergDithering d:
-                    return 1;
-                case JarvisJudiceNinkeDithering d:
-                    return 2;
-                case StuckiDithering d:
-                    return 3;
-                default:
-                    return 0;
-            }
+                FloydSteinbergDithering _ => 1,
+                JarvisJudiceNinkeDithering _ => 2,
+                StuckiDithering _ => 3,
+                _ => 0,
+            };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch ((int)(double)value)
+            return ((int)(double)value) switch
             {
-                case 1:
-                    return new FloydSteinbergDithering();
-                case 2:
-                    return new JarvisJudiceNinkeDithering();
-                case 3:
-                    return new StuckiDithering();
-                default:
-                    return new Dithering();
-            }
+                1 => new FloydSteinbergDithering(),
+                2 => new JarvisJudiceNinkeDithering(),
+                3 => new StuckiDithering(),
+                _ => new Dithering(),
+            };
         }
     }
     public class ColorModeToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch (value)
+            return value switch
             {
-                case Cie1976Comparison d:
-                    return "CIE-76 (ISO 12647)";
-                case CmcComparison d:
-                    return "CMC (l:c)";
-                case Cie94Comparison d:
-                    return "CIE-94 (DIN 99)";
-                default:
-                    return "CIE-Delta E 2000";
-            }
+                Cie1976Comparison _ => "CIE-76 (ISO 12647)",
+                CmcComparison _ => "CMC (l:c)",
+                Cie94Comparison _ => "CIE-94 (DIN 99)",
+                _ => "CIE-Delta E 2000",
+            };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -267,31 +244,23 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch (value)
+            return value switch
             {
-                case Cie1976Comparison d:
-                    return 0;
-                case CmcComparison d:
-                    return 1;
-                case Cie94Comparison d:
-                    return 2;
-                default:
-                    return 3;
-            }
+                Cie1976Comparison _ => 0,
+                CmcComparison _ => 1,
+                Cie94Comparison _ => 2,
+                _ => 3,
+            };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            switch ((int)(double)value)
+            return ((int)(double)value) switch
             {
-                case 1:
-                    return new CmcComparison();
-                case 2:
-                    return new Cie94Comparison();
-                case 3:
-                    return new CieDe2000Comparison();
-                default:
-                    return new Cie1976Comparison();
-            }
+                1 => new CmcComparison(),
+                2 => new Cie94Comparison(),
+                3 => new CieDe2000Comparison(),
+                _ => new Cie1976Comparison(),
+            };
         }
     }
     public class EnumBooleanConverter : IValueConverter
@@ -329,7 +298,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = "";
+            string path;
             if ((bool)value)
                 path = "/Icons/ok.ico";
             else
@@ -346,7 +315,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = "";
+            string path;
             if ((bool)value)
                 path = "/Icons/lock.ico";
             else
@@ -375,9 +344,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string uri = value as string;
-
-            if (uri != null)
+            if (value is string uri)
             {
                 try
                 {
@@ -417,15 +384,15 @@ namespace DominoPlanner.Usage
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string && targetType == typeof(IImage))
+            if (value is string vstr && targetType == typeof(IImage))
             {
-                var uri = new Uri((string)value, UriKind.RelativeOrAbsolute);
+                var uri = new Uri(vstr, UriKind.RelativeOrAbsolute);
                 var scheme = uri.IsAbsoluteUri ? uri.Scheme : "file";
 
                 switch (scheme)
                 {
                     case "file":
-                        return new Bitmap((string)value);
+                        return new Bitmap(vstr);
 
                     default:
                         var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();

@@ -81,7 +81,7 @@ namespace DominoPlanner.Core
         {
             WriteableBitmap[,] array = new WriteableBitmap[3, 3];
             StructureParameters sp = new StructureParameters();
-            sp.structureDefinitionXML = structure;
+            sp.StructureDefinitionXML = structure;
             for (int col = 0; col < 3; col++)
             {
                 for (int row = 0; row < 3; row++)

@@ -57,7 +57,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
           <ListBox.ItemTemplate>
             <DataTemplate >
-                <Image Classes="ToolImage" Source="{Binding img}" ToolTip.Tip="{Binding Name}"/>
+                <Image Classes="ToolImage" Source="{Binding Img}" ToolTip.Tip="{Binding Name}"/>
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
@@ -139,7 +139,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
       <StackPanel Orientation="Horizontal" Margin="1, 1">
         <Border BorderBrush="Black" BorderThickness="1" Width="30" Height="30">
-          <Image Source="{Binding SelectedTool.img}" Classes="ToolImage"/>
+          <Image Source="{Binding SelectedTool.Img}" Classes="ToolImage"/>
         </Border>
         <ContentControl Margin="2, 0, 0, 0" Content="{Binding SelectedTool}">
           <!--ContentTemplate="{StaticResource DisplaySettingsTemplate}"-->
@@ -202,7 +202,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
                SelectedItem="{Binding SelectedTool, Mode=TwoWay}" Classes="ToolButton">
         <ListBox.ItemTemplate>
           <DataTemplate >
-            <Image Classes="ToolImage" Source="{Binding img}" ToolTip.Tip="{Binding Name}"/>
+            <Image Classes="ToolImage" Source="{Binding Img}" ToolTip.Tip="{Binding Name}"/>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
@@ -224,7 +224,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
         </Button>
         <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
         <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Name: "/>
-        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding name}"/>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Name}"/>
         <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
         <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Rows: "/>
         <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectHeight}"/>

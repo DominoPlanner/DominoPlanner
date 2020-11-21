@@ -205,7 +205,7 @@ namespace DominoPlanner.Core
             }).ToList();
             if (Dithering.weights.GetLength(0) + Dithering.weights.GetLength(1) > 2)
             {
-                for (int i = 0; i < shapes.length; i++)
+                for (int i = 0; i < shapes.Length; i++)
                 {
                     tree.Insert(shapes[i]);
                 }
@@ -229,11 +229,11 @@ namespace DominoPlanner.Core
                         var originalColor = list[i].PrimaryDitherColor;
                         list[i].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
                         // Abweichung der beiden Farben bestimmen
-                        int fehler_r = (int)(originalColor.Red - colors[list[i].color].mediaColor.R);
-                        int fehler_g = (int)(originalColor.Green - colors[list[i].color].mediaColor.G);
-                        int fehler_b = (int)(originalColor.Blue - colors[list[i].color].mediaColor.B);
+                        int fehler_r = (int)(originalColor.Red - colors[list[i].Color].mediaColor.R);
+                        int fehler_g = (int)(originalColor.Green - colors[list[i].Color].mediaColor.G);
+                        int fehler_b = (int)(originalColor.Blue - colors[list[i].Color].mediaColor.B);
                         // bestimme Abmessungen des Suchbereichs
-                        DominoRectangle orig = list[i].getBoundingRectangle();
+                        DominoRectangle orig = list[i].GetBoundingRectangle();
                         double orig_x = orig.x + orig.width / 2;
                         double orig_y = orig.y + orig.height / 2;
                         DominoRectangle viewport = new DominoRectangle()
@@ -248,7 +248,7 @@ namespace DominoPlanner.Core
                         // Rohgewichte aller gefundenen Shapes finden
                         for (int j = 0; j < result.Count; j++)
                         {
-                            var bounding = result[j].getBoundingRectangle();
+                            var bounding = result[j].GetBoundingRectangle();
                             // alle rausschmeißen, die nicht komplett im Viewport liegen
                             double center_x = bounding.x + bounding.width / 2;
                             double center_y = bounding.y + bounding.height / 2;
@@ -280,7 +280,7 @@ namespace DominoPlanner.Core
                     IterationInformation.numberofiterations = iter;
                     Console.WriteLine($"Iteration {iter}");
                     var cs = new System.Threading.CancellationTokenSource();
-                    Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = -1 , CancellationToken = cs.Token}, (i) =>
+                    Parallel.For(0, shapes.Length, new ParallelOptions() { MaxDegreeOfParallelism = -1 , CancellationToken = cs.Token}, (i) =>
                     {
                         
                         try
@@ -308,7 +308,7 @@ namespace DominoPlanner.Core
                 if (StateReference == StateReference.Before)
                 {
                     domino.PrimaryDitherColor = domino.PrimaryOriginalColor;
-                    domino.color = 0;
+                    domino.Color = 0;
                 }
                 else
                 {
@@ -346,9 +346,9 @@ namespace DominoPlanner.Core
                     for (int x = 0; x < length; x++)
                     {
                         shapes[length * y + x].CalculateColor(colors, ColorMode, TransparencySetting, IterationInformation.weights);
-                        int error_r = (int)(shapes[length * y + x].PrimaryDitherColor.Red - colors[shapes[length * y + x].color].mediaColor.R);
-                        int error_g = (int)(shapes[length * y + x].PrimaryDitherColor.Green - colors[shapes[length * y + x].color].mediaColor.G);
-                        int error_b = (int)(shapes[length * y + x].PrimaryDitherColor.Blue - colors[shapes[length * y + x].color].mediaColor.B);
+                        int error_r = (int)(shapes[length * y + x].PrimaryDitherColor.Red - colors[shapes[length * y + x].Color].mediaColor.R);
+                        int error_g = (int)(shapes[length * y + x].PrimaryDitherColor.Green - colors[shapes[length * y + x].Color].mediaColor.G);
+                        int error_b = (int)(shapes[length * y + x].PrimaryDitherColor.Blue - colors[shapes[length * y + x].Color].mediaColor.B);
                         DiffuseErrorField(x, y, error_r, error_g, error_b, shapes, length, height);
                     }
                 });

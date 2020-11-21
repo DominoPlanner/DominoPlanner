@@ -21,7 +21,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return (last.length - getLengthOfRow(0, current_width) - getLengthOfRow(2, current_width)) 
+                return (Last.Length - getLengthOfRow(0, current_width) - getLengthOfRow(2, current_width)) 
                     / getLengthOfRow(1,_current_width);
             }
             set { }
@@ -75,7 +75,7 @@ namespace DominoPlanner.Core
                 var current = getPositionFromIndex(source_domain[i]);
                 var target_index = getIndexFromPosition(current.Y + rowshift, current.X + colshift, current.CountInsideCell);
                 // nur im "mittleren" Bereich darf gepastet werden
-                target_domain[i] = current.Y + rowshift < current_height && current.X + colshift < current_width ? target_index : last.length;
+                target_domain[i] = current.Y + rowshift < current_height && current.X + colshift < current_width ? target_index : Last.Length;
             }
             return target_domain;
         }
@@ -139,7 +139,7 @@ namespace DominoPlanner.Core
                     for (int i=0; i < cells[target_coltyp, target_rowtyp].Count; i++)
                     {
                         if (targetindex + i >= target.Length) break;
-                        target[targetindex + i].color = last.shapes[sourceindex + i].color;
+                        target[targetindex + i].Color = Last.shapes[sourceindex + i].Color;
                     }
                 }
             }
@@ -173,7 +173,7 @@ namespace DominoPlanner.Core
                 var (startindex, rowtyp, coltyp) = getIndexUndTyp(index, i, 0, current_width, current_height, column);
                 for (int j = 0; j < cells[coltyp, rowtyp].Count; j++)
                 {
-                    result[position] = last.shapes[startindex + j].color;
+                    result[position] = Last.shapes[startindex + j].Color;
                     position++;
                 }
             }
@@ -188,7 +188,7 @@ namespace DominoPlanner.Core
                 var (startindex, rowtyp, coltyp) = getIndexUndTyp( index, i, 0, target_width, target_height, column);
                 for (int j = 0; j < cells[coltyp, rowtyp].Count; j++)
                 {
-                    target[startindex + j].color = rowcolumn[position];
+                    target[startindex + j].Color = rowcolumn[position];
                     position++;
                 }
             }

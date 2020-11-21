@@ -81,13 +81,13 @@ namespace DominoPlanner.Usage
     public class ReferenceManagerViewModel : ModelBase
     {
         public static ReferenceManager window;
-        public ObservableCollection<PathResolutionVM> vms { get; set; }
+        public ObservableCollection<PathResolutionVM> VMs { get; set; }
         public ReferenceManagerViewModel()
         {
-            vms = new ObservableCollection<PathResolutionVM>();
+            VMs = new ObservableCollection<PathResolutionVM>();
             foreach (var i in Workspace.Instance.resolvedPaths)
             {
-                vms.Add(new PathResolutionVM(i));
+                VMs.Add(new PathResolutionVM(i));
             }
         }
     }

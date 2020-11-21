@@ -70,7 +70,7 @@
                 </Button>
             </StackPanel>
         </Grid>
-      <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding currentBlock}" >
+      <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding CurrentBlock}" >
         <!--PointerPressed="ContentControl_MouseDown"-->
         <!--
           <i:Interaction.Behaviors>

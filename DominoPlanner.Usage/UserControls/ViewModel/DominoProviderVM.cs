@@ -53,7 +53,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set { if (value != _OpenPopup) { _OpenPopup = value; } }
         }
         int refrshCounter = 0;
-        Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+        readonly Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private DominoTransfer _dominoTransfer;
 
         public bool? AllowRegeneration { get; set; } = false;
@@ -88,23 +88,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        public DominoTransfer dominoTransfer
+        public DominoTransfer DominoTransfer
         {
             get { return _dominoTransfer; }
             set
             {
                 _dominoTransfer = value;
-                refreshPlanPic();
+                RefreshPlanPic();
 
-                PhysicalLength = dominoTransfer.physicalLength;
-                PhysicalHeight = dominoTransfer.physicalHeight;
+                PhysicalLength = DominoTransfer.PhysicalLength;
+                PhysicalHeight = DominoTransfer.PhysicalHeight;
             }
         }
         #endregion
 
         #region prope
         private Cursor _cursorState;
-        public Cursor cursor
+        public Cursor Cursor
         {
             get { return _cursorState; }
             set
@@ -138,7 +138,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         protected bool _draw_borders;
-        public bool draw_borders
+        public bool Draw_borders
         {
             get { return _draw_borders; }
             set
@@ -167,7 +167,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         private Avalonia.Media.Color _backgroundColor = Avalonia.Media.Color.FromArgb(0, 255, 255, 255);
-        public Avalonia.Media.Color backgroundColor
+        public Avalonia.Media.Color BackgroundColor
         {
             get { return _backgroundColor; }
             set
@@ -238,7 +238,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         public Avalonia.Threading.Dispatcher dispatcher;
-        protected void refreshPlanPic()
+        protected void RefreshPlanPic()
         {
             if (AllowRegeneration == true)
             {
@@ -270,8 +270,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else if (AllowRegeneration == null)
             {
-                cursor = null;
-                _dominoCount = dominoTransfer.length;
+                Cursor = null;
+                _dominoCount = DominoTransfer.Length;
                 PostCalculationUpdate();
             }
         }
@@ -286,7 +286,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cs?.Cancel();
                 cs = new CancellationTokenSource();
-                cursor = new Cursor(StandardCursorType.Wait);
+                Cursor = new Cursor(StandardCursorType.Wait);
                 refrshCounter++;
                 if (AllowRegeneration == true)
                 {
@@ -297,13 +297,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             return CurrentProject.Generate(cs.Token, progress);
                         }
-                        catch { return CurrentProject.last; }
+                        catch { return CurrentProject.Last; }
                     });
                     DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
                     refrshCounter--;
                     if (refrshCounter == 0)
                     {
-                        dominoTransfer = dt;
+                        DominoTransfer = dt;
                     }
                 }
                 else if (AllowRegeneration == null)
@@ -316,13 +316,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             CurrentProject.RegenerateShapes();
                         }
                         catch { }
-                        return CurrentProject.last;
+                        return CurrentProject.Last;
                     });
                     DominoTransfer dt = await Task.Factory.StartNew(function);
                     refrshCounter--;
                     if (refrshCounter == 0)
                     {
-                        dominoTransfer = dt;
+                        DominoTransfer = dt;
                     }
                 }
             }
@@ -374,8 +374,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         protected void OpenBuildTools()
         {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
+            ProtocolV protocolV = new ProtocolV
+            {
+                DataContext = new ProtocolVM(CurrentProject, name, assemblyname)
+            };
             protocolV.Show(MainWindowViewModel.GetWindow());
         }
         public void RefreshTargetSize()
@@ -383,7 +385,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             bool oldUndoState = undostate;
             undostate = true;
             if (DominoCount > 0)
-                DominoCount = DominoCount + 1;
+                DominoCount += 1;
             undostate= oldUndoState;
         }
 

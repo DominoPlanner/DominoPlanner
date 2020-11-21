@@ -1,5 +1,4 @@
-﻿using Emgu.CV;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -91,6 +90,7 @@ namespace DominoPlanner.Core
         private Color _color;
         public Color Color { get => _color; set { SetField(ref _color, value); } }
         [ProtoMember(2)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "needed for serialization")]
         private String ColorSerialized
         {
             get { return Color.ToString(); }

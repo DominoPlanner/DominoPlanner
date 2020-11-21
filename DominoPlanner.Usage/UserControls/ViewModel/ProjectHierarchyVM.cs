@@ -67,8 +67,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        public AssemblyNodeVM parent { get; set; }
-        public ContextMenu contextMenu { get; set; }
+        public AssemblyNodeVM Parent { get; set; }
 
         public static Action<TabItem> openTab;
         public static Func<NodeVM, Task<bool>> closeTab;
@@ -106,8 +105,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     var ContextMenuEntries = BuildContextMenu();
                     if (ContextMenuEntries != null)
                     {
-                        _ContextMenu = new ContextMenu();
-                        _ContextMenu.Items = ContextMenuEntries;
+                        _ContextMenu = new ContextMenu
+                        {
+                            Items = ContextMenuEntries
+                        };
                     }
                 }
                 return _ContextMenu;
@@ -150,6 +151,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     return new AssemblyNodeVM(assy, parent);
                 case DocumentNode dn:
                     return new DocumentNodeVM(dn);
+                default:
+                    break;
             }
             return null;
         }
@@ -163,7 +166,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (brokenReference)
             {
                 await new ReferenceManager().ShowDialog(MainWindowViewModel.GetWindow());
-                parent?.AssemblyModel.Save();
+                Parent?.AssemblyModel.Save();
                 PostReferenceRestoration();
             }
             Open();
@@ -177,7 +180,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         public abstract void Open();
-        
+
     }
     public abstract class DominoWrapperNodeVM : NodeVM
     {
@@ -200,7 +203,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
     public class AssemblyNodeVM : DominoWrapperNodeVM
     {
-        public ColorNodeVM colorNode { get; set; }
+        public ColorNodeVM ColorNode { get; set; }
         public AssemblyNode AssemblyModel
         {
             get => Model as AssemblyNode;
@@ -242,7 +245,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             AssemblyModel = assembly;
             AssemblyModel.RelativePathChanged += (s, args) => RelativePathChanged();
-            colorNode = new ColorNodeVM(this);
+            ColorNode = new ColorNodeVM(this);
             LoadChildren();
         }
 
@@ -257,12 +260,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             NodeVM.openTab = openTab;
             NodeVM.closeTab = closeTab;
             NodeVM.getTab = getTab;
-            colorNode = new ColorNodeVM(this);
+            ColorNode = new ColorNodeVM(this);
             LoadChildren();
         }
         public void Initialize()
         {
-            colorNode = new ColorNodeVM(this);
+            ColorNode = new ColorNodeVM(this);
             LoadChildren();
         }
         public void LoadChildren()
@@ -273,27 +276,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Children.CollectionChanged -= ChildrenAddDelegates;
                 Children.CollectionChanged += ChildrenAddDelegates;
 
-                for (int i = 0; i < AssemblyModel.obj.children.Count; i++)
+                for (int i = 0; i < AssemblyModel.Obj.children.Count; i++)
                 {
-                    var node = AssemblyModel.obj.children[i];
+                    var node = AssemblyModel.Obj.children[i];
                     try
                     {
                         if (node is IDominoWrapper idw && (idw is AssemblyNode || idw is DocumentNode))
                         {
                             var vm = NodeVMFactory(idw, this);
-                            vm.parent = this;
+                            vm.Parent = this;
                             Children.Add(vm as DominoWrapperNodeVM);
                         }
                     }
                     catch (Exception ex) when (ex is InvalidDataException || ex is ProtoBuf.ProtoException)
                     {
                         // broken Subassembly
-                        var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, colorNode.AbsolutePath);
+                        var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, ColorNode.AbsolutePath);
                         {
-                            restored.parent = AssemblyModel.obj;
+                            restored.parent = AssemblyModel.Obj;
                             // make color path relative
                             restored.Path = Workspace.MakeRelativePath(AbsolutePath, restored.Path);
-                            AssemblyModel.obj.children[i] = restored;
+                            AssemblyModel.Obj.children[i] = restored;
                             Children.Add(NodeVMFactory(restored, this) as AssemblyNodeVM);
                             AssemblyModel.Save();
                         }
@@ -311,7 +314,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         AssemblyModel.Save();*/
                     }
                 }
-                AssemblyModel.obj.children.CollectionChanged += AssemblyModelChildren_CollectionChanged;
+                AssemblyModel.Obj.children.CollectionChanged += AssemblyModelChildren_CollectionChanged;
                 this.BrokenReference = false;
             }
             catch (FileNotFoundException)
@@ -367,7 +370,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     if (item is AssemblyNode || item is DocumentNode)
                     {
                         var newNode = NodeVMFactory(item as IDominoWrapper, this);
-                        newNode.parent = this;
+                        newNode.Parent = this;
                         Children.Add(newNode as DominoWrapperNodeVM);
                     }
                 }
@@ -376,14 +379,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void RemoveChild(DominoWrapperNodeVM node)
         {
-            AssemblyModel.obj.children.Remove(node.Model);
+            AssemblyModel.Obj.children.Remove(node.Model);
         }
         [ContextMenuAttribute("Open color list", "Icons/colorLine.ico", index: 0)]
         public void OpenColorList()
         {
             try
             {
-                colorNode.Open();
+                ColorNode.Open();
                 BrokenReference = false;
             }
             catch (FileNotFoundException)
@@ -398,7 +401,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Add new object", "Icons/add.ico", index: 1)]
         public async void NewFieldStructure()
         {
-            NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.obj);
+            NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.Obj);
             await new NewObject(novm).ShowDialog(MainWindowViewModel.GetWindow()) ;
             if (!novm.Close || novm.ResultNode == null) return;
             Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
@@ -421,7 +424,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     try
                     {
-                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.obj, result[0]);
+                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.Obj, result[0]);
                         AssemblyModel.Save();
                         Children.Where(x => x.Model == node).FirstOrDefault()?.Open();
                     }
@@ -436,12 +439,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         string relativePath = Workspace.MakeRelativePath(AbsolutePath, result[0]);
                         var assy = Workspace.Load<DominoAssembly>(result[0]);
-                        if (assy == AssemblyModel.obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.obj))
+                        if (assy == AssemblyModel.Obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.Obj))
                         {
                             Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
                             return;
                         }
-                        IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.obj);
+                        IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.Obj);
                         AssemblyModel.Save();
                     }
                     catch { }
@@ -452,14 +455,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
         public async void Rename()
         {
-            var dn = (AssemblyNode)Model;
             RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
             if (await ro.ShowDialog<bool>(MainWindowViewModel.GetWindow()) == true)
             {
                 Workspace.CloseFile(AbsolutePath);
                 var new_path = Path.Combine(Path.GetDirectoryName(AbsolutePath), ((RenameObjectVM)ro.DataContext).NewName);
                 File.Move(AbsolutePath, new_path);
-                if (parent == null)
+                if (Parent == null)
                 {
                     OpenProjectSerializer.RenameProject(AbsolutePath, new_path);
                     AssemblyModel.Path = new_path;
@@ -467,16 +469,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    AssemblyModel.Path = Workspace.MakeRelativePath(parent.AbsolutePath, new_path);
+                    AssemblyModel.Path = Workspace.MakeRelativePath(Parent.AbsolutePath, new_path);
                 }
             }
         }
         [ContextMenuAttribute("Remove", "Icons/remove.ico", index: 4)]
         public void Remove()
         {
-            if (parent != null)
+            if (Parent != null)
             {
-                this.parent.RemoveChild(this);
+                this.Parent.RemoveChild(this);
             }
             else
             {
@@ -500,13 +502,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 throw new InvalidDataException("Color file not found");
             }
-            colorlistPath = colorlistPath ?? colorres.First();
+            colorlistPath ??= colorres.First();
             Workspace.CloseFile(projectpath);
             if (File.Exists(projectpath))
                 File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.{MainWindow.ReadSetting("ProjectExtension")}"));
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
-            newMainNode.colorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
+            newMainNode.ColorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
             foreach (string path in Directory.EnumerateDirectories(colorpath))
             {
                 try
@@ -556,7 +558,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             set
             {
-                if (parent == null)
+                if (Parent == null)
                 {
                     AssemblyModel.Path = value;
                 }
@@ -565,31 +567,31 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class ColorNodeVM : NodeVM
     {
-        public override string RelativePathFromParent { get => parent.AssemblyModel.obj.colorPath; set => throw new NotImplementedException(); }
+        public override string RelativePathFromParent { get => Parent.AssemblyModel.Obj.ColorPath; set => throw new NotImplementedException(); }
 
         public ColorNodeVM(AssemblyNodeVM assembly)
         {
-            parent = assembly;
+            Parent = assembly;
         }
         public override void Open()
         {
             TabItem tabItem = NodeVM.getTab(this);
             if (tabItem != null && tabItem.Content is ColorListControlVM c) 
-                c.DominoAssembly = parent.AssemblyModel;
+                c.DominoAssembly = Parent.AssemblyModel;
             NodeVM.openTab(tabItem ?? new TabItem(this));
         }
         public override string AbsolutePath {
-            get => Workspace.AbsolutePathFromReferenceLoseUpdate(RelativePathFromParent, parent.AssemblyModel.obj);
+            get => Workspace.AbsolutePathFromReferenceLoseUpdate(RelativePathFromParent, Parent.AssemblyModel.Obj);
             set => throw new NotImplementedException(); }
     }
     public class DocumentNodeVM : DominoWrapperNodeVM
     {
         public override string RelativePathFromParent
         {
-            get => DocumentModel.relativePath;
+            get => DocumentModel.RelativePath;
             set
             {
-                DocumentModel.relativePath = value;
+                DocumentModel.RelativePath = value;
                 _AbsolutePath = null;
             }
         }
@@ -658,7 +660,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Color background = Colors.Transparent;
                 if (userDefinedExport)
                 {
-                    ExportOptions exp = new ExportOptions(DocumentModel.obj);
+                    ExportOptions exp = new ExportOptions(DocumentModel.Obj);
                     if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
                     {
                         var dc = exp.DataContext as ExportOptionsVM;
@@ -683,7 +685,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         File.Delete(result);
                     }
-                    DocumentModel.obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(result);
+                    DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(result);
 
                 }
             }
@@ -692,14 +694,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Show protocol", "Icons/file_export.ico", "HasFieldProtocol", true, 6)]
         public void ShowProtocol()
         {
-            if (!DocumentModel.obj.HasProtocolDefinition)
+            if (!DocumentModel.Obj.HasProtocolDefinition)
             {
                 Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
                 return;
             }
             ProtocolV protocolV = new ProtocolV();
-            DocumentModel.obj.Generate(new System.Threading.CancellationToken());
-            protocolV.DataContext = new ProtocolVM(DocumentModel.obj, Path.GetFileNameWithoutExtension(DocumentModel.relativePath));
+            DocumentModel.Obj.Generate(new System.Threading.CancellationToken());
+            protocolV.DataContext = new ProtocolVM(DocumentModel.Obj, Path.GetFileNameWithoutExtension(DocumentModel.RelativePath));
             protocolV.Show();
         }
         [ContextMenuAttribute("Open", "Icons/folder_tar.ico", Index = 0)]
@@ -726,11 +728,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                var msgbox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("Delete?", $"Remove reference to file {Name} from project {parent.Name}?\n" +
+                var msgbox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("Delete?", $"Remove reference to file {Name} from project {Parent.Name}?\n" +
                     $"The file won't be permanently deleted.", MessageBox.Avalonia.Enums.ButtonEnum.YesNo, MessageBox.Avalonia.Enums.Icon.Warning);
                 if (await closeTab(this) && await msgbox.ShowDialog(MainWindowViewModel.GetWindow())  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
                 {
-                    parent.RemoveChild(this);
+                    Parent.RemoveChild(this);
                     Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);
                 }
             }
@@ -753,7 +755,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     File.Move(old_path, Path.Combine(Path.GetDirectoryName(old_path), ((RenameObjectVM)ro.DataContext).NewName));
                     RelativePathFromParent = Path.Combine(Path.GetDirectoryName(RelativePathFromParent), 
                         ((RenameObjectVM)ro.DataContext).NewName);
-                    parent.AssemblyModel.Save();
+                    Parent.AssemblyModel.Save();
                     Open();
                 }
             }

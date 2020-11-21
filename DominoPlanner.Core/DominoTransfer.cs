@@ -1,6 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.Util;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,8 +21,8 @@ namespace DominoPlanner.Core
         //[ProtoMember(3, AsReference = true)]
         public ColorRepository colors;
         [ProtoMember(4, AsReference = true)]
-        public IterationInformation iterationInfo {get; set;}
-        public int length
+        public IterationInformation IterationInfo {get; set;}
+        public int Length
         {
             get { return shapes.Length; }
         }
@@ -42,28 +40,28 @@ namespace DominoPlanner.Core
                 return shapes.Max(y => (y.position != null) ? y.position.y : 0) + 1;
             }
         }
-        public int physicalLength
+        public int PhysicalLength
         {
             get
             {
                 return shapes.Max(x => x.GetContainer().x2) + 1;
             }
         }
-        public int physicalHeight
+        public int PhysicalHeight
         {
             get
             {
                 return shapes.Max(y => y.GetContainer().y2) + 1;
             }
         }
-        public int physicalExpandedLength
+        public int PhysicalExpandedLength
         {
             get
             {
                 return shapes.Max(x => x.GetContainer(expanded: true).x2) + 1;
             }
         }
-        public int physicalExpandedHeight
+        public int PhysicalExpandedHeight
         {
             get
             {
@@ -111,7 +109,7 @@ namespace DominoPlanner.Core
                     Color c;
                     if (colorType == 0)
                     {
-                        c = colors[shapes[i].color].mediaColor;
+                        c = colors[shapes[i].Color].mediaColor;
                     }
                     else if (colorType == 1)
                     {

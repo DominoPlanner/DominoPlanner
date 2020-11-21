@@ -6,8 +6,6 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Emgu.CV;
-using Emgu.CV.Structure;
 using ProtoBuf;
 using SkiaSharp;
 
@@ -39,7 +37,7 @@ namespace DominoPlanner.Core
         [ProtoMember(5)]
         public double RotateAngle { get => rotate_angle; set => SetField(ref rotate_angle, value); }
         private SKBitmap _to_blend;
-        internal SKBitmap to_blend
+        internal SKBitmap To_blend
         {
             get
             {
@@ -56,7 +54,7 @@ namespace DominoPlanner.Core
         {
             if (!mat_valid) UpdateMat();
             SKBitmap image = new SKBitmap();
-            to_blend.CopyTo(image);
+            To_blend.CopyTo(image);
             if (scale_x != 1 || scale_y != 1)
             {
                 SKImageInfo info = new SKImageInfo((int)(image.Width * scale_x), (int)(image.Height * scale_y));
@@ -64,14 +62,12 @@ namespace DominoPlanner.Core
             }
             //if (rotate_angle != 0)
             //    image = image.Rotate(rotate_angle, new Bgra(0, 0, 0, 0), false);
-            using (SKCanvas canvas = new SKCanvas(input))
-            {
-                canvas.DrawBitmap(image, new SKPoint((int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d)));
-            }
+            using SKCanvas canvas = new SKCanvas(input);
+            canvas.DrawBitmap(image, new SKPoint((int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d)));
         }
         public Size GetSizeOfMat()
         {
-            return new Size(to_blend.Width, to_blend.Height);
+            return new Size(To_blend.Width, To_blend.Height);
         }
         public bool mat_valid;
         public abstract void UpdateMat();
@@ -97,7 +93,8 @@ namespace DominoPlanner.Core
         public FontStyle FontStyle { get => _fontStyle; set { if (SetField(ref _fontStyle, value)) mat_valid = false; } }
 
         [ProtoMember(5)]
-        private string before_surrogate { get { return ColorTranslator.ToHtml(_color); } set { _color = ColorTranslator.FromHtml(value); } }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _color")]
+        private string Before_surrogate { get { return ColorTranslator.ToHtml(_color); } set { _color = ColorTranslator.FromHtml(value); } }
         private Color _color;
         public Color Color { get => _color; set { SetField(ref _color, value); mat_valid = false; } }
         [ProtoAfterDeserialization]
@@ -132,7 +129,7 @@ namespace DominoPlanner.Core
         }
         public override void UpdateMat()
         {
-            to_blend = SKBitmap.Decode(Workspace.AbsolutePathFromReference(ref _filepath, parent));
+            To_blend = SKBitmap.Decode(Workspace.AbsolutePathFromReference(ref _filepath, parent));
         }
         public BlendFileFilter()
         {
@@ -168,7 +165,7 @@ namespace DominoPlanner.Core
     {
         private double _gamma;
         [ProtoMember(1)]
-        public double Gamma { get => _gamma; set { SetField(ref _gamma, value); updateLUT(); } }
+        public double Gamma { get => _gamma; set { SetField(ref _gamma, value); UpdateLUT(); } }
 
         private byte[] LUT;
         public override void Apply(SKBitmap input)
@@ -184,7 +181,7 @@ namespace DominoPlanner.Core
             });
 
         }
-        public void updateLUT()
+        public void UpdateLUT()
         {
             LUT = new byte[256];
             for (int i = 0; i < LUT.Length; i++)
@@ -228,11 +225,14 @@ namespace DominoPlanner.Core
     public class ReplaceColorFilter : ImageFilter
     {
         [ProtoMember(2)]
-        private string before_surrogate { get { return ColorTranslator.ToHtml(_before); } set { _before = ColorTranslator.FromHtml(value); } }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _before")]
+        private string Before_surrogate { get { return ColorTranslator.ToHtml(_before); } set { _before = ColorTranslator.FromHtml(value); } }
         private Color _before;
         public Color BeforeColor { get => _before; set { SetField(ref _before, value); } }
         [ProtoMember(3)]
-        private string after_surrogate { get { return ColorTranslator.ToHtml(_after); } set { _after = ColorTranslator.FromHtml(value); } }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _after")]
+        private string After_surrogate { get { return ColorTranslator.ToHtml(_after); } set { _after = ColorTranslator.FromHtml(value); } }
         private Color _after;
         public Color AfterColor { get => _after; set { SetField(ref _after, value); } }
         private int _tol;
@@ -258,7 +258,7 @@ namespace DominoPlanner.Core
     }
     public static class ImageExtensions
     {
-        public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
+        /*public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
         {
             Bitmap source = background.ToBitmap();
             Bitmap over = overlay.AsBitmap();
@@ -306,26 +306,6 @@ namespace DominoPlanner.Core
                 source.UnlockBits(backgroundData);
             }
             background = source.ToImage<Bgra, byte>();
-        }
-        public static void OpacityReduction(this SKBitmap input, double opacity)
-        {
-            unsafe
-            {
-                var pixels = input.GetPixels(out var length);
-                var ptr = (byte*) pixels.ToPointer();
-                int height = input.Height;
-                int width = input.Width;
-                for (int row = 0; row < height; row++)
-                {
-                    for (var col = 0; col < width; col++)
-                    {
-                        var adress = (ptr + (row * width + col) * 4 + 3);
-                        var value = *adress;
-                        var new_opacity = (double)value * opacity;
-                        *adress = (byte)(new_opacity > 255 ? 255 : new_opacity);
-                    }
-                }
-            }
-        }
+*/
     }
 }

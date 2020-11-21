@@ -7,20 +7,12 @@ namespace DominoPlanner.Usage
     {
         internal static async void RaiseMessage(string message, string header, MessageType messageType)
         {
-            Icon image;
-            switch (messageType)
+            var image = messageType switch
             {
-                case MessageType.Error:
-                    image = Icon.Error;
-                    break;
-                case MessageType.Warning:
-                    image = Icon.Warning;
-                    break;
-                case MessageType.Info:
-                default:
-                    image = Icon.Info;
-                    break;
-            }
+                MessageType.Error => Icon.Error,
+                MessageType.Warning => Icon.Warning,
+                _ => Icon.Info,
+            };
             var box = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(header, message, ButtonEnum.Ok, image);
             if (MainWindowViewModel.GetWindow() != null)
                 await box.Show();

@@ -86,7 +86,7 @@
 
               </TextBlock>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Text="{Binding Extension}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
-                <TextBox VerticalContentAlignment="Center"  TextWrapping="Wrap" Margin="5, 0, 0, 0" Text="{Binding filename}"  />
+                <TextBox VerticalContentAlignment="Center"  TextWrapping="Wrap" Margin="5, 0, 0, 0" Text="{Binding Filename}"  />
             </DockPanel>
             <ListBox Margin="5" DockPanel.Dock="Top" SelectedIndex="{Binding SelectedType}" Items="{Binding ViewModels}" HorizontalAlignment="Stretch" Height="250" VerticalAlignment="Top" BorderThickness="2">
                 <ListBox.ItemTemplate>

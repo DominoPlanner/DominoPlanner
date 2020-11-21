@@ -7,9 +7,6 @@
              xmlns:vm="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.ColorControl">
-  <UserControl.Resources>
-    <vm:OffsetConverter x:Key="OffsetConverter"/>
-  </UserControl.Resources>
   <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
     <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
       <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">

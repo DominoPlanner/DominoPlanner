@@ -35,7 +35,7 @@
     <TextBlock Text="Resolved absolute path" Grid.Column="3"/>
     <GridSplitter Grid.Column="3" Width="2" HorizontalAlignment="Right" ResizeDirection="Columns"/>
   </Grid>
-    <ListBox Items="{Binding vms}">
+    <ListBox Items="{Binding VMs}">
       <ListBox.DataTemplates>
         <DataTemplate DataType="{x:Type local:PathResolutionVM}">
           <Grid DockPanel.Dock="Top">

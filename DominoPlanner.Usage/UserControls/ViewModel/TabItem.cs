@@ -23,7 +23,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public TabItem(string Header, string picturePath, string path) : this(path, "")
         {
             this.Header = Header;
-            this.picture = picturePath;
+            this.Picture = picturePath;
         }
 
         public TabItem(string Header, string picturePath, string path, TabBaseVM content) : this(Header, picturePath, path)
@@ -33,7 +33,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public TabItem(string path) : this(path, "")
         {
             this.Header = System.IO.Path.GetFileNameWithoutExtension(path);
-            this.picture = ImageHelper.GetImageOfFile(path);
+            this.Picture = ImageHelper.GetImageOfFile(path);
             var ext = System.IO.Path.GetExtension(path).ToLower();
             if (ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
             {
@@ -53,12 +53,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public TabItem(DocumentNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         {
-            Content = ViewModelGenerator(project.DocumentModel.obj, project.AbsolutePath);
+            Content = ViewModelGenerator(project.DocumentModel.Obj, project.AbsolutePath);
             ResetContent();
         }
         public TabItem(ColorNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         { 
-            Content = new ColorListControlVM(project.parent.AssemblyModel);
+            Content = new ColorListControlVM(project.Parent.AssemblyModel);
             ResetContent();
         }
         public static TabItem TabItemGenerator(NodeVM project)
@@ -132,7 +132,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region prope
 
-        public string picture { get; set; }
+        public string Picture { get; set; }
 
         private int _ProjectID;
         public int ProjectID

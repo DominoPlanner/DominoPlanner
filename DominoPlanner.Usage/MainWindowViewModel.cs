@@ -53,7 +53,7 @@ namespace DominoPlanner.Usage
             FileListClickCommand = new RelayCommand(o => { OpenItemFromPath(o); });
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
             Workspace.del = UpdateReferenceAsync;
-            loadProjectList();
+            LoadProjectList();
         }
 
         internal async Task<bool> CloseAllTabs()
@@ -75,15 +75,17 @@ namespace DominoPlanner.Usage
         }
         private string UpdateReferenceAsync(string absolutePath, string parentPath)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Directory = Path.GetDirectoryName(absolutePath);
-            ofd.Title = $"Locate file {Path.GetFileName(absolutePath)}";
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Directory = Path.GetDirectoryName(absolutePath),
+                Title = $"Locate file {Path.GetFileName(absolutePath)}",
+                AllowMultiple = false
+            };
             Errorhandler.RaiseMessage($"The object {parentPath} contains a reference to the file {absolutePath}," +
                 $"which could not be located. Please find the file.", "Missing file", Errorhandler.MessageType.Error);
             string extension = Path.GetExtension(absolutePath);
             ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { extension }, Name = $"{extension} files" });
             ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
-            ofd.AllowMultiple = false;
             string[] result = ofd.ShowDialog();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             { 
@@ -290,7 +292,7 @@ namespace DominoPlanner.Usage
                     if (File.Exists(fn))
                     {
                         OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(fn), Path.GetDirectoryName(fn));
-                        loadProject(openProject);
+                        LoadProject(openProject);
                     }
                 }
             }
@@ -310,7 +312,7 @@ namespace DominoPlanner.Usage
                 }
                 else
                 {
-                    SelectedProject = node.parent;
+                    SelectedProject = node.Parent;
                 }
             }
         }
@@ -366,7 +368,7 @@ namespace DominoPlanner.Usage
         /// <summary>
         /// Projektliste laden
         /// </summary>
-        private void loadProjectList()
+        private void LoadProjectList()
         {
             Projects = new ObservableCollection<AssemblyNodeVM>();
             List<OpenProject> OpenProjects = OpenProjectSerializer.GetOpenProjects();
@@ -374,7 +376,7 @@ namespace DominoPlanner.Usage
             {
                 foreach (OpenProject curOP in OpenProjects)
                 {
-                    loadProject(curOP);
+                    LoadProject(curOP);
                 }
             }
             else
@@ -384,7 +386,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private void loadProject(OpenProject newProject)
+        private void LoadProject(OpenProject newProject)
         {
             bool remove = true;
             string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{MainWindow.ReadSetting("ProjectExtension")}");
@@ -400,7 +402,7 @@ namespace DominoPlanner.Usage
                     // check if the file can be deserialized properly
                     node = new AssemblyNodeVM(mainnode, OpenItem, RemoveNodeFromTabs, GetTab);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     try
                     {
@@ -428,13 +430,13 @@ namespace DominoPlanner.Usage
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
             }
         }
-        private List<ProjectElement> getProjects(DominoAssembly dominoAssembly)
+        private List<ProjectElement> GetProjects(DominoAssembly dominoAssembly)
         {
             List<ProjectElement> returnList = new List<ProjectElement>();
 
             if (dominoAssembly != null)
             {
-                ProjectElement color = new ProjectElement(dominoAssembly.colorPath, @".\Icons\colorLine.ico", null);
+                ProjectElement color = new ProjectElement(dominoAssembly.ColorPath, @".\Icons\colorLine.ico", null);
                 returnList.Add(color);
             }
 
@@ -442,9 +444,9 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    string relativePath = dominoWrapper.relativePath;
+                    string relativePath = dominoWrapper.RelativePath;
                     string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoWrapper.parent);
-                    dominoWrapper.relativePath = relativePath;
+                    dominoWrapper.RelativePath = relativePath;
                     string picturepath = ImageHelper.GetImageOfFile(filepath);
                     ProjectElement project = new ProjectElement(filepath,
                         picturepath, dominoWrapper);
@@ -456,7 +458,7 @@ namespace DominoPlanner.Usage
                 {
                     // Remove file from Project
                     dominoAssembly.children.Remove(dominoWrapper);
-                    Errorhandler.RaiseMessage($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
+                    Errorhandler.RaiseMessage($"The file {dominoWrapper.RelativePath} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
                     dominoAssembly.Save();
                 }
             }
@@ -488,10 +490,10 @@ namespace DominoPlanner.Usage
                     return ass;
                 else
                 {
-                    var cur = SelectedProject.parent;
+                    var cur = SelectedProject.Parent;
                     while (!(cur is AssemblyNodeVM))
                     {
-                        cur = cur.parent;
+                        cur = cur.Parent;
                     }
                     return cur;
                 }
@@ -508,7 +510,7 @@ namespace DominoPlanner.Usage
             {
                 {
                     OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(result[0]), Path.GetDirectoryName(result[0]));
-                    loadProject(openProject);
+                    LoadProject(openProject);
                 }
             }
         }
@@ -534,7 +536,7 @@ namespace DominoPlanner.Usage
                     Errorhandler.RaiseMessage("Could not create new Project!", "Error!", Errorhandler.MessageType.Error);
                     return;
                 }
-                loadProject(newProj);
+                LoadProject(newProj);
             }
         }
 
