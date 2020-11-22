@@ -19,9 +19,9 @@ namespace DominoPlanner.Core
     {
         public static Lab SKToLab(this SKColor color)
         {
-            double r = color.Red / 255,
-                g = color.Green / 255,
-                b = color.Blue / 255,
+            double r = color.Red / 255d,
+                g = color.Green / 255d,
+                b = color.Blue / 255d,
                 x, y, z;
 
             r = (r > 0.04045) ? Math.Pow((r + 0.055) / 1.055, 2.4) : r / 12.92;

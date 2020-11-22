@@ -124,8 +124,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return TabItemType.CreateField;
             }
         }
-        private WriteableBitmap _CurrentPlan;
-        public WriteableBitmap CurrentPlan
+        private Bitmap _CurrentPlan;
+        public Bitmap CurrentPlan
         {
             get { return _CurrentPlan; }
             set
@@ -240,33 +240,30 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public Avalonia.Threading.Dispatcher dispatcher;
         protected void RefreshPlanPic()
         {
-            if (AllowRegeneration == true)
+            void regenerate()
             {
-                System.Diagnostics.Debug.WriteLine(progress.ToString());
-                /*if (dispatcher == null)
+                try
                 {
-                    CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                    cursor = null;
-                    _dominoCount = dominoTransfer.length;
+                    var new_img = DominoTransfer.GenerateImage(BackgroundColor, 2000, Draw_borders, Collapsed).Snapshot();
+                    CurrentPlan = Bitmap.DecodeToWidth(new_img.Encode().AsStream(), new_img.Width);
+                    Cursor = null;
+                    _dominoCount = DominoTransfer.Length;
                     PostCalculationUpdate();
                     RefreshColorAmount();
                 }
+                catch { }
+            };
+            if (AllowRegeneration == true)
+            {
+                System.Diagnostics.Debug.WriteLine(progress.ToString());
+                if (dispatcher == null)
+                {
+                    regenerate();
+                }
                 else
                 {
-                    dispatcher.InvokeAsync((Action)(() =>
-                    {
-                        try
-                        {
-                            WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                            CurrentPlan = newBitmap;
-                            _dominoCount = dominoTransfer.length;
-                            PostCalculationUpdate();
-                            RefreshColorAmount();
-                            cursor = null;
-                        }
-                        catch { }
-                    }));
-                }*/
+                    dispatcher.InvokeAsync(regenerate);
+                }
             }
             else if (AllowRegeneration == null)
             {

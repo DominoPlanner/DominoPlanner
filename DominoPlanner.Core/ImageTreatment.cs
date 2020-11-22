@@ -335,7 +335,7 @@ namespace DominoPlanner.Core
                     {
                         if (StateReference == StateReference.Before)
                         {
-                            shapes[length * yi + xi].PrimaryOriginalColor = image.GetPixel(yi, xi);
+                            shapes[length * yi + xi].PrimaryOriginalColor = image.GetPixel(xi, yi);
                         }
                         else
                         {
