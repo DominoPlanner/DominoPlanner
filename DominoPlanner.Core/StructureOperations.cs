@@ -152,9 +152,12 @@ namespace DominoPlanner.Core
             {
                 for (int x = -1; x < current_width + 1; x++)
                 {
+                    var cur = cells[getTyp(x, true, current_width, current_height), getTyp(y, false, current_width, current_height)];
+                    // hackfix for a race condition :/
+                    if (cells[1, 1] == null || cells[0, 0] == null || cur == null)
+                        continue;
                     DominoList.AddRange(
-                        (cells[getTyp(x, true, current_width, current_height), getTyp(y, false, current_width, current_height)]
-                        .TransformDefinition(
+                        (cur.TransformDefinition(
                             (x == -1) ? 0 : (cells[1, 1].width * x + cells[0, 0].width),
                             (y == -1) ? 0 : (cells[1, 1].height * y + cells[0, 0].height),
                             x, y, current_width, current_height))

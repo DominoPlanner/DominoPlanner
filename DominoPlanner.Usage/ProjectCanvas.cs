@@ -199,10 +199,10 @@ namespace DominoPlanner.Usage
 
         private void ProjectChanged()
         {
-            if (Project != null)
+            if (Project != null && Project.Count > 0)
             {
-                this.ProjectHeight = Project.Max(x => x.CanvasPoints.Max(y => y.Y));
-                this.ProjectWidth = Project.Max(x => x.CanvasPoints.Max(y => y.X));
+                this.ProjectHeight = Project.Max(x => x.CanvasPoints.Length > 0 ? x.CanvasPoints.Max(y => y.Y) : 0);
+                this.ProjectWidth = Project.Max(x => x.CanvasPoints.Length > 0 ? x.CanvasPoints.Max(y => y.X) : 0);
             }
         }
 
@@ -281,85 +281,9 @@ namespace DominoPlanner.Usage
 
 
         public override void Render(DrawingContext context)
-        {
-            /*IImage bit = null;
-            if (opacity_value != 0)
-            {
-                var reduced = OriginalImage.Clone();
-                Core.ImageExtensions.OpacityReduction(reduced, opacity_value);
-                //bit = BitmapSourceConvert.ToBitmapSource(reduced);
-            }
-            base.Render(dc);
-
-            var unselectedBrush = new SolidColorBrush(UnselectedBorderColor);
-            var selectedBrush = new SolidColorBrush(SelectedBorderColor);
-            if (!above && bit != null)
-                dc.DrawImage(bit, new Rect(0, 0, Width, Height));
-            foreach (DominoInCanvas dic in Stones)
-            {
-                Point point1 = dic.canvasPoints[0];
-                Point point2 = dic.canvasPoints[1];
-                Point point3 = dic.canvasPoints[2];
-                Point point4 = dic.canvasPoints[3];
-
-                StreamGeometry streamGeometry = new StreamGeometry();
-                using (StreamGeometryContext geometryContext = streamGeometry.Open())
-                {
-                    geometryContext.BeginFigure(point1, true);
-                    geometryContext.LineTo(point2);
-                    geometryContext.LineTo(point3);
-                    geometryContext.LineTo(point4);
-                    geometryContext.EndFigure(true);
-                }
-
-                Pen pen = new Pen();
-                if (dic.isSelected)
-                {
-                    pen.Brush = selectedBrush;
-                    pen.Thickness = BorderSize;
-                }
-                else if (dic.PossibleToPaste)
-                {
-                    pen.Brush = Brushes.Plum;
-                    pen.Thickness = BorderSize;
-                }
-                else
-                {
-                    pen.Brush = unselectedBrush;
-                    pen.Thickness = BorderSize / 2;
-                }
-
-                dc.DrawGeometry(new SolidColorBrush(dic.StoneColor), pen, streamGeometry);
-            }
-            if (above && bit != null)
-                dc.DrawImage(bit, new Rect(0, 0, Width, Height));
-            */
-            
+        {             
             context.Custom(new DominoRenderer(this));
-            //Dispatcher.UIThread.InvokeAsync(InvalidateVisual, DispatcherPriority.Background);
         }
-    }
-    public static class BitmapSourceConvert
-    {
-        /*[DllImport("gdi32")]
-        private static extern int DeleteObject(IntPtr o);
-
-        public static BitmapSource ToBitmapSource(IImage image)
-        {
-            using (System.Drawing.Bitmap source = image.Bitmap)
-            {
-                IntPtr ptr = source.GetHbitmap();
-
-                BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                    ptr,
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-
-                DeleteObject(ptr);
-                return bs;
-            }
-        }*/
     }
     public class DominoRenderer : ICustomDrawOperation
     {

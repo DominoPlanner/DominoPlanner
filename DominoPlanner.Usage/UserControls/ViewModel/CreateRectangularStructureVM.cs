@@ -1,12 +1,12 @@
-﻿using Avalonia.Media;
+﻿using Avalonia.Collections;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using DominoPlanner.Core;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -113,17 +113,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private IImage[] _description_imgs;
-        public IImage[] description_imgs
+        private AvaloniaList<IImage> _description_imgs;
+        public AvaloniaList<IImage> description_imgs
         {
             get { return _description_imgs; }
             set
             {
-                if (_description_imgs != value)
-                {
-                    _description_imgs = value;
-                    RaisePropertyChanged();
-                }
+                _description_imgs = value;
+                RaisePropertyChanged();
             }
         }
         protected XElement _selectedStructureElement;
@@ -175,16 +172,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public void RefreshDescriptionImages()
         {
-            WriteableBitmap[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
-            description_imgs = new IBitmap[9];
+            SKSurface[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
+            description_imgs = new AvaloniaList<IImage>();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    description_imgs[i + j * 3] = previews[i, j];
+                    var bit = previews[j, i].Snapshot();
+                    description_imgs.Add(Bitmap.DecodeToWidth(bit.Encode(SKEncodedImageFormat.Png, 100).AsStream(), bit.Width));
                 }
             }
-            RaisePropertyChanged("description_imgs");
         }
         #endregion
     }

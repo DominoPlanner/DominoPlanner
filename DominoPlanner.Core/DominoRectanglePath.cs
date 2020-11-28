@@ -68,22 +68,6 @@ namespace DominoPlanner.Core
             return points.Select(point => new System.Drawing.Point() { X = (int) point.X + xShift, Y = (int) point.Y  + xShift}).ToArray();
         }
 
-        /// <summary>
-        /// Gibt einen Pfad zurück, wie er für ein WriteableBitmap benötigt wird.
-        /// </summary>
-        /// <returns>den Pfad als Punkteliste, wobei der erste Punkt auch der letzte ist</returns>
-        public int[] getWBXPath()
-        {
-            var array = new int[points.Length * 2+2];
-            for (int i = 0; i < points.Length; i++)
-            {
-                array[i * 2] = (int)points[i].X;
-                array[i * 2 + 1] = (int)points[i].Y;
-            }
-            array[points.Length*2] = (int)points[0].X;
-            array[points.Length*2+1] = (int)points[0].Y;
-            return array;
-        }
         public DominoPath getOffsetRectangle(int offset)
         {
             List<IntPoint> intpoints = points.Select(p => new IntPoint(p.X, p.Y)).ToList();

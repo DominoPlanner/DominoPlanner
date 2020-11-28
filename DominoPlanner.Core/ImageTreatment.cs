@@ -254,7 +254,7 @@ namespace DominoPlanner.Core
                     }
                     if (counter != 0)
                     {
-                        result = new SKColor((byte)(B / counter), (byte)(G / counter), (byte)(R / counter), (byte)(A / counter));
+                        result = new SKColor((byte)(R / counter), (byte)(G / counter), (byte)(B / counter),   (byte)(A / counter));
                     }
                     else // rectangle too small
                     {

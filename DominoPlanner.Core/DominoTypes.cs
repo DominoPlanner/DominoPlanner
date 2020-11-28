@@ -60,8 +60,8 @@ namespace DominoPlanner.Core
 
         public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
-            Width = (expanded ? expanded_width : this.Width) * scaling_x;
-            Height = (expanded ? expanded_height : this.Height) * scaling_y;
+            //var width = (expanded ? expanded_width : this.Width) * scaling_x;
+            //var height = (expanded ? expanded_height : this.Height) * scaling_y;
             return new DominoPath()
             {
                 points = new Point[] {
