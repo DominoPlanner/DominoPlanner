@@ -304,6 +304,7 @@ namespace DominoPlanner.Usage
         private readonly bool above;
         private readonly SKColor background;
         private readonly float BorderSize;
+        int rendered = 0;
 
         public Rect Bounds { get; set; }
         public TransformedBounds? TightBounds { get; set; }
@@ -349,7 +350,10 @@ namespace DominoPlanner.Usage
 
         public void Render(IDrawingContextImpl context)
         {
-            
+
+            if (rendered > 20)
+                return;
+
             var canvas = (context as ISkiaDrawingContextImpl)?.SkCanvas;
             if (canvas == null)
             {
@@ -382,6 +386,7 @@ namespace DominoPlanner.Usage
             if (above) DrawImage(canvas);
                     
             canvas.Restore();
+            rendered += 1;
 
 
         }
