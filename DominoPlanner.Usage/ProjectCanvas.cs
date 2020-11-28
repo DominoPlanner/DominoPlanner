@@ -261,18 +261,22 @@ namespace DominoPlanner.Usage
                     Zoom *= 1.1;
                 else
                     Zoom *= 1 / 1.1;
-                
+
                 newx = (p.X - e.GetPosition(this).X / Zoom);
-                
+
                 newy = (p.Y - e.GetPosition(this).Y / Zoom);
-            }
-            else if (e.KeyModifiers == KeyModifiers.Shift || e.Delta.X != 0)
-            {
-                newx = oldx - 100 * (e.Delta.X + e.Delta.Y);
             }
             else
             {
-                newy = oldy - 100 * delta;
+                if (e.KeyModifiers == KeyModifiers.Shift)
+                {
+                    newx = oldx - 100 * (e.Delta.X + e.Delta.Y);
+                }
+                else
+                {
+                    newx = oldx - 100 * e.Delta.X;
+                    newy = oldy - 100 * delta;
+                }
             }
             ShiftX = newx;
             ShiftY = newy;
