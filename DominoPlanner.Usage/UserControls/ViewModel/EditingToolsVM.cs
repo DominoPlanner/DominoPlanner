@@ -741,7 +741,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _Expanded = value;
                     RaisePropertyChanged();
-                    parent.ResetCanvas();
+                    parent.RecreateCanvasViewModel();
                 }
             }
         }
@@ -758,7 +758,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private Color backgroundColor = Color.FromArgb(255, 255, 255, 0);
+        private Color backgroundColor = Color.FromArgb(0, 255, 255, 255);
         public Color BackgroundColor
         {
             get => backgroundColor;
@@ -768,7 +768,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 RaisePropertyChanged();
             }
         }
-        private Color borderColor = Color.FromArgb(50, 0, 0, 255);
+        private Color borderColor = Color.FromArgb(127, 0, 0, 255);
         public Color BorderColor
         {
             get => borderColor;
@@ -776,7 +776,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 borderColor = value;
                 RaisePropertyChanged();
-                Redraw();
             }
         }
         private Color selectedColor = Colors.Blue;
@@ -787,7 +786,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 selectedColor = value;
                 RaisePropertyChanged();
-                Redraw();
             }
         }
 
@@ -799,9 +797,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 borderSize = value;
-                //DominoProject.BorderSize = BorderSize;
                 RaisePropertyChanged();
-                Redraw();
             }
         }
 
@@ -813,7 +809,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 opacity = value;
                 RaisePropertyChanged();
-                Redraw();
             }
         }
 
@@ -825,7 +820,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 above = value;
                 RaisePropertyChanged();
-                Redraw();
             }
         }
         private double _ZoomValue = 1;
@@ -866,18 +860,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return imagepath;
             }
         }
-        
+        private bool forceRedraw;
+
+        public bool ForceRedraw
+        {
+            get { return forceRedraw; }
+            set { forceRedraw = value; RaisePropertyChanged(); }
+        }
+
         internal void SizeChanged(double width, double height)
         {
             visibleWidth = width;
             visibleHeight = height;
-            //RefreshTransformation();
         }
-        
-        public void Redraw()
-        {
-
-        }
+       
         private void ShowImage()
         {
             try

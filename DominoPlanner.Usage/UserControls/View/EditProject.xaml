@@ -189,6 +189,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
                             SourceImageAbove="{Binding DisplaySettingsTool.Above}"
                             BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"
                             BorderSize="{Binding DisplaySettingsTool.BorderSize}"
+                            ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
                               x:Name="ProjectCanvas"/>
         </Border>
       </Grid>

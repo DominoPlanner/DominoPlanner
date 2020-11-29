@@ -158,6 +158,13 @@ namespace DominoPlanner.Usage
 
         public static readonly StyledProperty<float> BorderSizeProperty = AvaloniaProperty.Register<ProjectCanvas, float>(nameof(BorderSize));
 
+        public bool ForceRedraw
+        {
+            get { return GetValue(ForceRedrawProperty); }
+            set { SetValue(ForceRedrawProperty, value); }
+        }
+        public static readonly StyledProperty<bool> ForceRedrawProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof( ForceRedraw), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+
 
         public double ProjectHeight { get; set; }
 
@@ -189,6 +196,7 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(BackgroundColorProperty);
             AffectsRender<ProjectCanvas>(UnselectedBorderColorProperty);
             AffectsRender<ProjectCanvas>(BorderSizeProperty);
+            AffectsRender<ProjectCanvas>(ForceRedrawProperty);
         }
 
         private void SourceImageChanged()
@@ -287,6 +295,7 @@ namespace DominoPlanner.Usage
         public override void Render(DrawingContext context)
         {             
             context.Custom(new DominoRenderer(this));
+            ForceRedraw = false;
         }
     }
     public class DominoRenderer : ICustomDrawOperation

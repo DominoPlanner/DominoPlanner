@@ -261,7 +261,7 @@ namespace DominoPlanner.Usage
                 }
                 if (toOpen.Content is EditProjectVM v)
                 {
-                    v.ResetCanvas();
+                    v.RecreateCanvasViewModel();
                 }
             }
             SelectedTab = toOpen;

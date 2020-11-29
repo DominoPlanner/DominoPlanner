@@ -120,7 +120,7 @@ namespace DominoPlanner.Usage
         public override void Apply()
         {
             base.Apply();
-            ((EditProjectVM)NewViewModel).ResetCanvas();
+            ((EditProjectVM)NewViewModel).RecreateCanvasViewModel();
         }
         public override void Undo()
         {
@@ -167,7 +167,7 @@ namespace DominoPlanner.Usage
                 rowc.current_height = current_height;
             }
             base.Undo();
-            Cmodel.ResetCanvas();
+            Cmodel.RecreateCanvasViewModel();
 
         }
     }

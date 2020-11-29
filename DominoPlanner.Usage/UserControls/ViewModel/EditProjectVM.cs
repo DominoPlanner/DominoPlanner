@@ -24,7 +24,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             CurrentProject = dominoProvider;
             dominoTransfer = dominoProvider.Last;
 
-            _DominoList = new AvaloniaList<ColorListEntry>();
+            _DominoList = new ObservableCollection<ColorListEntry>();
 
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
@@ -65,7 +65,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             };
             SelectedTool = SelectionTool;
             UpdateUIElements();
-
         }
         #endregion
 
@@ -159,10 +158,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return TabItemType.EditProject;
             }
         }
-        private AvaloniaList<ColorListEntry> _DominoList;
-        public AvaloniaList<ColorListEntry> DominoList
+        private ObservableCollection<ColorListEntry> _DominoList;
+        public ObservableCollection<ColorListEntry> DominoList
         {
-            get { return new AvaloniaList<ColorListEntry>(_DominoList.OrderBy(x => x.SortIndex)); }
+            get { return new ObservableCollection<ColorListEntry>(_DominoList.OrderBy(x => x.SortIndex)); }
             set
             {
                 if (_DominoList != value)
@@ -284,7 +283,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void UpdateUIElements()
         {
             RefreshColorAmount();
-            DisplaySettingsTool.Redraw();
+            Redraw();
             RefreshSizeLabels();
         }
         private void RefreshColorAmount()
@@ -412,7 +411,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(undoFilter is EditingActivatedOperation || undoFilter is SelectionOperation || undoFilter is SetColorOperation) )
             {
                 ClearCanvas(false);
-                ResetCanvas();
+                RecreateCanvasViewModel();
+                UpdateUIElements();
                 if (undoStack.Count == 0) UnsavedChanges = false;
             }
             else
@@ -440,7 +440,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(redoFilter is EditingDeactivatedOperation || redoFilter is SelectionOperation || redoFilter is SetColorOperation))
             {
                 ClearCanvas(false);
-                ResetCanvas();
+                RecreateCanvasViewModel();
+                UpdateUIElements();
             }
             else
             {
@@ -479,7 +480,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(addRows);
                         
-                        ResetCanvas();
+                        RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
                     }
@@ -508,7 +509,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(addRows);
                        
-                        ResetCanvas();
+                        RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
                     }
@@ -536,7 +537,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(deleteRows);
                         
-                        ResetCanvas();
+                        RecreateCanvasViewModel();
                     }
                 }
                 else
@@ -561,7 +562,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
                         ClearCanvas();
                         ExecuteOperation(deleteColumns);
-                        ResetCanvas();
+                        RecreateCanvasViewModel();
                     }
                 }
                 else
@@ -593,7 +594,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
             selectedColors = new int[CurrentProject.colors.Length];
-            DisplaySettingsTool.Redraw();
+            UpdateUIElements();
             SelectionTool.CurrentSelectionDomain.ResetSelectionArea();
             RefreshColorAmount();
         }
@@ -670,7 +671,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             return Dominoes[i].IsSelected;
         }
-        internal void ResetCanvas()
+        internal void RecreateCanvasViewModel()
         {
             if (CurrentProject.Last == null)
             {
@@ -682,11 +683,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 EditingDominoVM dic = new EditingDominoVM(i, CurrentProject.Last[i], CurrentProject.colors, DisplaySettingsTool.Expanded);
                 Dominoes.Add(dic);
             }
-            Dominoes = Dominoes;
         }
         internal void Redraw()
         {
-            Dominoes = Dominoes;
+            DisplaySettingsTool.ForceRedraw = true;
         }
         private List<int> PossiblePastePositions;
         public void HighlightPastePositions(int[] validPositions)
