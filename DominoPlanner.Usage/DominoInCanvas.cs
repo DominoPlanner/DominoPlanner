@@ -7,7 +7,7 @@ using Avalonia;
 
 namespace DominoPlanner.Usage
 {
-    public class EditingDominoVM : ModelBase
+    public class EditingDominoVM : ModelBase, Core.RTree.IGeometry
     {
         public int idx;
         public ColorRepository colorRepository;
@@ -59,6 +59,16 @@ namespace DominoPlanner.Usage
             this.idx = idx;
             this.domino = domino;
             this.expanded = expanded;
+        }
+
+        public bool Intersects(DominoRectangle rect)
+        {
+            return domino.Intersects(rect);
+        }
+
+        public DominoRectangle GetBoundingRectangle()
+        {
+            return domino.GetBoundingRectangle();
         }
     }
 }

@@ -18,6 +18,8 @@ using Avalonia.VisualTree;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Avalonia.Data.Converters;
+using DominoPlanner.Core.RTree;
+using Avalonia.Collections;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -103,7 +105,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Name = "Select";
             SelectionTools = new ObservableCollection<SelectionDomain>() {
                 new RectangleSelection(parent), new CircleSelectionDomain(parent),
-                new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent) };
+                new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent), new FillBucketDomain(parent)};
             CurrentSelectionDomain = SelectionTools[0];
             UndoSelectionOperation = new RelayCommand((o) => {
                 parent.UndoInternal(true);
@@ -418,13 +420,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 // single click 
                 boundingBox = new Rect(dominoPoint.X, dominoPoint.Y, 0, 0);
-                SingleClickFlag = true;
+                var r = parent.FindDominoAtPosition(pos);
+                if (r != null) result.Add(r.idx);
+                ResetFlag = true;
             }
             if (!ResetFlag)
             {
                 for (int i = 0; i < parent.Dominoes.Count; i++)
                 {
-                    if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, SingleClickFlag || IncludeBoundary))
+                    if (parent.Dominoes[i] is EditingDominoVM dic && IsInside(dic, boundingBox, IncludeBoundary))
                     {
                         result.Add(i);
                     }
@@ -674,6 +678,201 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 points.Add(pos);
                 UpdatePath();
+            }
+        }
+    }
+    public class FillBucketDomain : SelectionDomain
+    {
+
+        public bool IncludeDiagonals
+        {
+            get { return nl.EightNeighbor; }
+            set { nl.EightNeighbor = value; RaisePropertyChanged(); }
+        }
+
+        private readonly NeighborLocator nl;
+        private AvaloniaList<EditingDominoVM> dominoes;
+        public FillBucketDomain(EditProjectVM parent) : base(parent)
+        {
+            if (parent.CurrentProject is FieldParameters)
+            {
+                nl = new FieldNeighborLocator();
+            }
+            else
+            {
+                nl = new GeneralNeighborLocator();
+            }
+            this.parent = parent;
+            Image = "fill_bucketDrawingImage";
+            Name = "Fill area";
+        }
+
+        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
+        {
+            var props = e.GetCurrentPoint(null).Properties;
+            if (props.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed || props.PointerUpdateKind == PointerUpdateKind.RightButtonPressed)
+            {
+                if (SelectionMode == SelectionMode.Add || (SelectionMode == SelectionMode.Neutral && props.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed))
+                {
+                    CurrentSelectionMode = SelectionMode.Add;
+                }
+                else if (SelectionMode == SelectionMode.Remove || (SelectionMode == SelectionMode.Neutral && props.PointerUpdateKind == PointerUpdateKind.RightButtonPressed))
+                {
+                    CurrentSelectionMode = SelectionMode.Remove;
+                }
+                else
+                {
+                    CurrentSelectionMode = SelectionMode.Neutral;
+                }
+            }
+        }
+        public override List<int> MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
+        {
+            // If the canvas has been reset (i.e. after inserting / removing a line), reset the locator (= recalculate R tree)
+            if (dominoes != this.parent.Dominoes)
+            {
+                dominoes = this.parent.Dominoes;
+                nl.ResetLocator(parent, dominoes);
+            }
+            var props = e.GetCurrentPoint(null).Properties;
+            if (!(!props.IsLeftButtonPressed && !props.IsRightButtonPressed))
+                return new List<int>();
+
+            List<int> neighbors = new List<int>();
+
+            var start = parent.FindDominoAtPosition(dominoPoint);
+            if (start == null) return neighbors; // no domino was clicked
+
+            RecursiveSearch(start.idx, neighbors);
+            return neighbors;
+        }
+
+        private void RecursiveSearch(int dc, List<int> list)
+        {
+            var neighbors = nl.FindNeighbors(dc);
+            foreach (var n in neighbors)
+            {
+                if (list.Contains(n)) continue;
+                if (parent.dominoTransfer[n].Color == parent.dominoTransfer[dc].Color)
+                {
+                    list.Add(n);
+                    RecursiveSearch(n, list);
+                }
+
+            }
+        }
+        public override bool IsInside(EditingDominoVM dic, Rect boundingBox, bool includeBoundary)
+        {
+            throw new NotImplementedException();
+        }
+        public override void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
+        {
+
+        }
+    }
+    public abstract class NeighborLocator
+    {
+        public bool EightNeighbor = false;
+        public NeighborLocator()
+        {
+        }
+        public virtual void ResetLocator(EditProjectVM e, AvaloniaList<EditingDominoVM> pc) { }
+        public abstract List<int> FindNeighbors(int dc);
+    }
+    public class FieldNeighborLocator : NeighborLocator
+    {
+        private AvaloniaList<EditingDominoVM> dominoes;
+        private FieldParameters fp;
+        private readonly int[] positions = new int[] { -1, 0, 1 };
+        public FieldNeighborLocator()
+        {
+
+        }
+        public override void ResetLocator(EditProjectVM e, AvaloniaList<EditingDominoVM> dominoes)
+        {
+            this.dominoes = dominoes;
+            this.fp = (e.CurrentProject as FieldParameters);
+        }
+
+        public override List<int> FindNeighbors(int dc)
+        {
+            var result = new List<int>();
+            var pos = fp.getPositionFromIndex(dc);
+
+            foreach (int i in positions)
+            {
+                foreach (int j in positions)
+                {
+                    if (Math.Abs(i) + Math.Abs(j) <= 1 || EightNeighbor)
+                    {
+                        CheckCandidateAndAddToList(pos.X + i, pos.Y + j, result);
+                    }
+                }
+            }
+            return result;
+        }
+        private void CheckCandidateAndAddToList(int x, int y, List<int> list)
+        {
+            if (x >= 0 && x < fp.current_width && y >= 0 && y < fp.current_height)
+            {
+                list.Add(fp.getIndexFromPosition(y, x, 0));
+                //var w = fp.getIndexFromPosition(y, x, 0);
+            }
+        }
+    }
+
+    public class GeneralNeighborLocator : NeighborLocator
+    {
+        private RTree<EditingDominoVM> tree;
+        private EditProjectVM parent;
+        private AvaloniaList<EditingDominoVM> dominoes;
+        public GeneralNeighborLocator() : base() { }
+
+        public override List<int> FindNeighbors(int dc)
+        {
+            double cl = parent.CurrentProject.charLength;
+            var rect = parent.dominoTransfer[dc].GetBoundingRectangle();
+            var roi = new DominoRectangle()
+            {
+                height = cl * 2,
+                width = cl * 2,
+                x = rect.xc - cl,
+                y = rect.yc - cl
+            };
+            var results = tree.Search(roi);
+
+            // Todo: replace with real distance between polygons
+            var ordered_distances = results.Select(r => {
+                var current = r.domino.GetBoundingRectangle();
+                var dx = Math.Abs(current.xc - rect.xc) - (current.width + rect.width) / 2;
+                var dy = Math.Abs(current.yc - rect.yc) - (current.height + rect.height) / 2;
+                return new Tuple<EditingDominoVM, double>(r, EightNeighbor ? Math.Min(dx, dy) : Math.Max(dx, dy));
+            }).OrderByDescending(x => x.Item2);
+
+            return ordered_distances.Where(x => x.Item2 < cl / 10).Select(x => x.Item1.idx).ToList();
+        }
+        public override void ResetLocator(EditProjectVM e, AvaloniaList<EditingDominoVM> dominoes)
+        {
+            if(dominoes != this.dominoes)
+            {
+                parent = e;
+                this.dominoes = dominoes;
+                tree = new RTree<EditingDominoVM>(9, new GuttmannQuadraticSplit<EditingDominoVM>());
+                var list = parent.Dominoes.OrderByDescending(x =>
+                {
+                    var container = x.domino.GetContainer();
+                    return container.y + container.height / 2;
+                }).ThenBy(x =>
+                {
+                    var container = x.domino.GetContainer();
+                    return container.x + container.width / 2;
+                }).ToList();
+
+                for (int i = 0; i < parent.Dominoes.Count; i++)
+                {
+                    // todo: list not used?
+                    tree.Insert(parent.Dominoes[i]);
+                }
             }
         }
     }

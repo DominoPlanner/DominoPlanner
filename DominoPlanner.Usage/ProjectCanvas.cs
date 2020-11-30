@@ -449,12 +449,12 @@ namespace DominoPlanner.Usage
                 canvas.DrawPath(path, new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
                 if (vm.IsSelected)
                 {
-                    canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom}, 10 * zoom) });
+                        canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = Math.Max(BorderSize, 2) * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom}, 10 * zoom) });
                 }
                 else
                 {
-
-                    canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom });
+                    if (BorderSize > 0)
+                        canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom });
                 }
             }
         }

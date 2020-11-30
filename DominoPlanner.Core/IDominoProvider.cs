@@ -167,7 +167,7 @@ namespace DominoPlanner.Core
         protected bool LastValid { get => Editing || ((SecondaryCalculation?.LastValid != false) && (PrimaryCalculation?.LastValid != false)); }
         #endregion
         #region internal vars
-        protected int charLength;
+        public int charLength;
         private DominoTransfer _last;
         [ProtoMember(2)]
         public DominoTransfer Last

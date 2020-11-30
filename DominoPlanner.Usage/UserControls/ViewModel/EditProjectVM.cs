@@ -59,7 +59,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
                 new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
                 new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
-                new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
                 ZoomTool,
                 DisplaySettingsTool
             };
@@ -728,6 +727,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return true;
             }
             return false;
+        }
+        public EditingDominoVM FindDominoAtPosition(Avalonia.Point pos)
+        {
+            double min_dist = int.MaxValue;
+            EditingDominoVM result = null;
+            foreach (var shape in Dominoes)
+            {
+                if (shape.domino.IsInside(new Core.Point(pos.X, pos.Y))) return shape;
+                var rect = shape.domino.GetBoundingRectangle();
+                double dist = Math.Pow((rect.x + rect.width / 2) - pos.X, 2) + Math.Pow(rect.y + rect.height / 2 - pos.Y, 2);
+                if (min_dist > dist)
+                {
+                    min_dist = dist;
+                    result = shape;
+
+                }
+            }
+            return result;
         }
         #endregion
 
