@@ -54,9 +54,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             SelectionTool = new SelectionToolVM(this);
             DisplaySettingsTool = new DisplaySettingsToolVM(this);
             ZoomTool = new ZoomToolVM(this);
+            RulerTool = new RulerToolVM(this);
             EditingTools = new ObservableCollection<EditingToolVM>() {
                 SelectionTool,
-                new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
+                RulerTool,
                 new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
                 new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
                 ZoomTool,
@@ -88,11 +89,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return dominoes; }
             set { dominoes = value; RaisePropertyChanged(); }
         }
+        private AvaloniaList<CanvasDrawable> additionalDrawables;
+        public AvaloniaList<CanvasDrawable> AdditionalDrawables
+        {
+            get { return additionalDrawables; }
+            set { additionalDrawables = value; RaisePropertyChanged(); }
+        }
+        
 
 
         private SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
         public ZoomToolVM ZoomTool;
+        public RulerToolVM RulerTool;
         #endregion
 
         #region events
@@ -115,8 +124,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return selectedTool; }
             set
             {
-                if (value != null)
+                if (value != null && value != selectedTool)
+                {
+                    selectedTool?.LeaveTool();
                     selectedTool = value;
+                    selectedTool.EnterTool();
+                }
                 TabPropertyChanged(ProducesUnsavedChanges: false);
 
             }

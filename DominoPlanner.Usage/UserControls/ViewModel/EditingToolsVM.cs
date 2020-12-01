@@ -50,6 +50,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public virtual void KeyPressed(KeyEventArgs key) { }
 
         public virtual void MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e) { }
+
+
+        public virtual void LeaveTool() { }
+        public virtual void EnterTool() { }
     }
     public enum SelectionMode
     {
@@ -184,6 +188,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             Select(current, false);
             Select(n, true);
             parent.UpdateUIElements();
+        }
+        public override void LeaveTool()
+        {
+            CurrentSelectionDomain.RemoveSelectionDomain();
+        }
+        public override void EnterTool()
+        {
+            CurrentSelectionDomain.ResetSelectionArea();
         }
         private ICommand _UndoSelectionOperation;
         public ICommand UndoSelectionOperation { get { return _UndoSelectionOperation; } set { if (value != _UndoSelectionOperation) { _UndoSelectionOperation= value; } } }
@@ -1117,6 +1129,155 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             base.MouseDown(dominoPoint, e);
         }
+    }
+    public class RulerToolVM : EditingToolVM
+    {
+        private double _length;
+
+        public double Length
+        {
+            get { return _length; }
+            set { _length = value; RaisePropertyChanged(); }
+        }
+        private bool _snapping;
+
+        public bool Snapping
+        {
+            get { return _snapping; }
+            set { _snapping = value; RaisePropertyChanged(); }
+        }
+
+        private Avalonia.Point start;
+        private Avalonia.Point end;
+        private double linewidth = 8;
+        private int dragging;
+        public RulerToolVM(EditProjectVM parent)
+        {
+            this.parent = parent;
+            Image = "ruler2DrawingImage";
+            Name = "Measure distance";
+            MakeInvisible();
+        }
+        public override void KeyPressed(KeyEventArgs keyArgs)
+        {
+            var key = keyArgs.Key;
+            if (key == Key.LeftCtrl || key == Key.RightCtrl)
+                Snapping = !Snapping;
+        }
+        public override void MouseUp(Avalonia.Point pos, PointerReleasedEventArgs e)
+        {
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind != PointerUpdateKind.LeftButtonPressed) return;
+
+            dragging = 0;
+        }
+        public override void MouseDown(Avalonia.Point pos, PointerPressedEventArgs e)
+        {
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind != PointerUpdateKind.LeftButtonPressed) return;
+
+            if (parent.AdditionalDrawables.Count == 4)
+            {
+                if (Distance(pos, start) < (4 * linewidth))
+                    dragging = 1;
+                else if (Distance(pos, end) < (4 * linewidth))
+                    dragging = 2;
+                else
+                    dragging = 0;
+            }
+            else // no ruler there yet
+            {
+                dragging = 0;
+                MakeVisible();
+            }
+            if (dragging == 0)
+            {
+                start = pos;
+                end = pos;
+                UpdateShapes();
+                dragging = 2;
+            }
+
+
+        }
+        public double Distance(Avalonia.Point a, Avalonia.Point b)
+        {
+            return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
+        }
+        public override void MouseMove(Avalonia.Point pos, PointerEventArgs e)
+        {
+            if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
+            {
+                dragging = 0;
+                return;
+            }
+            var X = pos.X;
+            var Y = pos.Y;
+            if (pos.X < 0) X = 0;
+            if (pos.Y < 0) Y = 0;
+            if (pos.X > parent.PhysicalLength) X = parent.PhysicalLength;
+            if (pos.Y > parent.PhysicalHeight) Y = parent.PhysicalHeight;
+
+            if (Snapping)
+            {
+                // get angle between stationary and dragged point
+                var stationary = dragging == 1 ? end : start;
+                var angle = Math.Atan2(pos.X - stationary.X, pos.Y - stationary.Y);
+                // round to multiples of Pi/8 (22.5 deg)
+                var steps = 360 / 5;
+                angle = Math.Round(angle * steps / Math.PI) * Math.PI / steps;
+                var distance = Distance(pos, stationary);
+                X = Math.Sin(angle) * distance + stationary.X;
+                Y = Math.Cos(angle) * distance + stationary.Y;
+            }
+            if (dragging == 1)
+                start = new Avalonia.Point(X, Y);
+            else if (dragging == 2)
+                end = new Avalonia.Point(X, Y);
+            Length = Distance(start, end);
+            UpdateShapes();
+        }
+        public override void EnterTool()
+        {
+            Length = 0;
+        }
+        public override void LeaveTool()
+        {
+            MakeInvisible();
+        }
+        public void MakeVisible()
+        {
+            parent.AdditionalDrawables = new AvaloniaList<CanvasDrawable>();
+        }
+        public void MakeInvisible()
+        {
+            parent.AdditionalDrawables = new AvaloniaList<CanvasDrawable>();
+        }
+        public void UpdateShapes()
+        {
+            linewidth = 10 / parent.DisplaySettingsTool.ZoomValue;
+            var p1 = new SKPath();
+            p1.MoveTo((float)start.X,(float) start.Y);
+            p1.Close();
+            var p2 = new SKPath();
+            p2.MoveTo((float)end.X,(float) end.Y);
+            p2.Close();
+
+            var circlepaint = new SKPaint() { Color = SKColors.Blue, IsAntialias = true, StrokeCap = SKStrokeCap.Round, StrokeWidth = 10, IsStroke = true};
+
+            var line = new SKPath();
+            line.MoveTo((float)start.X,(float) start.Y);
+            line.LineTo((float)end.X,(float) end.Y);
+
+            parent.AdditionalDrawables = new AvaloniaList<CanvasDrawable>()
+            {
+                
+                new CanvasDrawable { Path = line, Paint = new SKPaint() {Color = SKColors.White, StrokeWidth = (float) 3, IsStroke = true, IsAntialias=true}},
+                new CanvasDrawable { Path = line, Paint = new SKPaint() {Color = SKColors.Black, StrokeWidth = (float) 1, IsStroke = true, IsAntialias=true}},
+                new CanvasDrawable { Path = p1, Paint = circlepaint},
+                new CanvasDrawable { Path = p2, Paint = circlepaint},
+            };
+            
+        }
+        
     }
     public class ZoomToolVM : EditingToolVM
     {

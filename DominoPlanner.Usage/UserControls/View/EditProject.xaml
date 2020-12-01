@@ -124,6 +124,21 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
         </Button>
       </StackPanel>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:RulerToolVM}">
+      <DockPanel Margin="5, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="18">
+
+        <TextBlock Margin="0, 0" Text="{Binding Length, StringFormat=Current Length: {0:F2} mm}" VerticalAlignment="Center"/>
+        <CheckBox Margin="10,0,0,-1"  IsChecked="{Binding Snapping}" VerticalAlignment="Center">Snap to 5 degree increments (Toggle with Ctrl)</CheckBox>
+        <TextBlock TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" Margin="20, 0, 0, 0">
+          <TextBlock.Text>
+            <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
+              <Binding Path="DataContext.PhysicalLength" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+              <Binding Path="DataContext.PhysicalHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+      </DockPanel>
+    </DataTemplate>
     <DataTemplate DataType="{x:Type vm:ZoomToolVM}">
       <StackPanel Orientation="Horizontal" Margin="5, 0">
         <Button Margin="1, 0"  ToolTip.Tip="Zoom out" Command="{Binding ZoomOut}">
@@ -200,6 +215,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
                             BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"
                             BorderSize="{Binding DisplaySettingsTool.BorderSize}"
                             ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
+                            AdditionalDrawables="{Binding AdditionalDrawables}"
                               x:Name="ProjectCanvas"/>
         </Border>
       </Grid>

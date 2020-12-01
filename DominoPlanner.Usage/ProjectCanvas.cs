@@ -165,7 +165,13 @@ namespace DominoPlanner.Usage
         }
         public static readonly StyledProperty<bool> ForceRedrawProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof( ForceRedraw), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+        public AvaloniaList<CanvasDrawable> AdditionalDrawables
+        {
+            get { return GetValue(AdditionalDrawablesProperty); }
+            set { SetValue(AdditionalDrawablesProperty, value); }
+        }
 
+        public static readonly StyledProperty<AvaloniaList<CanvasDrawable>> AdditionalDrawablesProperty = AvaloniaProperty.Register<ProjectCanvas, AvaloniaList<CanvasDrawable>>(nameof(Project));
         public double ProjectHeight { get; set; }
 
         public double ProjectWidth { get; set; }
@@ -197,6 +203,7 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(UnselectedBorderColorProperty);
             AffectsRender<ProjectCanvas>(BorderSizeProperty);
             AffectsRender<ProjectCanvas>(ForceRedrawProperty);
+            AffectsRender<ProjectCanvas>(AdditionalDrawablesProperty);
         }
 
         private void SourceImageChanged()
@@ -244,6 +251,11 @@ namespace DominoPlanner.Usage
             if (DataContext is EditProjectVM ed)
                 ed.Canvas_MouseMove(ScreenPointToDominoCoordinates(p.Position), e);
         }
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (DataContext is EditProjectVM ed)
+                ed.PressedKey(this, e);
+        }
         Avalonia.Point ScreenPointToDominoCoordinates(Avalonia.Point p)
         {
             var tempx = p.X / Zoom + ShiftX;
@@ -259,6 +271,7 @@ namespace DominoPlanner.Usage
             base.OnPointerWheelChanged(e);
             var delta = e.Delta.Y;
             Debug.WriteLine("Delta = " + e.Delta);
+            Debug.WriteLine(e.KeyModifiers);
             if (e.KeyModifiers == KeyModifiers.Control)
             {
                 Debug.WriteLine("Raw position: " + e.GetPosition(this));
@@ -298,6 +311,19 @@ namespace DominoPlanner.Usage
             ForceRedraw = false;
         }
     }
+    public class CanvasDrawable
+    {
+        public SKPath Path {get; set;}
+        public SKPaint Paint {get; set;}
+
+        public void Render(SKCanvas canvas, SKMatrix transform)
+        {
+            var p2 = Path.Clone();
+            p2.Transform(transform);
+            canvas.DrawPath(p2, Paint);
+        }
+
+    }
     public class DominoRenderer : ICustomDrawOperation
     {
         private readonly FormattedText _noSkia;
@@ -316,6 +342,7 @@ namespace DominoPlanner.Usage
         private readonly byte bitmapopacity;
         private readonly bool above;
         private readonly SKColor background;
+        private AvaloniaList<CanvasDrawable> AdditionalDrawables;
         private readonly float BorderSize;
         int rendered = 0;
 
@@ -345,6 +372,7 @@ namespace DominoPlanner.Usage
             this.ProjectWidth = (float)pc.ProjectWidth;
             this.above = pc.SourceImageAbove;
             this.background = new SKColor(pc.BackgroundColor.R, pc.BackgroundColor.G, pc.BackgroundColor.B, pc.BackgroundColor.A);
+            this.AdditionalDrawables = pc.AdditionalDrawables;
 
             selectionPath?.Transform(transform);
             selectionVisible = pc.SelectionDomainVisible;
@@ -389,14 +417,19 @@ namespace DominoPlanner.Usage
             {
                 DrawDomino(canvas, project[i]);
             }
+            if (above) DrawImage(canvas);
+
             if (selectionVisible && selectionPath != null)
             {
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
             }
-
-
-            if (above) DrawImage(canvas);
+            foreach (CanvasDrawable d in AdditionalDrawables)
+            {
+                var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
+                d.Render(canvas, transform);
+            }
+            
                     
             canvas.Restore();
             rendered += 1;
