@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Input;
+using DominoPlanner.Core;
 using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
@@ -109,6 +110,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 (Content as DominoProviderTabItem).name = System.IO.Path.GetFileNameWithoutExtension(path);
             }
             return Content;
+        }
+
+        internal void KeyPressed(object sender, KeyEventArgs args)
+        {
+            if (!args.Handled)
+            {
+                Content?.KeyPressed(sender, args);
+            }
         }
 
         internal void ResetContent()

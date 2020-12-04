@@ -1,10 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using System;
 using System.Configuration;
-using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage
 {
@@ -14,6 +12,7 @@ namespace DominoPlanner.Usage
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
+            KeyDown += (o, e) => KeyPressedHandler(o, e);
             /*PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
@@ -53,6 +52,13 @@ namespace DominoPlanner.Usage
                 }
             }
             //PipeManager.StopServer();
+        }
+        private void KeyPressedHandler(object sender, KeyEventArgs args)
+        {
+            if (DataContext is MainWindowViewModel mwvm)
+            {
+                mwvm.KeyPressed(sender, args);
+            }
         }
         /*public void HandleNamedPipe_OpenRequest(string filesToOpen)
         {

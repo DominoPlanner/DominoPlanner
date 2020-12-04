@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Input;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +98,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
 	    private ICommand _RedoComm;
         public ICommand RedoComm { get { return _RedoComm; } set { if (value != _RedoComm) { _RedoComm = value; } } }
+
+        internal virtual void KeyPressed(object sender, KeyEventArgs args) { }
         #endregion
     }
 

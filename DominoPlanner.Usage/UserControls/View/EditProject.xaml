@@ -83,10 +83,10 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
     <DataTemplate DataType="{x:Type vm:SelectionDomain}">
       <StackPanel Orientation="Horizontal">
         <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0">Boundary treatment:</TextBlock>
-        <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="Boundary" ToolTip.Tip="Include dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary}">
+        <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="Boundary" ToolTip.Tip="Include dominoes on selection boundary" IsChecked="{Binding IncludeBoundary}">
           <Image Source="{StaticResource include_borderDrawingImage}" Classes="ToolImage"/>
         </RadioButton>
-        <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="Boundary" ToolTip.Tip="Exclude dominoes on selection boundary" IsChecked="{Binding CurrentSelectionDomain.IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
+        <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="Boundary" ToolTip.Tip="Exclude dominoes on selection boundary" IsChecked="{Binding IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
           <Image Source="{StaticResource exclude_borderDrawingImage}" Classes="ToolImage"/>
         </RadioButton>
       </StackPanel>

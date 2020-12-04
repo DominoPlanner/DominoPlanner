@@ -352,6 +352,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void SelectAll()
         {
             SelectionTool.Select(Enumerable.Range(0, dominoTransfer.Length).ToList(), true);
+            UpdateUIElements();
         }
         List<int> toCopy = new List<int>();
         private void Copy()
@@ -460,9 +461,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 UpdateUIElements();
             }
         }
-        internal void PressedKey(object sender, KeyEventArgs args)
+        internal override void KeyPressed(object sender, KeyEventArgs args)
         {
-            SelectedTool.KeyPressed(args);
+            if (!args.Handled)
+                SelectedTool.KeyPressed(args);
         }
         internal override void ResetContent()
         {

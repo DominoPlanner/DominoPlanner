@@ -30,7 +30,6 @@ namespace DominoPlanner.Core
             get => _width; set
             {
                 _width = value;
-                expanded_width = value;
             }
         }
         private double _height;
@@ -40,13 +39,36 @@ namespace DominoPlanner.Core
             get => _height; set
             {
                 _height = value;
-                expanded_height = value;
             }
         }
         [ProtoMember(5)]
-        public double expanded_width;
+        private double expanded_width;
+        public double ExpandedWidth
+        {
+            get
+            {
+                if (expanded_width == 0) return Width;
+                else return expanded_width;
+            }
+            set
+            {
+                expanded_width = value;
+            }
+        }
         [ProtoMember(6)]
-        public double expanded_height;
+        private double expanded_height;
+        public double ExpandedHeight
+        {
+            get
+            {
+                if (expanded_height == 0) return Height;
+                else return expanded_height;
+            }
+            set
+            {
+                expanded_height = value;
+            }
+        }
         public override DominoRectangle GetContainer(double scaling_x, double scaling_y, bool expanded = false)
         {
             return new DominoRectangle()
@@ -60,15 +82,16 @@ namespace DominoPlanner.Core
 
         public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
-            //var width = (expanded ? expanded_width : this.Width) * scaling_x;
-            //var height = (expanded ? expanded_height : this.Height) * scaling_y;
+            var width = (expanded ? expanded_width : this.Width);
+            
+            var height = (expanded ? expanded_height : this.Height);
             return new DominoPath()
             {
                 points = new Point[] {
                 new Point(x * scaling_x, y * scaling_y),
-                new Point((x + Width) * scaling_x, y * scaling_y),
-                new Point((x + Width) * scaling_x, (y + Height) * scaling_y),
-                new Point(x * scaling_x, (y + Height) * scaling_y)}
+                new Point((x + width) * scaling_x, y * scaling_y),
+                new Point((x + width) * scaling_x, (y + height) * scaling_y),
+                new Point(x * scaling_x, (y + height) * scaling_y)}
             };
 
         }

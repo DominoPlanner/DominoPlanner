@@ -942,7 +942,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private bool _Expanded;
+        private bool _Expanded = true;
         public bool Expanded
         {
             get => _Expanded;
@@ -953,6 +953,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _Expanded = value;
                     RaisePropertyChanged();
                     parent.RecreateCanvasViewModel();
+                    ForceRedraw = true;
                 }
             }
         }
@@ -1000,7 +1001,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private double borderSize = 2;
+        private double borderSize = 0.5;
 
         public double BorderSize
         {
@@ -1162,7 +1163,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             var key = keyArgs.Key;
             if (key == Key.LeftCtrl || key == Key.RightCtrl)
+            {
                 Snapping = !Snapping;
+                keyArgs.Handled = true;
+            }
+                
         }
         public override void MouseUp(Avalonia.Point pos, PointerReleasedEventArgs e)
         {

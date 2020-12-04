@@ -89,8 +89,8 @@ namespace DominoPlanner.Core
                         y = (VerticalDistance + VerticalSize) * yi,
                         Width = HorizontalSize,
                         Height = VerticalSize,
-                        expanded_width = HorizontalDistance + HorizontalSize,
-                        expanded_height = VerticalDistance + VerticalSize,
+                        ExpandedWidth = HorizontalDistance + HorizontalSize,
+                        ExpandedHeight = VerticalDistance + VerticalSize,
                         position = new ProtocolDefinition() { x = xi, y = yi }
                     };
                     array[length * yi + xi] = shape;

@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Input;
 
 namespace DominoPlanner.Usage
 {
@@ -54,6 +55,14 @@ namespace DominoPlanner.Usage
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
             Workspace.del = UpdateReferenceAsync;
             LoadProjectList();
+        }
+
+        internal void KeyPressed(object sender, KeyEventArgs args)
+        {
+            if (!args.Handled)
+            {
+                SelectedTab?.KeyPressed(sender, args);
+            }
         }
 
         internal async Task<bool> CloseAllTabs()

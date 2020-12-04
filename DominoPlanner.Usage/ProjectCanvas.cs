@@ -53,14 +53,6 @@ namespace DominoPlanner.Usage
 
         public static readonly StyledProperty<double> ZoomProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(Zoom));
 
-        public bool Expanded
-        {
-            get { return GetValue(ExpandedProperty); }
-            set { SetValue(ExpandedProperty, value); }
-        }
-
-        public static readonly StyledProperty<bool> ExpandedProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof(Expanded));
-
         public Color UnselectedBorderColor
         {
             get { return GetValue(UnselectedBorderColorProperty); }
@@ -185,9 +177,8 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(ZoomProperty);
             //Stones = new List<DominoInCanvas>();
             //Stones.Add(new DominoInCanvas(50, 50, 50, 50, Colors.AliceBlue));
-            DataContextProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SubscribeEvents(e));
+            //DataContextProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SubscribeEvents(e));
             AffectsRender<ProjectCanvas>(ProjectProperty);
-            AffectsRender<ProjectCanvas>(ExpandedProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainVisibleProperty);
@@ -220,18 +211,6 @@ namespace DominoPlanner.Usage
                 this.ProjectWidth = Project.Max(x => x.CanvasPoints.Length > 0 ? x.CanvasPoints.Max(y => y.X) : 0);
             }
         }
-
-        private void SubscribeEvents(AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.OldValue is EditProjectVM oldv)
-            {
-                this.KeyDown -= oldv.PressedKey;
-            }
-            if (e.NewValue is EditProjectVM newv)
-            {
-                this.KeyDown += newv.PressedKey;
-            }
-        }
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             
@@ -250,11 +229,6 @@ namespace DominoPlanner.Usage
             var p = e.GetCurrentPoint(this);
             if (DataContext is EditProjectVM ed)
                 ed.Canvas_MouseMove(ScreenPointToDominoCoordinates(p.Position), e);
-        }
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            if (DataContext is EditProjectVM ed)
-                ed.PressedKey(this, e);
         }
         Avalonia.Point ScreenPointToDominoCoordinates(Avalonia.Point p)
         {
@@ -417,6 +391,10 @@ namespace DominoPlanner.Usage
             {
                 DrawDomino(canvas, project[i]);
             }
+            for (int i = 0; i < project.Count; i++)
+            {
+                DrawDominoBorder(canvas, project[i]);
+            }
             if (above) DrawImage(canvas);
 
             if (selectionVisible && selectionPath != null)
@@ -480,14 +458,31 @@ namespace DominoPlanner.Usage
                 path.Close();
 
                 canvas.DrawPath(path, new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
+            }
+        }
+        private void DrawDominoBorder(SKCanvas canvas, EditingDominoVM vm)
+        {
+            var shape = vm.domino;
+            var c = vm.StoneColor;
+            var dp = vm.CanvasPoints;
+            // is the domino visible at all?
+            var inside = dp.Select(x => new Avalonia.Point(x.X, x.Y)).Sum(x => Bounds.Contains(PointToDisplayAvaloniaPoint(x)) ? 1 : 0);
+            if (inside > 0)
+            {
+                var path = new SKPath();
+                path.MoveTo(PointToDisplaySkiaPoint(dp[0]));
+                foreach (var line in dp.Skip(0))
+                    path.LineTo(PointToDisplaySkiaPoint(line));
+                path.Close();
+
                 if (vm.IsSelected)
                 {
-                        canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = Math.Max(BorderSize, 2) * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom}, 10 * zoom) });
+                    canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = Math.Max(BorderSize, 2) * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom }, 10 * zoom) });
                 }
                 else
                 {
                     if (BorderSize > 0)
-                        canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize * zoom });
+                        canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize / 2 * zoom });
                 }
             }
         }
