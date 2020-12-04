@@ -82,9 +82,9 @@ namespace DominoPlanner.Core
 
         public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
-            var width = (expanded ? expanded_width : this.Width);
+            var width = (expanded ? ExpandedWidth : this.Width);
             
-            var height = (expanded ? expanded_height : this.Height);
+            var height = (expanded ? ExpandedHeight : this.Height);
             return new DominoPath()
             {
                 points = new Point[] {
