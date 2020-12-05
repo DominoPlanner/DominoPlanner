@@ -12,6 +12,7 @@
     <None Remove="Properties.xaml" />
     <None Remove="ProtocolV.xaml" />
     <None Remove="ReferenceManager.xaml" />
+    <None Remove="SetStandard.xaml" />
     <None Remove="UserControls\View\BasicSettings.xaml" />
     <None Remove="UserControls\View\CalculationV.xaml" />
     <None Remove="UserControls\View\CircleSize.xaml" />
@@ -49,6 +50,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="ReferenceManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="SetStandard.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="UserControls\View\BasicSettings.xaml">
@@ -136,6 +140,9 @@
     <Compile Update="ReferenceManager.xaml.cs">
       <DependentUpon>ReferenceManager.xaml</DependentUpon>
     </Compile>
+    <Compile Update="SetStandard.xaml.cs">
+      <DependentUpon>SetStandard.xaml</DependentUpon>
+    </Compile>
     <Compile Update="UserControls\View\BasicSettings.xaml.cs">
       <DependentUpon>BasicSettings.xaml</DependentUpon>
     </Compile>
@@ -190,10 +197,13 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Resources\Icons.xaml"></AvaloniaResource>
+    <None Update="Resources\Lamping %28en%29.DColor">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\lamping.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\StructureTemplates.xml">
+    <None Update="Resources\Structures.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

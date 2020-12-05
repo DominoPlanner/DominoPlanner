@@ -268,7 +268,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColorNode = new ColorNodeVM(this);
             LoadChildren();
         }
-        public void LoadChildren()
+        public async void LoadChildren()
         {
             try
             {
@@ -291,7 +291,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     catch (Exception ex) when (ex is InvalidDataException || ex is ProtoBuf.ProtoException)
                     {
                         // broken Subassembly
-                        var restored = RestoreAssembly((node as AssemblyNode).AbsolutePath, ColorNode.AbsolutePath);
+                        var restored = await RestoreAssembly((node as AssemblyNode).AbsolutePath, ColorNode.AbsolutePath);
                         {
                             restored.parent = AssemblyModel.Obj;
                             // make color path relative
@@ -430,7 +430,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch (FileNotFoundException)
                     {
-                        Errorhandler.RaiseMessage("Error loading file", "Error", Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage("Error loading file", "Error", Errorhandler.MessageType.Error);
                     }
                 }
                 else if (extension == "." + MainWindow.ReadSetting("ProjectExtension").ToLower())
@@ -441,7 +441,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         var assy = Workspace.Load<DominoAssembly>(result[0]);
                         if (assy == AssemblyModel.Obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.Obj))
                         {
-                            Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
+                            await Errorhandler.RaiseMessage("This operation would create a circular dependency between assemblies. This is not supported.", "Circular Reference", Errorhandler.MessageType.Error);
                             return;
                         }
                         IDominoWrapper node = new AssemblyNode(relativePath, AssemblyModel.Obj);
@@ -493,7 +493,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             PropertiesWindow pw = new PropertiesWindow(Model);
             pw.ShowDialog(MainWindowViewModel.GetWindow());
         }
-        public static AssemblyNode RestoreAssembly(string projectpath, string colorlistPath = null)
+        public static async Task<AssemblyNode> RestoreAssembly(string projectpath, string colorlistPath = null)
         {
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
             var colorres = Directory.EnumerateFiles(colorpath, $"*.{MainWindow.ReadSetting("ColorExtension")}");
@@ -532,7 +532,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             newMainNode.Save();
             Workspace.CloseFile(projectpath);
-            Errorhandler.RaiseMessage($"The project file {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
+            await Errorhandler.RaiseMessage($"The project file {projectpath} was damaged. An attempt has been made to restore the file.", "Damaged File", Errorhandler.MessageType.Info);
 
             return new AssemblyNode(projectpath);
         }
@@ -689,14 +689,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                 }
             }
-            catch (Exception ex) { Errorhandler.RaiseMessage("Export failed" + ex, "Error", Errorhandler.MessageType.Error); }
+            catch (Exception ex) { await Errorhandler.RaiseMessage("Export failed" + ex, "Error", Errorhandler.MessageType.Error); }
         }
         [ContextMenuAttribute("Show protocol", "Icons/file_export.ico", "HasFieldProtocol", true, 6)]
-        public void ShowProtocol()
+        public async void ShowProtocol()
         {
             if (!DocumentModel.Obj.HasProtocolDefinition)
             {
-                Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
+                await Errorhandler.RaiseMessage("Could not generate a protocol. This structure type has no protocol definition.", "No Protocol", Errorhandler.MessageType.Warning);
                 return;
             }
             ProtocolV protocolV = new ProtocolV();
@@ -705,7 +705,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             protocolV.Show();
         }
         [ContextMenuAttribute("Open", "Icons/folder_tar.ico", Index = 0)]
-        public override void Open()
+        public override async void Open()
         {
             try
             {
@@ -718,7 +718,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             catch (InvalidDataException)
             {
                 RemoveNodeFromProject();
-                Errorhandler.RaiseMessage($"The file {this.Name} is broken. " +
+                await Errorhandler.RaiseMessage($"The file {this.Name} is broken. " +
                     $"It has been removed from the project.", "File not readable", Errorhandler.MessageType.Error);
             }
             
@@ -733,12 +733,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (await closeTab(this) && await msgbox.ShowDialog(MainWindowViewModel.GetWindow())  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
                 {
                     Parent.RemoveChild(this);
-                    Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage($"{Name} has been removed!", "Removed", Errorhandler.MessageType.Error);
                 }
             }
             catch (Exception)
             {
-                Errorhandler.RaiseMessage("Could not remove the object!", "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Could not remove the object!", "Error", Errorhandler.MessageType.Error);
             }
             
         }
@@ -761,7 +761,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch
             {
-                Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Renaming object failed!", "Error", Errorhandler.MessageType.Error);
             }
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]

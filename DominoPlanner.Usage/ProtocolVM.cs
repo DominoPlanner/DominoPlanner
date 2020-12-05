@@ -363,7 +363,7 @@ namespace DominoPlanner.Usage
             lbhv.Show();
         }
 
-        public void SaveExcelFile()
+        public async void SaveExcelFile()
         {
             SaveFileDialog dlg = new SaveFileDialog
             {
@@ -379,11 +379,11 @@ namespace DominoPlanner.Usage
                     DominoProvider.SaveXLSFieldPlan(result, currentOPP); // Jojo hier Projektname einfügen
                     Process.Start(result);
                 }
-                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
 
-        public void SaveHTMLFile()
+        public async void SaveHTMLFile()
         {
             SaveFileDialog dlg = new SaveFileDialog
             {
@@ -403,7 +403,7 @@ namespace DominoPlanner.Usage
                     fs.Close();
                     Process.Start(filename);
                 }
-                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
         #endregion

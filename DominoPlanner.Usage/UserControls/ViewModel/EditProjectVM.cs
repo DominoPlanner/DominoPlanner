@@ -355,13 +355,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
         List<int> toCopy = new List<int>();
-        private void Copy()
+        private async void Copy()
         {
-            if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
+            if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
             ClearPastePositions();
             if (selectedDominoes.Count < 0)
             {
-                Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
                 return;
             }
             toCopy = new List<int>(selectedDominoes);
@@ -374,16 +374,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
             UpdateUIElements();
         }
 
-        private void Paste()
+        private async void Paste()
         {
             try
             {
-                if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
+                if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
                 if (selectedDominoes.Count == 0) return;
                 int pasteindex = selectedDominoes.First();
                 RemoveFromSelectedDominoes(pasteindex);
@@ -396,7 +396,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
         public void ExecuteOperation(PostFilter pf)
@@ -481,7 +481,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        private void AddRow(bool addBelow)
+        private async void AddRow(bool addBelow)
         {
             try
             {
@@ -500,17 +500,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     else
                     {
-                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
-        private void AddColumn(bool addRight)
+        private async void AddColumn(bool addRight)
         {
             try
             {
@@ -529,17 +529,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     else
                     {
-                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
-        private void RemoveSelRows()
+        private async void RemoveSelRows()
         {
             try
             {
@@ -556,16 +556,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    Errorhandler.RaiseMessage("Could not remove a row in this project.", "Remove Row", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage("Could not remove a row in this project.", "Remove Row", Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
 
-        private void RemoveSelColumns()
+        private async void RemoveSelColumns()
         {
             try
             {
@@ -581,12 +581,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    Errorhandler.RaiseMessage("Could not remove a column in this project.", "Remove Column", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage("Could not remove a column in this project.", "Remove Column", Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
         }
         internal void ClearFullSelection(bool undoable = false)

@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using static DominoPlanner.Usage.ColorControl;
 
@@ -598,7 +599,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _warningLabelText; }
             set { _warningLabelText = value; TabPropertyChanged(ProducesUnsavedChanges: false); }
         }
-        int[] AddProjectCounts(AssemblyNode assy)
+        async Task<int[]> AddProjectCounts(AssemblyNode assy)
         {
             int[] sum = new int[assy.Obj.Colors.Length];
             foreach (var child in assy?.Obj.children)
@@ -609,12 +610,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         if (Path.GetFullPath(child_as.Obj.AbsoluteColorPath) == Path.GetFullPath(assy.Obj.AbsoluteColorPath))
                         {
-                            sum = sum.Zip(AddProjectCounts(child_as), (x, y) => x + y).ToArray();
+                            sum = sum.Zip(await AddProjectCounts(child_as), (x, y) => x + y).ToArray();
                         }
                     }
                     catch
                     {
-                        Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(child_as.Path)}.", "Error", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(child_as.Path)}.", "Error", Errorhandler.MessageType.Warning);
                     }
                 }
                 if (child is DocumentNode dn)
@@ -635,7 +636,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch
                     {
-                        Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.RelativePath)}.", "Error", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.RelativePath)}.", "Error", Errorhandler.MessageType.Warning);
                     }
                 }
             }
@@ -646,7 +647,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return sum;
         }
 
-        internal override void ResetContent()
+        internal override async void ResetContent()
         {
             ShowProjects = true;
             //if (DifColumns == null)
@@ -656,7 +657,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cle.ProjectCount.Clear();
             }
-            AddProjectCounts(DominoAssembly);
+            await AddProjectCounts(DominoAssembly);
             
         }
         #endregion

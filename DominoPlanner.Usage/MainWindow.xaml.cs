@@ -13,6 +13,7 @@ namespace DominoPlanner.Usage
             InitializeComponent();
             DataContext = new MainWindowViewModel();
             KeyDown += (o, e) => KeyPressedHandler(o, e);
+            Opened += (o, e) => MainWindow_Initialized();
             /*PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
@@ -74,7 +75,13 @@ namespace DominoPlanner.Usage
                 Dispatcher.BeginInvoke(new Action(() => { this.Topmost = false; }));
             });
         }*/
-
+        protected void MainWindow_Initialized()
+        {
+            if (DataContext is MainWindowViewModel mwvm)
+            {
+                mwvm.AfterStartupChecks();
+            }
+        }
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

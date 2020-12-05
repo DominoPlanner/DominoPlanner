@@ -35,14 +35,15 @@ namespace DominoPlanner.Usage
                 SelectedPath = result;
             }
         }
+        public Window window;
 
-        private void CreateNewProject()
+        private async void CreateNewProject()
         {
             try
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    Errorhandler.RaiseMessage("This folder already exists. Please choose another project name.", "Existing Folder", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage("This folder already exists. Please choose another project name.", "Existing Folder", Errorhandler.MessageType.Error, window);
                     return;
                 }
 
@@ -63,7 +64,7 @@ namespace DominoPlanner.Usage
 
                 main.Save();
 
-                Errorhandler.RaiseMessage($"The project {ProjectName}.{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info);
+                await Errorhandler.RaiseMessage($"The project {ProjectName}.{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info, window);
                 Close = true;
             }
             catch (Exception e)

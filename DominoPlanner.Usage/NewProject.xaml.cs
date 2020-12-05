@@ -21,6 +21,7 @@ namespace DominoPlanner.Usage
             DataContext = npvm;
             InitializeComponent();
             npvm.PropertyChanged += Npvm_PropertyChanged;
+            npvm.window = this;
         }
 
         private void Npvm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Controls.Templates;
 using Avalonia.Metadata;
+using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage
 {
@@ -145,6 +146,8 @@ namespace DominoPlanner.Usage
         private ICommand _CreateIt;
         public ICommand CreateIt { get { return _CreateIt; } set { if (value != _CreateIt) { _CreateIt = value; } } }
 
+        public static NewObject Window { get; internal set; }
+
 
         #endregion
         #region Methods
@@ -203,9 +206,9 @@ namespace DominoPlanner.Usage
                 ImageInformation = new NoImageInformation()
             });
         }
-        private void MCreateIt()
+        private async void MCreateIt()
         {
-            ResultNode = ViewModels[SelectedType].CreateIt(parentProject, Filename, ProjectPath);
+            ResultNode = await ViewModels[SelectedType].CreateIt(parentProject, Filename, ProjectPath);
             if (ResultNode != null)
             {
                 Close = true;
@@ -216,7 +219,9 @@ namespace DominoPlanner.Usage
     public class ImageInformation : ModelBase
     {
         public virtual void UpdateProvider(DominoProviderVM provider) { }
-        public virtual bool FinalizeProvider(IDominoProvider provider, string filename)
+#pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+        public virtual async Task<bool> FinalizeProvider(IDominoProvider provider, string filename)
+#pragma warning restore CS1998 
         { return true; }
         public virtual void RevertChangesToFileSystem() { }
     }
@@ -257,7 +262,7 @@ namespace DominoPlanner.Usage
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = "Image files" });
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All Files" });
             openFileDialog.AllowMultiple = false;
-            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+            var result = await openFileDialog.ShowAsync(NewObjectVM.Window);
             if (result != null && result.Length != 0 && File.Exists(result[0]))
             {
                 InternPictureName = result[0];
@@ -270,7 +275,7 @@ namespace DominoPlanner.Usage
             }
             catch
             {
-                Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error, NewObjectVM.Window);
             }
 
         }
@@ -286,13 +291,13 @@ namespace DominoPlanner.Usage
             }
 
         }
-        public override bool FinalizeProvider(IDominoProvider provider, string savepath)
+        public override async Task<bool> FinalizeProvider(IDominoProvider provider, string savepath)
         {
             finalImagePath = InternPictureName;
 
             if (string.IsNullOrEmpty(finalImagePath) || string.IsNullOrWhiteSpace(finalImagePath))
             {
-                Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
                 InternPictureName = finalImagePath;
                 return false;
             }
@@ -310,7 +315,7 @@ namespace DominoPlanner.Usage
             }
             catch (IOException)
             {
-                Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning);
+                await Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning, NewObjectVM.Window);
                 InternPictureName = finalImagePath;
                 return false;
             }
@@ -340,7 +345,7 @@ namespace DominoPlanner.Usage
         public string Description { get; set; }
         public string Icon { get; set; }
         public abstract string Extension { get; }
-        public abstract IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath);
+        public abstract Task<IDominoWrapper> CreateIt(DominoAssembly parentProject, string filename, string ProjectPath);
         public abstract object ViewModel { get; }
         public abstract void UpdateImageInformation();
     }
@@ -355,14 +360,14 @@ namespace DominoPlanner.Usage
 
         public override string Extension => "." + MainWindow.ReadSetting("ObjectExtension");
 
-        public bool Finalize(string filepath, DominoAssembly parentProject)
+        public async Task<bool> Finalize(string filepath, DominoAssembly parentProject)
         {
             Provider.CurrentProject.Save(filepath);
             string colorlist = parentProject.ColorPath;
             Provider.CurrentProject.ColorPath = $@"..\{colorlist}";
-            return ImageInformation.FinalizeProvider(Provider.CurrentProject, filepath);
+            return await ImageInformation.FinalizeProvider(Provider.CurrentProject, filepath);
         }
-        public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
+        public override async Task<IDominoWrapper> CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
         {
             try
             {
@@ -370,17 +375,17 @@ namespace DominoPlanner.Usage
 
                 if (File.Exists(resultPath))
                 {
-                    Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose a different Name.", "Error!", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose a different Name.", "Error!", Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
                 {
-                    Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 try
                 {
-                    bool finalizeResult = Finalize(resultPath, parentProject);
+                    bool finalizeResult = await Finalize(resultPath, parentProject);
 
                     if (!finalizeResult)
                     {
@@ -393,7 +398,7 @@ namespace DominoPlanner.Usage
                     Workspace.CloseFile(Provider.CurrentProject);
                     ImageInformation.RevertChangesToFileSystem();
                     if (!(ex is OperationCanceledException))
-                        Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex.Message + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex.Message + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 Provider.CurrentProject.Save();
@@ -403,7 +408,7 @@ namespace DominoPlanner.Usage
             }
             catch (Exception es)
             {
-                Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error, NewObjectVM.Window);
                 return null;
             }
         }
@@ -419,11 +424,11 @@ namespace DominoPlanner.Usage
             this.parentProject = parentProject;
             ColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject);
         }
-        public override IDominoWrapper CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
+        public override async Task<IDominoWrapper> CreateIt(DominoAssembly parentProject, string filename, string ProjectPath)
         {
             if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
             {
-                Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
                 return null;
             }
             string newProject = Path.Combine(ProjectPath, "Planner Files", filename);
@@ -437,8 +442,8 @@ namespace DominoPlanner.Usage
                 {
                     if (Directory.Exists(newProject))
                     {
-                        Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error",
-                            Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error",
+                            Errorhandler.MessageType.Error, NewObjectVM.Window);
                         return null;
                     }
                     Directory.CreateDirectory(newProject);
@@ -458,7 +463,7 @@ namespace DominoPlanner.Usage
             catch
             {
                 if (Directory.Exists(newProject)) Directory.Delete(newProject, true);
-                Errorhandler.RaiseMessage("Project creation failed. The file system changes have been reverted", "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage("Project creation failed. The file system changes have been reverted", "Error", Errorhandler.MessageType.Error, NewObjectVM.Window);
             }
             return null;
         }
