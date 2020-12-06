@@ -69,17 +69,11 @@
         </Expander>
       </StackPanel>
     </ScrollViewer>
-    <Button Grid.Row="2" Height="30" Margin="5, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding EditClick}">
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-        <Image Height="20" Source="/Icons/draw_freehand.ico" Margin="2" />
-        <TextBlock Text="Edit" />
-      </StackPanel>
-    </Button>
-    <Button Grid.Row="2" Height="30" Margin="130, 5, 0, 5" Width="120" HorizontalAlignment="Left" Command="{Binding BuildtoolsClick}" IsVisible="{Binding VisibleFieldplan}">
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-        <Image Height="20" Source="/Icons/file_export.ico" Margin="2" />
-        <TextBlock Text="Buildtools" />
-      </StackPanel>
-    </Button>
+    <StackPanel Grid.Row="2" Orientation="Horizontal">
+      <conv:ImageButton Image="/Icons/draw_freehand.ico"
+                         Command="{Binding EditClick}" Content="Edit"/>
+      <conv:ImageButton Image="/Icons/file_export.ico" Content="Buildtools"
+                        Command="{Binding BuildtoolsClick}" IsVisible="{Binding VisibleFieldplan}"/>
+    </StackPanel>
   </Grid>
 </UserControl>

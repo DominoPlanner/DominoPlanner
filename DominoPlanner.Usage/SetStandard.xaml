@@ -6,37 +6,20 @@
         xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View" 
         x:Class="DominoPlanner.Usage.SetStandardV"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Title="Set Standard" Height="600" Width="600" DataContext="SetStandardVM" Icon="/Icons/DominoCalculator.ico" CanResize="False">
-  <Grid>
-    
-    <Button HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="79" Height="30" Command="{Binding SetStandardPath}">
-      <StackPanel Orientation="Horizontal">
-        <Image Source="/Icons/open.ico" Height="20" />
-        <Label Content="Choose" />
-      </StackPanel>
-    </Button>
-    <Button Margin="0,41,5,0" VerticalAlignment="Top" Height="30" Command="{Binding SaveStandardPath}" HorizontalAlignment="Right" Width="56">
-      <StackPanel Orientation="Horizontal">
-        <Image Source="/Icons/document_save.ico" Height="20" />
-        <Label Content="Save" />
-      </StackPanel>
-    </Button>
-    <Label Content="{Binding standardpath}" Margin="94,41,66,0" VerticalAlignment="Top" Height="30"/>
-    <Label Content="Select a standard folder to store your projects in:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-    <Label Content="Set Standardcolor" HorizontalAlignment="Left" Margin="10,86,0,0" VerticalAlignment="Top"/>
-    <Button Margin="0,84,5,0" VerticalAlignment="Top" Height="30" Command="{Binding SetStandardColor}" HorizontalAlignment="Right" Width="113">
-      <StackPanel Orientation="Horizontal">
-        <Image Source="/Icons/open.ico" Height="20" />
-        <Label Content="Open Colorlist" />
-      </StackPanel>
-    </Button>
-    <Button Margin="0,84,123,0" VerticalAlignment="Top" Height="30" Command="{Binding ClearList}" HorizontalAlignment="Right" Width="76">
-      <StackPanel Orientation="Horizontal">
-        <Image Source="/Icons/new.ico" Height="20" />
-        <Label Content="New List" />
-      </StackPanel>
-    </Button>
-    
-    <View:ColorListControl Margin="5,121,5,5" DataContext="{Binding ColorVM}" /> 
-  </Grid>
+        Title="Set Standard" Height="600" Width="650" DataContext="SetStandardVM" Icon="/Icons/DominoCalculator.ico" CanResize="False">
+    <DockPanel LastChildFill="True">
+      <Label Content="Select a standard folder to store your projects in:" DockPanel.Dock="Top"/>
+      <DockPanel DockPanel.Dock="Top">
+        <local:ImageButton Image="/Icons/open.ico" DockPanel.Dock="Right" Content="Choose" Command="{Binding SetStandardPath}"/>
+        <Label Content="{Binding standardpath}" VerticalAlignment="Center"/>
+      </DockPanel>
+      <DockPanel LastChildFill="False" DockPanel.Dock="Top" >
+        <Label Content="Default color list:" VerticalAlignment="Center"/>
+        <local:ImageButton DockPanel.Dock="Right" Command="{Binding SetStandardColor}"
+                           Image="/Icons/open.ico" Content="Open Colorlist" />
+        <local:ImageButton DockPanel.Dock="Right" Command="{Binding ClearList}" 
+                           Image="/Icons/new.ico" Content="New List" />
+      </DockPanel>
+      <View:ColorListControl DataContext="{Binding ColorVM}" DockPanel.Dock="Top" />
+    </DockPanel>
 </Window>

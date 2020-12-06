@@ -447,8 +447,8 @@ namespace DominoPlanner.Usage
             throw new NotImplementedException();
         }
     }
-    class PopupColorPicker : ColorPicker
+    public class PopupColorPicker : ColorPicker
     {
-
+        public PopupColorPicker() { }
     }
 }

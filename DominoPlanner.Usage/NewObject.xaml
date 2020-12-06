@@ -70,12 +70,9 @@
     <Grid>
         
         <DockPanel Margin="2" VerticalAlignment="Stretch">
-            <Button DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="5,5,5,5" Command="{Binding CreateIt}" IsDefault="True">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/ok.ico" Height="20"/>
-                    <TextBlock Text="Create"/>
-                </StackPanel>
-            </Button>
+            <local:ImageButton DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" 
+                               Image="/Icons/ok.ico" IsDefault="True"
+                               Content="Create" Command="{Binding CreateIt}"/>
             <StackPanel DockPanel.Dock="Right" >
                 <TextBlock>Object specific settings:</TextBlock>
             <ContentControl Margin="5" Content="{Binding CurrentViewModel}" Width="300"/>

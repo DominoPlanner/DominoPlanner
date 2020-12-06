@@ -1,6 +1,7 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:uc="clr-namespace:DominoPlanner.Usage.UserControls"
              xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
              x:Class="DominoPlanner.Usage.App">
   <Application.Resources>
@@ -217,6 +218,20 @@
             </StackPanel>
           </ControlTemplate>
         </Setter>
+      </Style>
+      
+      <Style Selector="local|ImageButton">
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Button Height="30" Margin="5" Command="{TemplateBinding Command}">
+              <StackPanel Orientation="Horizontal" Margin="10, 0">
+                <Image Source="{TemplateBinding Image}" Height="20" VerticalAlignment="Center" Margin="0,  0, 5, 0"/>                
+                <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+          </ControlTemplate>
+        </Setter>
+        
       </Style>
     </Application.Styles>
   <Application.Resources>

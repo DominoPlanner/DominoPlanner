@@ -237,18 +237,10 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
 
     <Grid Grid.Row="2">
       <StackPanel Grid.Row="2"  Orientation="Horizontal">
-        <Button Height="30" Width="120" Margin="5" HorizontalAlignment="Left" Command="{Binding RestoreBasicSettings}">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-            <Image Height="20" Source="/Icons/draw_freehand.ico" Margin="2" />
-            <TextBlock Text="Basic Settings" />
-          </StackPanel>
-        </Button>
-        <Button Grid.Row="2" Height="30" Margin="5" Width="120" HorizontalAlignment="Left" IsVisible="{Binding VisibleFieldplan}" Command="{Binding BuildtoolsClick}">
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-            <Image Height="20" Source="/Icons/file_export.ico"  Margin="2" />
-            <TextBlock Text="Buildtools" />
-          </StackPanel>
-        </Button>
+        <parent:ImageButton Image="/Icons/draw_freehand.ico" 
+                            Content="Basic Settings" Command="{Binding RestoreBasicSettings}"/>
+        <parent:ImageButton Image="/Icons/file_export.ico" IsVisible="{Binding VisibleFieldplan}"
+                            Content="Buildtools" Command="{Binding BuildtoolsClick}"/>
         <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
         <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Name: "/>
         <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Name}"/>

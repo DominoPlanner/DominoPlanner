@@ -114,70 +114,29 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
             </Style>
             <Style Selector="ContentControl.Content.Sum /template/ TextBlock">
               <Setter Property="FontWeight" Value="Bold"/>
-              
             </Style>
-
-            
-            
           </local:ProjectColorList.Styles>
         </local:ProjectColorList>
         <Grid Grid.Row="1">
-          <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" IsVisible="{Binding SelectedStone, Converter={StaticResource IsNotNullConverter}}" LastChildFill="False">
-            <main:PopupColorPicker Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
+          <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsVisible="{Binding SelectedStone, Converter={StaticResource IsNotNullConverter}}" LastChildFill="False">
+            <main:PopupColorPicker VerticalAlignment="Center" Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
 
             <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
-            <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="200"></TextBox>
+            <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center"></TextBox>
             <TextBlock VerticalAlignment="Center" Margin="5" >Color Amout:</TextBlock>
-            <NumericUpDown Text="{Binding SelectedStone.Count, Mode=TwoWay}" Width="200"/>
+            <NumericUpDown Text="{Binding SelectedStone.Count, Mode=TwoWay}" Width="100"/>
 
           </DockPanel>
           <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
-            <DockPanel.Styles>
-              <Style Selector="Button">
-                <Setter Property="Margin" Value="5"/>
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Padding" Value="10,5"/>
-              </Style>
-            </DockPanel.Styles>
-            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnMoveUp}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/up.ico" Height="20" />
-                    <TextBlock Text="Move up" />
-                </StackPanel>
-            </Button>
-            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnMoveDown}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/down.ico" Height="20" />
-                    <TextBlock Text="Move Down" />
-                </StackPanel>
-            </Button>
-            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnAddColor}">
-              <StackPanel Orientation="Horizontal">
-                <Image Source="/Icons/add.ico" Height="20" />
-                <TextBlock Text="Add Color" />
-              </StackPanel>
-            </Button>
-            
-            
-            <Button DockPanel.Dock="Left" Height="30" Command="{Binding BtnRemove}" IsVisible="false">
-              <StackPanel Orientation="Horizontal">
-                <Image Source="/Icons/remove.ico" Height="20" />
-                <TextBlock Text="Remove Selected" />
-              </StackPanel>
-            </Button>
-            <Button DockPanel.Dock="Right" Height="30" Command="{Binding BtnExportXLSX}">
-              <StackPanel Orientation="Horizontal">
-                <Image  Source="/Icons/document_save.ico" Height="20" />
-                <TextBlock Text="Export to Excel" />
-              </StackPanel>
-            </Button>
-            <Button DockPanel.Dock="Right"  Height="30" Command="{Binding BtnSaveColors}">
-              <StackPanel Orientation="Horizontal">
-                <Image  Source="/Icons/document_save.ico" Height="20" />
-                <TextBlock Text="Save Colors" />
-              </StackPanel>
-            </Button>
-            
+            <parent:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="Move up"/>
+            <parent:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="Move down"/>
+            <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color"/>
+            <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" 
+                                IsVisible="false" Content="Remove Selected"/>
+            <parent:ImageButton DockPanel.Dock="Right" Content="Save Colors"
+                                Image="/Icons/document_save.ico" Command="{Binding BtnSaveColors}"/>
+            <parent:ImageButton DockPanel.Dock="Right" Content="Export to Excel"
+                                Image="/Icons/document_save.ico"  Command="{Binding BtnExportXLSX}"/>
           </DockPanel>
         </Grid>
     </Grid>
