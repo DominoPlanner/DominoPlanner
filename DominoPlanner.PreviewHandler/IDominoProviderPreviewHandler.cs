@@ -125,7 +125,6 @@ namespace DominoPlanner.PreviewHandler
                     
                     Graphics g = Graphics.FromImage(result);
                     g.Clear(System.Drawing.Color.White);
-                    
                     g.DrawImage(bmp, largerSide / 2 + 1 - bmp.Size.Width / 2, 
                         largerSide / 2 + 1- bmp.Size.Height / 2, bmp.Size.Width, bmp.Size.Height);
                     g.DrawRectangle(new Pen(Color.Black), new Rectangle(0, 0, largerSide, largerSide));

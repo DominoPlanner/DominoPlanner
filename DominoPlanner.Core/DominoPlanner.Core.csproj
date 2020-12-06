@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
+    <UserSecretsId>419a2851-2d31-44f4-af38-97c272d45edf</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,5 +28,11 @@
     <PackageReference Include="protobuf-net" Version="2.4.6" />
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
   </ItemGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>DominoPlanner.Core.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
 
 </Project>

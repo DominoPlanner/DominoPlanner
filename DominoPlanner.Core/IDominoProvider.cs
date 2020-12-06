@@ -43,7 +43,7 @@ namespace DominoPlanner.Core
                 SKSurface surf = SKSurface.Create(new SKImageInfo(256, 256));
                 if (Last != null && Last.colors != null)
                 {
-                    surf = Last.GenerateImage(256);
+                    surf = Last.GenerateImage(Colors.White, 256, expanded: true);
                 }
                 var image = surf.Snapshot().Encode();
                 using MemoryStream memoryStream = new MemoryStream();
