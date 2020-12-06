@@ -11,12 +11,11 @@ namespace DominoPlanner.Usage
     {
         public SetStandardVM()
         {
-            var StandardColorPath = MainWindow.ReadSetting("StandardColorArray");
+            var StandardColorPath = Properties.Settings.Default.StandardColorArray;
             SetStandardColor = new RelayCommand(o => { SetColorPath(); });
             SetStandardPath = new RelayCommand(o => { SetStandardPathOpen(); });
-            SaveStandardPath = new RelayCommand(o => { SaveStandard(); });
             ClearList = new RelayCommand(o => { ClearListMet(); });
-            standardpath = MainWindow.ReadSetting("StandardProjectPath");
+            standardpath = Properties.Settings.Default.StandardProjectPath;
 
             if (!File.Exists(StandardColorPath))
             {
@@ -54,6 +53,8 @@ namespace DominoPlanner.Usage
                 if (_standardpath != value)
                 {
                     _standardpath = value;
+                    Properties.Settings.Default.StandardProjectPath = value;
+                    Properties.Settings.Default.Save();
                     RaisePropertyChanged();
                 }
             }
@@ -62,10 +63,6 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Method
-        private void SaveStandard()
-        {
-            MainWindow.AddUpdateAppSettings("StandardProjectPath", standardpath);
-        }
 
         private async void SetStandardPathOpen()
         {
@@ -79,15 +76,15 @@ namespace DominoPlanner.Usage
 
         private async void SetColorPath()
         {
-            var StandardColorPath = MainWindow.ReadSetting("StandardColorArray");
+            var StandardColorPath = Properties.Settings.Default.StandardColorArray;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
                 openFileDialog.Directory = ColorVM.FilePath;
                 openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
                 {
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {MainWindow.ReadSetting("ColorExtension"),  "clr", "farbe"}, Name = "All color files"},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {MainWindow.ReadSetting("ColorExtension")}, Name = "DominoPlanner 3.x color files"},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Properties.Settings.Default.ColorExtension,  "clr", "farbe"}, Name = "All color files"},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Properties.Settings.Default.ColorExtension }, Name = "DominoPlanner 3.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = "DominoPlanner 2.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = "Dominorechner color files"},
                 };
@@ -149,9 +146,6 @@ namespace DominoPlanner.Usage
 
         private ICommand _SetStandardPath;
         public ICommand SetStandardPath { get { return _SetStandardPath; } set { if (value != _SetStandardPath) { _SetStandardPath = value; } } }
-
-        private ICommand _SaveStandardPath;
-        public ICommand SaveStandardPath { get { return _SaveStandardPath; } set { if (value != _SaveStandardPath) { _SaveStandardPath = value; } } }
 
         private ICommand _ClearList;
         internal SetStandardV window;

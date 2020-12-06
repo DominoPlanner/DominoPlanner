@@ -37,20 +37,21 @@ namespace DominoPlanner.Usage
         internal async void AfterStartupChecks()
         {
             var share_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
-
-            if (MainWindow.ReadSetting("FirstStartup") == "1")
+            Properties.Settings.Default.Upgrade();
+            if (Properties.Settings.Default.FirstStartup)
             {
-                MainWindow.AddUpdateAppSettings("StandardColorArray", Path.Combine(share_path, "colors." + MainWindow.ReadSetting("ColorExtension")));
+                Properties.Settings.Default.StandardColorArray = Path.Combine(share_path, "colors." + Properties.Settings.Default.ColorExtension);
                 var project_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
-                MainWindow.AddUpdateAppSettings("StandardProjectPath", project_path);
-                MainWindow.AddUpdateAppSettings("OpenProjectList", Path.Combine(share_path, "OpenProjects.xml"));
+                Properties.Settings.Default.StandardProjectPath = project_path;
+                Properties.Settings.Default.OpenProjectList = Path.Combine(share_path, "OpenProjects.xml");
                 Directory.CreateDirectory(project_path);
                 Directory.CreateDirectory(share_path);
                 OpenProjectSerializer.Create();
-                MainWindow.AddUpdateAppSettings("FirstStartup", "0");
+                Properties.Settings.Default.FirstStartup = false;
             }
+            Properties.Settings.Default.Save();
 
-            while (!File.Exists(MainWindow.ReadSetting("StandardColorArray")))
+            while (!File.Exists(Properties.Settings.Default.StandardColorArray))
             {
                await Errorhandler.RaiseMessage("Please create a default color table.", "Missing Color Table", Errorhandler.MessageType.Info);
                await new SetStandardV().ShowDialog(GetWindow());
@@ -224,7 +225,7 @@ namespace DominoPlanner.Usage
         {
             string path = param.ToString();
             string ex = Path.GetExtension(path).ToLower();
-            if (ex == "." + MainWindow.ReadSetting("ColorExtension").ToLower() || ex == "." + MainWindow.ReadSetting("ObjectExtension").ToLower())
+            if (ex == "." + Properties.Settings.Default.ColorExtension.ToLower() || ex == "." + Properties.Settings.Default.ObjectExtension.ToLower())
             {
                 OpenItem(GetTab(path) ?? new UserControls.ViewModel.TabItem(path));
             }
@@ -261,11 +262,11 @@ namespace DominoPlanner.Usage
             {
                 var fn = s.Trim();
                 var ext = Path.GetExtension(fn).ToLower();
-                if (ext == "." + MainWindow.ReadSetting("ObjectExtension").ToLower() || ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
+                if (ext == "." + Properties.Settings.Default.ObjectExtension.ToLower() || ext == "." + Properties.Settings.Default.ColorExtension.ToLower())
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
+                else if (ext == "." + Properties.Settings.Default.ColorExtension.ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)
@@ -378,7 +379,7 @@ namespace DominoPlanner.Usage
         private async void LoadProject(OpenProject newProject)
         {
             bool remove = true;
-            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{MainWindow.ReadSetting("ProjectExtension")}");
+            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{Properties.Settings.Default.ProjectExtension}");
             if (File.Exists(projectpath))
             {
                 remove = false;
@@ -457,7 +458,7 @@ namespace DominoPlanner.Usage
         private async void AddProject_Exists()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ProjectExtension") }, Name = MainWindow.ReadSetting("ProjectExtension") });
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Properties.Settings.Default.ProjectExtension }, Name = Properties.Settings.Default.ProjectExtension });
             //openFileDialog.RestoreDirectory = true;
             var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
             if (result != null && result.Length == 1 && File.Exists(result[0]))

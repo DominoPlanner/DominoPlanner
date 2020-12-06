@@ -36,12 +36,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             this.Header = System.IO.Path.GetFileNameWithoutExtension(path);
             this.Picture = ImageHelper.GetImageOfFile(path);
             var ext = System.IO.Path.GetExtension(path).ToLower();
-            if (ext == "." + MainWindow.ReadSetting("ColorExtension").ToLower())
+            if (ext == "." + Properties.Settings.Default.ColorExtension.ToLower())
             {
                 Content = new ColorListControlVM(path);
                 ResetContent();
             }
-            else if (ext == "."+  MainWindow.ReadSetting("ObjectExtension").ToLower())
+            else if (ext == "."+  Properties.Settings.Default.ObjectExtension.ToLower())
             {
                 Content = ViewModelGenerator(Workspace.Load<IDominoProvider>(path), (path));
                 ResetContent();

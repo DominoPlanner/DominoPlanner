@@ -109,7 +109,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private string _endung = "." + MainWindow.ReadSetting("ObjectExtension");
+        private string _endung = "." + Properties.Settings.Default.ObjectExtension;
         public string Extension
         {
             get { return _endung; }
@@ -358,7 +358,7 @@ namespace DominoPlanner.Usage
         public override object ViewModel => Provider;
         public DominoProviderVM Provider { get; set; }
 
-        public override string Extension => "." + MainWindow.ReadSetting("ObjectExtension");
+        public override string Extension => "." + Properties.Settings.Default.ObjectExtension;
 
         public async Task<bool> Finalize(string filepath, DominoAssembly parentProject)
         {
@@ -415,7 +415,7 @@ namespace DominoPlanner.Usage
     }
     public class NewAssemblyEntry : NewObjectEntry
     {
-        public override string Extension => "." + MainWindow.ReadSetting("ProjectExtension");
+        public override string Extension => "." +Properties.Settings.Default.ProjectExtension;
         public override object ViewModel => this;
         public string ColorPath { get; set; }
 

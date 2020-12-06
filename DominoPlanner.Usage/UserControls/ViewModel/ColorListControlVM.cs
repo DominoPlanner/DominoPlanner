@@ -433,9 +433,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 SaveFileDialog ofd = new SaveFileDialog
                 {
-                    DefaultExtension = MainWindow.ReadSetting("ColorExtension")
+                    DefaultExtension = Properties.Settings.Default.ColorExtension
                 };
-                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ColorExtension") }, Name = "Color files" });
+                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Properties.Settings.Default.ColorExtension }, Name = "Color files" });
                 ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
                 var filename = ofd.ShowDialog();
                 if (filename != null && filename != "")

@@ -14,8 +14,8 @@ namespace DominoPlanner.Usage
         #region CTOR
         public NewProjectVM()
         {
-            SelectedPath = MainWindow.ReadSetting("StandardProjectPath");
-            sPath = MainWindow.ReadSetting("StandardColorArray");
+            SelectedPath = Properties.Settings.Default.StandardProjectPath;
+            sPath = Properties.Settings.Default.StandardColorArray;
             ProjectName = "New Project";
             rbStandard = true;
             rbCustom = false; //damit die Labels passen
@@ -53,18 +53,18 @@ namespace DominoPlanner.Usage
                 Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
                 DominoAssembly main = new DominoAssembly();
-                main.Save(Path.Combine(projectpath, ProjectName + "." + MainWindow.ReadSetting("ProjectExtension")));
+                main.Save(Path.Combine(projectpath, ProjectName + "." + Properties.Settings.Default.ProjectExtension));
 
                 if (File.Exists(sPath))
                 {
-                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors.{MainWindow.ReadSetting("ColorExtension")}");
+                    string colorPath = Path.Combine(SelectedPath, ProjectName, "Planner Files", $"colors.{Properties.Settings.Default.ColorExtension}");
                     File.Copy(sPath, colorPath);
-                    main.ColorPath = Path.Combine("Planner Files", "colors." + MainWindow.ReadSetting("ColorExtension"));
+                    main.ColorPath = Path.Combine("Planner Files", "colors." + Properties.Settings.Default.ColorExtension);
                 }
 
                 main.Save();
 
-                await Errorhandler.RaiseMessage($"The project {ProjectName}.{MainWindow.ReadSetting("ProjectExtension")} has been created", "Created", Errorhandler.MessageType.Info, window);
+                await Errorhandler.RaiseMessage($"The project {ProjectName}.{Properties.Settings.Default.ProjectExtension} has been created", "Created", Errorhandler.MessageType.Info, window);
                 Close = true;
             }
             catch (Exception e)
@@ -80,7 +80,7 @@ namespace DominoPlanner.Usage
             {
                 openFileDialog.Directory = sPath;
                 openFileDialog.AllowMultiple = false;
-                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { MainWindow.ReadSetting("ColorExtension") }, Name = "Color files" });
+                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Properties.Settings.Default.ColorExtension }, Name = "Color files" });
                 openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
             }
             catch (Exception) { }

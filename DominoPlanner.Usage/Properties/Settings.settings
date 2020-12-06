@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DominoPlanner.Usage.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FirstStartup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="StandardColorArray" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%appdata%/DominoPlanner/colors.DColor</Value>
+    </Setting>
+    <Setting Name="StandardProjectPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%user%/DominoPlanner</Value>
+    </Setting>
+    <Setting Name="OpenProjectList" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%appdata%/DominoPlanner/OpenProjects.xml</Value>
+    </Setting>
+    <Setting Name="ColorExtension" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DColor</Value>
+    </Setting>
+    <Setting Name="ObjectExtension" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DObject</Value>
+    </Setting>
+    <Setting Name="ProjectExtension" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DProject</Value>
+    </Setting>
+    <Setting Name="StructureTemplates" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Resources/Structures.xml</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

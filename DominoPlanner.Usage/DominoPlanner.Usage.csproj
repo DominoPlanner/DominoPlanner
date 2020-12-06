@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>Icons/DominoCalculator.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="ExportOptions.xaml" />
@@ -134,6 +135,11 @@
     <Compile Update="Properties.xaml.cs">
       <DependentUpon>Properties.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Update="ProtocolV.xaml.cs">
       <DependentUpon>ProtocolV.xaml</DependentUpon>
     </Compile>
@@ -197,6 +203,10 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Resources\Icons.xaml"></AvaloniaResource>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Update="Resources\Lamping %28en%29.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

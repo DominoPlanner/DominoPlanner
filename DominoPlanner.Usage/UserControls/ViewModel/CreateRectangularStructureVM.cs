@@ -152,7 +152,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var names = new List<string>();
             try
             {
-                string structurepath = MainWindow.ReadSetting("StructureTemplates");
+                string structurepath = Properties.Settings.Default.StructureTemplates;
                 StreamReader fr = new StreamReader(structurepath);
                 XElement xElement = XElement.Parse(fr.ReadToEnd());
                 structures = xElement.Elements().ToList();
