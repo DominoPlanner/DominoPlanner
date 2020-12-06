@@ -266,7 +266,7 @@ namespace DominoPlanner.Usage
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == "." + Properties.Settings.Default.ColorExtension.ToLower())
+                else if (ext == "." + Properties.Settings.Default.ProjectExtension.ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)

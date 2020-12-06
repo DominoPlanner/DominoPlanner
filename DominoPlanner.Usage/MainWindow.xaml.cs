@@ -1,20 +1,23 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using System;
 using System.Configuration;
+using System.Text;
 
 namespace DominoPlanner.Usage
 {
     public class MainWindow : Window
     {
+        NamedPipeManager PipeManager;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = new MainWindowViewModel();
             KeyDown += (o, e) => KeyPressedHandler(o, e);
             Opened += (o, e) => MainWindow_Initialized();
-            /*PipeManager = new NamedPipeManager("DominoPlanner");
+            PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
             var args = Environment.GetCommandLineArgs();
@@ -28,7 +31,7 @@ namespace DominoPlanner.Usage
                 }
                 filesToOpen = sb.ToString();
             }
-            PipeManager.Write(filesToOpen);*/
+            PipeManager.Write(filesToOpen);
 #if DEBUG
             //this.AttachDevTools();
 #endif
@@ -52,7 +55,7 @@ namespace DominoPlanner.Usage
                     }
                 }
             }
-            //PipeManager.StopServer();
+            PipeManager.StopServer();
         }
         private void KeyPressedHandler(object sender, KeyEventArgs args)
         {
@@ -61,9 +64,9 @@ namespace DominoPlanner.Usage
                 mwvm.KeyPressed(sender, args);
             }
         }
-        /*public void HandleNamedPipe_OpenRequest(string filesToOpen)
+        public void HandleNamedPipe_OpenRequest(string filesToOpen)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
                 ((MainWindowViewModel)DataContext).OpenFile(filesToOpen);
 
@@ -72,9 +75,9 @@ namespace DominoPlanner.Usage
 
                 this.Topmost = true;
                 this.Activate();
-                Dispatcher.BeginInvoke(new Action(() => { this.Topmost = false; }));
+                Dispatcher.UIThread.InvokeAsync(new Action(() => { this.Topmost = false; }));
             });
-        }*/
+        }
         protected void MainWindow_Initialized()
         {
             if (DataContext is MainWindowViewModel mwvm)
