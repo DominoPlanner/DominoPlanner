@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using DominoPlanner.Core;
-using Emgu.CV;
 using System.Runtime.InteropServices;
 using SharpShell.Attributes;
 using SharpShell.Diagnostics;
@@ -41,7 +40,9 @@ namespace DominoPlanner.PreviewHandler
         }
         public void DoPreview(string filepath)
         {
-            Logging.Log("in DoPreview");
+            // we'd need to import Avalonia to do this (damn color structs). 
+            // Since the preview handler was disabled anyway, ignore for now
+            /*Logging.Log("in DoPreview");
             Logging.Log("try to load file " + filepath);
             var obj = Workspace.Load<IDominoProvider>(filepath);
             Logging.Log("object loaded into workspace");
@@ -54,7 +55,7 @@ namespace DominoPlanner.PreviewHandler
                 Width = 200,
                 Height = 200,
             };
-            panelImages.Controls.Add(pictureBox);
+            panelImages.Controls.Add(pictureBox);*/
         }
         private System.Windows.Forms.Panel panelImages;
 
