@@ -11,6 +11,84 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="DominoPlanner.Usage.MainWindow" Closing="Window_Closing"
         Title="DominoPlanner.Avalonia" Icon="/Icons/DominoCalculator.ico">
+    
+      <NativeMenu.Menu>
+        <NativeMenu>
+          <NativeMenuItem Header="New">
+            <NativeMenuItem.Menu>
+              <NativeMenu>
+                <NativeMenuItem Header="New Project" Command="{Binding NewProject}" Gesture="Alt+N"/>
+                <NativeMenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" Gesture="Ctrl+N"/>
+              </NativeMenu>
+            </NativeMenuItem.Menu>
+          </NativeMenuItem>
+
+          <NativeMenuItem Header="Add Existing">
+            <NativeMenuItem.Menu>
+              <NativeMenu>
+                <NativeMenuItem Header="Add existing project" Command="{Binding AddExistingProject}"/>
+                <NativeMenuItem Header="Add existing Field/Structure" Command="{Binding AddExistingItem}"/>
+              </NativeMenu>
+            </NativeMenuItem.Menu>
+          </NativeMenuItem>
+
+          <NativeMenuItem Header="Save">
+            <NativeMenuItem.Menu>
+              <NativeMenu>
+                <NativeMenuItem Header="Save" Command="{Binding SaveCurrentOpen}" Gesture="Ctrl+S"/>
+                <NativeMenuItem Header="Save all" Command="{Binding SaveAll}" Gesture="Ctrl+Alt+S"/>
+              </NativeMenu>
+            </NativeMenuItem.Menu>
+         </NativeMenuItem>
+
+         <NativeMenuItem Header="Undo Redo">
+          <NativeMenuItem.Menu>
+            <NativeMenu>
+              <NativeMenuItem Header="Undo" Command="{Binding SelectedTab.Content.UndoComm}" Gesture="Ctrl+Z"/>
+              <NativeMenuItem Header="Redo" Command="{Binding SelectedTab.Content.RedoComm}" Gesture="Ctrl+Shift+Z"/>
+            </NativeMenu>
+          </NativeMenuItem.Menu>
+         </NativeMenuItem>
+        </NativeMenu>
+
+        <NativeMenuItem Header="Settings">
+          <NativeMenuItem.Menu>
+            <NativeMenu>
+              <NativeMenuItem Header="Set Standards" Command="{Binding MenuSetStandard}" Gesture="Ctrl+R"/>
+            </NativeMenu>
+          </NativeMenuItem.Menu>
+         </NativeMenuItem>
+
+        <NativeMenuItem Header="Editing">
+          <NativeMenuItem.Menu>
+            <NativeMenu>
+              <NativeMenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Ctrl+C"/>
+              <NativeMenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Ctrl+V"/>
+
+              <NativeMenuItem Header="Add">
+                <NativeMenuItem.Menu>
+                  <NativeMenu>
+                    <NativeMenuItem Header="Add row above" Command="{Binding SelectedTab.Content.AddRowAbove}" Gesture="Alt+W"/>
+                    <NativeMenuItem Header="Add row below" Command="{Binding SelectedTab.Content.AddRowBelow}" Gesture="Alt+S"/>
+                    <NativeMenuItem Header="Add column right" Command="{Binding SelectedTab.Content.AddColumnRight}" Gesture="Alt+D"/>
+                    <NativeMenuItem Header="Add column left" Command="{Binding SelectedTab.Content.AddColumnLeft}" Gesture="Alt+A" />
+                  </NativeMenu>
+                </NativeMenuItem.Menu>
+              </NativeMenuItem>
+
+              <NativeMenuItem Header="Remove">
+                <NativeMenuItem.Menu>
+                  <NativeMenu>
+                    <NativeMenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" Gesture="Alt+R"/>
+                    <NativeMenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" Gesture="Alt+C"/>
+                  </NativeMenu>
+                </NativeMenuItem.Menu>
+              </NativeMenuItem>
+
+            </NativeMenu>
+          </NativeMenuItem.Menu>
+        </NativeMenuItem>
+      </NativeMenu.Menu>
   <Window.DataTemplates>
     <DataTemplate DataType="{x:Type vm:EditProjectVM}">
       <View:EditProject HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" DataContext="{Binding Self}"/>
@@ -25,6 +103,7 @@
   <Window.Resources>
     <local:PathToImageConverter x:Key="PathToImageConverter"/>
     <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
+      <local:OsToVisiblityConverter x:Key="OsToVisibility"/>
   </Window.Resources>
   <Window.KeyBindings>
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewFieldStruct}"/>
@@ -44,12 +123,12 @@
     <KeyBinding Gesture="Alt+R" Command="{Binding SelectedTab.Content.RemoveRows}"/>
     <KeyBinding Gesture="Alt+C" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
   </Window.KeyBindings>
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="247*"/>
-      <RowDefinition Height="424*"/>
-    </Grid.RowDefinitions>
-    <Menu Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" >
+  <Grid Margin="0,0,0,0">
+      <Grid.RowDefinitions>
+          <RowDefinition MaxHeight="25" Height="Auto"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+    <Menu Grid.Row="0" IsVisible="{Binding OsType, Converter={StaticResource OsToVisibility}}" Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" >
       <MenuItem>
         <MenuItem.Header>
           <StackPanel Orientation="Horizontal">
@@ -200,7 +279,7 @@
         </MenuItem.Header>
       </MenuItem>
     </Menu>
-    <Border  Margin="0,25,0.286,0.428" BorderBrush="Red" BorderThickness="0" Grid.RowSpan="2">
+    <Border Grid.Row="1" Margin="0,0,0.286,0.428" BorderBrush="Red" BorderThickness="0" Grid.RowSpan="2">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="200" MinWidth="100"/>

@@ -152,6 +152,19 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+        private PlatformID osType;
+        public PlatformID OsType
+        {
+            get { return osType; }
+            set
+            {
+                if(osType != value)
+                {
+                    osType = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
 
         #region Command
