@@ -32,7 +32,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>DominoPlanner.Core.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>DominoPlanner.Core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>

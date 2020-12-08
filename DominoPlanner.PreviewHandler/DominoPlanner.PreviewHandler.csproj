@@ -38,7 +38,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>DominoPlanner.PreviewHandler.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>DominoPlanner.PreviewHandler.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="IDominoProviderPreviewHandler.cs" />
@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="DominoPlanner.PreviewHandler.pfx" />
+    <None Include="DominoPlanner.PreviewHandler.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
