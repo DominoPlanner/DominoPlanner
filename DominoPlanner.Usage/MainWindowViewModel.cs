@@ -113,11 +113,11 @@ namespace DominoPlanner.Usage
                 {
                     if (_SelectedTab != null)
                     {
-                        //if (_SelectedTab.Content is ColorListControlVM colorList)
-                        //{
-                        //    //hässlich aber tut... :D
-                        //    //colorList.DifColumns.Clear();
-                        //}
+                        if (value != null && value.Content is ColorListControlVM colorList)
+                        {
+                            // to fix a weird bug where changing the tab resets the count
+                            colorList.SelectedStone = null;
+                        }
                     }
                     _SelectedTab = value;
                     if (SelectedTab != null)

@@ -30,10 +30,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
 
-            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
+            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
 
-            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class="Color" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
             ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
             ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
             ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
@@ -327,9 +327,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
-        
 
-        
+
+
         protected void FillColorList()
         {
             UsedColors = new ObservableCollection<ColorListEntry>();
@@ -383,56 +383,37 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             undostate = true;
             if (DominoCount > 0)
                 DominoCount += 1;
-            undostate= oldUndoState;
+            undostate = oldUndoState;
         }
-
-        public void PropertyValueChanged(object sender, object value_new,
-            [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
+        public void PropertyValueChanged(object sender, object value_new, [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
         {
-            if (!undostate)
+            if (ChangesSize)
             {
-                try
+                if (!undostate)
                 {
                     undostate = true;
                     if (producesUnsavedChanges)
                         UnsavedChanges = true;
-                    if (ChangesSize)
+                    try
                     {
                         var filter = new TargetSizeChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()), PostUndoAction ?? PostAction ?? (() => Refresh()), TargetSizeAffectedProperties);
                         undoStack.Push(filter);
                         filter.Apply();
+                        redoStack = new Stack<PostFilter>();
                     }
-                    else
+                    finally
                     {
-                        var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
-                        if (undoStack.Count != 0)
-                        {
-                            var lastOnStack = undoStack.Peek();
-                            if (lastOnStack is PropertyChangedOperation op)
-                            {
-                                if (op.sender == sender && op.membername == membername)
-                                {
-                                    // property has been changed multiple times in a row
-                                    if (!op.value_old.Equals(value_new))
-                                    {
-                                        op.value_new = value_new;
-                                        undoStack.Pop();
-                                        filter = op;
-                                    }
-                                }
-                            }
-                        }
-                        undoStack.Push(filter);
-                        filter.Apply();
+                        undostate = false;
                     }
-                    redoStack = new Stack<PostFilter>();
-                }
-                finally
-                {
-                    undostate = false;
                 }
             }
-        }
+            else
+            {
+                base.PropertyValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction ?? (() => Refresh()), PostUndoAction);
+            }
+        } 
+
+
         #endregion
 
         #region Commands

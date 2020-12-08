@@ -75,6 +75,10 @@ namespace DominoPlanner.Core
         }
         [Browsable(false)]
         public virtual bool show { get { return count != 0; } }
+
+        [ProtoMember(4)]
+        public bool Deleted { get; set; }
+
         public abstract XElement Save();
 
         public event EventHandler<string> PropertyChanged;
@@ -112,7 +116,7 @@ namespace DominoPlanner.Core
     {
         public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {
-            if (count == 0)
+            if (count == 0 || Deleted) // if count is zero or the color was deleted, don't use for computation
                 return Int32.MaxValue;
             return comp.Distance(color.SKToLab(), labColor);
         }

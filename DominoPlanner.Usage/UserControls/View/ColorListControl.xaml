@@ -16,6 +16,7 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
         <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
       <parent:IntToStringConverter x:Key="IntToStringConverter"/>
       <parent:IsNotNullConverter x:Key="IsNotNullConverter"/>
+      <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
       
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
@@ -60,6 +61,7 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                 </Setter.Value>
               </Setter>
             </Style>
+            
             <!--infinite render loop
             <Style Selector="ContentControl.Name:not(.Header)">
               <Setter Property="Template">
@@ -104,6 +106,7 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                       <TextBlock.Foreground>
                             <MultiBinding Converter="{StaticResource AmountToColorConverter}">
                               <TemplateBinding Property="Content"/>
+                              <Binding RelativeSource="{RelativeSource AncestorType=ListBoxItem}" Path="DataContext.Deleted"/>
                               <Binding RelativeSource="{RelativeSource AncestorType=ListBoxItem}" Path="DataContext.Count"/>
                             </MultiBinding>
                       </TextBlock.Foreground>
@@ -124,15 +127,17 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
             <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
             <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center"></TextBox>
             <TextBlock VerticalAlignment="Center" Margin="5" >Color Amout:</TextBlock>
-            <NumericUpDown Text="{Binding SelectedStone.Count, Mode=TwoWay}" Width="100"/>
-
+            <NumericUpDown Text="{Binding SelectedStone.Count}" Width="100"/>
+            
           </DockPanel>
           <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
             <parent:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="Move up"/>
             <parent:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="Move down"/>
             <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color"/>
-            <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" 
-                                IsVisible="false" Content="Remove Selected"/>
+            <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
+                                Content="Remove Selected" ToolTip.Tip="The color will not be used in new projects (and won't be available during editing), but it will not be deleted from existing projects."/>
+            <parent:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
+                                Content="Restore Selected"/>
             <parent:ImageButton DockPanel.Dock="Right" Content="Save Colors"
                                 Image="/Icons/document_save.ico" Command="{Binding BtnSaveColors}"/>
             <parent:ImageButton DockPanel.Dock="Right" Content="Export to Excel"

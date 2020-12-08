@@ -1,13 +1,21 @@
 ﻿using Avalonia.Media;
 using DominoPlanner.Core;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace DominoPlanner.Usage
 {
     // Viewmodel for DominoColor
     public class ColorListEntry : ModelBase
     {
+        public Action<object, object, string, bool, Action, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, Action PostUndoAction = null)
+        {
+            ValueChanged?.Invoke(sender, value_new, membername, producesUnsavedChanges, PostAction, PostUndoAction);
+        }
         public ColorListEntry()
         {
             ProjectCount = new ObservableCollection<int>();
@@ -37,20 +45,20 @@ namespace DominoPlanner.Usage
         public string Name
         {
             get { return DominoColor.name; }
-            set { DominoColor.name = value; RaisePropertyChanged(); }
+            set { PropertyValueChanged(this, value); DominoColor.name = value; RaisePropertyChanged(); }
         }
 
 
         public int Count
         {
             get { return DominoColor.count; }
-            set { DominoColor.count = value; RaisePropertyChanged(); }
+            set { PropertyValueChanged(this, value); DominoColor.count = value; RaisePropertyChanged(); }
         }
 
         public Color Color
         {
             get { return DominoColor.mediaColor; }
-            set { DominoColor.mediaColor = value; RaisePropertyChanged(); }
+            set { PropertyValueChanged(this, value); DominoColor.mediaColor = value; RaisePropertyChanged(); }
         }
 
 
@@ -94,6 +102,13 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public bool Deleted
+        {
+            get { return DominoColor.Deleted; }
+            set { DominoColor.Deleted = value; RaisePropertyChanged(); }
+        }
+
         private ObservableCollection<int> _ProjectCount;
         public ObservableCollection<int> ProjectCount
         {

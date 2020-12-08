@@ -1,26 +1,15 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Avalonia.Controls;
-using Avalonia.Data;
 using System.Windows.Input;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia;
-using Avalonia.Collections;
-using Avalonia.Markup.Xaml;
-using Avalonia.Data.Converters;
-using System.Reflection.Emit;
-using Avalonia.Markup.Xaml.Templates;
-using Avalonia.Controls.Templates;
-using ThemeEditor.Controls.ColorPicker;
 
 namespace DominoPlanner.Usage
 {
@@ -31,7 +20,7 @@ namespace DominoPlanner.Usage
     {
         public ObservableCollection<ColorListEntry> Colors
         {
-            get { return (ObservableCollection<ColorListEntry>)GetValue(ColorsProperty); }
+            get { return GetValue(ColorsProperty); }
             set { SetValue(ColorsProperty, value); }
         }
 
@@ -115,8 +104,9 @@ namespace DominoPlanner.Usage
                 {
                     var cc = new ContentControl()
                     {
-                        [!ContentProperty] = new Binding(column.DataField, BindingMode.TwoWay)
+                        [!ContentProperty] = new Binding(column.DataField, BindingMode.Default)
                     };
+                    cc[!ForegroundProperty] = new Binding("Deleted") { Converter = new VisibilityToDeletedColorConverter() };
 
                     cc.Classes.Add(column.Class);
                     Grid.SetColumn(cc, counter);
@@ -188,69 +178,26 @@ namespace DominoPlanner.Usage
             public string Class { get; set; } = "";
             public bool CanResize { get; set; } = false;
         }
-        /*public class ConfigToDynamicGridConverter : IValueConverter
-        {
-            //private GridView currentGridView;
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                //if (currentGridView != null) BindingOperations.ClearAllBindings(currentGridView);
-                //currentGridView?.Columns.Clear();
-                var config = value as AvaloniaList<Column>;
-                var grid = new Grid();
-                if (config != null)
-                {
-                    foreach (var column in config)
-                    {
-                        // add title column;
-
-
-                        int minWidth = 0;
-                        DataTemplate columnLayout = new DataTemplate();
-                        if (column.DataField != "DominoColor.mediaColor")
-                        {
-                            minWidth = 50;
-                            FrameworkElementFactory labelFactory = new FrameworkElementFactory(typeof(TextBlock));
-                            labelFactory.SetBinding(TextBlock.TextProperty, new Binding(column.DataField));
-                            columnLayout.VisualTree = labelFactory;
-                            if (!string.IsNullOrEmpty(column.HighlightDataField))
-                            {
-                                MultiBinding colorBinding = new MultiBinding();
-                                colorBinding.Bindings.Add(new Binding(column.DataField));
-                                colorBinding.Bindings.Add(new Binding(column.HighlightDataField));
-                                colorBinding.Converter = new AmountToColorConverter();
-                                labelFactory.SetBinding(TextBlock.ForegroundProperty, colorBinding);
-                            }
-                            var binding = new Binding(column.DataField);
-                        }
-                        else
-                        {
-                            FrameworkElementFactory rectFactory = new FrameworkElementFactory(typeof(Rectangle));
-                            Binding binding = new Binding(column.DataField);
-                            binding.Converter = new ColorToBrushConverter();
-                            rectFactory.SetBinding(Rectangle.FillProperty, binding);
-                            rectFactory.SetValue(Rectangle.WidthProperty, 16.0);
-                            rectFactory.SetValue(Rectangle.HeightProperty, 24.0);
-                            columnLayout.VisualTree = rectFactory;
-                        }
-                        var GridViewColumnHeader = new GridViewColumnHeader();
-                        GridViewColumnHeader.MinWidth = minWidth;
-                        GridViewColumnHeader.Content = column.Header;
-                        grdiView.Columns.Add(new GridViewColumn { Header = GridViewColumnHeader, CellTemplate = columnLayout });
-                    }
-                }
-                currentGridView = grdiView;
-                return grdiView;
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                throw new NotSupportedException();
-            }
-        }*/
         
         public void OnScrollChanged(object control, ScrollChangedEventArgs args)
         {
             this.Find<ScrollViewer>("OuterScrollViewer").Offset = new Vector(this.Find<ScrollViewer>("InnerScrollViewer").Offset.X, 0);
+        }
+    }
+    public class VisibilityToDeletedColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool b && b)
+            {
+                return Brushes.Gray;
+            }
+            return Brushes.Black;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using DominoPlanner.Core;
 using Microsoft.Win32;
 using OfficeOpenXml;
@@ -179,7 +180,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         var contentblock = new ContentControl()
                         {
-                            [!ContentControl.ContentProperty] = new Binding("ProjectCount[" + (projectindex) + "]")
+                            [!ContentProperty] = new Binding("ProjectCount[" + (projectindex) + "]"),
                         };
                         contentblock.Classes.Add("Content");
                         contentblock.Classes.Add("Project");
@@ -232,8 +233,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             BtnAddColor = new RelayCommand(o => { AddNewColor(); });
             BtnSaveColors = new RelayCommand(o => { Save(); });
             BtnRemove = new RelayCommand(o => { RemoveSelected(); });
-            BtnMoveDown = new RelayCommand(o => { MoveDown(); });
-            BtnMoveUp = new RelayCommand(o => { MoveUp(); });
+            BtnMoveDown = new RelayCommand(o => { Move(false); });
+            BtnMoveUp = new RelayCommand(o => { Move(true); });
             BtnExportXLSX = new RelayCommand(o => { ExportXLSX(); });
             base.UnsavedChanges = false;
 
@@ -282,11 +283,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             int counter = 0;
             if (ColorRepository.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
-                _ColorList.Add(new ColorListEntry() { DominoColor = ColorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
+                _ColorList.Add(new ColorListEntry() { DominoColor = ColorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1, ValueChanged = PropertyValueChanged });
             }
             foreach (DominoColor domino in ColorRepository.RepresentionForCalculation.OfType<DominoColor>())
             {
-                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = ColorRepository.Anzeigeindizes[counter] });
+                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = ColorRepository.Anzeigeindizes[counter], ValueChanged = PropertyValueChanged });
                 counter++;
             }
         }
@@ -377,41 +378,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }*/
 
         }
-        public override void Undo()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Redo()
-        {
-            throw new NotImplementedException();
-        }
         private void RemoveSelected()
         {
-            throw new NotImplementedException();
-            //UnsavedChanges = true;
-        }
-
-        private void MoveUp()
-        {
-            try
+            if (SelectedStone.DominoColor is DominoColor dominoColor)
             {
-                if (SelectedStone.DominoColor is DominoColor dominoColor)
-                {
-                    ColorRepository.MoveUp(dominoColor);
-                }
-                RaisePropertyChanged("ColorList");
+                DeleteColorOperation op = new DeleteColorOperation(SelectedStone);
+                op.Apply();
+                undoStack.Push(op);
+                UnsavedChanges = true;
             }
-            catch (Exception) { }
         }
-
-        private void MoveDown()
+        private void Move(bool up)
         {
             try
             {
                 if (SelectedStone.DominoColor is DominoColor dominoColor)
                 {
-                    ColorRepository.MoveDown(dominoColor);
+                    MoveColorOperation op = new MoveColorOperation(ColorRepository, dominoColor, up);
+                    op.Apply();
+                    if (op.valid)
+                        undoStack.Push(op);
                 }
                 RaisePropertyChanged("ColorList");
             }
@@ -420,10 +406,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddNewColor()
         {
-            ColorRepository.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color"));
-            _ColorList.Add(new ColorListEntry() { DominoColor = ColorRepository.RepresentionForCalculation.Last(), SortIndex = ColorRepository.Anzeigeindizes.Last(),
-             ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))});
-
+            AddColorOperation op = new AddColorOperation(ColorRepository, _ColorList);
+            op.Apply();
+            if (op.added != null)
+            {
+                op.added.ValueChanged = PropertyValueChanged;
+                SelectedStone = op.added;
+            }
+            undoStack.Push(op);
             UnsavedChanges = true;
         }
 
@@ -529,6 +519,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
                     }
                 }
+                _SelectedStone = value;
                 TabPropertyChanged(ProducesUnsavedChanges: false);
             }
         }
@@ -650,9 +641,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal override async void ResetContent()
         {
             ShowProjects = true;
-            //if (DifColumns == null)
-                //DifColumns = new ObservableCollection<DataGridColumn>();
-            //DifColumns.Clear();
             foreach(ColorListEntry cle in _ColorList)
             {
                 cle.ProjectCount.Clear();
@@ -662,5 +650,123 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         #endregion
     }
-    
+    public class DeletedColorVisibilityConverter : IMultiValueConverter
+    {
+        // Colors can have three states:
+        // - used, but deleted: -> gray, but visible
+        // - not deleted -> black
+        // - deleted and not used -> invisible
+        // deleted colors won't be used anymore
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values[0] is bool deleted)
+                if (!deleted)
+                    return true;
+            if (values[1] is ObservableCollection<int> counts)
+            {
+                foreach (int count in counts)
+                    if (count > 0)
+                        return true;
+            }
+            return false;
+        }
+    }
+    public class MoveColorOperation : PostFilter
+    {
+        private readonly ColorRepository repo;
+        private readonly DominoColor stoneToMove;
+        private readonly bool up;
+        public bool valid = true;
+        public MoveColorOperation(ColorRepository repo, DominoColor stoneToMove, bool up)
+        {
+            this.repo = repo;
+            this.stoneToMove = stoneToMove;
+            this.up = up;
+        }
+        public override void Apply()
+        {
+            try
+            {
+                if (up)
+                    repo.MoveUp(stoneToMove);
+                else
+                    repo.MoveDown(stoneToMove);
+            }
+            catch (InvalidOperationException)
+            {
+                valid = false;
+            }
+        }
+
+        public override void Undo()
+        {
+            try
+            {
+                if (valid)
+                {
+                    if (up)
+                        repo.MoveDown(stoneToMove);
+                    else
+                        repo.MoveUp(stoneToMove);
+                }
+            }
+            catch { }
+        }
+    }
+    public class AddColorOperation : PostFilter
+    {
+        private readonly ColorRepository repo;
+        private readonly ObservableCollection<ColorListEntry> _ColorList;
+        internal ColorListEntry added = null;
+        public AddColorOperation(ColorRepository repo, ObservableCollection<ColorListEntry> _ColorList)
+        {
+            this.repo = repo;
+            this._ColorList = _ColorList;
+        }
+        public override void Apply()
+        {
+            if (added == null)
+            {
+                repo.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color"));
+                added = new ColorListEntry()
+                {
+                    DominoColor = repo.RepresentionForCalculation.Last(),
+                    SortIndex = repo.Anzeigeindizes.Last(),
+                    ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))
+                };
+                _ColorList.Add(added);
+            }
+            else
+            {
+                // redo
+                added.Deleted = false;
+            }
+        }
+
+        public override void Undo()
+        {
+            added.Deleted = true;
+        }
+    }
+    public class DeleteColorOperation : PostFilter
+    {
+        private readonly ColorListEntry entry;
+        private readonly bool OldState;
+        public DeleteColorOperation(ColorListEntry entry)
+        {
+            this.entry = entry;
+            this.OldState = entry.Deleted;
+        }
+
+        public override void Apply()
+        {
+            entry.Deleted = !this.OldState;
+        }
+
+        public override void Undo()
+        {
+            entry.Deleted = this.OldState;
+        }
+    }
+
 }

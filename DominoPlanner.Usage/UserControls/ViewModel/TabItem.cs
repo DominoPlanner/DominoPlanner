@@ -224,8 +224,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public string name { get; set; }
         public string assemblyname { get; set; }
 
-        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
         #region properties
         private IDominoProvider _CurrentProject;
@@ -296,13 +294,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private bool _undostate;
-
-        public bool undostate
-        {
-            get { return _undostate; }
-            set { _undostate = value; }
-        }
+        
         public Func<DominoProviderTabItem, DominoProviderTabItem> GetNewViewModel;
         public Action<DominoProviderTabItem, DominoProviderTabItem> RegisterNewViewModel;
         public bool Editing
@@ -327,30 +319,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #endregion
         #region methods
-        public override void Undo()
-        {
-            undostate = true;
-            if (undoStack.Count != 0)
-            {
-                PostFilter undoFilter = undoStack.Pop();
-                redoStack.Push(undoFilter);
-                undoFilter.Undo();
-                if (undoStack.Count == 0) UnsavedChanges = false;
-            }
-            undostate = false;
-        }
-
-        public override void Redo()
-        {
-            undostate = true;
-            if (redoStack.Count != 0)
-            {
-                PostFilter redoFilter = redoStack.Pop();
-                undoStack.Push(redoFilter);
-                redoFilter.Apply();
-            }
-            undostate = false;
-        }
+        
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();

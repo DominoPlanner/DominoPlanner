@@ -5,8 +5,12 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:vm="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
+             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel;assembly=DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.ColorControl">
+  <UserControl.Resources>
+    <local:DeletedColorVisibilityConverter x:Key="DeletedColorVisibilityConverter"/>
+  </UserControl.Resources>
   <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
     <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
       <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">
@@ -32,10 +36,20 @@
               </ControlTemplate>
             </Setter>
           </Style>
+          <Style Selector="ListBoxItem">
+            <Setter Property="IsVisible">
+              <MultiBinding Converter="{StaticResource DeletedColorVisibilityConverter}">
+                 <Binding Path="Deleted"/>
+                 <Binding Path="ProjectCount"/>
+              </MultiBinding>
+            </Setter>
+          </Style>
         </Grid.Styles>
         <Border BorderThickness="0 0 0 1" BorderBrush="{StaticResource ThemeBorderMidBrush}"></Border>
         <Grid Grid.Row="0" Name="HeaderGrid"></Grid>
-          <ListBox Grid.Row="1" Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+          <ListBox Grid.Row="1"
+                   Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+          
           </ListBox>
       </Grid>
     </ScrollViewer>

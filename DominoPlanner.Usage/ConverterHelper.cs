@@ -24,14 +24,18 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] == null || values[1] == null)
+            if (values[0] == null || values[2] == null || values[1] == null)
                 return Brushes.Black;
-            if (int.TryParse(values[0].ToString(), out int anzahl) && int.TryParse(values[1].ToString(), out int gesamt))
+            if (int.TryParse(values[0].ToString(), out int anzahl) && int.TryParse(values[2].ToString(), out int gesamt))
             {
                 if (anzahl > gesamt)
                 {
                     return Brushes.Red;
                 }
+            }
+            if (values[1] is bool b && b)
+            {
+                return Brushes.Gray;
             }
             return Brushes.Black;
         }
