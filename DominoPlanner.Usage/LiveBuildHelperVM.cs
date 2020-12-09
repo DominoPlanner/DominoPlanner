@@ -46,7 +46,7 @@ namespace DominoPlanner.Usage
                 new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
                 new Column() { DataField = "DominoColor.name", Header = "Name" },
                 new Column() { DataField = "ProjectCount[0]", Header = "Total used" },
-                new Column() { DataField = "ProjectCount[1]", Header = "Remaining" },
+                new Column() { DataField = "ProjectCount[1]", Header = "Remaining", Class="Count" },
                 new Column() { DataField = "ProjectCount[2]", Header = "Next " + NextN }
             };
 

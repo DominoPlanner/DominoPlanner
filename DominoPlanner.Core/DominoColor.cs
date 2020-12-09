@@ -218,7 +218,11 @@ namespace DominoPlanner.Core
             int anzeigeindex = Anzeigeindizes[index];
             if (anzeigeindex == 0) throw new InvalidOperationException("Die Farbe ist bereits ganz oben");
             int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex - 1);
-            Anzeigeindizes[position_neuer_index]++;
+            if (position_neuer_index != -1)
+            {
+                // otherwise, the index is not currently in use
+                Anzeigeindizes[position_neuer_index]++;
+            }
             Anzeigeindizes[index]--;
         }
         public void MoveDown(DominoColor color)
@@ -227,7 +231,11 @@ namespace DominoPlanner.Core
             int anzeigeindex = Anzeigeindizes[index];
             if (anzeigeindex == Anzeigeindizes.Max()) throw new InvalidOperationException("Die Farbe ist bereits ganz unten");
             int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex + 1);
-            Anzeigeindizes[position_neuer_index]--;
+            if (position_neuer_index != -1)
+            {
+                // otherwise, the index is not currently in use
+                Anzeigeindizes[position_neuer_index]--;
+            }
             Anzeigeindizes[index]++;
         }
         public IEnumerable<IDominoColor> SortedRepresentation

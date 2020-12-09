@@ -11,13 +11,12 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl">
     <UserControl.Resources>
-        <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
-        <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
-        <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
+      <parent:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
+      <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+      <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
       <parent:IntToStringConverter x:Key="IntToStringConverter"/>
-      <parent:IsNotNullConverter x:Key="IsNotNullConverter"/>
+      <parent:IsNormalColorConverter x:Key="IsNormalColorConverter"/>
       <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
-      
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -26,17 +25,6 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
         </Grid.RowDefinitions>
         <local:ProjectColorList Colors="{Binding ColorList}" ColumnConfig="{Binding ColumnConfig}" Project="{Binding DominoAssembly}" SelectedColor="{Binding SelectedStone, Mode=TwoWay}" Margin="5,5,5,5">
           <local:ProjectColorList.Styles>
-            <Style Selector="ContentControl.Header">
-              <Setter Property="Template">
-                <Setter.Value>
-                  <ControlTemplate>
-                    <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
-                      <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
-                    </Border>
-                  </ControlTemplate>
-                </Setter.Value>
-              </Setter>
-            </Style>
             <Style Selector="ContentControl.Header.Sum, ContentControl.Header.Project">
               <Setter Property="Template">
                 <Setter.Value>
@@ -47,6 +35,10 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                   </ControlTemplate>
                 </Setter.Value>
               </Setter>
+            </Style>
+            <Style Selector="GridSplitter">
+              <Setter Property="Background" Value="{StaticResource ThemeBorderMidBrush}"/>
+              <Setter Property="Width" Value="2"/>
             </Style>
             <Style Selector="ContentControl.Header.Sum /template/ TextBlock">
               <Setter Property="FontStyle" Value="Italic"/> 
@@ -115,13 +107,19 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                 </Setter.Value>
               </Setter>
             </Style>
+            
             <Style Selector="ContentControl.Content.Sum /template/ TextBlock">
               <Setter Property="FontWeight" Value="Bold"/>
             </Style>
           </local:ProjectColorList.Styles>
         </local:ProjectColorList>
         <Grid Grid.Row="1">
-          <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsVisible="{Binding SelectedStone, Converter={StaticResource IsNotNullConverter}}" LastChildFill="False">
+          <Grid.Styles>
+            <Style Selector="DockPanel.OnlyNormalColors, StackPanel.OnlyNormalColors">
+              <Setter Property="IsVisible" Value="{Binding SelectedStone, Converter={StaticResource IsNormalColorConverter}}"/>
+            </Style>
+          </Grid.Styles>
+          <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Classes="OnlyNormalColors" LastChildFill="False">
             <main:PopupColorPicker VerticalAlignment="Center" Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
 
             <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
@@ -131,13 +129,15 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
             
           </DockPanel>
           <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
-            <parent:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="Move up"/>
-            <parent:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="Move down"/>
-            <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color"/>
-            <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
-                                Content="Remove Selected" ToolTip.Tip="The color will not be used in new projects (and won't be available during editing), but it will not be deleted from existing projects."/>
-            <parent:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
-                                Content="Restore Selected"/>
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Classes="OnlyNormalColors">
+              <parent:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="Move up"/>
+              <parent:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="Move down"/>
+              <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color"/>
+              <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
+                                  Content="Remove Selected" ToolTip.Tip="The color will not be used in new projects (and won't be available during editing), but it will not be deleted from existing projects."/>
+              <parent:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
+                                  Content="Restore Selected"/>
+            </StackPanel>
             <parent:ImageButton DockPanel.Dock="Right" Content="Save Colors"
                                 Image="/Icons/document_save.ico" Command="{Binding BtnSaveColors}"/>
             <parent:ImageButton DockPanel.Dock="Right" Content="Export to Excel"

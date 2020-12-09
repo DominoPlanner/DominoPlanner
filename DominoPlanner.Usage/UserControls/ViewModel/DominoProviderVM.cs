@@ -14,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Input;
 using Avalonia.Collections;
 using static DominoPlanner.Usage.ColorControl;
+using Avalonia.Controls;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -34,8 +35,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             OpenPopup = new RelayCommand(x => PopupOpen = true);
 
             ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
-            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize = true });
             ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
             ColorColumnConfig.Add(new Column() { DataField = "Weight", Header = "Weight" });
 
@@ -215,8 +216,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-
         public ObservableCollection<ColorListEntry> UsedColors { get; set; }
+        public ObservableCollection<ColorListEntry> SortedColors
+        {
+            get
+            {
+                return new ObservableCollection<ColorListEntry>(UsedColors.OrderBy(x => x.SortIndex));
+            }
+        }
+
         private bool _ColorRestrictionFulfilled;
 
         public bool ColorRestrictionFulfilled
@@ -367,6 +375,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     UsedColors[i].ProjectCount.Add(CurrentProject.Counts[0]);
                 }
             }
+            TabPropertyChanged(nameof(SortedColors), false);
             ColorRestrictionFulfilled = fulfilled;
         }
         protected void OpenBuildTools()

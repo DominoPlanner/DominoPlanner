@@ -241,9 +241,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColumnConfig = new AvaloniaList<Column>
             {
                 new Column() { DataField = "Color", Header = "", Class = "Color", CanResize = false },
-                new Column() { DataField = "Name", Header = "Name", Class = "Name", CanResize = false },
-                new Column() { DataField = "Color", Header = "RGB", Class = "RGB", CanResize = false },
-                new Column() { DataField = "Count", Header = "Count", CanResize = false }
+                new Column() { DataField = "Name", Header = "Name", Class = "Name",  CanResize = true, Width = new GridLength(100) },
+                new Column() { DataField = "Color", Header = "RGB", Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
+                new Column() { DataField = "Count", Header = "Count", Class="Count", CanResize = true, Width = new GridLength(70) }
             };
 
             ShowProjects = false;
@@ -397,9 +397,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     MoveColorOperation op = new MoveColorOperation(ColorRepository, dominoColor, up);
                     op.Apply();
                     if (op.valid)
+                    {
                         undoStack.Push(op);
+                        UnsavedChanges = true;
+                    }
                 }
-                RaisePropertyChanged("ColorList");
+                TabPropertyChanged("ColorList", ProducesUnsavedChanges: false);
             }
             catch (Exception) { }
         }
@@ -443,11 +446,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColorRepository.Save(FilePath);
             UnsavedChanges = false;
             return true;
-        }
-
-        private void DominoColor_PropertyChanged(object sender, string e)
-        {
-            UnsavedChanges = true;
         }
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -508,17 +506,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _SelectedStone; }
             set
             {
-                if (value != null && !(value.DominoColor is EmptyDomino))
-                {
-                    if (_SelectedStone != value)
-                    {
-                        if (_SelectedStone != null)
-                            _SelectedStone.DominoColor.PropertyChanged -= DominoColor_PropertyChanged;
-                        _SelectedStone = value;
-                        if (_SelectedStone != null)
-                            _SelectedStone.DominoColor.PropertyChanged += DominoColor_PropertyChanged;
-                    }
-                }
                 _SelectedStone = value;
                 TabPropertyChanged(ProducesUnsavedChanges: false);
             }

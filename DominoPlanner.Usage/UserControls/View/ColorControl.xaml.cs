@@ -72,7 +72,7 @@ namespace DominoPlanner.Usage
             foreach (var column in this.ColumnConfig)
             {
                 // create columns
-                var cdef = new ColumnDefinition() { Width = GridLength.Auto };
+                var cdef = new ColumnDefinition() { Width = column.Width };
                 header.ColumnDefinitions.Add(cdef);
                 cdef.SharedSizeGroup = "COL_" + counter;
                 // set header
@@ -109,6 +109,10 @@ namespace DominoPlanner.Usage
                     cc[!ForegroundProperty] = new Binding("Deleted") { Converter = new VisibilityToDeletedColorConverter() };
 
                     cc.Classes.Add(column.Class);
+                    if (column.Width != GridLength.Auto)
+                    {
+                        cc.Classes.Add("FixedWidth");
+                    }
                     Grid.SetColumn(cc, counter);
                     g.Children.Add(cc);
                 }
@@ -160,16 +164,6 @@ namespace DominoPlanner.Usage
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-
-        /*private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            {
-                if (((FrameworkElement)e.OriginalSource).DataContext is ColorListEntry)
-                {
-                    ClickCommand.Execute(null);
-                }
-            }
-        }*/
         public class Column
         {
             public string Header { get; set; }
@@ -177,6 +171,7 @@ namespace DominoPlanner.Usage
             public string HighlightDataField { get; set; }
             public string Class { get; set; } = "";
             public bool CanResize { get; set; } = false;
+            public GridLength Width { get; set; } = GridLength.Auto;
         }
         
         public void OnScrollChanged(object control, ScrollChangedEventArgs args)

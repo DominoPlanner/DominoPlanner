@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Input;
 using Avalonia.Input;
 using Avalonia.Collections;
+using Avalonia.Controls;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -329,8 +330,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColorColumnConfig = new AvaloniaList<ColorControl.Column>
             {
                 new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
-                new ColorControl.Column() { DataField = "DominoColor.name", Header = "Name" },
-                new ColorControl.Column() { DataField = "DominoColor.count", Header = "Total" },
+                new ColorControl.Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true },
+                new ColorControl.Column() { DataField = "DominoColor.count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize=true },
                 new ColorControl.Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField = "DominoColor.count" },
                 new ColorControl.Column() { DataField = "ProjectCount[1]", Header = "Selected" }
             };

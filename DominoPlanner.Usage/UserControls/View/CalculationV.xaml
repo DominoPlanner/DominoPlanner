@@ -104,7 +104,7 @@
                                 <Popup Name="myPopup" IsOpen="{Binding PopupOpen}" StaysOpen="False">
                                     <parent:ColorControl Grid.Row="2" MaxHeight="250"
                                          ColumnConfig="{Binding ColorColumnConfig}" 
-                                         Colors="{Binding UsedColors}" >
+                                         Colors="{Binding SortedColors}" >
                                     </parent:ColorControl>
                                 </Popup>
                             </StackPanel>

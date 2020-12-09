@@ -459,12 +459,30 @@ namespace DominoPlanner.Usage
             throw new NotImplementedException();
         }
     }
+    public class IsNormalColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ColorListEntry e && e.DominoColor is DominoColor dc)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class IntToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
                 return "";
+            if (value is int i && i == int.MaxValue)
+                return "(infinite)";
 
             return value.ToString();
         }
