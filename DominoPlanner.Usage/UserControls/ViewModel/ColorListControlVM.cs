@@ -59,7 +59,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             });
             itemscontrol.ItemTemplate = template;
         }
-        int GetDepth(AssemblyNode assy)
+        public static int GetDepth(AssemblyNode assy)
         {
             if (assy.Obj.children.OfType<AssemblyNode>().Count() == 0)
             {
@@ -79,7 +79,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             int index = start_column;
             foreach (var p in assy.Obj.children)
             {
-                if (p is AssemblyNode ass_child) {
+                if (p is AssemblyNode ass_child)
+                {
                     if (ass_child.ColorPathMatches(assy))
                     {
                         index += PopulateHeaderColumns(g, ass_child, level + 1, index);
@@ -100,7 +101,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         Grid.SetRowSpan(errorheader, HeaderRow - level + 1);
                         index++;
                     }
-                    
+
                 }
                 if (p is DocumentNode dn)
                 {
@@ -113,7 +114,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     Grid.SetRowSpan(contentblock, HeaderRow - (level));
                     g.Children.Add(contentblock);
                     contentblock.Content = Path.GetFileNameWithoutExtension(dn.RelativePath);
-                    
+
                     if (!dn.ColorPathMatches(assy))
                     {
                         contentblock.Classes.Add("Different");
@@ -121,12 +122,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     index++;
                 }
             }
-            
+
             // this is the title
             var cp = new ContentControl()
             {
                 Content = Path.GetFileNameWithoutExtension(assy.Path)
-                
+
             };
             cp.Classes.Add("Header");
             cp.Classes.Add("Assembly");
@@ -142,14 +143,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             tb.Classes.Add("Header");
             tb.Classes.Add("Sum");
             Grid.SetColumn(tb, index);
-            Grid.SetRow(tb, level+1);
+            Grid.SetRow(tb, level + 1);
             Grid.SetRowSpan(tb, HeaderRow - (level));
             g.Children.Add(tb);
             index++;
             //finish positioning
             var colspan = index - start_column; // +1 for sum column
             Grid.SetColumnSpan(cp, colspan);
-            
+
 
             return colspan;
         }
@@ -207,7 +208,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             return new Tuple<int, int>(index - start_column, projectindex - projectcount_startindex);
         }
-        
+
 
         public AssemblyNode Project
         {
@@ -229,7 +230,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColorList = new ObservableCollection<ColorListEntry>();
 
             Reload(filepath);
-            
+
             BtnAddColor = new RelayCommand(o => { AddNewColor(); });
             BtnSaveColors = new RelayCommand(o => { Save(); });
             BtnRemove = new RelayCommand(o => { RemoveSelected(); });
@@ -248,7 +249,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             ShowProjects = false;
         }
-        
+
         public ColorListControlVM(AssemblyNode dominoAssembly) : this(Workspace.AbsolutePathFromReferenceLoseUpdate(dominoAssembly.Obj.ColorPath, dominoAssembly.Obj))
         {
             this.DominoAssembly = dominoAssembly;
@@ -291,92 +292,150 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 counter++;
             }
         }
-        private void ExportXLSX()
+        private async void ExportXLSX()
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var p = new ExcelPackage();
             // content
             var ws = p.Workbook.Worksheets.Add("Overview");
             ws.Cells["A1"].Value = "Color Usage Overview";
             ws.Cells["A1"].Style.Font.Size = 15;
-            ws.Cells["B3"].Value = "Color";
-            ws.Cells["C3"].Value = "Available";
-
-            // Write project titles
-            /*for (int i = 0; i < DifColumns.Count; i++)
-            { 
-                ws.Cells[3, 4 + i].Value = DifColumns[i].Header;
-
-                ws.Cells[4 + ColorList.Count, 4+i].Formula
-                    = "SUM(" + ws.Cells[4, 4+i].Address + ":" + ws.Cells[3 + ColorList.Count, 4+i].Address + ")";
-            }
-            ws.Cells[4 + ColorList.Count, 3].Formula
-                    = "SUM(" + ws.Cells[4, 3].Address + ":" + ws.Cells[3 + ColorList.Count, 3].Address + ")";
-            ws.Cells[ColorList.Count + 4, 4 + DifColumns.Count].Formula =
-                 "SUM(" + ws.Cells[4, 4 + DifColumns.Count].Address + ":" + ws.Cells[3 + ColorList.Count, 4 + DifColumns.Count].Address + ")";
-            if (DifColumns.Count != 0)  ws.Cells[3, 4 + DifColumns.Count].Value = "Sum";
-            ws.Cells[4 + ColorList.Count, 2].Value = "Sum";
-            // fill color counts
+            var HeaderRow = ProjectColorList.GetDepth(DominoAssembly);
+            // 
+            var offset = HeaderRow + 4;
+            ws.Cells[offset - 1, 2].Value = "Color";
+            ws.Cells[offset - 1, 3].Value = "Available";
             for (int i = 0; i < ColorList.Count; i++)
             {
 
-                ws.Cells[i + 4, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                ws.Cells[i + 4, 1].Style.Fill.BackgroundColor.SetColor(ColorList[i].DominoColor.mediaColor.ToSD());
-                ws.Cells[i + 4, 2].Value = ColorList[i].DominoColor.name;
-                ws.Cells[i + 4, 3].Value = ColorList[i].DominoColor.count;
-                for (int j = 0; j < ColorList[i].ProjectCount.Count; j++)
-                {
-                    ws.Cells[4 + i, 4 + j].Value = ColorList[i].ProjectCount[j];
-                }
-                if (DifColumns.Count != 0)
-                {
-                    ws.Cells[4 + i, 4 + DifColumns.Count].Formula
-                        = "SUM(" + ws.Cells[4 + i, 4].Address + ":"
-                        + ws.Cells[4 + i, 3 + DifColumns.Count].Address + ")";
-                }
+                ws.Cells[offset + i, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                ws.Cells[offset + i, 1].Style.Fill.BackgroundColor.SetColor(ColorList[i].DominoColor.mediaColor.ToSD());
+                ws.Cells[offset + i, 2].Value = ColorList[i].DominoColor.name;
+                ws.Cells[offset + i, 3].Value = ColorList[i].DominoColor.count;
             }
+            ws.Cells[offset, 3].Value = ""; // Count of empty domino
 
-            ws.Cells["C4"].Value = ""; // Count of empty domino
+            var length = ExportAssemblyToExcel(ws, DominoAssembly, 0, 0, 0, HeaderRow);
+            int index = length.Item1;
+
+
+            // add lines 
+            ws.Cells[3, 3, 4 + ColorList.Count + HeaderRow, 3 + index].Style.Border.Right.Style
+                = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+            ws.Cells[2, 1, 3 + ColorList.Count + HeaderRow, 3 + index].Style.Border.Bottom.Style
+                = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+            ws.Cells[3 + HeaderRow, 1, 3 + HeaderRow, 3 + index].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            ws.Cells[3 + HeaderRow + ColorList.Count, 1, 3 + HeaderRow + ColorList.Count, 3 + index].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
             ws.Calculate();
-
-            //styling 
-
-            ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
-            ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Font.Bold = true;
-
-            ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Font.Bold = true;
-            ws.Cells[3, 1, 3, 4 + DifColumns.Count].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Font.Bold = true;
-            ws.Cells[3, 3, 4 + ColorList.Count, 3].Style.Border.Right.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            if (DifColumns.Count != 0)
-            {
-                ws.Cells[3, 4, 4 + ColorList.Count, 3 + DifColumns.Count].Style.Border.Right.Style
-                    = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-                ws.Cells[4, 2, 3 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Bottom.Style
-                    = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            }
-
-            ws.Cells[4 + ColorList.Count, 2, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Top.Style 
-                = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            ws.Cells[3, 4 + DifColumns.Count, 4 + ColorList.Count, 4 + DifColumns.Count].Style.Border.Left.Style
-                = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-
+            // auto fit unfortunately doesn't work for merged cells (project headers)
+            //ws.Cells.AutoFitColumns();
+            
+            
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.FileName = "ColorList";
-            dlg.DefaultExt = ".xlsx";
-            dlg.Filter = "Excel files (.xlsx)|*.xlsx|All Files (*.*)|*";
-            if (dlg.ShowDialog() == true)
+            dlg.InitialFileName = "ColorList";
+            dlg.Filters = new List<FileDialogFilter>() {
+                new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = "Excel files" },
+                new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" }
+            };
+            var result = await dlg.ShowAsync(MainWindowViewModel.GetWindow());
+            if (!string.IsNullOrEmpty(result))
             {
                 try
                 {
-                    p.SaveAs(new FileInfo(dlg.FileName));
-                    Process.Start(dlg.FileName);
+                    p.SaveAs(new FileInfo(result));
+                    var process = new Process();
+                    process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
+                    process.Start();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Errorhandler.RaiseMessage("Save failed", "Fail", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage("Save failed:" + ex.Message, "Fail", Errorhandler.MessageType.Error);
                 }
-            }*/
+            }
 
+        }
+        private ValueTuple<int, int> ExportAssemblyToExcel(ExcelWorksheet ws, AssemblyNode assy, int level, int start_column, int projectcount_startindex, int header_rows)
+        {
+            int projectindex = projectcount_startindex;
+            int index = start_column;
+            int top_offset;
+            int left_offset;
+            foreach (var p in assy.Obj.children)
+            {
+                top_offset = 3 + level + 1;
+                left_offset = 4 + index;
+                var header_cell = ws.Cells[top_offset, left_offset];
+                if (p is AssemblyNode ass_child)
+                {
+                    if (ass_child.ColorPathMatches(assy))
+                    {
+                        var subresult = ExportAssemblyToExcel(ws, ass_child, level + 1, index, projectindex, header_rows);
+                        index += subresult.Item1;
+                        projectindex += subresult.Item2;
+                    }
+                    else
+                    {
+                        header_cell.Value = Path.GetFileNameWithoutExtension(ass_child.Path);
+                        header_cell.Style.Font.Color.SetColor(System.Drawing.Color.Red);
+                        ws.Cells[top_offset, left_offset, header_rows + 3, left_offset].Merge = true;
+                        index++;
+                    }
+
+                }
+                if (p is DocumentNode dn)
+                {
+                    header_cell.Value = Path.GetFileNameWithoutExtension(dn.RelativePath);
+                    if (!dn.ColorPathMatches(assy))
+                    {
+                        header_cell.Style.Font.Color.SetColor(System.Drawing.Color.Red);
+
+                    }
+                    else
+                    {
+                        for (int i = 0; i < ColorList.Count; i++)
+                        {
+                            if (projectindex < ColorList[i].ProjectCount.Count)
+                            {
+                                ws.Cells[header_rows + 4 + i, left_offset].Value = ColorList[i].ProjectCount[projectindex];
+                            }
+                        }
+                        ws.Cells[header_rows + 4 + ColorList.Count, left_offset].Formula = $"SUM({ws.Cells[header_rows + 5, left_offset].Address}:{ws.Cells[header_rows + 3 + ColorList.Count, left_offset].Address})";
+                        projectindex++;
+                    }
+                    ws.Cells[top_offset, left_offset, header_rows + 3, left_offset].Merge = true;
+                    header_cell.Style.VerticalAlignment = OfficeOpenXml.Style.ExcelVerticalAlignment.Bottom;
+                    index++;
+                    
+                }
+            }
+            // add assembly header
+            top_offset = 3 + level;
+            left_offset = 4 + start_column;
+            // set assemby name
+            
+            ws.Cells[top_offset, left_offset].Value = Path.GetFileNameWithoutExtension(assy.Path);
+            
+            // join assembly cells
+            var colspan = index - start_column; // +1 for sum column
+            ws.Cells[top_offset, left_offset, top_offset, left_offset + colspan].Merge = true;
+            ws.Cells[top_offset, left_offset].Style.Font.Bold = true;
+            // sum column
+            int sum_col = left_offset + colspan;
+            ws.Cells[top_offset + 1, sum_col].Value = "Sum";
+            ws.Cells[top_offset + 1, sum_col, header_rows + 3, sum_col].Merge = true;
+            ws.Cells[top_offset + 1, sum_col].Style.Font.Italic = true;
+            for (int i = 0; i < ColorList.Count; i++)
+            {
+                if (projectindex < ColorList[i].ProjectCount.Count)
+                {
+                    ws.Cells[header_rows + 4 + i, sum_col].Value = ColorList[i].ProjectCount[projectindex];
+                    ws.Cells[header_rows + 4 + i, sum_col].Style.Font.Italic = true;
+                }
+            }
+            ws.Cells[header_rows + 4 + ColorList.Count, sum_col].Formula = $"SUM({ws.Cells[header_rows + 5, sum_col].Address}:{ws.Cells[header_rows + 3 + ColorList.Count, sum_col].Address})";
+            index++;
+            projectindex++;
+            return (index - start_column, projectindex - projectcount_startindex);
         }
         private void RemoveSelected()
         {
@@ -422,7 +481,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public override bool Save()
         {
-            if(FilePath == string.Empty)
+            if (FilePath == string.Empty)
             {
                 SaveFileDialog ofd = new SaveFileDialog
                 {
@@ -498,7 +557,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public AssemblyNode DominoAssembly
         {
             get { return dominoAssembly; }
-            set { dominoAssembly = value; ResetContent(); RaisePropertyChanged();  }
+            set { dominoAssembly = value; ResetContent(); RaisePropertyChanged(); }
         }
         private ColorListEntry _SelectedStone;
         public ColorListEntry SelectedStone
@@ -628,12 +687,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         internal override async void ResetContent()
         {
             ShowProjects = true;
-            foreach(ColorListEntry cle in _ColorList)
+            foreach (ColorListEntry cle in _ColorList)
             {
                 cle.ProjectCount.Clear();
             }
             await AddProjectCounts(DominoAssembly);
-            
+
         }
         #endregion
     }
