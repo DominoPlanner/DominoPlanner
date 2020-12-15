@@ -162,13 +162,49 @@ namespace DominoPlanner.Usage
             get { return GetValue(AdditionalDrawablesProperty); }
             set { SetValue(AdditionalDrawablesProperty, value); }
         }
-
         public static readonly StyledProperty<AvaloniaList<CanvasDrawable>> AdditionalDrawablesProperty = AvaloniaProperty.Register<ProjectCanvas, AvaloniaList<CanvasDrawable>>(nameof(Project));
+
+
+        public double VerticalSliderSize
+        {
+            get { return GetValue(VerticalSliderSizeProperty); }
+            set { SetValue(VerticalSliderSizeProperty, value); }
+        }
+        public static readonly StyledProperty<double> VerticalSliderSizeProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(VerticalSliderSize));
+
+        public double VerticalSliderPos
+        {
+            get { return GetValue(VerticalSliderPosProperty); }
+            set { SetValue(VerticalSliderPosProperty, value); }
+        }
+        public static readonly StyledProperty<double> VerticalSliderPosProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(VerticalSliderPos));
+
+        public double HorizontalSliderSize
+        {
+            get { return GetValue(HorizontalSliderSizeProperty); }
+            set { SetValue(HorizontalSliderSizeProperty, value); }
+        }
+        public static readonly StyledProperty<double> HorizontalSliderSizeProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(HorizontalSliderSize));
+
+        public double HorizontalSliderPos
+        {
+            get { return GetValue(HorizontalSliderPosProperty); }
+            set { SetValue(HorizontalSliderPosProperty, value); }
+        }
+        public static readonly StyledProperty<double> HorizontalSliderPosProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(HorizontalSliderPos));
+
+
         public double ProjectHeight { get; set; }
 
         public double ProjectWidth { get; set; }
 
         public SKBitmap OriginalImage;
+
+        private double VirtualVerticalSliderMin;
+        private double VirtualVerticalSliderMax;
+
+        private double VirtualHorizontalSliderMin;
+        private double VirtualHorizontalSliderMax;
 
         public ProjectCanvas()
         {
@@ -195,6 +231,62 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(BorderSizeProperty);
             AffectsRender<ProjectCanvas>(ForceRedrawProperty);
             AffectsRender<ProjectCanvas>(AdditionalDrawablesProperty);
+            //ShiftXProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateVerticalSlider(o, e));
+            ShiftYProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateVerticalSlider(o, e));
+            ZoomProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateVerticalSlider(o, e));
+            VerticalSliderPosProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateVerticalSlider(o, e));
+            ShiftXProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
+            ZoomProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
+            HorizontalSliderPosProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
+        }
+        
+        protected override Size ArrangeOverride(Size finalSize){
+            UpdateVerticalSlider(this, null);
+            UpdateHorizontalSlider(this, null);
+            return finalSize;
+        }
+
+        private void UpdateVerticalSlider(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e == null || e.Property == ShiftYProperty || e.Property == ZoomProperty)
+            {
+                double newval = e == null || e.Property == ZoomProperty ? ShiftY : (double) e.NewValue;
+                // Binding to maximum or minimum doesn't work for some reason, so it's fixed
+                VirtualVerticalSliderMax = Math.Max(ShiftY, ProjectHeight - Bounds.Height / Zoom);
+                VirtualVerticalSliderMin = Math.Min(ShiftY, 0);
+                var scaling_factor = 100.0 / (VirtualVerticalSliderMax - VirtualVerticalSliderMin);
+                VerticalSliderPos = newval * scaling_factor - VirtualVerticalSliderMin * scaling_factor;
+                VerticalSliderSize = scaling_factor * Bounds.Height;
+                
+                Debug.WriteLine(VerticalSliderSize);
+            }
+            else if (e.Property == VerticalSliderPosProperty && !double.IsNaN((double)e.NewValue))
+            {
+                var scaling_factor = 100.0 / (VirtualVerticalSliderMax - VirtualVerticalSliderMin);
+                ShiftY = (double) e.NewValue / scaling_factor +  VirtualVerticalSliderMin; 
+            }
+
+        }
+        private void UpdateHorizontalSlider(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e == null || e.Property == ShiftXProperty || e.Property == ZoomProperty)
+            {
+                double newval = e == null || e.Property == ZoomProperty ? ShiftX : (double) e.NewValue;
+                // Binding to maximum or minimum doesn't work for some reason, so it's fixed
+                VirtualHorizontalSliderMax = Math.Max(ShiftY, ProjectWidth - Bounds.Width / Zoom);
+                VirtualHorizontalSliderMin = Math.Min(ShiftY, 0);
+                var scaling_factor = 100.0 / (VirtualHorizontalSliderMax - VirtualHorizontalSliderMin);
+                HorizontalSliderPos = newval * scaling_factor - VirtualHorizontalSliderMin * scaling_factor;
+                HorizontalSliderSize = scaling_factor * Bounds.Width;
+                
+                Debug.WriteLine(HorizontalSliderSize);
+            }
+            else if (e.Property == HorizontalSliderPosProperty && !double.IsNaN((double)e.NewValue))
+            {
+                var scaling_factor = 100.0 / (VirtualHorizontalSliderMax - VirtualHorizontalSliderMin);
+                ShiftX = (double) e.NewValue / scaling_factor +  VirtualHorizontalSliderMin; 
+            }
+
         }
 
         private void SourceImageChanged()
@@ -238,6 +330,10 @@ namespace DominoPlanner.Usage
         }
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
         {
+            if (double.IsNaN(ShiftX))
+                ShiftX = 0;
+            if (double.IsNaN(ShiftY))
+                ShiftY = 0;
             var oldx = ShiftX;
             var oldy = ShiftY;
             double newx = ShiftX, newy = ShiftY;

@@ -193,10 +193,16 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
       </DockPanel>
       <!--<ScrollViewer Grid.Column="1" x:Name="ScrollViewer" Margin="0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"> SizeChanged="Grid_SizeChanged" -->
       <Grid Grid.Column="1" ColumnDefinitions="*, Auto" RowDefinitions="*, Auto">
-        <ScrollBar Grid.Row="1" Orientation="Horizontal">
+        <ScrollBar Grid.Row="1" Orientation="Horizontal" Visibility="Visible"
+                                                          Minimum="0"
+                                                          Maximum="100" Value="{Binding HorizontalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}" 
+                                                          ViewportSize="{Binding HorizontalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}">
           
         </ScrollBar>
-        <ScrollBar Grid.Column="1" Orientation="Vertical">
+        <ScrollBar Grid.Column="1" Orientation="Vertical" Width="20" Visibility="Visible"
+                                                          Minimum="0"
+                                                          Maximum="100" Value="{Binding VerticalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}" 
+                                                          ViewportSize="{Binding VerticalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}">
         </ScrollBar>
         <Border BorderBrush="Beige" BorderThickness="1">
         <parent:ProjectCanvas Project="{Binding Dominoes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True"
@@ -216,6 +222,7 @@ ScrollViewer.VerticalScrollBarVisibility="Disabled">
                             BorderSize="{Binding DisplaySettingsTool.BorderSize}"
                             ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
                             AdditionalDrawables="{Binding AdditionalDrawables}"
+                            
                               x:Name="ProjectCanvas"/>
         </Border>
       </Grid>
