@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using System;
 using System.Configuration;
 using System.Text;
+using Avalonia;
 
 namespace DominoPlanner.Usage
 {
@@ -33,7 +34,7 @@ namespace DominoPlanner.Usage
             }
             PipeManager.Write(filesToOpen);
 #if DEBUG
-            //this.AttachDevTools();
+            this.AttachDevTools();
 #endif
         }
         // ugly hacky workaround for the fact that events don't wait if they are canceled asynchronously

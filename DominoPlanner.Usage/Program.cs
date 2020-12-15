@@ -161,7 +161,9 @@ namespace DominoPlanner.Usage
                 {
                     writer.AutoFlush = true;
                     writer.Write(text);
+                    #if win
                     client.WaitForPipeDrain();
+                    #endif
                 }
             }
             return true;

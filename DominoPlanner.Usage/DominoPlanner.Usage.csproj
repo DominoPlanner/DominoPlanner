@@ -102,6 +102,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.0-preview6" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0-preview6" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0-preview6" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-preview6" />
     <PackageReference Include="MessageBox.Avalonia" Version="0.10.0-prev2" />
     <PackageReference Include="Serilog" Version="2.10.0" />
