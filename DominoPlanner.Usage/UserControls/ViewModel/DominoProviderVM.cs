@@ -192,12 +192,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (__dominoCount != value)
                 {
-                    __dominoCount = value;
-                    TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
+                    if (!isTargetCountUpdating)
+                    {
+                        __dominoCount = value;
+                        TabPropertyChanged(nameof(DominoCount), ProducesUnsavedChanges: false);
+                    }
                 }
             }
         }
 
+        private bool isTargetCountUpdating = false;
         // entspricht Targetcount, daran wird gebunden
         public int DominoCount
         {
@@ -208,8 +212,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (CurrentProject is ICountTargetable t)
                     {
+                        isTargetCountUpdating = true;
                         PropertyValueChanged(this, value, producesUnsavedChanges: false, ChangesSize: true);
                         t.TargetCount = value;
+                        isTargetCountUpdating = false;
                     }
                     __dominoCount = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
