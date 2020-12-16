@@ -6,8 +6,6 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Logging;
-using Serilog.Filters;
-
 namespace DominoPlanner.Usage
 {
     class Program
