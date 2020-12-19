@@ -684,7 +684,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public bool IsSelected(int i)
         {
-            return Dominoes[i].IsSelected;
+            return Dominoes[i].State.HasFlag(EditingDominoStates.Selected);
         }
         internal void RecreateCanvasViewModel()
         {
@@ -710,7 +710,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             foreach (int i in validPositions)
             {
                 var dic = Dominoes[i];
-                dic.PossibleToPaste = true;
+                dic.State |= EditingDominoStates.PasteHighlight;
                 PossiblePastePositions.Add(i);
             }
             Redraw();
@@ -719,7 +719,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             foreach (int i in PossiblePastePositions)
             {
-                Dominoes[i].PossibleToPaste = false;
+                Dominoes[i].State &= ~EditingDominoStates.PasteHighlight;
             }
             PossiblePastePositions.Clear();
             Redraw();
@@ -727,9 +727,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public bool SelectDominoVisual(int position)
         {
             var dic = Dominoes[position];
-            if (dic.IsSelected == false)
+            if (!dic.State.HasFlag(EditingDominoStates.Selected))
             {
-                dic.IsSelected = true;
+                dic.State |= EditingDominoStates.Selected;
                 return true;
             }
             return false;
@@ -737,9 +737,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public bool DeSelectDominoVisual(int position)
         {
             var dic = Dominoes[position];
-            if (dic.IsSelected == true)
+            if (dic.State.HasFlag(EditingDominoStates.Selected))
             {
-                dic.IsSelected = false;
+                dic.State &= ~EditingDominoStates.Selected;
                 return true;
             }
             return false;

@@ -4,9 +4,18 @@ using DominoPlanner.Core;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia;
+using System;
 
 namespace DominoPlanner.Usage
 {
+    [Flags]
+    public enum EditingDominoStates
+    {
+        Default = 0,
+        Selected = 1,
+        PasteHighlight = 2,
+        DeletionHighlight = 4
+    }
     public class EditingDominoVM : ModelBase, Core.RTree.IGeometry
     {
         public int idx;
@@ -18,29 +27,15 @@ namespace DominoPlanner.Usage
             get { return colorRepository[domino.Color].mediaColor; }
         }
 
-        private bool _PossibleToPaste;
-
-        public bool PossibleToPaste
+        private EditingDominoStates _state;
+        public EditingDominoStates State
         {
-            get { return _PossibleToPaste; }
+            get { return _state; }
             set
             {
-                if(_PossibleToPaste != value)
+                if (_state != value)
                 {
-                    _PossibleToPaste = value;
-                }
-            }
-        }
-
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get { return _isSelected; }
-            set
-            {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
+                    _state = value;
                 }
             }
         }

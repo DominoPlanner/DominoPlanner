@@ -402,6 +402,7 @@ namespace DominoPlanner.Usage
         private readonly float zoom;
         private readonly SKColor unselectedBorderColor;
         private readonly SKColor selectedBorderColor;
+        private readonly SKColor pasteHightlightColor;
         private readonly SKPath selectionPath;
         private readonly bool selectionVisible;
         private readonly SKColor selectionColor;
@@ -433,6 +434,7 @@ namespace DominoPlanner.Usage
             zoom = (float)pc.Zoom;
             unselectedBorderColor = new SKColor(pc.UnselectedBorderColor.R, pc.UnselectedBorderColor.G, pc.UnselectedBorderColor.B, pc.UnselectedBorderColor.A);
             selectedBorderColor = new SKColor(pc.SelectedBorderColor.R, pc.SelectedBorderColor.G, pc.SelectedBorderColor.B, pc.SelectedBorderColor.A);
+            pasteHightlightColor = new SKColor(Colors.Violet.R, Colors.Violet.G, Colors.Violet.B, Colors.Violet.A);
             selectionColor = new SKColor(pc.SelectionDomainColor.R, pc.SelectionDomainColor.G, pc.SelectionDomainColor.B, 255);
             selectionPath = pc.SelectionDomain.Clone();
             this.project = pc.Project;
@@ -570,10 +572,19 @@ namespace DominoPlanner.Usage
                 foreach (var line in dp.Skip(0))
                     path.LineTo(PointToDisplaySkiaPoint(line));
                 path.Close();
-
-                if (vm.IsSelected)
+                SKColor? borderColor = null;
+                if (vm.State.HasFlag(EditingDominoStates.PasteHighlight))
                 {
-                    canvas.DrawPath(path, new SKPaint() { Color = selectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = Math.Max(BorderSize, 2) * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom }, 10 * zoom) });
+                    borderColor = pasteHightlightColor;
+                }
+                if (vm.State.HasFlag(EditingDominoStates.Selected))
+                {
+                    borderColor = selectedBorderColor;
+                }
+                
+                if (borderColor != null)
+                {
+                    canvas.DrawPath(path, new SKPaint() { Color = (SKColor)borderColor, IsAntialias = true, IsStroke = true, StrokeWidth = Math.Max(BorderSize, 2) * zoom, PathEffect = SKPathEffect.CreateDash(new float[] { 8 * zoom, 2 * zoom }, 10 * zoom) });
                 }
                 else
                 {
