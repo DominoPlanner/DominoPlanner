@@ -287,7 +287,7 @@ namespace DominoPlanner.Usage
                     if(ShowHistory && SelectedRow - 2 >= 0)
                     {
                         int oldStoneIndex = intField[firstBlockStone + i, SelectedRow - 2];
-                        HistStones.Add(new SolidColorBrush(fParameters.colors[oldStoneIndex].mediaColor));
+                        if(oldStoneIndex >= 0 && fParameters.colors.Length > oldStoneIndex) HistStones.Add(new SolidColorBrush(fParameters.colors[oldStoneIndex].mediaColor));
                     }
 
                     int stoneindex = intField[firstBlockStone + i, SelectedRow - 1];
@@ -337,12 +337,12 @@ namespace DominoPlanner.Usage
                 int startj = (i == firstRow) ? firstBlockStone : 0; 
                 for (int j = startj; j < intField.GetLength(0); j++)
                 {
-                    if (counter < NextN && intField[j, i] != 0)
+                    if (counter < NextN && intField[j, i] > 0)
                     {
                         NextNCount[intField[j, i]]++;
                         counter++;
                     }
-                    RemainingCount[intField[j, i]]++;
+                    if(intField[j, i] >= 0 && intField[j, i] < RemainingCount.Count()) RemainingCount[intField[j, i]]++;
                     
                 }
             }
