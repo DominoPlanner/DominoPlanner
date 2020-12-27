@@ -11,12 +11,16 @@
         Title="FieldBlockViewer"
         Height="600" Width="800" 
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
-    <i:Interaction.Behaviors>
+  <Window.Resources>
+    <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
+    <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
+  </Window.Resources>  
+  <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="PointerPressed">
             <ia:InvokeCommandAction Command="{Binding MouseDown}"/>
         </ia:EventTriggerBehavior>
     </i:Interaction.Behaviors>
-    <Grid>
+    <Grid x:Name="MG">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
@@ -70,17 +74,96 @@
                 </Button>
             </StackPanel>
         </Grid>
-      <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding CurrentBlock}" >
-        <!--PointerPressed="ContentControl_MouseDown"-->
-        <!--
-          <i:Interaction.Behaviors>
-                <i:EventTrigger EventName="SizeChanged">
-                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="Loaded">
-                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
-                </i:EventTrigger>
-            </i:Interaction.Behaviors>-->
-      </ContentControl>
+      <Grid Grid.Row="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" MaxHeight="150"/>
+          <RowDefinition Height="*" MaxHeight="50"/>
+          <RowDefinition Height="*" MaxHeight="250"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                <Border.Width>
+                  <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                    <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
+                    <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
+                  </MultiBinding>
+                </Border.Width>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                <Border.Width>
+                  <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                  </MultiBinding>
+                </Border.Width>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
+          <ListBox.Styles>
+            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+              <Setter Property="Background" Value="Transparent"/>
+            </Style>
+          </ListBox.Styles>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Border Height="80" VerticalAlignment="Top">
+                <Border.Width>
+                  <MultiBinding Converter="{StaticResource BorderWidthConverter}">
+                    <Binding Path="Amount"/>
+                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                  </MultiBinding>
+                </Border.Width>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="18" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
     </Grid>
 </Window>

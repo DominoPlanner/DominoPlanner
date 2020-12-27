@@ -14,6 +14,8 @@ using Avalonia.Layout;
 using Avalonia.Input;
 using Avalonia.Collections;
 using static DominoPlanner.Usage.ColorControl;
+using Avalonia.Data.Converters;
+using System.Globalization;
 
 namespace DominoPlanner.Usage
 {
@@ -32,13 +34,13 @@ namespace DominoPlanner.Usage
         #region CTOR
         public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize, Core.Orientation orientation, bool MirrorX, bool MirrorY)
         {
-            blockSize = pBlockSize;
+            BlockSize = pBlockSize;
             fParameters = pFParameters;
             intField = fParameters.GetBaseField(orientation, MirrorX, MirrorY);
             NextN = 500;
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
-            CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / blockSize)));
+            CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / BlockSize)));
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { CurrentBlock.Focus(); });
             ColumnConfig = new AvaloniaList<Column>
@@ -51,11 +53,16 @@ namespace DominoPlanner.Usage
             };
 
             OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
+
+            CurrentStones = new ObservableCollection<SolidColorBrush>();
+            HistStones = new ObservableCollection<SolidColorBrush>();
+            ColorNames = new ObservableCollection<ColorAmount>();
+
+            RefreshCanvas();
         }
         #endregion
 
         #region fields
-        private readonly int blockSize;
         private readonly IDominoProvider fParameters;
         private readonly int stonesPerLine;
         private readonly int[,] intField;
@@ -64,6 +71,21 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region prope
+        private int _BlockSize;
+        public int BlockSize
+        {
+            get { return _BlockSize; }
+            set
+            {
+                if (_BlockSize != value)
+                {
+                    _BlockSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+
         private string _BatState;
         public string BatState
         {
@@ -202,99 +224,89 @@ namespace DominoPlanner.Usage
             set { _nextN = value; }
         }
 
+        private ObservableCollection<SolidColorBrush> _CurrentStones;
+        public ObservableCollection<SolidColorBrush> CurrentStones
+        {
+            get { return _CurrentStones; }
+            set
+            {
+                if (_CurrentStones != value)
+                {
+                    _CurrentStones = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<SolidColorBrush> _HistStones;
+        public ObservableCollection<SolidColorBrush> HistStones
+        {
+            get { return _HistStones; }
+            set
+            {
+                if (_HistStones != value)
+                {
+                    _HistStones = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<ColorAmount> _ColorNames;
+        public ObservableCollection<ColorAmount> ColorNames
+        {
+            get { return _ColorNames; }
+            set
+            {
+                if (_ColorNames != value)
+                {
+                    _ColorNames = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         #endregion
 
         #region methods
         private void RefreshCanvas()
         {
-            /*BatState = "Battery: " + System.Windows.Forms.SystemInformation.PowerStatus.BatteryLifePercent * 100 + " % "
-            + (((System.Windows.Forms.SystemInformation.PowerStatus.BatteryChargeStatus & System.Windows.Forms.BatteryChargeStatus.Charging) == System.Windows.Forms.BatteryChargeStatus.Charging) ? ", charging" : "");
-            */
+            CurrentStones.Clear();
+            HistStones.Clear();
+            ColorNames.Clear();
             CurrentBlock.Children.RemoveRange(0, CurrentBlock.Children.Count);
             
-            stoneWidth = (((int)CurrentBlock.Bounds.Width) - (2 * 2 * space) - ((blockSize - 1) * space)) / blockSize;
-            int stoneHeight = 250;
-            int marginHeight = (((int)CurrentBlock.Bounds.Height) / 2);
-
-            int firstBlockStone = blockSize * (SelectedBlock - 1);
-
-            int lastColor = intField[(SelectedBlock - 1) * blockSize, SelectedRow - 1];
-            string lastColorName = lastColor > 0 ? fParameters.colors[lastColor].name : "";
-            int lastLeftMargin = 2 * space;
-            int countColor = 0;
+            stoneWidth = (((int)CurrentBlock.Bounds.Width) - (2 * 2 * space) - ((BlockSize - 1) * space)) / BlockSize;
             
-            for (int i = 0; i < blockSize; i++)
+            int firstBlockStone = BlockSize * (SelectedBlock - 1);
+
+            for (int i = 0; i < BlockSize; i++)
             {
                 if (firstBlockStone + i < stonesPerLine)
                 {
                     if(ShowHistory && SelectedRow - 2 >= 0)
                     {
                         int oldStoneIndex = intField[firstBlockStone + i, SelectedRow - 2];
-                        //currentBlock.Children.Add(new EditingDominoVM(stoneWidth, stoneHeight / 4, ((i + 2) * space) + (i * stoneWidth), 10, fParameters.colors[oldStoneIndex].mediaColor));
+                        HistStones.Add(new SolidColorBrush(fParameters.colors[oldStoneIndex].mediaColor));
                     }
 
                     int stoneindex = intField[firstBlockStone + i, SelectedRow - 1];
                     if (stoneindex < 0) continue;
-                    //currentBlock.Children.Add(new EditingDominoVM(stoneWidth, stoneHeight, ((i + 2) * space) + (i * stoneWidth), marginHeight - stoneHeight, fParameters.colors[stoneindex].mediaColor));
                     
-                    if (lastColor != intField[firstBlockStone + i, SelectedRow - 1])
+                    CurrentStones.Add(new SolidColorBrush(fParameters.colors[stoneindex].mediaColor));
+
+                    if (ColorNames.Count == 0 || !ColorNames.LastOrDefault().ColorName.Equals(fParameters.colors[stoneindex].name))
                     {
-                        DrawText(lastColorName, countColor, lastLeftMargin, marginHeight);
-                        lastColor = intField[firstBlockStone + i, SelectedRow - 1];
-                        lastColorName = lastColor > 0 ? fParameters.colors[lastColor].name : "";
-                        lastLeftMargin = ((i + 1) * space) + (i * stoneWidth);
-                        countColor = 1;
+                        ColorNames.Add(new ColorAmount(fParameters.colors[stoneindex].name, 1));
                     }
                     else
                     {
-                        countColor++;
+                        ColorNames.LastOrDefault().Amount++;
                     }
                 }
             }
-            DrawText(lastColorName, countColor, lastLeftMargin, marginHeight);
         }
 
-        private void DrawText(string colorName, int colorAmount, int margin_left, int margin_top)
-        {
-            int stonesWidth = (((colorAmount + 1) * space) + (colorAmount * stoneWidth));
-
-            TextBlock tb = new TextBlock
-            {
-                FontSize = 16,
-                Text = colorName + Environment.NewLine + colorAmount,
-                FontWeight = FontWeight.Bold,
-                TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(margin_left, margin_top + 20, 0, 0),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top,
-                Width = ((colorAmount + 1) * space) + (colorAmount * stoneWidth)
-            };
-
-            System.Drawing.Size textSize = new System.Drawing.Size(100, 10); //TextRenderer.MeasureText(colorName, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
-
-            if (stonesWidth < textSize.Width)
-            {
-                if (stoneWidth < tb.FontSize * 1.4)
-                {
-                    tb.FontSize = stoneWidth / 1.4;
-                }
-                tb.Text = colorName + " " + colorAmount;
-                textSize = new System.Drawing.Size(100, 10);  //System.Windows.Forms.TextRenderer.MeasureText(tb.Text, new System.Drawing.Font(tb.FontFamily.FamilyNames.ToString(), (float)tb.FontSize));
-                tb.TextAlignment = TextAlignment.Left;
-                tb.Width = textSize.Width;
-                tb.TextWrapping = TextWrapping.NoWrap;
-                tb.Margin = new Thickness(margin_left + (stonesWidth / 2) + (tb.FontSize * 1.4 / 2), margin_top + 20, 0, 0);
-                tb.RenderTransform = new RotateTransform() { Angle = 90 };
-            }
-
-            CurrentBlock.Children.Add(tb);
-        }
-
-        private void RefreshRemainingColors()
-        {
-
-        }
         private void FillColorList()
         {
             Colors = new ObservableCollection<ColorListEntry>();
@@ -315,7 +327,7 @@ namespace DominoPlanner.Usage
         }
         private void RefreshColorAmount()
         {
-            int firstBlockStone = blockSize * (SelectedBlock - 1);
+            int firstBlockStone = BlockSize * (SelectedBlock - 1);
             int firstRow = SelectedRow - 1;
             int[] RemainingCount = new int[Colors.Count];
             int[] NextNCount = new int[Colors.Count];
@@ -412,8 +424,6 @@ namespace DominoPlanner.Usage
         }
         #endregion
 
-
-
         private ICommand _MouseDown;
         public ICommand MouseDown { get { return _MouseDown; } set { if (value != _MouseDown) { _MouseDown = value; } } }
 
@@ -421,5 +431,47 @@ namespace DominoPlanner.Usage
         private ICommand _SizeChanged;
         public ICommand SizeChanged { get { return _SizeChanged; } set { if (value != _SizeChanged) { _SizeChanged = value; } } }
 
+    }
+
+    public class ColorAmount : ModelBase
+    {
+        public ColorAmount(string colorName, int amount)
+        {
+            ColorName = colorName;
+            Amount = amount;
+        }
+
+        private string _ColorName;
+        public string ColorName
+        {
+            get { return _ColorName; }
+            set
+            {
+                if (_ColorName != value)
+                {
+                    _ColorName = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _Amount;
+        public int Amount
+        {
+            get { return _Amount; }
+            set
+            {
+                if (_Amount != value)
+                {
+                    _Amount = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{Amount} {ColorName}";
+        }
     }
 }

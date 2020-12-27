@@ -496,4 +496,134 @@ namespace DominoPlanner.Usage
     {
         public PopupColorPicker() { }
     }
+
+    public class ImgSizeConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 3 && values[0] is Bitmap bitmap && values[1] is double width && values[2] is double height && parameter is string parameterValue)
+            {
+                if (width > 0 && height > 0)
+                {
+                    double newHeight;
+                    double newWidth;
+
+                    double widthToHeight_Image = bitmap.Size.Height / bitmap.Size.Width;
+                    double widthToHeight_Space = height / width;
+
+                    if ((widthToHeight_Image > 1 && widthToHeight_Image > widthToHeight_Space) || (width * widthToHeight_Image) > height)
+                    {
+                        newHeight = height;
+                        newWidth = height / widthToHeight_Image;
+                    }
+                    else
+                    {
+                        newWidth = width;
+                        newHeight = width * widthToHeight_Image;
+                    }
+
+                    if (parameterValue.Equals("Height"))
+                    {
+                        return newHeight;
+                    }
+                    else if (parameterValue.Equals("Width"))
+                    {
+                        return newWidth;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public class DirectionSizeConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool visible = false;
+            if (values.Count == 3 && values[0] is bool orientation && values[1] is bool mirrorX && values[2] is bool mirrorY && parameter is string parameterString)
+            {
+                //TopLeft
+                if (!mirrorX && !mirrorY)
+                {
+                    if (parameterString.Equals("TopLeft") || parameterString.Equals("Top") || parameterString.Equals("Left"))
+                    {
+                        visible = true;
+                    }
+                }
+
+                //TopRight
+                if (orientation ? (!mirrorX && mirrorY) : (mirrorX && !mirrorY))
+                {
+                    if (parameterString.Equals("TopRight") || parameterString.Equals("Top") || parameterString.Equals("Right"))
+                    {
+                        visible = true;
+                    }
+                }
+
+                //BottomLeft
+                if (orientation ? (mirrorX && !mirrorY) : (!mirrorX && mirrorY))
+                {
+                    if (parameterString.Equals("BottomLeft") || parameterString.Equals("Bottom") || parameterString.Equals("Left"))
+                    {
+                        visible = true;
+                    }
+                }
+
+                //BottomRight
+                if (mirrorX && mirrorY)
+                {
+                    if (parameterString.Equals("BottomRight") || parameterString.Equals("Bottom") || parameterString.Equals("Right"))
+                    {
+                        visible = true;
+                    }
+                }
+            }
+            if (targetType == typeof(Avalonia.Media.IBrush))
+            {
+                if (visible)
+                {
+                    return Avalonia.Media.Brushes.Red;
+                }
+                else
+                {
+                    return Avalonia.Media.Brushes.White;
+                }
+            }
+            else
+            {
+                return visible;
+            }
+        }
+    }
+
+    public class BorderWidthConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 3)
+            {
+                if (values[0] is int colorAmount && values[1] is int amount && values[2] is double width)
+                {
+                    return Math.Floor((width - 6) / amount) * colorAmount - 4;
+                }
+            }
+            return 20;
+        }
+    }
+
+    public class StoneWidthConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 2)
+            {
+                if (values[0] is int amount && values[1] is double width)
+                {
+                    return Math.Floor((width - 6) / amount) - 4;
+                }
+            }
+            return 20;
+        }
+    }
 }

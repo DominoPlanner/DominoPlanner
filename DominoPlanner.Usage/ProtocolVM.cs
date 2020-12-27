@@ -1,8 +1,11 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
 using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows.Input;
 
@@ -10,6 +13,21 @@ namespace DominoPlanner.Usage
 {
     class ProtocolVM : ModelBase
     {
+        private ICommand _ClipTopRight;
+        public ICommand ClipTopRight { get { return _ClipTopRight; } set { if (value != _ClipTopRight) { _ClipTopRight = value; } } }
+
+			private ICommand _ClickTopLeft;
+        public ICommand ClickTopLeft { get { return _ClickTopLeft; } set { if (value != _ClickTopLeft) { _ClickTopLeft = value; } } }
+
+
+			private ICommand _ClickBottomLeft;
+        public ICommand ClickBottomLeft { get { return _ClickBottomLeft; } set { if (value != _ClickBottomLeft) { _ClickBottomLeft = value; } } }
+
+			private ICommand _ClickBottomRight;
+        public ICommand ClickBottomRight { get { return _ClickBottomRight; } set { if (value != _ClickBottomRight) { _ClickBottomRight = value; } } }
+
+
+
         #region CTOR
         public ProtocolVM(string filePath)
         {
@@ -328,6 +346,21 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        private Bitmap _CurrentPlan;
+        public Bitmap CurrentPlan
+        {
+            get { return _CurrentPlan; }
+            set
+            {
+                if (_CurrentPlan != value)
+                {
+                    _CurrentPlan = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -344,11 +377,19 @@ namespace DominoPlanner.Usage
             currentOPP.mirrorHorizontal = DominoProvider.FieldPlanDirection == Core.Orientation.Vertical;
             CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
+            SkiaSharp.SKImage new_img = DominoProvider.Last.GenerateImage(1000, false).Snapshot();
+            CurrentPlan = Bitmap.DecodeToWidth(new_img.Encode().AsStream(), new_img.Width);
+
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
             SaveHTML = new RelayCommand(o => { SaveHTMLFile(); });
             SaveExcel = new RelayCommand(o => { SaveExcelFile(); });
 
             this.PropertyChanged += ProtocolVM_PropertyChanged;
+
+            ClickTopLeft = new RelayCommand(o => { MirrorX = false; MirrorY = false; });
+            ClipTopRight = new RelayCommand(o => { MirrorX = !Orientation; MirrorY = Orientation; });
+            ClickBottomLeft = new RelayCommand(o => { MirrorX = Orientation; MirrorY = !Orientation; });
+            ClickBottomRight = new RelayCommand(o => { MirrorX = true; MirrorY = true; });
         }
         private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -376,7 +417,7 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(result, currentOPP); // Jojo hier Projektname einfügen
+                    DominoProvider.SaveXLSFieldPlan(result, currentOPP);
                     Process.Start(result);
                 }
                 catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
