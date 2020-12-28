@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignHeight="50" d:DesignWidth="200"
-             x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"      
+             x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"
              >
     <UserControl.Resources>
         <parent:DiffusionModeToIntConverter x:Key="EnumToIntConverter"/>
@@ -12,12 +12,7 @@
     </UserControl.Resources>
     <Grid>
         <HeaderedContentControl Header="{Binding ResizeMode, Converter={StaticResource InterToStringConverter}, StringFormat=Resize Mode: {0}}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
+            <Grid ColumnDefinitions="1*, 3*, 1.5*">
                 <TextBlock Grid.Column="0" Text="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding ResizeMode, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
                 <TextBlock Grid.Column="2" Text="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center"/>

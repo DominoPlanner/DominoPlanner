@@ -8,76 +8,75 @@
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel;assembly=DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.ColorControl">
-  <UserControl.Resources>
-    <local:DeletedColorVisibilityConverter x:Key="DeletedColorVisibilityConverter"/>
-    <vm:IntToStringConverter x:Key="IntToStringConverter"/>
-  </UserControl.Resources>
-  <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
-    <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
-      <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">
-        <Grid.Styles>
-          <Style Selector="ListBox">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Background" Value="Transparent"/>
-          </Style>
-          <Style Selector="ListBox ContentControl">
-            <Setter Property="Margin" Value="2,0"/>
-          
-          </Style>
-          <Style Selector="TextBlock.Header">
-            <Setter Property="Margin" Value="2,0"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-          </Style>
-          <Style Selector="ContentControl.FixedWidth TextBlock">
-            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-          </Style>
-          <Style Selector="ListBoxItem Grid">
-            <Setter Property="Background" Value="Transparent"/>
-          </Style>
-          <Style Selector="ListBox ContentControl.Count">
-            <Setter Property="Template">
-              <ControlTemplate>
-                <TextBlock Text="{TemplateBinding Content, Converter={StaticResource IntToStringConverter}}"></TextBlock>
-              </ControlTemplate>
-            </Setter>
-          </Style>
-          <Style Selector="ListBox ContentControl.Color">
-            <Setter Property="Template">
-              <ControlTemplate>
-                <Rectangle Width="40" Height="20">
-                  <Rectangle.Fill>
-                    <SolidColorBrush Color="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-                  </Rectangle.Fill>
-                </Rectangle>
-              </ControlTemplate>
-            </Setter>
-          </Style>
-          <Style Selector="ListBoxItem">
-            <Setter Property="IsVisible">
-              <MultiBinding Converter="{StaticResource DeletedColorVisibilityConverter}">
-                 <Binding Path="Deleted"/>
-                 <Binding Path="ProjectCount"/>
-              </MultiBinding>
-            </Setter>
-          </Style>
-          <Style Selector="ContentControl.Header">
-            <Setter Property="Template">
-              <Setter.Value>
-                <ControlTemplate>
-                  <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
-                    <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
-                  </Border>
-                </ControlTemplate>
-              </Setter.Value>
-            </Setter>
-          </Style>
-        </Grid.Styles>
-        <Grid Grid.Row="0" Name="HeaderGrid"></Grid>
-        <ListBox Grid.Row="1"
-                  Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-        </ListBox>
-      </Grid>
-    </ScrollViewer>
-  </Border>
-  
+    <UserControl.Resources>
+        <local:DeletedColorVisibilityConverter x:Key="DeletedColorVisibilityConverter"/>
+        <vm:IntToStringConverter x:Key="IntToStringConverter"/>
+    </UserControl.Resources>
+    <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
+        <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
+            <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *" Name="LayoutRoot">
+                <Grid.Styles>
+                    <Style Selector="ListBox">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
+                    <Style Selector="ListBox ContentControl">
+                        <Setter Property="Margin" Value="2,0"/>
+                    </Style>
+                    <Style Selector="TextBlock.Header">
+                        <Setter Property="Margin" Value="2,0"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                    </Style>
+                    <Style Selector="ContentControl.FixedWidth TextBlock">
+                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                    </Style>
+                    <Style Selector="ListBoxItem Grid">
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
+                    <Style Selector="ListBox ContentControl.Count">
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <TextBlock Text="{TemplateBinding Content, Converter={StaticResource IntToStringConverter}}"></TextBlock>
+                            </ControlTemplate>
+                        </Setter>
+                    </Style>
+                    <Style Selector="ListBox ContentControl.Color">
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <Rectangle Width="40" Height="20">
+                                    <Rectangle.Fill>
+                                        <SolidColorBrush Color="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </ControlTemplate>
+                        </Setter>
+                    </Style>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="IsVisible">
+                            <MultiBinding Converter="{StaticResource DeletedColorVisibilityConverter}">
+                                <Binding Path="Deleted"/>
+                                <Binding Path="ProjectCount"/>
+                            </MultiBinding>
+                        </Setter>
+                    </Style>
+                    <Style Selector="ContentControl.Header">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
+                                        <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Grid.Styles>
+                <Grid Grid.Row="0" Name="HeaderGrid"></Grid>
+                <ListBox Grid.Row="1"
+                          Items="{Binding Colors}" Name="ItemsControl" SelectedItem="{Binding SelectedColor}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                </ListBox>
+            </Grid>
+        </ScrollViewer>
+    </Border>
+
 </UserControl>

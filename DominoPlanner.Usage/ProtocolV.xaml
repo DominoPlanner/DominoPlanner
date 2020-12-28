@@ -9,293 +9,293 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="DominoPlanner.Usage.ProtocolV"
         Title="Protocol" MinHeight="700" MinWidth="800" Height="750" Width="800" Icon="/Icons/DominoCalculator.ico">
-  <Window.Resources>
-    <local:FieldPlanArrowsGridConverter x:Key="ArrowsGridConverter"/>
-    <local:ImgSizeConverter x:Key="ImgSizeConverter"/>
-  </Window.Resources>
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition/>
-      <ColumnDefinition Width="205"/>
-    </Grid.ColumnDefinitions>
-    <Grid x:Name="ParentGrid" Margin="5">
-      <Grid>
-        <Grid.Height>
-          <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Height">
-            <Binding Path="CurrentPlan"/>
-            <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
-            <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
-          </MultiBinding>
-        </Grid.Height>
-        <Grid.Width>
-          <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Width">
-            <Binding Path="CurrentPlan"/>
-            <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
-            <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
-          </MultiBinding>
-        </Grid.Width>
+    <Window.Resources>
+        <local:FieldPlanArrowsGridConverter x:Key="ArrowsGridConverter"/>
+        <local:ImgSizeConverter x:Key="ImgSizeConverter"/>
+    </Window.Resources>
+    <Grid>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="10"/>
-          <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="10"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="205"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="10"/>
-          <RowDefinition Height="*"/>
-          <RowDefinition Height="10"/>
-        </Grid.RowDefinitions>
-        <LayoutTransformControl Grid.Row="1" Grid.Column="1" Margin="1">
-          <LayoutTransformControl.LayoutTransform>
-            <RotateTransform Angle="{Binding RotateAngle}"/>
-          </LayoutTransformControl.LayoutTransform>
-        <Image  Source="{Binding Path=CurrentPlan}" Stretch="Uniform"/>
-        </LayoutTransformControl>
-        <Ellipse Grid.Row="0" Grid.Column="0" Stroke="Red" StrokeThickness="1">
-          <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerPressed">
-              <ia:InvokeCommandAction Command="{Binding ClickTopLeft}"/>
-            </ia:EventTriggerBehavior>
-          </i:Interaction.Behaviors>
-          <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopLeft" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Ellipse.Fill>
-        </Ellipse>
-        <Ellipse Grid.Row="0" Grid.Column="2" Stroke="Red" StrokeThickness="1">
-          <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerPressed">
-              <ia:InvokeCommandAction Command="{Binding ClipTopRight}"/>
-            </ia:EventTriggerBehavior>
-          </i:Interaction.Behaviors>
-          <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopRight" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Ellipse.Fill>
-        </Ellipse>
-        <Ellipse Grid.Row="2" Grid.Column="0" Stroke="Red" StrokeThickness="1">
-          <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerPressed">
-              <ia:InvokeCommandAction Command="{Binding ClickBottomLeft}"/>
-            </ia:EventTriggerBehavior>
-          </i:Interaction.Behaviors>
-          <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomLeft" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Ellipse.Fill>
-        </Ellipse>
-        <Ellipse Grid.Row="2" Grid.Column="2" Stroke="Red" StrokeThickness="1">
-          <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerPressed">
-              <ia:InvokeCommandAction Command="{Binding ClickBottomRight}"/>
-            </ia:EventTriggerBehavior>
-          </i:Interaction.Behaviors>
-          <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomRight" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Ellipse.Fill>
-        </Ellipse>
-        <Grid Grid.Column="1" Margin="1,0,1,0" ColumnDefinitions="7, *, 7">
-          <Grid.Styles>
-            <Style Selector="Rectangle, Polygon">
-              <Setter Property="Fill">
-                <SolidColorBrush>
-                  <SolidColorBrush.Color>
-                    <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalColor" >
-                      <Binding Path="Orientation"/>
-                      <Binding Path="MirrorX" />
-                      <Binding Path="MirrorY" />
-                      <Binding Path="NaturalOrientation" />
+        <Grid x:Name="ParentGrid" Margin="5">
+            <Grid>
+                <Grid.Height>
+                    <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Height">
+                        <Binding Path="CurrentPlan"/>
+                        <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
+                        <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
                     </MultiBinding>
-                  </SolidColorBrush.Color>
-                </SolidColorBrush>
-              </Setter>
-            </Style>
-          </Grid.Styles>
-          <Grid.Row>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalRow" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Grid.Row>
-          <Rectangle Grid.Column="1" Margin="-4,3,-4,3"/>
-          <Polygon Grid.Column="0" Points="0,5 7,0 7,10" StrokeThickness="2">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="LeftHorizontalVisibility" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-                <Binding Path="NaturalOrientation" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-          <Polygon Grid.Column="2" Points="7,5 0,0 0,10" StrokeThickness="2">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="RightHorizontalVisibility" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-                <Binding Path="NaturalOrientation" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-        </Grid>
+                </Grid.Height>
+                <Grid.Width>
+                    <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Width">
+                        <Binding Path="CurrentPlan"/>
+                        <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
+                        <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
+                    </MultiBinding>
+                </Grid.Width>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="10"/>
+                </Grid.RowDefinitions>
+                <LayoutTransformControl Grid.Row="1" Grid.Column="1" Margin="1">
+                    <LayoutTransformControl.LayoutTransform>
+                        <RotateTransform Angle="{Binding RotateAngle}"/>
+                    </LayoutTransformControl.LayoutTransform>
+                    <Image  Source="{Binding Path=CurrentPlan}" Stretch="Uniform"/>
+                </LayoutTransformControl>
+                <Ellipse Grid.Row="0" Grid.Column="0" Stroke="Red" StrokeThickness="1">
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="PointerPressed">
+                            <ia:InvokeCommandAction Command="{Binding ClickTopLeft}"/>
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Ellipse.Fill>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopLeft" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Grid.Row="0" Grid.Column="2" Stroke="Red" StrokeThickness="1">
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="PointerPressed">
+                            <ia:InvokeCommandAction Command="{Binding ClipTopRight}"/>
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Ellipse.Fill>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopRight" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Grid.Row="2" Grid.Column="0" Stroke="Red" StrokeThickness="1">
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="PointerPressed">
+                            <ia:InvokeCommandAction Command="{Binding ClickBottomLeft}"/>
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Ellipse.Fill>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomLeft" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Ellipse Grid.Row="2" Grid.Column="2" Stroke="Red" StrokeThickness="1">
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="PointerPressed">
+                            <ia:InvokeCommandAction Command="{Binding ClickBottomRight}"/>
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Ellipse.Fill>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomRight" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Grid Grid.Column="1" Margin="1,0,1,0" ColumnDefinitions="7, *, 7">
+                    <Grid.Styles>
+                        <Style Selector="Rectangle, Polygon">
+                            <Setter Property="Fill">
+                                <SolidColorBrush>
+                                    <SolidColorBrush.Color>
+                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalColor" >
+                                            <Binding Path="Orientation"/>
+                                            <Binding Path="MirrorX" />
+                                            <Binding Path="MirrorY" />
+                                            <Binding Path="NaturalOrientation" />
+                                        </MultiBinding>
+                                    </SolidColorBrush.Color>
+                                </SolidColorBrush>
+                            </Setter>
+                        </Style>
+                    </Grid.Styles>
+                    <Grid.Row>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalRow" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Grid.Row>
+                    <Rectangle Grid.Column="1" Margin="-4,3,-4,3"/>
+                    <Polygon Grid.Column="0" Points="0,5 7,0 7,10" StrokeThickness="2">
+                        <Polygon.IsVisible>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="LeftHorizontalVisibility" >
+                                <Binding Path="Orientation"/>
+                                <Binding Path="MirrorX" />
+                                <Binding Path="MirrorY" />
+                                <Binding Path="NaturalOrientation" />
+                            </MultiBinding>
+                        </Polygon.IsVisible>
+                    </Polygon>
+                    <Polygon Grid.Column="2" Points="7,5 0,0 0,10" StrokeThickness="2">
+                        <Polygon.IsVisible>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="RightHorizontalVisibility" >
+                                <Binding Path="Orientation"/>
+                                <Binding Path="MirrorX" />
+                                <Binding Path="MirrorY" />
+                                <Binding Path="NaturalOrientation" />
+                            </MultiBinding>
+                        </Polygon.IsVisible>
+                    </Polygon>
+                </Grid>
 
-        <Grid Grid.Row="1" Margin="0,1,0,1" RowDefinitions="7, *, 7">
-          <Grid.Styles>
-            <Style Selector="Rectangle, Polygon">
-              <Setter Property="Fill">
-                <SolidColorBrush>
-                  <SolidColorBrush.Color>
-                    <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColor" >
-                      <Binding Path="Orientation"/>
-                      <Binding Path="MirrorX" />
-                      <Binding Path="MirrorY" />
-                      <Binding Path="NaturalOrientation" />
-                    </MultiBinding>
-                  </SolidColorBrush.Color>
-                </SolidColorBrush>
-              </Setter>
-            </Style>
-          </Grid.Styles>
-          <Grid.Column>
-            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColumn" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-              <Binding Path="NaturalOrientation" />
-            </MultiBinding>
-          </Grid.Column>
-          <Rectangle Grid.Row="1" Margin="3,-4,3,-4"/>
-          <Polygon Grid.Row="0" Points="5,0 10,7 0,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopVerticalVisibility" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-                <Binding Path="NaturalOrientation" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-          <Polygon Grid.Row="2" Points="0,0 10,0 5,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomVerticalVisibility" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-                <Binding Path="NaturalOrientation" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
+                <Grid Grid.Row="1" Margin="0,1,0,1" RowDefinitions="7, *, 7">
+                    <Grid.Styles>
+                        <Style Selector="Rectangle, Polygon">
+                            <Setter Property="Fill">
+                                <SolidColorBrush>
+                                    <SolidColorBrush.Color>
+                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColor" >
+                                            <Binding Path="Orientation"/>
+                                            <Binding Path="MirrorX" />
+                                            <Binding Path="MirrorY" />
+                                            <Binding Path="NaturalOrientation" />
+                                        </MultiBinding>
+                                    </SolidColorBrush.Color>
+                                </SolidColorBrush>
+                            </Setter>
+                        </Style>
+                    </Grid.Styles>
+                    <Grid.Column>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColumn" >
+                            <Binding Path="Orientation"/>
+                            <Binding Path="MirrorX" />
+                            <Binding Path="MirrorY" />
+                            <Binding Path="NaturalOrientation" />
+                        </MultiBinding>
+                    </Grid.Column>
+                    <Rectangle Grid.Row="1" Margin="3,-4,3,-4"/>
+                    <Polygon Grid.Row="0" Points="5,0 10,7 0,7">
+                        <Polygon.IsVisible>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopVerticalVisibility" >
+                                <Binding Path="Orientation"/>
+                                <Binding Path="MirrorX" />
+                                <Binding Path="MirrorY" />
+                                <Binding Path="NaturalOrientation" />
+                            </MultiBinding>
+                        </Polygon.IsVisible>
+                    </Polygon>
+                    <Polygon Grid.Row="2" Points="0,0 10,0 5,7">
+                        <Polygon.IsVisible>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomVerticalVisibility" >
+                                <Binding Path="Orientation"/>
+                                <Binding Path="MirrorX" />
+                                <Binding Path="MirrorY" />
+                                <Binding Path="NaturalOrientation" />
+                            </MultiBinding>
+                        </Polygon.IsVisible>
+                    </Polygon>
+                </Grid>
+            </Grid>
         </Grid>
-      </Grid>
-    </Grid>
-    <DockPanel Grid.Column="1">
-      <HeaderedContentControl DockPanel.Dock="Top" Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
-        <DockPanel>
-          <DockPanel DockPanel.Dock="Top" Margin="2">
-            <TextBlock DockPanel.Dock="Left" Text="Title:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <TextBox DockPanel.Dock="Right" Margin="5, 0, 0, 0" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
-          </DockPanel>
-          <CheckBox Margin="2" DockPanel.Dock="Top" x:Name="chkUseTemplate" Content="Display blocks (for template)" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
-                    ToolTip.Tip="When activating this option, DominoPlanner will show blocks in the specified length.&#10;
+        <DockPanel Grid.Column="1">
+            <HeaderedContentControl DockPanel.Dock="Top" Grid.Row="0" Header="Main Settings" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="2">
+                        <TextBlock DockPanel.Dock="Left" Text="Title:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBox DockPanel.Dock="Right" Margin="5, 0, 0, 0" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
+                    </DockPanel>
+                    <CheckBox Margin="2" DockPanel.Dock="Top" x:Name="chkUseTemplate" Content="Display blocks (for template)" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
+                              ToolTip.Tip="When activating this option, DominoPlanner will show blocks in the specified length.&#10;
                               This should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes
                               (e.g. you left out one domino)."/>
-          <DockPanel DockPanel.Dock="Top" Margin="2">
-            <NumericUpDown DockPanel.Dock="Right" Focusable="False" IsEnabled="{Binding UseBlocks}" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" />
-            <TextBlock DockPanel.Dock="Left" Text="Stones/Block" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-          </DockPanel>
-          <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="Hide color names" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"  Width="113"/>
+                    <DockPanel DockPanel.Dock="Top" Margin="2">
+                        <NumericUpDown DockPanel.Dock="Right" Focusable="False" IsEnabled="{Binding UseBlocks}" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" />
+                        <TextBlock DockPanel.Dock="Left" Text="Stones/Block" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="Hide color names" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"  Width="113"/>
 
-        </DockPanel>
-      </HeaderedContentControl>
-      <HeaderedContentControl DockPanel.Dock="Top" Header="Property Settings" ToolTip.Tip="Selects additional information shown at the end of the document" VerticalAlignment="Top">
-        <StackPanel Margin="0, 2, 0, 0">
-          <RadioButton GroupName="Summary" IsChecked="{Binding HasNoProperties}" Content="No Properties" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
-          <RadioButton GroupName="Summary" IsChecked="{Binding HasShortProperties}" Content="Short Properties" ToolTip.Tip="Shows Length, Height, and total amount of used dominoes" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
-          <RadioButton GroupName="Summary" IsChecked="{Binding HasExtendedProperties}" Content="Detailed Properties" ToolTip.Tip="Shows a complete list of used colors" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
-        </StackPanel>
-      </HeaderedContentControl>
-      <HeaderedContentControl DockPanel.Dock="Top" Header="Transform field plan">
-        <StackPanel Margin="0, 2, 0, 0">
-          <CheckBox Margin="2" IsChecked="{Binding Orientation}" >Transpose field plan</CheckBox>
-          <CheckBox IsChecked="{Binding MirrorX}" Margin="2" VerticalAlignment="Top" Content="Mirror horizontally"/>
-          <CheckBox IsChecked="{Binding MirrorY}" Margin="2" VerticalAlignment="Top" Content="Mirror vertically"/>
-        </StackPanel>
+                </DockPanel>
+            </HeaderedContentControl>
+            <HeaderedContentControl DockPanel.Dock="Top" Header="Property Settings" ToolTip.Tip="Selects additional information shown at the end of the document" VerticalAlignment="Top">
+                <StackPanel Margin="0, 2, 0, 0">
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasNoProperties}" Content="No Properties" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasShortProperties}" Content="Short Properties" ToolTip.Tip="Shows Length, Height, and total amount of used dominoes" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                    <RadioButton GroupName="Summary" IsChecked="{Binding HasExtendedProperties}" Content="Detailed Properties" ToolTip.Tip="Shows a complete list of used colors" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+                </StackPanel>
+            </HeaderedContentControl>
+            <HeaderedContentControl DockPanel.Dock="Top" Header="Transform field plan">
+                <StackPanel Margin="0, 2, 0, 0">
+                    <CheckBox Margin="2" IsChecked="{Binding Orientation}" >Transpose field plan</CheckBox>
+                    <CheckBox IsChecked="{Binding MirrorX}" Margin="2" VerticalAlignment="Top" Content="Mirror horizontally"/>
+                    <CheckBox IsChecked="{Binding MirrorY}" Margin="2" VerticalAlignment="Top" Content="Mirror vertically"/>
+                </StackPanel>
 
-      </HeaderedContentControl>
-      <Expander DockPanel.Dock="Top" IsVisible="true" Header="Advanced Settings" Margin="2,2,2,2" >
-        <!--Panel.ZIndex="3"-->
-        <StackPanel >
-          <DockPanel Margin="2" VerticalAlignment="Center">
-            <TextBlock VerticalAlignment="Center">Cell content:</TextBlock>
-            <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextRegex}" ToolTip.Tip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
-          </DockPanel>
-          <DockPanel  Margin="2" VerticalAlignment="Center">
-            <TextBlock VerticalAlignment="Center">Text Format:</TextBlock>
-            <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip.Tip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
-          </DockPanel>
-          <!--<GroupBox Header="Border visibility">
+            </HeaderedContentControl>
+            <Expander DockPanel.Dock="Top" IsVisible="true" Header="Advanced Settings" Margin="2,2,2,2" >
+                <!--Panel.ZIndex="3"-->
+                <StackPanel >
+                    <DockPanel Margin="2" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center">Cell content:</TextBlock>
+                        <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextRegex}" ToolTip.Tip="Represents the text in a cell.&#x0a;%count% is replaced by the number of dominoes in the cell, %color% by the color name."></TextBox>
+                    </DockPanel>
+                    <DockPanel  Margin="2" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center">Text Format:</TextBlock>
+                        <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip.Tip="HTML Font Tag.&#x0a;The font tag is closed automatically. Not all HTML features are currently supported by Excel Export."></TextBox>
+                    </DockPanel>
+                    <!--<GroupBox Header="Border visibility">
                         <StackPanel Margin="2">
                             <RadioButton Margin="2" Content="Separate" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}"/>
                             <RadioButton Margin="2" Content="Collapsed" HorizontalAlignment="Left" IsChecked="{Binding CollapseBorders}" />
                         </StackPanel>
 
                         </GroupBox>-->
-          <HeaderedContentControl Header="Cell background color" >
-            <StackPanel VerticalAlignment="Center" Margin="2">
-              <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
-              <RadioButton Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
-            </StackPanel>
-          </HeaderedContentControl>
-          <HeaderedContentControl Header="Text color">
-            <StackPanel Margin="2">
-              <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
-              <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedTextColor}"/>
-              <RadioButton Grid.Row="2" Content="Intelligent" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding IntelligentTextColor}"/>
+                    <HeaderedContentControl Header="Cell background color" >
+                        <StackPanel VerticalAlignment="Center" Margin="2">
+                            <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultBackColor}"/>
+                            <RadioButton Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedBackColor}"/>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Text color">
+                        <StackPanel Margin="2">
+                            <RadioButton Content="Default" Margin="2"  ToolTip.Tip="Uses the color of the domino as cell background." IsChecked="{Binding DefaultTextColor}"/>
+                            <RadioButton Grid.Row="1" Content="Inverted" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding InvertedTextColor}"/>
+                            <RadioButton Grid.Row="2" Content="Intelligent" Margin="2" ToolTip.Tip="Uses the inverted color as cell background" IsChecked="{Binding IntelligentTextColor}"/>
 
-            </StackPanel>
-          </HeaderedContentControl>
-        </StackPanel>
-      </Expander>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </Expander>
 
-      <Button VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="5" Command="{Binding SaveExcel}" >
-        <StackPanel Orientation="Horizontal">
-          <Image Source="/Icons/insert_table.ico" Height="20" />
-          <TextBlock Text="Save Excel File"/>
-        </StackPanel>
-      </Button>
-      <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom" Command="{Binding ShowLiveBuildHelper}" >
-        <!--Panel.ZIndex="1"-->
-        <StackPanel Orientation="Horizontal">
-          <Image Source="/Icons/properties.ico" Height="20" />
-          <TextBlock Text="Field Viewer"/>
-        </StackPanel>
-      </Button>
+            <Button VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Margin="5" Command="{Binding SaveExcel}" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/insert_table.ico" Height="20" />
+                    <TextBlock Text="Save Excel File"/>
+                </StackPanel>
+            </Button>
+            <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom" Command="{Binding ShowLiveBuildHelper}" >
+                <!--Panel.ZIndex="1"-->
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/properties.ico" Height="20" />
+                    <TextBlock Text="Field Viewer"/>
+                </StackPanel>
+            </Button>
 
-      <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom"  Command="{Binding SaveHTML}" >
-        <StackPanel Orientation="Horizontal">
-          <Image Source="/Icons/document_save.ico" Height="20"/>
-          <TextBlock Text="Save as HTML"/>
-        </StackPanel>
-      </Button>
-    </DockPanel>
-  </Grid>
+            <Button VerticalAlignment="Bottom" Margin="5" DockPanel.Dock="Bottom"  Command="{Binding SaveHTML}" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/document_save.ico" Height="20"/>
+                    <TextBlock Text="Save as HTML"/>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+    </Grid>
 </Window>

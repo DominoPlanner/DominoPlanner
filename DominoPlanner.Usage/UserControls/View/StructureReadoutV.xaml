@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
              xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
@@ -13,11 +13,7 @@
     <Grid>
         <HeaderedContentControl DockPanel.Dock="Top" Header="Image readout">
             <DockPanel>
-                <Grid Grid.Row="4" DockPanel.Dock="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                <Grid Grid.Row="4" DockPanel.Dock="Top" ColumnDefinitions="*, *">
                     <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Corner}}" GroupName="a"/>
                     <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" GroupName="a" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Average}}"/>
                 </Grid>

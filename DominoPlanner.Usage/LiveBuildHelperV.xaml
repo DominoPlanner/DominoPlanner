@@ -11,112 +11,112 @@
         Title="FieldBlockViewer"
         Height="600" Width="800"
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
-  <Window.Resources>
-    <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
-    <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
-  </Window.Resources>
-  <i:Interaction.Behaviors>
-    <ia:EventTriggerBehavior EventName="PointerPressed">
-      <ia:InvokeCommandAction Command="{Binding MouseDown}"/>
-    </ia:EventTriggerBehavior>
-  </i:Interaction.Behaviors>
-  <Grid x:Name="MG">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="100"/>
-      <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
-    <Grid Grid.Row="0" ColumnDefinitions="300, 5, 300, *">
-      <Grid Grid.Column="0" ColumnDefinitions="3*, 3*, 2*, 3*">
-        <TextBlock Grid.Column="0" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-        <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
-        <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
-        <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-      </Grid>
-      <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
-        <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-        <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
-        <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
-        <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-      </Grid>
-      <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
-      <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
-        <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
-        <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
-          <StackPanel>
-            <TextBlock>Show remaining colors</TextBlock>
-            <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
-              <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
-            </Popup>
-          </StackPanel>
-        </Button>
-      </StackPanel>
+    <Window.Resources>
+        <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
+        <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
+    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="PointerPressed">
+            <ia:InvokeCommandAction Command="{Binding MouseDown}"/>
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    <Grid x:Name="MG">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" ColumnDefinitions="300, 5, 300, *">
+            <Grid Grid.Column="0" ColumnDefinitions="3*, 3*, 2*, 3*">
+                <TextBlock Grid.Column="0" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
+                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+            </Grid>
+            <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
+                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
+                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+            </Grid>
+            <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+            <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
+                    <StackPanel>
+                        <TextBlock>Show remaining colors</TextBlock>
+                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                            <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
+                        </Popup>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.Styles>
+                <Style Selector="ListBox">
+                    <Setter Property="ItemsPanel">
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </Setter>
+                </Style>
+                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+            </Grid.Styles>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MaxHeight="150"/>
+                <RowDefinition Height="*" MaxHeight="50"/>
+                <RowDefinition Height="*" MaxHeight="250"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                                    <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="80" VerticalAlignment="Top">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource BorderWidthConverter}">
+                                    <Binding Path="Amount"/>
+                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="18" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
     </Grid>
-    <Grid Grid.Row="1">
-      <Grid.Styles>
-        <Style Selector="ListBox">
-          <Setter Property="ItemsPanel">
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal"/>
-            </ItemsPanelTemplate>
-          </Setter>
-        </Style>
-        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-          <Setter Property="Background" Value="Transparent"/>
-        </Style>
-        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-          <Setter Property="Background" Value="Transparent"/>
-        </Style>
-      </Grid.Styles>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="*" MaxHeight="150"/>
-        <RowDefinition Height="*" MaxHeight="50"/>
-        <RowDefinition Height="*" MaxHeight="250"/>
-        <RowDefinition Height="*"/>
-      </Grid.RowDefinitions>
-      <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
-              <Border.Width>
-                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                  <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
-                  <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
-                </MultiBinding>
-              </Border.Width>
-            </Border>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
-              <Border.Width>
-                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                  <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
-                  <Binding Path="Bounds.Width" ElementName="StoneBox"/>
-                </MultiBinding>
-              </Border.Width>
-            </Border>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <Border Height="80" VerticalAlignment="Top">
-              <Border.Width>
-                <MultiBinding Converter="{StaticResource BorderWidthConverter}">
-                  <Binding Path="Amount"/>
-                  <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
-                  <Binding Path="Bounds.Width" ElementName="StoneBox"/>
-                </MultiBinding>
-              </Border.Width>
-              <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="18" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
-            </Border>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </Grid>
-  </Grid>
 </Window>
