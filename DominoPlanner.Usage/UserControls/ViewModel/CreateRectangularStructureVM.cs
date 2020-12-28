@@ -103,6 +103,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     _structure_index = value;
                     SelectedStructureElement = structures.ElementAt(_structure_index);
+                    TabPropertyChanged("VisibleFieldplan", ProducesUnsavedChanges: false);
                     RaisePropertyChanged();
                     RefreshDescriptionImages();
                     if (temp_struct_index != -1)

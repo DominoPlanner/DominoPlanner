@@ -7,10 +7,43 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
+    public enum Corner
+    {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+    public struct NaturalFieldPlanOrientation
+    {
+        public bool orientation;
+        public bool x;
+        public bool y;
+        public NaturalFieldPlanOrientation(bool mirrorX, bool mirrorY, bool orientation ) // true = vertical
+        {
+            x = mirrorX;
+            y = mirrorY;
+            this.orientation = orientation;
+        }
+        public (bool, bool) GetCorner(bool left, bool top, bool currentOrientation)
+        {
+            var (templeft, temptop) = (left ^ x, top ^ y);
+            if (currentOrientation && templeft != temptop)
+            {
+                return (temptop, templeft);
+            }
+            else
+            {
+                return (templeft, temptop);
+            }
+        }
+    }
     class ProtocolVM : ModelBase
     {
         private ICommand _ClipTopRight;
@@ -26,6 +59,13 @@ namespace DominoPlanner.Usage
 			private ICommand _ClickBottomRight;
         public ICommand ClickBottomRight { get { return _ClickBottomRight; } set { if (value != _ClickBottomRight) { _ClickBottomRight = value; } } }
 
+        private NaturalFieldPlanOrientation naturalOrientation;
+
+        public NaturalFieldPlanOrientation NaturalOrientation
+        {
+            get { return naturalOrientation; }
+            set { naturalOrientation = value; RaisePropertyChanged();  }
+        }
 
 
         #region CTOR
@@ -53,6 +93,15 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region prope
+
+        private double rotateAngle;
+
+        public double RotateAngle
+        {
+            get { return rotateAngle; }
+            set { rotateAngle = value; RaisePropertyChanged(); }
+        }
+
         private bool _DefaultBackColor;
         public bool DefaultBackColor
         {
@@ -377,6 +426,8 @@ namespace DominoPlanner.Usage
             currentOPP.mirrorHorizontal = DominoProvider.FieldPlanDirection == Core.Orientation.Vertical;
             CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
+            NaturalOrientation = GetNaturalOrientation();
+
             SkiaSharp.SKImage new_img = DominoProvider.Last.GenerateImage(1000, false).Snapshot();
             CurrentPlan = Bitmap.DecodeToWidth(new_img.Encode().AsStream(), new_img.Width);
 
@@ -386,10 +437,48 @@ namespace DominoPlanner.Usage
 
             this.PropertyChanged += ProtocolVM_PropertyChanged;
 
-            ClickTopLeft = new RelayCommand(o => { MirrorX = false; MirrorY = false; });
-            ClipTopRight = new RelayCommand(o => { MirrorX = !Orientation; MirrorY = Orientation; });
-            ClickBottomLeft = new RelayCommand(o => { MirrorX = Orientation; MirrorY = !Orientation; });
-            ClickBottomRight = new RelayCommand(o => { MirrorX = true; MirrorY = true; });
+            ClickTopLeft = new RelayCommand(o => SetOrientation(false, false));
+            ClipTopRight = new RelayCommand(o => SetOrientation(true, false));
+            ClickBottomLeft = new RelayCommand(o => SetOrientation(false, true));
+            ClickBottomRight = new RelayCommand(o => SetOrientation(true, true));
+
+            // Special case: diagonal fields. We'll rotate the image so the arrows are correct again.
+            if (DominoProvider is StructureParameters structure && XElement.Parse(structure._structureDefinitionXML).Attribute("Name").Value == "Diagonal Field")
+            {
+                RotateAngle = 45;
+            }
+
+        }
+        private void SetOrientation(bool left, bool top)
+        {
+            var (target_left, target_top) = NaturalOrientation.GetCorner(left, top, Orientation);
+            if (MirrorX == target_left && MirrorY == target_top)
+                Orientation = !Orientation;
+            (target_left, target_top) = NaturalOrientation.GetCorner(left, top, Orientation);
+            MirrorX = target_left;
+            MirrorY = target_top;
+        }
+        private NaturalFieldPlanOrientation GetNaturalOrientation()
+        {
+            var field = DominoProvider.GetBaseField();
+            var topLeft = DominoProvider.Last.shapes.OrderBy(x => x.position.x).ThenBy(x => x.position.y).First();
+            var topRight = DominoProvider.Last.shapes.OrderByDescending(x => x.position.x).ThenBy(x => x.position.y).First();
+            var bottomLeft = DominoProvider.Last.shapes.OrderByDescending(x => x.position.y).ThenBy(x => x.position.x).First();
+
+            var horizontalDx = topRight.GetBoundingRectangle().xc - topLeft.GetBoundingRectangle().xc;
+            var horizontalDy = topRight.GetBoundingRectangle().yc - topLeft.GetBoundingRectangle().yc;
+            var verticalDx = bottomLeft.GetBoundingRectangle().xc - topLeft.GetBoundingRectangle().xc;
+            var verticalDy = bottomLeft.GetBoundingRectangle().yc - topLeft.GetBoundingRectangle().yc;
+            NaturalFieldPlanOrientation orientation = new NaturalFieldPlanOrientation();
+            
+            if (horizontalDx < 0)
+                orientation.x = true;
+            if (verticalDy < 0)
+                orientation.y = true;
+            orientation.orientation = !(Math.Abs(horizontalDx) - Math.Abs(horizontalDy) > 0);
+            //if (orientation.x ^ orientation.y)
+            //    orientation.orientation = !orientation.orientation;
+            return orientation;
         }
         private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -447,9 +536,9 @@ namespace DominoPlanner.Usage
                 catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
         }
-        #endregion
+#endregion
 
-        #region commands
+#region commands
         private ICommand _ShowliveBuildHelper;
         public ICommand ShowLiveBuildHelper { get { return _ShowliveBuildHelper; } set { if (value != _ShowliveBuildHelper) { _ShowliveBuildHelper = value; } } }
 
@@ -458,6 +547,6 @@ namespace DominoPlanner.Usage
 
         private ICommand _SaveExcel;
         public ICommand SaveExcel { get { return _SaveExcel; } set { if (value != _SaveExcel) { _SaveExcel = value; } } }
-        #endregion
+#endregion
     }
 }

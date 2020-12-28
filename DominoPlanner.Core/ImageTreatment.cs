@@ -212,6 +212,8 @@ namespace DominoPlanner.Core
         #region overrides
         public override void ReadoutColors(DominoTransfer shapes)
         {
+            if (shapes.Length == 0)
+                return;
             var img = FilteredImage;
             double scalingX = (double)(Width - 1) / shapes.PhysicalLength;
             double scalingY = (double)(Height - 1) / shapes.PhysicalHeight;

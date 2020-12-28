@@ -10,7 +10,7 @@
         x:Class="DominoPlanner.Usage.ProtocolV"
         Title="Protocol" MinHeight="700" MinWidth="800" Height="750" Width="800" Icon="/Icons/DominoCalculator.ico">
   <Window.Resources>
-    <local:DirectionSizeConverter x:Key="DirectionSizeConverter"/>
+    <local:FieldPlanArrowsGridConverter x:Key="ArrowsGridConverter"/>
     <local:ImgSizeConverter x:Key="ImgSizeConverter"/>
   </Window.Resources>
   <Grid>
@@ -44,7 +44,12 @@
           <RowDefinition Height="*"/>
           <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <Image Grid.Row="1" Grid.Column="1" Margin="1" Source="{Binding Path=CurrentPlan}" Stretch="Uniform"/>
+        <LayoutTransformControl Grid.Row="1" Grid.Column="1" Margin="1">
+          <LayoutTransformControl.LayoutTransform>
+            <RotateTransform Angle="{Binding RotateAngle}"/>
+          </LayoutTransformControl.LayoutTransform>
+        <Image  Source="{Binding Path=CurrentPlan}" Stretch="Uniform"/>
+        </LayoutTransformControl>
         <Ellipse Grid.Row="0" Grid.Column="0" Stroke="Red" StrokeThickness="1">
           <i:Interaction.Behaviors>
             <ia:EventTriggerBehavior EventName="PointerPressed">
@@ -52,10 +57,11 @@
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
           <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopLeft" >
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopLeft" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
           </Ellipse.Fill>
         </Ellipse>
@@ -66,10 +72,11 @@
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
           <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopRight" >
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopRight" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
           </Ellipse.Fill>
         </Ellipse>
@@ -80,10 +87,11 @@
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
           <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomLeft" >
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomLeft" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
           </Ellipse.Fill>
         </Ellipse>
@@ -94,141 +102,105 @@
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
           <Ellipse.Fill>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomRight" >
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomRight" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
           </Ellipse.Fill>
         </Ellipse>
-        <Grid Grid.Row="0" Grid.Column="1" Margin="1,0,1,0">
-          <Grid.IsVisible>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="Top" >
+        <Grid Grid.Column="1" Margin="1,0,1,0" ColumnDefinitions="7, *, 7">
+          <Grid.Styles>
+            <Style Selector="Rectangle, Polygon">
+              <Setter Property="Fill">
+                <SolidColorBrush>
+                  <SolidColorBrush.Color>
+                    <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalColor" >
+                      <Binding Path="Orientation"/>
+                      <Binding Path="MirrorX" />
+                      <Binding Path="MirrorY" />
+                      <Binding Path="NaturalOrientation" />
+                    </MultiBinding>
+                  </SolidColorBrush.Color>
+                </SolidColorBrush>
+              </Setter>
+            </Style>
+          </Grid.Styles>
+          <Grid.Row>
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalRow" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
-          </Grid.IsVisible>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="7"/>
-          </Grid.ColumnDefinitions>
-          <Rectangle Grid.Column="1" Margin="-4,3,-4,3" Fill="Blue"/>
-          <Polygon Grid.Column="0" Fill="Blue" Points="0,5 7,0 7,10" StrokeThickness="2">
+          </Grid.Row>
+          <Rectangle Grid.Column="1" Margin="-4,3,-4,3"/>
+          <Polygon Grid.Column="0" Points="0,5 7,0 7,10" StrokeThickness="2">
             <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopRight" >
+              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="LeftHorizontalVisibility" >
                 <Binding Path="Orientation"/>
                 <Binding Path="MirrorX" />
                 <Binding Path="MirrorY" />
+                <Binding Path="NaturalOrientation" />
               </MultiBinding>
             </Polygon.IsVisible>
           </Polygon>
-          <Polygon Grid.Column="2" Fill="Blue" Points="7,5 0,0 0,10" StrokeThickness="2">
+          <Polygon Grid.Column="2" Points="7,5 0,0 0,10" StrokeThickness="2">
             <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopLeft" >
+              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="RightHorizontalVisibility" >
                 <Binding Path="Orientation"/>
                 <Binding Path="MirrorX" />
                 <Binding Path="MirrorY" />
+                <Binding Path="NaturalOrientation" />
               </MultiBinding>
             </Polygon.IsVisible>
           </Polygon>
         </Grid>
-        <Grid Grid.Row="2" Grid.Column="1" Margin="1,0,1,0">
-          <Grid.IsVisible>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="Bottom" >
+
+        <Grid Grid.Row="1" Margin="0,1,0,1" RowDefinitions="7, *, 7">
+          <Grid.Styles>
+            <Style Selector="Rectangle, Polygon">
+              <Setter Property="Fill">
+                <SolidColorBrush>
+                  <SolidColorBrush.Color>
+                    <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColor" >
+                      <Binding Path="Orientation"/>
+                      <Binding Path="MirrorX" />
+                      <Binding Path="MirrorY" />
+                      <Binding Path="NaturalOrientation" />
+                    </MultiBinding>
+                  </SolidColorBrush.Color>
+                </SolidColorBrush>
+              </Setter>
+            </Style>
+          </Grid.Styles>
+          <Grid.Column>
+            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColumn" >
               <Binding Path="Orientation"/>
               <Binding Path="MirrorX" />
               <Binding Path="MirrorY" />
+              <Binding Path="NaturalOrientation" />
             </MultiBinding>
-          </Grid.IsVisible>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="7"/>
-          </Grid.ColumnDefinitions>
-          <Rectangle Grid.Column="1" Margin="-4,3,-4,3" Fill="Blue"/>
-          <Polygon Grid.Column="0" Fill="Blue" Points="0,5 7,0 7,10" StrokeThickness="2">
+          </Grid.Column>
+          <Rectangle Grid.Row="1" Margin="3,-4,3,-4"/>
+          <Polygon Grid.Row="0" Points="5,0 10,7 0,7">
             <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomRight" >
+              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopVerticalVisibility" >
                 <Binding Path="Orientation"/>
                 <Binding Path="MirrorX" />
                 <Binding Path="MirrorY" />
+                <Binding Path="NaturalOrientation" />
               </MultiBinding>
             </Polygon.IsVisible>
           </Polygon>
-          <Polygon Grid.Column="2" Fill="Blue" Points="7,5 0,0 0,10" StrokeThickness="2">
+          <Polygon Grid.Row="2" Points="0,0 10,0 5,7">
             <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomLeft" >
+              <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomVerticalVisibility" >
                 <Binding Path="Orientation"/>
                 <Binding Path="MirrorX" />
                 <Binding Path="MirrorY" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="0" Margin="0,1,0,1">
-          <Grid.IsVisible>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="Left" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-            </MultiBinding>
-          </Grid.IsVisible>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="7"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="7"/>
-          </Grid.RowDefinitions>
-          <Rectangle Grid.Row="1" Margin="3,-4,3,-4" Fill="Blue"/>
-          <Polygon Grid.Row="0" Fill="Blue" Points="5,0 10,7 0,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomLeft" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-          <Polygon Grid.Row="2" Fill="Blue" Points="0,0 10,0 5,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopLeft" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="2" Margin="0,1,0,1">
-          <Grid.IsVisible>
-            <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="Right" >
-              <Binding Path="Orientation"/>
-              <Binding Path="MirrorX" />
-              <Binding Path="MirrorY" />
-            </MultiBinding>
-          </Grid.IsVisible>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="7"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="7"/>
-          </Grid.RowDefinitions>
-          <Rectangle Grid.Row="1" Margin="3,-4,3,-4" Fill="Blue"/>
-          <Polygon Grid.Row="0" Fill="Blue" Points="5,0 10,7 0,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="BottomRight" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
-              </MultiBinding>
-            </Polygon.IsVisible>
-          </Polygon>
-          <Polygon Grid.Row="2" Fill="Blue" Points="0,0 10,0 5,7">
-            <Polygon.IsVisible>
-              <MultiBinding Converter="{StaticResource DirectionSizeConverter}" ConverterParameter="TopRight" >
-                <Binding Path="Orientation"/>
-                <Binding Path="MirrorX" />
-                <Binding Path="MirrorY" />
+                <Binding Path="NaturalOrientation" />
               </MultiBinding>
             </Polygon.IsVisible>
           </Polygon>

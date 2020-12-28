@@ -535,68 +535,68 @@ namespace DominoPlanner.Usage
             return true;
         }
     }
-
-    public class DirectionSizeConverter : IMultiValueConverter
+    public class FieldPlanArrowsGridConverter : IMultiValueConverter
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            bool visible = false;
-            if (values.Count == 3 && values[0] is bool orientation && values[1] is bool mirrorX && values[2] is bool mirrorY && parameter is string parameterString)
+            if (values.Count == 4 && values[0] is bool orientation && values[1] is bool mirrorX && values[2] is bool mirrorY && parameter is string parameterString && values[3] is NaturalFieldPlanOrientation naturalOrientation)
             {
-                //TopLeft
-                if (!mirrorX && !mirrorY)
+                NaturalFieldPlanOrientation currentOrientation = new NaturalFieldPlanOrientation(mirrorX, mirrorY, orientation);
+                bool top;
+                bool left;
+                bool result = false;
+                if (naturalOrientation.x ^ naturalOrientation.y) // in this case, transposition works 90° rotated
                 {
-                    if (parameterString.Equals("TopLeft") || parameterString.Equals("Top") || parameterString.Equals("Left"))
-                    {
-                        visible = true;
-                    }
-                }
-
-                //TopRight
-                if (orientation ? (!mirrorX && mirrorY) : (mirrorX && !mirrorY))
-                {
-                    if (parameterString.Equals("TopRight") || parameterString.Equals("Top") || parameterString.Equals("Right"))
-                    {
-                        visible = true;
-                    }
-                }
-
-                //BottomLeft
-                if (orientation ? (mirrorX && !mirrorY) : (!mirrorX && mirrorY))
-                {
-                    if (parameterString.Equals("BottomLeft") || parameterString.Equals("Bottom") || parameterString.Equals("Left"))
-                    {
-                        visible = true;
-                    }
-                }
-
-                //BottomRight
-                if (mirrorX && mirrorY)
-                {
-                    if (parameterString.Equals("BottomRight") || parameterString.Equals("Bottom") || parameterString.Equals("Right"))
-                    {
-                        visible = true;
-                    }
-                }
-            }
-            if (targetType == typeof(Avalonia.Media.IBrush))
-            {
-                if (visible)
-                {
-                    return Avalonia.Media.Brushes.Red;
+                    top = orientation ? (currentOrientation.x != naturalOrientation.x) : (currentOrientation.y == naturalOrientation.y);
+                    left = orientation ? (currentOrientation.y != naturalOrientation.y) : (currentOrientation.x == naturalOrientation.x);
                 }
                 else
                 {
-                    return Avalonia.Media.Brushes.White;
+                    top = orientation ? (currentOrientation.x == naturalOrientation.x) : (currentOrientation.y == naturalOrientation.y);
+                    left = orientation ? (currentOrientation.y == naturalOrientation.y) : (currentOrientation.x == naturalOrientation.x);
+                }
+                if (parameterString.Equals("HorizontalRow"))
+                    return top ? 0 : 2;
+
+                if (parameterString.Equals("HorizontalColor"))
+                    return (!(currentOrientation.orientation ^ naturalOrientation.orientation)) ? Colors.Blue : Colors.LightBlue;
+
+                if (parameterString.Equals("RightHorizontalVisibility"))
+                    return left;
+
+                if (parameterString.Equals("LeftHorizontalVisibility"))
+                    return !left;
+
+                if (parameterString.Equals("VerticalColumn"))
+                    return left ? 0 : 2;
+
+                if (parameterString.Equals("VerticalColor"))
+                    return (currentOrientation.orientation ^ naturalOrientation.orientation) ? Colors.Blue : Colors.LightBlue;
+
+                if (parameterString.Equals("BottomVerticalVisibility"))
+                    return top;
+                if (parameterString.Equals("TopVerticalVisibility"))
+                    return !top;
+
+                else if (parameterString.Equals("TopLeft"))
+                    result = top && left;
+                else if (parameterString.Equals("TopRight"))
+                    result = top && !left;
+                else if (parameterString.Equals("BottomLeft"))
+                    result = !top && left;
+                else if (parameterString.Equals("BottomRight"))
+                    result = !top && !left;
+                if (targetType == typeof(Avalonia.Media.IBrush))
+                {
+                    if (result)
+                        return Brushes.Red;
+                    else
+                        return Brushes.Transparent;
                 }
             }
-            else
-            {
-                return visible;
-            }
+            return null;
         }
     }
-
     public class BorderWidthConverter : IMultiValueConverter
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)

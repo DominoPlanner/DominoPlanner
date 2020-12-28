@@ -10,7 +10,7 @@ namespace DominoPlanner.Usage
         {
             this.InitializeComponent();
 #if DEBUG
-            //this.AttachDevTools();
+            this.AttachDevTools();
 #endif
         }
 
