@@ -27,6 +27,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public class EditingToolVM : ModelBase
     {
         public EditProjectVM parent;
+
+        public EditingToolVM(EditProjectVM parent)
+        {
+            this.parent = parent;
+        }
         public string Name { get; internal set; }
         private string image;
 
@@ -50,6 +55,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public virtual void KeyPressed(KeyEventArgs key) { }
 
         public virtual void MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e) { }
+
+        public virtual void OnUndo() { }
+        public virtual void OnRedo() { }
 
 
         public virtual void LeaveTool() { }
@@ -103,7 +111,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class SelectionToolVM : EditingToolVM
     {
-        public SelectionToolVM(EditProjectVM parent)
+        public SelectionToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "rect_selectDrawingImage";
             Name = "Select";
@@ -118,7 +126,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 parent.RedoInternal(true);
             });
             InvertSelection = new RelayCommand((o) => InvertSelectionOperation());
-            this.parent = parent;
         }
 
         private SelectionDomain currentSelectionDomain;
@@ -321,7 +328,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return new Rect(rect.Left, rect.Top, rect.Width, rect.Height);
         }
 
-        public bool IsInsideBoundingBox(Rect BoundingBox, EditingDominoVM dic, bool includeBoundary)
+        public static bool IsInsideBoundingBox(Rect BoundingBox, EditingDominoVM dic, bool includeBoundary)
         {
             var points = dic.domino.GetPath(expanded: dic.expanded).points;
             if (includeBoundary)
@@ -426,7 +433,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return result;
             }
             Rect boundingBox = GetBoundingBox();
-            bool SingleClickFlag = false;
             var pos = dominoPoint;
             if ((pos.X - MouseDownPoint.X) * (pos.X - MouseDownPoint.X) + (pos.Y - MouseDownPoint.Y) * (pos.Y - MouseDownPoint.Y) < 5)
             {
@@ -895,11 +901,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private readonly double largestX = 0;
         private readonly double largestY = 0;
 
-        public DisplaySettingsToolVM(EditProjectVM parent)
+        public DisplaySettingsToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "display_settingsDrawingImage";
             Name = "View Properties";
-            this.parent = parent;
             ShowImageClick = new RelayCommand(o => { ShowImage(); });
 
             if (parent.CurrentProject != null && parent.CurrentProject.PrimaryImageTreatment != null)
@@ -1116,21 +1121,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _ShowImageClick;
         public ICommand ShowImageClick { get { return _ShowImageClick; } set { if (value != _ShowImageClick) { _ShowImageClick = value; } } }
     }
-    public class RulerTool : EditingToolVM
-    {
-        public override void KeyPressed(KeyEventArgs key)
-        {
-            base.KeyPressed(key);
-        }
-        public override void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
-        {
-            base.MouseUp(dominoPoint, e);
-        }
-        public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
-        {
-            base.MouseDown(dominoPoint, e);
-        }
-    }
     public class RulerToolVM : EditingToolVM
     {
         private double _length;
@@ -1152,9 +1142,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private Avalonia.Point end;
         private double linewidth = 8;
         private int dragging;
-        public RulerToolVM(EditProjectVM parent)
+        public RulerToolVM(EditProjectVM parent) : base(parent)
         {
-            this.parent = parent;
             Image = "ruler2DrawingImage";
             Name = "Measure distance";
             MakeInvisible();
@@ -1286,9 +1275,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class ZoomToolVM : EditingToolVM
     {
-        public ZoomToolVM(EditProjectVM parent) : base()
+        public ZoomToolVM(EditProjectVM parent) : base(parent)
         {
-            this.parent = parent;
             Image = "zoomDrawingImage";
             Name = "Zoom";
             ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue += 1);
@@ -1300,6 +1288,239 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _ZoomOut;
         public ICommand ZoomOut { get { return _ZoomOut; } set { if (value != _ZoomOut) { _ZoomOut = value; } } }
 
+    }
+    public class RowColumnInsertionVM : EditingToolVM
+    {
+        public override void EnterTool()
+        {
+            parent.ClearFullSelection();
+            UpdateInsertionPositions();
+            DrawPositions();
+        }
+        public override void OnRedo()
+        {
+            base.OnRedo();
+            UpdateInsertionPositions();
+            DrawPositions();
+        }
+        public override void OnUndo()
+        {
+            base.OnUndo();
+            UpdateInsertionPositions();
+            DrawPositions();
+        }
+        public override void LeaveTool()
+        {
+            parent.AdditionalDrawables.Clear();
+            foreach (var i in parent.Dominoes)
+                i.State &= ~EditingDominoStates.DeletionHighlight;
+        }
+        private void UpdateInsertionPositions()
+        {
+            if (parent.CurrentProject is IRowColumnAddableDeletable irc)
+            {
+                column_positions = AddDeleteHelper.GetInsertionPositions(irc, true, parent.DisplaySettingsTool.Expanded);
+                row_positions = AddDeleteHelper.GetInsertionPositions(irc, false, parent.DisplaySettingsTool.Expanded);
+            }
+        }
+        public RowColumnInsertionVM(EditProjectVM parent) : base(parent)
+        {
+            Image = "add_delete_rowDrawingImage";
+            Name = "Add/Delete Rows";
+            
+        }
+        private bool insertionMode = true;
+
+        public bool InsertionMode
+        {
+            get { return insertionMode; }
+            set
+            {
+                insertionMode = value; RaisePropertyChanged();
+                if (!insertionMode)
+                {
+                    UpdateInsertionPositions();
+                    DrawPositions();
+                }
+                if (insertionMode)
+                {
+                    foreach (var i in parent.Dominoes)
+                        i.State &= ~EditingDominoStates.DeletionHighlight;
+                    parent.DisplaySettingsTool.ForceRedraw = true;
+                }
+            }
+        }
+
+        List<InsertionHelper> column_positions;
+        List<InsertionHelper> row_positions;
+
+        private bool direction = true;
+
+        public bool Direction
+        {
+            get { return direction; }
+            set
+            {
+                direction = value; RaisePropertyChanged();
+                UpdateInsertionPositions();
+                DrawPositions();
+            }
+        }
+
+        private bool livePreview = true;
+
+        public bool LivePreviewEnabled
+        {
+            get { return livePreview; }
+            set { livePreview = value; RaisePropertyChanged();  }
+        }
+        public override void MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
+        {
+            base.MouseMove(dominoPoint, e);
+
+            if (InsertionMode)
+            {
+                PreviewInsertion(dominoPoint);
+            }
+            else 
+            {
+                PreviewRemoval(dominoPoint);
+            }
+
+        }
+        
+        public override void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
+        {
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+            if (InsertionMode)
+            {
+                parent.ClearFullSelection();
+                var closest_line = GetClosestLine(dominoPoint);
+                if (Direction)
+                {
+                    parent.AddRow(!closest_line.Before, closest_line.Index, closest_domino.domino);
+                }
+                if (!Direction)
+                {
+                    parent.AddColumn(!closest_line.Before, closest_line.Index, closest_domino.domino);
+                }
+            }
+            else
+            {
+                if (parent.CurrentProject is IRowColumnAddableDeletable rc)
+                {
+                    var pos = rc.getPositionFromIndex(closest_domino.idx);
+                    if (Direction)
+                    {
+                        if (pos.Y >= 0 && pos.Y < rc.current_height)
+                        {
+                            parent.RemoveSelRows(closest_domino.idx);
+                        }
+                    }
+                    else
+                    {
+                        if (pos.X >= 0 && pos.X < rc.current_width)
+                        {
+                            parent.RemoveSelColumns(closest_domino.idx);
+                        }
+                    }
+                }
+            }
+            UpdateInsertionPositions();
+            DrawPositions();
+        }
+        CanvasDrawable PreviewLine1;
+        CanvasDrawable PreviewLine2;
+        private InsertionHelper GetClosestLine(Avalonia.Point dominoPoint)
+        {
+            return Direction ? row_positions.OrderBy(x => Math.Abs(x.DrawPosition - dominoPoint.Y)).First() : column_positions.OrderBy(x => Math.Abs(x.DrawPosition - dominoPoint.X)).First();
+        }
+        private void PreviewInsertion(Avalonia.Point dominoPoint)
+        {
+            var closest_line = GetClosestLine(dominoPoint);
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+
+            var path = closest_line.GetPath(parent.PhysicalLength, parent.PhysicalHeight, Direction);
+            parent.AdditionalDrawables.Remove(PreviewLine1);
+            parent.AdditionalDrawables.Remove(PreviewLine2);
+            PreviewLine1 = new CanvasDrawable()
+            {
+                Paint = new SKPaint()
+                {
+                    Color = new SKColor(closest_domino.StoneColor.R, closest_domino.StoneColor.G, closest_domino.StoneColor.B, closest_domino.StoneColor.A),
+                    IsStroke = true,
+                    StrokeWidth = 2
+                },
+                Path = path,
+            };
+            PreviewLine2 = new CanvasDrawable() { Paint = new SKPaint() { Color = SKColors.Gray, IsStroke = true, StrokeWidth = 4 }, Path = path };
+            parent.AdditionalDrawables.Add(PreviewLine2);
+            parent.AdditionalDrawables.Add(PreviewLine1);
+
+        }
+        private void PreviewRemoval(Avalonia.Point dominoPoint)
+        {
+            foreach (var i in parent.Dominoes)
+                i.State &= ~EditingDominoStates.DeletionHighlight;
+            
+            parent.ClearFullSelection();
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+            int[] indices = null;
+            if (parent.CurrentProject is IRowColumnAddableDeletable rc)
+            {
+                var pos = rc.getPositionFromIndex(closest_domino.idx);
+                if (Direction)
+                {
+                    if (pos.Y >= 0 && pos.Y < rc.current_height)
+                    {
+                        indices = AddDeleteHelper.getAllIndicesInRowColumn(rc, pos.Y, false, parent.CurrentProject.Last.Length, rc.current_width, rc.current_height);
+                    }
+                }
+                else
+                {
+                    if (pos.X >= 0 && pos.X < rc.current_width)
+                    {
+                        indices = AddDeleteHelper.getAllIndicesInRowColumn(rc, pos.X, true, parent.CurrentProject.Last.Length, rc.current_width, rc.current_height);
+                    }
+                }
+            }
+            if (indices != null)
+            {
+                foreach (int i in indices)
+                {
+                    parent.Dominoes[i].State |= EditingDominoStates.DeletionHighlight;
+                }
+            }
+        }
+        private void DrawPositions()
+        {
+            parent.AdditionalDrawables.Clear();
+            if (column_positions == null || row_positions == null)
+                UpdateInsertionPositions();
+            foreach (var pos in Direction ? row_positions : column_positions )
+            {
+                var path = pos.GetPath(parent.PhysicalLength, parent.PhysicalHeight, Direction);
+                parent.AdditionalDrawables.Add(new CanvasDrawable() { Paint = new SKPaint() { Color = new SKColor(0, 0, 0, 128), IsStroke = true, StrokeWidth = 2 }, Path = path, BeforeBorders = true });
+            }
+        }
+    }
+    public static class InsertionHelperExtension
+    {
+        public static SKPath GetPath(this InsertionHelper pos, int width, int height, bool Direction)
+        {
+            SKPath path = new SKPath();
+            if (Direction)
+            {
+                path.MoveTo(0, (float)pos.DrawPosition);
+                path.LineTo(width, (float)pos.DrawPosition);
+            }
+            else
+            {
+                path.MoveTo((float)pos.DrawPosition, 0);
+                path.LineTo((float)pos.DrawPosition, height);
+            }
+            return path;
+        }
     }
 
 }

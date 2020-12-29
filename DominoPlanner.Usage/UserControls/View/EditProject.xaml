@@ -1,4 +1,5 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -130,8 +131,8 @@
                 <TextBlock TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" Margin="20, 0, 0, 0">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}Dimensions: {0} mm x {1} mm">
-                            <Binding Path="DataContext.PhysicalLength" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
-                            <Binding Path="DataContext.PhysicalHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+                            <Binding Path="DataContext.PhysicalLength" x:CompileBindings="False" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
+                            <Binding Path="DataContext.PhysicalHeight" x:CompileBindings="False" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Grid}"/>
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>
@@ -142,10 +143,27 @@
                 <Button Margin="1, 0"  ToolTip.Tip="Zoom out" Command="{Binding ZoomOut}">
                     <Image Source="{StaticResource zoom_outDrawingImage}" Classes="ToolImage"/>
                 </Button>
-                <Slider HorizontalAlignment="Center" Minimum="1" Maximum="6" Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
+                <Slider HorizontalAlignment="Center" Minimum="1" Maximum="6" x:CompileBindings="False" Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
                 <Button Margin="1, 0"  ToolTip.Tip="Zoom in" Command="{Binding ZoomIn}">
                     <Image Source="{StaticResource zoom_inDrawingImage}" Classes="ToolImage"/>
                 </Button>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RowColumnInsertionVM}">
+            <StackPanel Orientation="Horizontal" Margin="5, 0">
+                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding Direction}">
+                    <Image Source="{StaticResource add_delete_rowDrawingImage}">
+                        <Image.RenderTransform>
+                            <RotateTransform Angle="90"></RotateTransform>
+                        </Image.RenderTransform>
+                    </Image>
+                </RadioButton>
+                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding !Direction}"
+                             Content="Column">
+                    <Image Source="{StaticResource add_delete_rowDrawingImage}"/>
+                </RadioButton>
+                <RadioButton Classes="ToolButton" GroupName="AddDelete" IsChecked="{Binding InsertionMode}" Content="+" Margin="10, 0, 0, 0"/>
+                <RadioButton Classes="ToolButton" GroupName="AddDelete" IsChecked="{Binding !InsertionMode}" Content="-"/>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:EditingToolVM}">
@@ -230,7 +248,7 @@
                      Items="{Binding EditingTools}"
                      SelectedItem="{Binding SelectedTool, Mode=TwoWay}" Classes="ToolButton">
                 <ListBox.ItemTemplate>
-                    <DataTemplate >
+                    <DataTemplate>
                         <Image Classes="ToolImage" Source="{Binding Img}" ToolTip.Tip="{Binding Name}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

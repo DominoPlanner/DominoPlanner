@@ -73,8 +73,8 @@ namespace DominoPlanner.Core
         {
             return new DominoRectangle()
             {
-                width = (expanded ? expanded_width : this.Width) * scaling_x,
-                height = (expanded ? expanded_height : this.Height) * scaling_y,
+                width = (expanded ? ExpandedWidth : this.Width) * scaling_x,
+                height = (expanded ? ExpandedHeight : this.Height) * scaling_y,
                 x = this.x * scaling_x,
                 y = this.y * scaling_y
             };

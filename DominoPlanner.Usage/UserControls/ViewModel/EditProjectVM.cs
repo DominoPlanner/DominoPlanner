@@ -59,11 +59,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             EditingTools = new ObservableCollection<EditingToolVM>() {
                 SelectionTool,
                 RulerTool,
-                new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
-                new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
+                new EditingToolVM(this) { Image = "textDrawingImage", Name="Write text"},
                 ZoomTool,
                 DisplaySettingsTool
             };
+            if (this.CurrentProject is IRowColumnAddableDeletable)
+            {
+                RowColumnTool = new RowColumnInsertionVM(this);
+                EditingTools.Insert(2, RowColumnTool);
+            }
             SelectedTool = SelectionTool;
             UpdateUIElements();
         }
@@ -99,10 +103,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
 
 
-        private SelectionToolVM SelectionTool { get; set; }
+        public SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
         public ZoomToolVM ZoomTool;
         public RulerToolVM RulerTool;
+        public RowColumnInsertionVM RowColumnTool;
         #endregion
 
         #region events
@@ -433,7 +438,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 UpdateUIElements();
             }
-            
+            SelectedTool.OnUndo();
         }
             
         public override void Redo()
@@ -461,6 +466,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 UpdateUIElements();
             }
+            SelectedTool.OnRedo();
         }
         internal override void KeyPressed(object sender, KeyEventArgs args)
         {
@@ -482,16 +488,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        private async void AddRow(bool addBelow)
+        public async void AddRow(bool addBelow, int index = -1, IDominoShape colorReference = null)
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (selectedDominoes.Count > 0 || index != -1)
                 {
-                    int selDomino = selectedDominoes.First();
+                    int selDomino = selectedDominoes.Count > 0 ? selectedDominoes.First() : index;
+                    int color = (colorReference ?? dominoTransfer[selDomino]).Color;
                     if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, dominoTransfer[selDomino].Color, addBelow);
+                        AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, color, addBelow);
                         ClearCanvas();
                         ExecuteOperation(addRows);
                         
@@ -511,16 +518,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private async void AddColumn(bool addRight)
+        public async void AddColumn(bool addRight, int index = -1, IDominoShape colorReference  =null)
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (selectedDominoes.Count > 0 || index != -1)
                 {
-                    int selDomino = selectedDominoes.First();
+                    int selDomino = selectedDominoes.Count > 0 ? selectedDominoes.First() : index;
+                    int color = (colorReference ?? dominoTransfer[selDomino]).Color;
                     if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, dominoTransfer[selDomino].Color, addRight);
+                        AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, color, addRight);
                         ClearCanvas();
                         ExecuteOperation(addRows);
                        
@@ -540,18 +548,26 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private async void RemoveSelRows()
+        public async void RemoveSelRows(int index = -1)
         {
             try
             {
                 if (CurrentProject is IRowColumnAddableDeletable)
                 {
+                    int[] deletionIndices = null;
+                    if (index != -1)
+                    {
+                        deletionIndices = new int[] { index };
+                    }
                     if (selectedDominoes.Count > 0)
                     {
-                        DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
+                        deletionIndices = selectedDominoes.ToArray();
+                    }
+                    if (deletionIndices != null)
+                    {
+                        DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), deletionIndices);
                         ClearCanvas();
                         ExecuteOperation(deleteRows);
-                        
                         RecreateCanvasViewModel();
                     }
                 }
@@ -566,15 +582,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private async void RemoveSelColumns()
+        public async void RemoveSelColumns(int index = -1)
         {
             try
             {
                 if (CurrentProject is IRowColumnAddableDeletable)
                 {
+                    int[] deletionIndices = null;
+                    if (index != -1)
+                    {
+                        deletionIndices = new int[] { index };
+                    }
                     if (selectedDominoes.Count > 0)
                     {
-                        DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
+                        deletionIndices = selectedDominoes.ToArray();
+                    }
+                    if (deletionIndices != null)
+                    {
+                        DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), deletionIndices);
                         ClearCanvas();
                         ExecuteOperation(deleteColumns);
                         RecreateCanvasViewModel();

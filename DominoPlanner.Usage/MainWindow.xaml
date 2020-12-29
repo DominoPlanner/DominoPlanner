@@ -9,7 +9,7 @@
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Width="800" Height="450"
-        x:Class="DominoPlanner.Usage.MainWindow" Closing="Window_Closing"
+        x:Class="DominoPlanner.Usage.MainWindow" Closing="Window_Closing" x:CompileBindings="True" x:DataType="local:MainWindowViewModel"
         Title="DominoPlanner.Avalonia" Icon="/Icons/DominoCalculator.ico">
 
     <NativeMenu.Menu>
@@ -61,7 +61,7 @@
 
         <NativeMenuItem Header="Editing">
             <NativeMenuItem.Menu>
-                <NativeMenu>
+                <NativeMenu x:CompileBindings="False">
                     <NativeMenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Ctrl+C"/>
                     <NativeMenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Ctrl+V"/>
 
@@ -113,15 +113,15 @@
         <KeyBinding Gesture="Ctrl+Z" Command="{Binding SelectedTab.Content.UndoComm}"/>
         <KeyBinding Gesture="Ctrl+Y" Command="{Binding SelectedTab.Content.RedoComm}"/>
         <KeyBinding Gesture="Ctrl+R" Command="{Binding MenuSetStandard}"/>
-        <KeyBinding Gesture="Ctrl+C" Command="{Binding SelectedTab.Content.CopyCom}"/>
-        <KeyBinding Gesture="Ctrl+V" Command="{Binding SelectedTab.Content.PasteCom}"/>
-        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectedTab.Content.SelectAllCom}"/>
-        <KeyBinding Gesture="Alt+W" Command="{Binding SelectedTab.Content.AddRowAbove}"/>
-        <KeyBinding Gesture="Alt+A" Command="{Binding SelectedTab.Content.AddColumnLeft}"/>
-        <KeyBinding Gesture="Alt+S" Command="{Binding SelectedTab.Content.AddRowBelow}"/>
-        <KeyBinding Gesture="Alt+D" Command="{Binding SelectedTab.Content.AddColumnRight}"/>
-        <KeyBinding Gesture="Alt+R" Command="{Binding SelectedTab.Content.RemoveRows}"/>
-        <KeyBinding Gesture="Alt+C" Command="{Binding SelectedTab.Content.RemoveColumns}"/>
+        <KeyBinding Gesture="Ctrl+C" Command="{Binding SelectedTab.Content.CopyCom}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Ctrl+V" Command="{Binding SelectedTab.Content.PasteCom}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectedTab.Content.SelectAllCom}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+W" Command="{Binding SelectedTab.Content.AddRowAbove}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+A" Command="{Binding SelectedTab.Content.AddColumnLeft}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+S" Command="{Binding SelectedTab.Content.AddRowBelow}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+D" Command="{Binding SelectedTab.Content.AddColumnRight}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+R" Command="{Binding SelectedTab.Content.RemoveRows}" x:CompileBindings="False"/>
+        <KeyBinding Gesture="Alt+C" Command="{Binding SelectedTab.Content.RemoveColumns}" x:CompileBindings="False"/>
     </Window.KeyBindings>
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -208,7 +208,7 @@
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem Name="EditingMenuItem">
+            <MenuItem Name="EditingMenuItem" x:CompileBindings="False">
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/draw_freehand.ico" Margin="2"/>
@@ -262,7 +262,7 @@
                     <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGesture="Alt+C"/>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Name="Workspace" Items="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
+            <MenuItem x:CompileBindings="False" Name="Workspace" Items="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
                 <MenuItem.Styles>
                     <Style Selector="#Workspace > MenuItem">
                         <Setter Property="Icon" Value="{Binding Item1, Converter={StaticResource PathToImageConverter}}"/>
@@ -289,7 +289,7 @@
                 <TreeView Grid.Column="0" Margin="0,0,0,0" Items="{Binding Projects}" Background="#34FFFFFF" SelectedItem="{Binding SelectedProject}">
 
                     <TreeView.Styles>
-                        <Style Selector="TreeViewItem">
+                        <Style Selector="TreeViewItem" x:CompileBindings="False">
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
                             <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
                         </Style>
@@ -319,7 +319,7 @@
                                 </Grid>
                             </ContentControl>
                         </TreeDataTemplate>
-                        <TreeDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type vm:DocumentNodeVM}">
+                        <TreeDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type vm:DocumentNodeVM}" x:CompileBindings="False">
                             <ContentControl Height="20">
                                 <i:Interaction.Behaviors>
                                     <ia:EventTriggerBehavior EventName="DoubleTapped">
@@ -351,7 +351,7 @@
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
                         <!-- this is the body of the TabItem template-->
-                        <DataTemplate>
+                        <DataTemplate DataType="{x:Type vm:TabItem}">
                             <ContentControl Margin="1,1,1,1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Content="{Binding Content}"/>
                         </DataTemplate>
                     </TabControl.ContentTemplate>

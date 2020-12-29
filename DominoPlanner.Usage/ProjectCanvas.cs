@@ -22,6 +22,7 @@ using Avalonia.Data.Converters;
 using System.Globalization;
 using Avalonia.Controls.Shapes;
 using Avalonia.VisualTree;
+using System.Collections.Specialized;
 
 namespace DominoPlanner.Usage
 {
@@ -238,8 +239,26 @@ namespace DominoPlanner.Usage
             ShiftXProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
             ZoomProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
             HorizontalSliderPosProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
+            AdditionalDrawablesProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => AdditionalDrawablesChanged(o, e));
+            
         }
-        
+
+        private void AdditionalDrawablesChanged(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.OldValue != null && e.OldValue is AvaloniaList<CanvasDrawable> list)
+            {
+                list.CollectionChanged -= ForceRedrawMethod;
+            }
+            if (e.NewValue != null && e.NewValue is AvaloniaList<CanvasDrawable> list2)
+            {
+                list2.CollectionChanged += ForceRedrawMethod;
+            }
+        }
+        private void ForceRedrawMethod(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ForceRedraw = true;
+        }
+
         protected override Size ArrangeOverride(Size finalSize){
             UpdateVerticalSlider(this, null);
             UpdateHorizontalSlider(this, null);
@@ -385,6 +404,7 @@ namespace DominoPlanner.Usage
     {
         public SKPath Path {get; set;}
         public SKPaint Paint {get; set;}
+        public bool BeforeBorders { get; set; }
 
         public void Render(SKCanvas canvas, SKMatrix transform)
         {
@@ -403,6 +423,7 @@ namespace DominoPlanner.Usage
         private readonly SKColor unselectedBorderColor;
         private readonly SKColor selectedBorderColor;
         private readonly SKColor pasteHightlightColor;
+        private readonly SKColor deletionHighlightColor;
         private readonly SKPath selectionPath;
         private readonly bool selectionVisible;
         private readonly SKColor selectionColor;
@@ -435,6 +456,7 @@ namespace DominoPlanner.Usage
             unselectedBorderColor = new SKColor(pc.UnselectedBorderColor.R, pc.UnselectedBorderColor.G, pc.UnselectedBorderColor.B, pc.UnselectedBorderColor.A);
             selectedBorderColor = new SKColor(pc.SelectedBorderColor.R, pc.SelectedBorderColor.G, pc.SelectedBorderColor.B, pc.SelectedBorderColor.A);
             pasteHightlightColor = new SKColor(Colors.Violet.R, Colors.Violet.G, Colors.Violet.B, Colors.Violet.A);
+            deletionHighlightColor = SKColors.Red;
             selectionColor = new SKColor(pc.SelectionDomainColor.R, pc.SelectionDomainColor.G, pc.SelectionDomainColor.B, 255);
             selectionPath = pc.SelectionDomain.Clone();
             this.project = pc.Project;
@@ -489,6 +511,7 @@ namespace DominoPlanner.Usage
             {
                 DrawDomino(canvas, project[i]);
             }
+            DrawAdditionals(canvas, true);
             for (int i = 0; i < project.Count; i++)
             {
                 DrawDominoBorder(canvas, project[i]);
@@ -500,17 +523,25 @@ namespace DominoPlanner.Usage
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
                 canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
             }
-            foreach (CanvasDrawable d in AdditionalDrawables)
-            {
-                var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
-                d.Render(canvas, transform);
-            }
-            
-                    
+            DrawAdditionals(canvas, false);
+
+
+
             canvas.Restore();
             rendered += 1;
 
 
+        }
+        private void DrawAdditionals(SKCanvas canvas, bool beforeBorders)
+        {
+            foreach (CanvasDrawable d in AdditionalDrawables)
+            {
+                if (d.BeforeBorders == beforeBorders)
+                {
+                    var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
+                    d.Render(canvas, transform);
+                }
+            }
         }
         private void DrawImage(SKCanvas canvas)
         {
@@ -564,6 +595,7 @@ namespace DominoPlanner.Usage
             var c = vm.StoneColor;
             var dp = vm.CanvasPoints;
             // is the domino visible at all?
+            // todo: speed up this call
             var inside = dp.Select(x => new Avalonia.Point(x.X, x.Y)).Sum(x => Bounds.Contains(PointToDisplayAvaloniaPoint(x)) ? 1 : 0);
             if (inside > 0)
             {
@@ -580,6 +612,10 @@ namespace DominoPlanner.Usage
                 if (vm.State.HasFlag(EditingDominoStates.Selected))
                 {
                     borderColor = selectedBorderColor;
+                }
+                if (vm.State.HasFlag(EditingDominoStates.DeletionHighlight))
+                {
+                    borderColor = deletionHighlightColor;
                 }
                 
                 if (borderColor != null)

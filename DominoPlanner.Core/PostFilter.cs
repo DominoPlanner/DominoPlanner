@@ -102,20 +102,26 @@ namespace DominoPlanner.Core
         public int Y { get; set; }
         public int CountInsideCell { get; set; }
     }
-    public class AddRows : PostFilter
+    public abstract class AddRowColumn : PostFilter
     {
-        IRowColumnAddableDeletable reference;
+        protected IRowColumnAddableDeletable reference;
         public int[] added_indizes;
-        int position;
-        int color;
-        int count;
-        bool below;
-        public AddRows(IRowColumnAddableDeletable reference, int position, int count, int color, bool below)
+        protected int position;
+        protected int color;
+        protected int count;
+        public AddRowColumn(IRowColumnAddableDeletable reference, int position, int count, int color)
         {
             this.reference = reference;
             this.position = position;
             this.count = count;
             this.color = color;
+        }
+    }
+    public class AddRows : AddRowColumn
+    {
+        bool below;
+        public AddRows(IRowColumnAddableDeletable reference, int position, int count, int color, bool below) : base(reference, position, count, color)
+        {
             this.below = below;
         }
         public override void Apply()
@@ -153,20 +159,11 @@ namespace DominoPlanner.Core
                 AddDeleteHelper.AddRowColumn(reference, false, remaining_positions, oldShapes, out _);
         }
     }
-    public class AddColumns : PostFilter
+    public class AddColumns : AddRowColumn
     {
-        IRowColumnAddableDeletable reference;
-        public int[] added_indizes;
-        int position;
-        int color;
-        int count;
         bool right;
-        public AddColumns(IRowColumnAddableDeletable reference, int position, int count, int color, bool right)
+        public AddColumns(IRowColumnAddableDeletable reference, int position, int count, int color, bool right) : base(reference, position, count, color)
         {
-            this.reference = reference;
-            this.position = position;
-            this.count = count;
-            this.color = color;
             this.right = right;
         }
         public override void Apply()
@@ -358,6 +355,56 @@ namespace DominoPlanner.Core
             }
             return result;
         }
+        public static List<InsertionHelper> GetInsertionPositions(IRowColumnAddableDeletable reference, bool column, bool expanded = false)
+        {
+            if (reference is IDominoProvider p)
+            {
+                List<InsertionHelper> result = new List<InsertionHelper>();
+                int[] current_column;
+                int[] last_column = null;
+                var dim = column ? reference.current_width : reference.current_height;
+                for (int i = 0; i <= dim; i++)
+                {
+                    double lastend = 0;
+                    if (i != 0)
+                    {
+                        lastend = column ? last_column.Max(x => p.Last[x].GetContainer(expanded: expanded).x2) : last_column.Max(x => p.Last[x].GetContainer(expanded: expanded).y2);
+                    }
+                    if (i < dim)
+                    {
+                        current_column = getAllIndicesInRowColumn(reference, i, column, p.Last.Length, reference.current_width, reference.current_height);
+                        var curstart = column ? current_column.Min(x => p.Last[x].GetContainer(expanded: expanded).x) : current_column.Min(x => p.Last[x].GetContainer(expanded: expanded).y);
+                        if (i == 0)
+                        {
+                            result.Add(new InsertionHelper() { DrawPosition = curstart, Before = true, Index = current_column[0] });
+                        }
+                        else if (i != dim && last_column != null)
+                        {
+                            result.Add(new InsertionHelper()
+                            {
+                                DrawPosition = 0.5d * (lastend + curstart),
+                                Before = true,
+                                Index = current_column[0]
+                            });
+                        }
+                        last_column = current_column;
+                    }
+                    else
+                    {
+                        result.Add(new InsertionHelper() { DrawPosition = lastend, Before = false, Index = last_column[0] });
+                    }
+                    
+                }
+                return result;
+            }
+            throw new ArgumentException("Needs an IDominoProvider as argument");
+        }
+    }
+    public struct InsertionHelper
+    {
+        public double DrawPosition;
+        public int Index;
+        public bool Before;
     }
     public interface ICopyPasteable
     {
