@@ -33,17 +33,32 @@ namespace DominoPlanner.Usage
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
             
         }
+        public static string ShareDirectory
+        {
+            get
+            {
+#if DEBUG
+                return Environment.CurrentDirectory;
+#else
+                return Properties.Settings.Default.SharePath;
+#endif
+            }
+
+        }
 
         internal async void AfterStartupChecks()
         {
-            var share_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
+            
             Properties.Settings.Default.Upgrade();
             if (Properties.Settings.Default.FirstStartup)
             {
+                var share_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
+                Properties.Settings.Default.SharePath = share_path;
                 Properties.Settings.Default.StandardColorArray = Path.Combine(share_path, "colors." + Properties.Settings.Default.ColorExtension);
                 var project_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
                 Properties.Settings.Default.StandardProjectPath = project_path;
                 Properties.Settings.Default.OpenProjectList = Path.Combine(share_path, "OpenProjects.xml");
+                Properties.Settings.Default.StructureTemplates = Path.Combine("Resources", "Structures.xml");
                 Directory.CreateDirectory(project_path);
                 Directory.CreateDirectory(share_path);
                 OpenProjectSerializer.Create();

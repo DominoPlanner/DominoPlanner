@@ -6,6 +6,9 @@
 #define MyAppPublisher "DominoPlanner Team"
 #define MyAppURL "https://github.com/jhofinger/DominoPlanner"
 #define MyAppExeName  "DominoPlanner.Usage.exe"
+   
+#expr Exec('dotnet','clean -c Release', "..\DominoPlanner.Usage") 
+#expr Exec('dotnet','publish -c Release /p:PublishProfile=Properties\PublishProfiles\win-x64.pubxml', "..\DominoPlanner.Usage") 
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -37,9 +40,10 @@ ChangesAssociations=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\*"; Excludes: "..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\Resources\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\DominoPlanner.PreviewHandler\bin\Debug\*"; DestDir: "{app}\PreviewHandler"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\packages\ServerRegistrationManager.2.7.2\lib\net45\ServerRegistrationManager.exe"; DestDir: "{app}\PreviewHandler" 
+Source: "..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\Resources\*"; DestDir: "{localappdata}\DominoPlanner\Resources\"; Flags: onlyifdoesntexist recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

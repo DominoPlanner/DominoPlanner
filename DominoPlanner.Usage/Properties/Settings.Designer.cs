@@ -118,5 +118,17 @@ namespace DominoPlanner.Usage.Properties {
                 this["StructureTemplates"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("%localappdata%/DominoPlanner")]
+        public string SharePath {
+            get {
+                return ((string)(this["SharePath"]));
+            }
+            set {
+                this["SharePath"] = value;
+            }
+        }
     }
 }

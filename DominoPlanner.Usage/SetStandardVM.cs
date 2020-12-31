@@ -21,7 +21,8 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    File.Copy(@".\Resources\lamping.DColor", StandardColorPath);
+                    var share_path = MainWindowViewModel.ShareDirectory;
+                    File.Copy(Path.Combine(share_path, "Resources", "lamping.DColor"), StandardColorPath);
                 }
                 catch { }
             }
@@ -88,7 +89,8 @@ namespace DominoPlanner.Usage
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = "DominoPlanner 2.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = "Dominorechner color files"},
                 };
-                openFileDialog.Directory = Path.Combine(Environment.CurrentDirectory, "Resources");
+                var share_path = MainWindowViewModel.ShareDirectory;
+                openFileDialog.Directory = Path.Combine(share_path, "Resources");
             }
             catch (Exception) { }
             var result = await openFileDialog.ShowAsync(window);

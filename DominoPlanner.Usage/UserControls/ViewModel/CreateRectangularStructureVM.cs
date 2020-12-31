@@ -5,6 +5,7 @@ using DominoPlanner.Core;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -153,7 +154,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var names = new List<string>();
             try
             {
-                string structurepath = Properties.Settings.Default.StructureTemplates;
+                string structurepath = Path.Combine(MainWindowViewModel.ShareDirectory, Properties.Settings.Default.StructureTemplates);
+                if (!File.Exists(structurepath))
+                {
+                    Debug.WriteLine("Structure file not found");
+                }
                 StreamReader fr = new StreamReader(structurepath);
                 XElement xElement = XElement.Parse(fr.ReadToEnd());
                 structures = xElement.Elements().ToList();

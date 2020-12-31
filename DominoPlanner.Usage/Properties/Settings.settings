@@ -26,5 +26,8 @@
     <Setting Name="StructureTemplates" Type="System.String" Scope="User">
       <Value Profile="(Default)">Resources/Structures.xml</Value>
     </Setting>
+    <Setting Name="SharePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%localappdata%/DominoPlanner</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
