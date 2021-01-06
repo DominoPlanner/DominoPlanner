@@ -427,7 +427,16 @@ namespace DominoPlanner.Usage
                 switch (scheme)
                 {
                     case "file":
-                        return new Bitmap(vstr);
+                        {
+                            try
+                            {
+                                return new Bitmap(vstr);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
 
                     default:
                         var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();

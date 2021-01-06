@@ -155,7 +155,7 @@ namespace DominoPlanner.Usage
         private void FillObjects()
         {
             ViewModels = new ObservableCollection<NewObjectEntry>();
-            CurrentImageInformation = new SingleImageInformation();
+            CurrentImageInformation = new SingleImageInformation(this);
             string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject);
             ViewModels.Add(new DominoProviderObjectEntry()
             {
@@ -229,15 +229,28 @@ namespace DominoPlanner.Usage
     {
 
     }
-    public class SingleImageInformation : ImageInformation
+    public class SingleImageInformation : ImageInformation, IFileDragDropTarget
     {
-        public SingleImageInformation()
+        NewObjectVM parent;
+        public SingleImageInformation(NewObjectVM parent)
         {
-            LoadNewImage = new RelayCommand((x) => { if (x is DominoProviderVM vm) SetNewImage(vm); });
+            this.parent = parent;
+            LoadNewImage = new RelayCommand((o) => OpenNewImage() );
         }
         private string DefaultPictureName { get; set; } = "/Icons/add.ico";
         private string internPictureName = "";
 
+        public DominoProviderVM CurrentProvider
+        {
+            get 
+            { 
+                if (parent.CurrentViewModel is DominoProviderVM vM) 
+                    return vM;
+                else
+                    return null;
+            }
+        }
+        
         public string InternPictureName
         {
             get { return internPictureName; }
@@ -255,29 +268,33 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Methods
-
-        private async void SetNewImage(DominoProviderVM provider)
+        private async void SetNewImage(string filename)
+        {
+            string oldfilename = InternPictureName;
+            if (CurrentProvider == null) return;
+            if (File.Exists(filename))
+            {
+                InternPictureName = filename;
+            }
+            try
+            {
+                UpdateProvider(CurrentProvider);
+            }
+            catch
+            {
+                await Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                InternPictureName = oldfilename;
+            }
+        }
+        private async void OpenNewImage()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = "Image files" });
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All Files" });
             openFileDialog.AllowMultiple = false;
             var result = await openFileDialog.ShowAsync(NewObjectVM.Window);
-            if (result != null && result.Length != 0 && File.Exists(result[0]))
-            {
-                InternPictureName = result[0];
-            }
-            try
-            {
-                //var img = new Emgu.CV.Mat(InternPictureName, Emgu.CV.CvEnum.ImreadModes.Unchanged);
-                //img.Dispose();
-                UpdateProvider(provider);
-            }
-            catch
-            {
-                await Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error, NewObjectVM.Window);
-            }
-
+            if (result != null && result.Length != 0)
+                SetNewImage(result[0]);
         }
         public override void UpdateProvider(DominoProviderVM provider)
         {
@@ -333,6 +350,12 @@ namespace DominoPlanner.Usage
         public override void RevertChangesToFileSystem()
         {
             if (File.Exists(finalImagePath)) File.Delete(finalImagePath);
+        }
+
+        public void OnFileDrop(string[] filepaths)
+        {
+            if (filepaths != null && filepaths.Length != 0)
+                SetNewImage(filepaths[0]);
         }
         #endregion
     }

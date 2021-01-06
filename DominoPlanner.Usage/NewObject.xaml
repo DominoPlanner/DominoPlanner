@@ -30,7 +30,7 @@
             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={}Image Source: {0}}"
                            Margin="5" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
-                <Border DockPanel.Dock="Bottom" Background="White" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch">
+                <Border DockPanel.Dock="Bottom" Background="White" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" DragDrop.AllowDrop="True" local:FileDragDropHelper.IsFileDragDropEnabled="True" local:FileDragDropHelper.FileDragDropTarget="{Binding Path=.}">
                     <ContentControl Content="{Binding InternPictureName}">
                         <ContentControl.Resources>
                             <DataTemplate x:Key="ImageTemplate">
@@ -46,7 +46,7 @@
                         </ContentControl.DataTemplates>
                         <i:Interaction.Behaviors>
                             <ia:EventTriggerBehavior EventName="PointerReleased">
-                                <ia:InvokeCommandAction Command="{Binding LoadNewImage}" CommandParameter="{Binding DataContext.CurrentViewModel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+                                <ia:InvokeCommandAction Command="{Binding LoadNewImage}"/>
                             </ia:EventTriggerBehavior>
                         </i:Interaction.Behaviors>
                     </ContentControl>
