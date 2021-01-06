@@ -507,7 +507,9 @@ namespace DominoPlanner.Usage
                 try
                 {
                     DominoProvider.SaveXLSFieldPlan(result, currentOPP);
-                    Process.Start(result);
+                    var process = new Process();
+                    process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
+                    process.Start();
                 }
                 catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }
@@ -530,8 +532,10 @@ namespace DominoPlanner.Usage
                     FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
                     StreamWriter sw = new StreamWriter(fs);
                     sw.Write(CurrentProtocol);
-                    fs.Close();
-                    Process.Start(filename);
+                    sw.Close();
+                    var process = new Process();
+                    process.StartInfo = new ProcessStartInfo(filename) { UseShellExecute = true };
+                    process.Start();
                 }
                 catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
             }

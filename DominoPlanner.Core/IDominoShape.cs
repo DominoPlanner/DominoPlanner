@@ -193,6 +193,10 @@ namespace DominoPlanner.Core
 
         public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
         {
+            if (weights == null)
+            {
+                return;
+            }
             double minimum = int.MaxValue;
             for (int color = 0; color < colors.Length; color++)
             {
