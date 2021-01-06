@@ -231,6 +231,7 @@ namespace DominoPlanner.Usage
 
 
         private bool _HasNoProperties;
+        [SettingsAttribute("ProtocolVM")]
         public bool HasNoProperties
         {
             get { return _HasNoProperties; }
@@ -247,6 +248,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasShortProperties;
+        [SettingsAttribute("ProtocolVM")]
         public bool HasShortProperties
         {
             get { return _HasShortProperties; }
@@ -263,6 +265,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasExtendedProperties;
+        [SettingsAttribute("ProtocolVM")]
         public bool HasExtendedProperties
         {
             get { return _HasExtendedProperties; }
@@ -313,6 +316,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _UseBlocks;
+        [SettingsAttribute("ProtocolVM")]
         public bool UseBlocks
         {
             get { return _UseBlocks; }
@@ -326,8 +330,8 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
         private int _StonesPerBlock;
+        [SettingsAttribute("ProtocolVM")]
         public int StonesPerBlock
         {
             get { return _StonesPerBlock; }
@@ -415,9 +419,6 @@ namespace DominoPlanner.Usage
         #region Methods
         private void Init()
         {
-            StonesPerBlock = 50;
-            UseBlocks = true;
-            HasShortProperties = true;
             TextFormat = "<font face=\"Verdana\">";
             DefaultBackColor = true;
             IntelligentTextColor = true;

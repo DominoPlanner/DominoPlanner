@@ -4,6 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -18,6 +19,17 @@ namespace DominoPlanner.Usage
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            var propertyInfo = this.GetType().GetProperty(propertyName);
+            if (propertyInfo != null)
+            {
+                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true);
+                if (attributes.Any())
+                {
+                    var attribute = (SettingsAttribute)attributes[0];
+                    WriteSetting<object>(attribute.ClassName, attribute.PropertyName, propertyInfo.GetValue(this));
+                }
+            }
+           
         }
 
         public ModelBase Self
@@ -40,7 +52,45 @@ namespace DominoPlanner.Usage
                 return bitmapimage;
             }
         }*/
+        public ModelBase()
+        {
+            var propertyInfos = this.GetType().GetProperties();
+            foreach (var propertyInfo in propertyInfos)
+            {
+                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true);
+                if (attributes.Any())
+                {
+                    var attribute = (SettingsAttribute)attributes[0];
+                    propertyInfo.SetValue(this, ReadSetting<object>(attribute.ClassName, attribute.PropertyName));
+                }
+            }
+        }
+        public T ReadSetting<T>(string vmname, string propertyname)
+        {
+            var o = Properties.Settings.Default[vmname + "_" + propertyname];
+            if (o is T o2)
+                return o2;
+            else
+                return default;
+        }
+        public void WriteSetting<T>(string vmname, string propertyname, T value)
+        {
+            Properties.Settings.Default[vmname + "_" + propertyname] = value;
+            Properties.Settings.Default.Save();
+        }
 
+
+    }
+    public class SettingsAttribute : Attribute
+    {
+        public string ClassName{ get; set; }
+        public string PropertyName { get; set; }
+
+        public SettingsAttribute(string className, [CallerMemberName] string propertyName = null)
+        {
+            ClassName = className;
+            PropertyName = propertyName;
+        }
     }
 
     public class RelayCommand : ICommand

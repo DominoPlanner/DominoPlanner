@@ -130,5 +130,65 @@ namespace DominoPlanner.Usage.Properties {
                 this["SharePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ProtocolVM_HasNoProperties {
+            get {
+                return ((bool)(this["ProtocolVM_HasNoProperties"]));
+            }
+            set {
+                this["ProtocolVM_HasNoProperties"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ProtocolVM_HasShortProperties {
+            get {
+                return ((bool)(this["ProtocolVM_HasShortProperties"]));
+            }
+            set {
+                this["ProtocolVM_HasShortProperties"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ProtocolVM_HasExtendedProperties {
+            get {
+                return ((bool)(this["ProtocolVM_HasExtendedProperties"]));
+            }
+            set {
+                this["ProtocolVM_HasExtendedProperties"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ProtocolVM_UseBlocks {
+            get {
+                return ((bool)(this["ProtocolVM_UseBlocks"]));
+            }
+            set {
+                this["ProtocolVM_UseBlocks"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int ProtocolVM_StonesPerBlock {
+            get {
+                return ((int)(this["ProtocolVM_StonesPerBlock"]));
+            }
+            set {
+                this["ProtocolVM_StonesPerBlock"] = value;
+            }
+        }
     }
 }
