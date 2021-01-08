@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <local:DeletedColorVisibilityConverter x:Key="DeletedColorVisibilityConverter"/>
         <vm:IntToStringConverter x:Key="IntToStringConverter"/>
+        <vm:ColorListEntryToBrushConverter x:Key="ColorToBrushConverter"/>
     </UserControl.Resources>
     <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
         <ScrollViewer Name="OuterScrollViewer" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled">
@@ -43,11 +44,20 @@
                     <Style Selector="ListBox ContentControl.Color">
                         <Setter Property="Template">
                             <ControlTemplate>
-                                <Rectangle Width="40" Height="20">
-                                    <Rectangle.Fill>
-                                        <SolidColorBrush Color="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                    </Rectangle.Fill>
-                                </Rectangle>
+                                <ContentControl Content="{TemplateBinding Content}">
+                                    <ContentControl.DataTemplates>
+                                        <DataTemplate DataType="{x:Type vm:ColorMixEntry}">
+                                            <Image Source="{Binding Preview}" Width="40" Height="20"/>
+                                        </DataTemplate>
+                                        <DataTemplate DataType="{x:Type vm:ColorListEntry}">
+                                            <Rectangle Width="40" Height="20">
+                                                <Rectangle.Fill>
+                                                    <SolidColorBrush Color="{Binding Color}"/>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+                                        </DataTemplate>
+                                    </ContentControl.DataTemplates>
+                                </ContentControl>
                             </ControlTemplate>
                         </Setter>
                     </Style>

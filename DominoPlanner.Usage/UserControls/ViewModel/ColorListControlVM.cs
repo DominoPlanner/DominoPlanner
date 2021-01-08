@@ -231,7 +231,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             Reload(filepath);
 
-            BtnAddColor = new RelayCommand(o => { AddNewColor(); });
+            BtnAddColor = new RelayCommand(o => AddNewColor(false));
+            BtnAddColorMix = new RelayCommand(o => AddNewColor(true));
             BtnSaveColors = new RelayCommand(o => { Save(); });
             BtnRemove = new RelayCommand(o => { RemoveSelected(); });
             BtnMoveDown = new RelayCommand(o => { Move(false); });
@@ -241,9 +242,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             ColumnConfig = new AvaloniaList<Column>
             {
-                new Column() { DataField = "Color", Header = "", Class = "Color", CanResize = false },
+                new Column() { DataField = ".", Header = "", Class = "Color", CanResize = false },
                 new Column() { DataField = "Name", Header = "Name", Class = "Name",  CanResize = true, Width = new GridLength(100) },
-                new Column() { DataField = "Color", Header = "RGB", Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
+                new Column() { DataField = ".", Header = "RGB", Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
                 new Column() { DataField = "Count", Header = "Count", Class="Count", CanResize = true, Width = new GridLength(70) }
             };
 
@@ -439,7 +440,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void RemoveSelected()
         {
-            if (SelectedStone.DominoColor is DominoColor dominoColor)
+            if (SelectedStone.DominoColor is IDominoColor dominoColor && !(dominoColor is EmptyDomino))
             {
                 DeleteColorOperation op = new DeleteColorOperation(SelectedStone);
                 op.Apply();
@@ -451,7 +452,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             try
             {
-                if (SelectedStone.DominoColor is DominoColor dominoColor)
+                if (SelectedStone.DominoColor is IDominoColor dominoColor && !(dominoColor is EmptyDomino))
                 {
                     MoveColorOperation op = new MoveColorOperation(ColorRepository, dominoColor, up);
                     op.Apply();
@@ -466,9 +467,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             catch (Exception) { }
         }
 
-        private void AddNewColor()
+        private void AddNewColor(bool colorMix)
         {
-            AddColorOperation op = new AddColorOperation(ColorRepository, _ColorList);
+            AddColorOperation op = new AddColorOperation(ColorRepository, _ColorList, colorMix);
             op.Apply();
             if (op.added != null)
             {
@@ -512,7 +513,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    _ColorList.Where(x => x.DominoColor is DominoColor).ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
+                    var array = _ColorList.Where(x => !(x.DominoColor is EmptyDomino)).ToArray();
+                    array.ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
                     break;
             }
             UnsavedChanges = false;
@@ -529,6 +531,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private ICommand _BtnAddColor;
         public ICommand BtnAddColor { get { return _BtnAddColor; } set { if (value != _BtnAddColor) { _BtnAddColor = value; } } }
+
+        private ICommand _BtnAddColorMix;
+        public ICommand BtnAddColorMix { get { return _BtnAddColorMix; } set { if (value != _BtnAddColorMix) { _BtnAddColorMix = value; } } }
 
         private ICommand _BtnSaveColors;
         public ICommand BtnSaveColors { get { return _BtnSaveColors; } set { if (value != _BtnSaveColors) { _BtnSaveColors = value; } } }
@@ -667,11 +672,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             sum = sum.Zip(counts2.Item2, (x, y) => x + y).ToArray();
                             for (int i = 0; i < counts2.Item2.Length; i++)
                             {
-                                _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                                if (i < _ColorList.Count)
+                                {
+                                    _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                                }
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.RelativePath)}.", "Error", Errorhandler.MessageType.Warning);
                     }
@@ -679,7 +687,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             for (int i = 0; i < sum.Length; i++)
             {
-                _ColorList[i].ProjectCount.Add(sum[i]);
+                if (i < _ColorList.Count)
+                {
+                    _ColorList[i].ProjectCount.Add(sum[i]);
+                }
             }
             return sum;
         }
@@ -720,10 +731,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     public class MoveColorOperation : PostFilter
     {
         private readonly ColorRepository repo;
-        private readonly DominoColor stoneToMove;
+        private readonly IDominoColor stoneToMove;
         private readonly bool up;
         public bool valid = true;
-        public MoveColorOperation(ColorRepository repo, DominoColor stoneToMove, bool up)
+        public MoveColorOperation(ColorRepository repo, IDominoColor stoneToMove, bool up)
         {
             this.repo = repo;
             this.stoneToMove = stoneToMove;
@@ -764,22 +775,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private readonly ColorRepository repo;
         private readonly ObservableCollection<ColorListEntry> _ColorList;
         internal ColorListEntry added = null;
-        public AddColorOperation(ColorRepository repo, ObservableCollection<ColorListEntry> _ColorList)
+        private readonly bool IsColorMix;
+        public AddColorOperation(ColorRepository repo, ObservableCollection<ColorListEntry> _ColorList, bool isColorMix)
         {
             this.repo = repo;
             this._ColorList = _ColorList;
+            this.IsColorMix = isColorMix;
         }
         public override void Apply()
         {
             if (added == null)
             {
-                repo.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color"));
-                added = new ColorListEntry()
+                IDominoColor result;
+                if (!IsColorMix)
                 {
-                    DominoColor = repo.RepresentionForCalculation.Last(),
-                    SortIndex = repo.Anzeigeindizes.Last(),
-                    ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))
-                };
+                    result = new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color");
+                }
+                else
+                {
+                    result = new ColorMixColor() { name = "Colormix" };
+                }
+                repo.Add(result);
+                added = ColorListEntry.ColorListEntryFactory(result, repo, _ColorList[0].ProjectCount.Count);
                 _ColorList.Add(added);
             }
             else

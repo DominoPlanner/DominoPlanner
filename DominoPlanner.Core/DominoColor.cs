@@ -193,6 +193,8 @@ namespace DominoPlanner.Core
         public ColorMixColor()
         {
             colors = new List<ColorMixComponent>();
+            colors.Add(new ColorMixComponent() { count = 1, index = 10 });
+            colors.Add(new ColorMixComponent() { count = 1, index = 11 });
         }
         public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {

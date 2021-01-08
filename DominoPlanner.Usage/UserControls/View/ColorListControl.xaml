@@ -17,11 +17,12 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
         <parent:IntToStringConverter x:Key="IntToStringConverter"/>
         <parent:IsNormalColorConverter x:Key="IsNormalColorConverter"/>
         <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <parent:ComponentToColorConverter x:Key="ComponentToColorConverter"/>
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <local:ProjectColorList Colors="{Binding ColorList}" ColumnConfig="{Binding ColumnConfig}" Project="{Binding DominoAssembly}" SelectedColor="{Binding SelectedStone, Mode=TwoWay}" Margin="5,5,5,5">
             <local:ProjectColorList.Styles>
@@ -113,26 +114,175 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                 </Style>
             </local:ProjectColorList.Styles>
         </local:ProjectColorList>
-        <Grid Grid.Row="1">
-            <Grid.Styles>
+        <StackPanel Grid.Row="1" x:Name="EditingGrid" Orientation="Vertical">
+            <StackPanel.Styles>
                 <Style Selector="DockPanel.OnlyNormalColors, StackPanel.OnlyNormalColors">
                     <Setter Property="IsVisible" Value="{Binding SelectedStone, Converter={StaticResource IsNormalColorConverter}}"/>
                 </Style>
-            </Grid.Styles>
-            <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Classes="OnlyNormalColors" LastChildFill="False">
-                <main:PopupColorPicker VerticalAlignment="Center" Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
+            </StackPanel.Styles>
+            <StackPanel.DataTemplates>
+                <DataTemplate DataType="{x:Type main:ColorMixEntry}">
+                    <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"  LastChildFill="False" Height="160">
+                        <StackPanel Orientation="Vertical">
+                            <TextBox Text="{Binding Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center" Margin="5"/>
+                            <TextBlock Margin="5">Mode:</TextBlock>
+                            <RadioButton IsChecked="{Binding CountsAreAbsolute}" Margin="10, 5">Absolute amounts</RadioButton>
+                            <RadioButton IsChecked="{Binding !CountsAreAbsolute}" Margin="10, 5">Shares</RadioButton>
+                        </StackPanel>
+                        <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1">
+                            <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *">
+                                <Grid.Styles>
+                                    <Style Selector="TreeView">
+                                        <Setter Property="BorderThickness" Value="0"></Setter>
+                                    </Style>
+                                </Grid.Styles>
 
-                <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
-                <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center"></TextBox>
-                <TextBlock VerticalAlignment="Center" Margin="5" >Color Amout:</TextBlock>
-                <NumericUpDown Text="{Binding SelectedStone.Count}" Width="100"/>
+                                <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1">
+                                    <Border.Styles>
+                                        <Style Selector="TextBlock">
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Margin" Value="5 2"/>
+                                        </Style>
+                                    </Border.Styles>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30"/>
+                                            <ColumnDefinition SharedSizeGroup="A" Width="45"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="B" MinWidth="200"/>
+                                            <ColumnDefinition SharedSizeGroup="C" Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <DockPanel Grid.Column="0">
+                                            <ToggleButton Name="PopupButton" Margin="2">
+                                                    <Image Source="/Icons/add.ico" Height="15" VerticalAlignment="Center"/>
+                                            </ToggleButton>
 
-            </DockPanel>
+                                            <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" StaysOpen="False" PlacementMode="Top">
+                                                <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="5" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                                                    <ListBox Items="{Binding #EditingGrid.DataContext.ColorList}">
+                                                        <ListBox.DataTemplates>
+                                                            <DataTemplate DataType="{x:Type parent:ColorMixEntry}">
+                                                                <Grid></Grid>
+                                                                <!-- we don't want to show color mix colors here -->
+                                                            </DataTemplate>
+                                                            <DataTemplate DataType="{x:Type parent:ColorListEntry}">
+                                                                <StackPanel Orientation="Horizontal" Background="Transparent">
+                                                                    <i:Interaction.Behaviors>
+                                                                        <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                                            <ia:InvokeCommandAction Command="{Binding #PopupButton.DataContext.AddColor}" CommandParameter="{Binding .}" ></ia:InvokeCommandAction>
+                                                                        </ia:EventTriggerBehavior>
+                                                                        <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                                            <ia:ChangePropertyAction PropertyName="IsChecked" Value="False" TargetObject="{Binding #PopupButton}"/>
+                                                                        </ia:EventTriggerBehavior>
+                                                                    </i:Interaction.Behaviors>
+                                                                    <Rectangle Width="40" Height="20">
+                                                                        <Rectangle.Fill>
+                                                                            <SolidColorBrush Color="{Binding Color}"/>
+                                                                        </Rectangle.Fill>
+                                                                    </Rectangle>
+                                                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="5, 0" FontWeight="Normal"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ListBox.DataTemplates>
+                                                    </ListBox>
+                                                </Border>
+                                            </Popup>
+                                        </DockPanel>
+                                        <GridSplitter Width="2" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
+                                        <TextBlock Grid.Column="2" Text="Color name"/>
+                                        <GridSplitter Width="2" Grid.Column="2" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
+                                        <TextBlock Grid.Column="3" Text="Count"/>
+                                    </Grid>
+                                </Border>
+                                <ScrollViewer Grid.Row="1">
+                                    <ListBox Items="{Binding Components}" Grid.Row="1" Margin="0" Padding="0">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid >
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="30"/>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="B"/>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0" Margin="2" Command="{Binding DeleteCommand}">
+                                                        <Image Source="/Icons/remove.ico" Height="15"></Image>
+                                                    </Button>
+                                                    <Rectangle Grid.Column="1" Width="40" Height="20">
+                                                        <Rectangle.Fill>
+                                                            <SolidColorBrush>
+                                                                <SolidColorBrush.Color>
+                                                                    <MultiBinding Converter="{StaticResource ComponentToColorConverter}">
+                                                                        <Binding ElementName="EditingGrid" Path="DataContext.ColorRepository"/>
+                                                                        <Binding Path="Index"/>
+                                                                    </MultiBinding>
+                                                                </SolidColorBrush.Color>
+                                                            </SolidColorBrush>
+                                                        </Rectangle.Fill>
+                                                    </Rectangle>
+                                                    <TextBlock Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource ComponentToColorConverter}">
+                                                                <Binding ElementName="EditingGrid" Path="DataContext.ColorRepository"/>
+                                                                <Binding Path="Index"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <NumericUpDown Grid.Column="3" Value="{Binding Count}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type main:ColorListEntry}">
+                    <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Classes="OnlyNormalColors" LastChildFill="False">
+                        <main:PopupColorPicker VerticalAlignment="Center" Color="{Binding Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
+                        <TextBlock VerticalAlignment="Center" Margin="5">Color Name:</TextBlock>
+                        <TextBox Text="{Binding Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center"></TextBox>
+                        <TextBlock VerticalAlignment="Center" Margin="5" >Color Amout:</TextBlock>
+                        <NumericUpDown Text="{Binding Count}" Width="100"/>
+                    </DockPanel>
+                </DataTemplate>
+
+            </StackPanel.DataTemplates>
+            <ContentControl Content="{Binding SelectedStone}">
+            </ContentControl>
             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Classes="OnlyNormalColors">
                     <parent:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="Move up"/>
                     <parent:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="Move down"/>
-                    <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color"/>
+                    <StackPanel>
+                        <ToggleButton Name="PopupButton" DockPanel.Dock="Right" Margin="5" Height="30">
+                            <StackPanel Orientation="Horizontal" Margin="10, 0">
+                                <Image Source="/Icons/add.ico" Height="20" VerticalAlignment="Center" Margin="0,  0, 5, 0"/>
+                                <TextBlock VerticalAlignment="Center">Add Color</TextBlock>
+                            </StackPanel>
+                        </ToggleButton>
+
+                        <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" StaysOpen="False" PlacementMode="Top">
+                            <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="5" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Vertical">
+                                    <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color">
+                                    <i:Interaction.Behaviors>
+                                                <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                    <ia:ChangePropertyAction PropertyName="IsChecked" Value="False" TargetObject="{Binding #PopupButton}"/>
+                                                </ia:EventTriggerBehavior>
+                                            </i:Interaction.Behaviors>
+                                    </parent:ImageButton>
+                                    <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColorMix}" Content="Add colormix">
+                                    <i:Interaction.Behaviors>
+                                                <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                    <ia:ChangePropertyAction PropertyName="IsChecked" Value="False" TargetObject="{Binding #PopupButton}"/>
+                                                </ia:EventTriggerBehavior>
+                                            </i:Interaction.Behaviors>
+                                    </parent:ImageButton>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </StackPanel>
                     <parent:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
                                         Content="Remove Selected" ToolTip.Tip="The color will not be used in new projects (and won't be available during editing), but it will not be deleted from existing projects."/>
                     <parent:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
@@ -143,6 +293,6 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                 <parent:ImageButton DockPanel.Dock="Right" Content="Export to Excel"
                                     Image="/Icons/document_save.ico"  Command="{Binding BtnExportXLSX}"/>
             </DockPanel>
-        </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

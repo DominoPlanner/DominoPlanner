@@ -102,9 +102,14 @@ namespace DominoPlanner.Usage
                 g.ColumnDefinitions.Add(cdef2);
                 cdef2.SharedSizeGroup = "COL_" + counter;
                 {
+                    var binding = new Binding(column.DataField, BindingMode.Default);
+                    if (column.Converter != null)
+                    {
+                        binding.Converter = column.Converter;
+                    }
                     var cc = new ContentControl()
                     {
-                        [!ContentProperty] = new Binding(column.DataField, BindingMode.Default)
+                        [!ContentProperty] = binding
                     };
                     cc[!ForegroundProperty] = new Binding("Deleted") { Converter = new VisibilityToDeletedColorConverter() };
 
@@ -172,6 +177,8 @@ namespace DominoPlanner.Usage
             public string Class { get; set; } = "";
             public bool CanResize { get; set; } = false;
             public GridLength Width { get; set; } = GridLength.Auto;
+
+            public IValueConverter Converter { get; set; }
         }
         
         public void OnScrollChanged(object control, ScrollChangedEventArgs args)

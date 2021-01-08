@@ -28,6 +28,21 @@ namespace DominoPlanner.Usage
         {
             SumAll = ProjectCount.Sum();
         }
+        public static ColorListEntry ColorListEntryFactory(IDominoColor color, ColorRepository repo, int ProjectCountLength)
+        {
+            ColorListEntry result;
+            if (color is ColorMixColor cmc)
+            {
+                result = new ColorMixEntry(cmc, repo);
+            }
+            else
+            {
+                result = new ColorListEntry() { DominoColor = color };
+            }
+            result.SortIndex = repo.Anzeigeindizes[repo.IndexOf(color)];
+            result.ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, ProjectCountLength));
+            return result;
+        }
 
         #region PROPERTIES
         private IDominoColor _DominoColor;
@@ -135,16 +150,23 @@ namespace DominoPlanner.Usage
         public ColorMixComponent model;
         private ColorMixEntry parent;
 
+        public Action<object, object, string, bool, Action, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, Action PostUndoAction = null)
+        {
+            ValueChanged?.Invoke(sender, value_new, membername, producesUnsavedChanges, PostAction, PostUndoAction);
+        }
+
         public int Count
         {
             get { return model.count; }
-            set { model.count = value; RaisePropertyChanged(); }
+            set { PropertyValueChanged(this, value); model.count = value; RaisePropertyChanged(); parent.UpdatePreview(); }
         }
 
         public int Index
         {
             get { return model.index; }
-            set { model.index = value; RaisePropertyChanged();}
+            set { PropertyValueChanged(this, value); model.index = value; RaisePropertyChanged(); parent.UpdatePreview();  }
         }
         public ColorMixComponentVM(ColorMixComponent model, ColorMixEntry parent)
         {
@@ -188,14 +210,26 @@ namespace DominoPlanner.Usage
             get { return addCommand; }
             set { addCommand = value; RaisePropertyChanged(); }
         }
-        
+
+        public ColorRepository ColorRepository { get; }
+        private DrawingImage preview;
+
+        public DrawingImage Preview
+        {
+            get { return preview; }
+            set { preview = value; RaisePropertyChanged(); }
+        }
+
+
         private void ComponentsChanged(object o, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 foreach (ColorMixComponentVM i in e.NewItems)
                 {
-                    Model.colors.Add(i.model);
+                    if (!Model.colors.Contains(i.model))
+                        Model.colors.Add(i.model);
+                    i.ValueChanged = this.ValueChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -205,19 +239,42 @@ namespace DominoPlanner.Usage
                     Model.colors.Remove(i.model);
                 }
             }
+            UpdatePreview();
+        }
+        public void UpdatePreview()
+        {
+            var di = new DrawingImage();
+            var gd = new DrawingGroup();
+            di.Drawing = gd;
+            double x = 0;
+            var sum = Components.Sum(x => x.Count);
+            foreach (ColorMixComponentVM component in Components)
+            {
+                var width = 40.0 / sum * component.Count;
+                gd.Children.Add(new GeometryDrawing() { Geometry = new RectangleGeometry(new Avalonia.Rect(x, 0, width, 20)), Brush = new SolidColorBrush(ColorRepository[component.Index].mediaColor) });
+                x += width;
+            }
+            Preview = di;
+
         }
 
-        public ColorMixEntry(ColorMixColor color)
+        public ColorMixEntry(ColorMixColor color, ColorRepository repo)
         {
+            ColorRepository = repo;
+            DominoColor = color;
+            Components = new AvaloniaList<ColorMixComponentVM>();
             foreach (var c in color.colors)
             {
                 Components.Add(new ColorMixComponentVM(c, this));
             }
-            AddCommand = new RelayCommand((o) => AddColor());
+            AddCommand = new RelayCommand((o) => AddColor(o as ColorListEntry));
+            UpdatePreview();
         }
-        public void AddColor()
+        public void AddColor(ColorListEntry reference)
         {
-            Components.Add(new ColorMixComponentVM(new ColorMixComponent(){ count = 1, index = 0}, this));
+            
+            Components.Add(new ColorMixComponentVM(new ColorMixComponent(){ count = 1, index = ColorRepository.IndexOf(reference.DominoColor) + 1 }, this));
+            UpdatePreview();
         }
 
         internal void Delete(ColorMixComponentVM colorMixComponentVM)

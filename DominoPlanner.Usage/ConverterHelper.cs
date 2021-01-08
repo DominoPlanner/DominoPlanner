@@ -52,9 +52,13 @@ namespace DominoPlanner.Usage
         {
             if (value == null)
                 return "";
-            if (value is Color c)
+            if (value is ColorMixEntry cm)
             {
-                return string.Format("#{1:X2}{2:X2}{3:X2}", c.A, c.R, c.G, c.B);
+                return cm.Components.Count + " colors";
+            }
+            if (value is ColorListEntry c)
+            {
+                return string.Format("#{1:X2}{2:X2}{3:X2}", c.Color.A, c.Color.R, c.Color.G, c.Color.B);
             }
             System.Drawing.Color c2 = (System.Drawing.Color)value;
             return System.Drawing.ColorTranslator.ToHtml(c2);
@@ -472,7 +476,7 @@ namespace DominoPlanner.Usage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ColorListEntry e && e.DominoColor is DominoColor dc)
+            if (value is ColorListEntry e && (e.DominoColor is DominoColor dc || e.DominoColor is ColorMixColor cmc))
             {
                 return true;
             }
@@ -633,6 +637,45 @@ namespace DominoPlanner.Usage
                 }
             }
             return 20;
+        }
+    }
+    public class ColorListEntryToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is ColorMixEntry cmc)
+            {
+                return Brushes.Transparent;
+            }
+            else if (value is ColorListEntry cm)
+            {
+                return new SolidColorBrush(cm.Color);
+            }
+            return null;
+            
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ComponentToColorConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 2 && values[0] is ColorRepository color && values[1] is int index)
+            {
+                if (targetType == typeof(Color))
+                {
+                    return color[index].mediaColor;
+                }
+                else
+                {
+                    return color[index].name;
+                }
+            }
+            return null;
         }
     }
 }
