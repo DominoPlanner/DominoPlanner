@@ -1,7 +1,9 @@
-﻿using Avalonia.Media;
+﻿using Avalonia.Collections;
+using Avalonia.Media;
 using DominoPlanner.Core;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -127,5 +129,100 @@ namespace DominoPlanner.Usage
             }
         }
         #endregion
+    }
+    public class ColorMixComponentVM : ModelBase
+    {
+        public ColorMixComponent model;
+        private ColorMixEntry parent;
+
+        public int Count
+        {
+            get { return model.count; }
+            set { model.count = value; RaisePropertyChanged(); }
+        }
+
+        public int Index
+        {
+            get { return model.index; }
+            set { model.index = value; RaisePropertyChanged();}
+        }
+        public ColorMixComponentVM(ColorMixComponent model, ColorMixEntry parent)
+        {
+            this.model = model;
+            this.parent = parent;
+            DeleteCommand = new RelayCommand((o) => parent.Delete(this));
+        }
+        private RelayCommand deleteCommand;
+        public RelayCommand DeleteCommand
+        {
+            get { return deleteCommand; }
+            set { deleteCommand = value; RaisePropertyChanged();}
+        }
+        
+    }
+    public class ColorMixEntry : ColorListEntry
+    {
+        public ColorMixColor Model {
+            get{ return DominoColor as ColorMixColor; }
+        }
+        public bool CountsAreAbsolute
+        {
+            get { return Model.AbsoluteCount; }
+            set { Model.AbsoluteCount = value; RaisePropertyChanged(); }
+        }
+
+        private AvaloniaList<ColorMixComponentVM> components;
+        public AvaloniaList<ColorMixComponentVM> Components
+        {
+            get { return components; }
+            set { 
+                if (components != null) 
+                    components.CollectionChanged -= ComponentsChanged; 
+                components = value;
+                value.CollectionChanged += ComponentsChanged; 
+            }
+        }
+        private RelayCommand addCommand;
+        public RelayCommand AddCommand
+        {
+            get { return addCommand; }
+            set { addCommand = value; RaisePropertyChanged(); }
+        }
+        
+        private void ComponentsChanged(object o, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (ColorMixComponentVM i in e.NewItems)
+                {
+                    Model.colors.Add(i.model);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (ColorMixComponentVM i in e.OldItems)
+                {
+                    Model.colors.Remove(i.model);
+                }
+            }
+        }
+
+        public ColorMixEntry(ColorMixColor color)
+        {
+            foreach (var c in color.colors)
+            {
+                Components.Add(new ColorMixComponentVM(c, this));
+            }
+            AddCommand = new RelayCommand((o) => AddColor());
+        }
+        public void AddColor()
+        {
+            Components.Add(new ColorMixComponentVM(new ColorMixComponent(){ count = 1, index = 0}, this));
+        }
+
+        internal void Delete(ColorMixComponentVM colorMixComponentVM)
+        {
+            Components.Remove(colorMixComponentVM);
+        }
     }
 }

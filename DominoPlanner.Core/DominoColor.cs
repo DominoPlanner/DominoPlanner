@@ -15,6 +15,7 @@ namespace DominoPlanner.Core
 {
     [ProtoContract]
     [ProtoInclude(500, typeof(DominoColor))]
+    [ProtoInclude(501, typeof(ColorMixColor))]
     public abstract class IDominoColor
     {
         [ProtoMember(3, DataFormat = DataFormat.FixedSize)]
@@ -170,13 +171,47 @@ namespace DominoPlanner.Core
                 new XAttribute("b", mediaColor.B));
         }
     }
+    [ProtoContract]
+    public class ColorMixComponent
+    {
+        [ProtoMember(0)]
+        public int count;
+        [ProtoMember(1)]
+        public int index;
+    }
+    public class ColorMixColor : IDominoColor
+    {
+        // the logic for handling the count is in the viewmodel mostly
+        public override int count
+        {
+            get { return int.MaxValue; }
+        }
+        [ProtoMember(7)]
+        public List<ColorMixComponent> colors;
+        [ProtoMember(7)]
+        public bool AbsoluteCount;
+        public ColorMixColor()
+        {
+            colors = new List<ColorMixComponent>();
+        }
+        public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
+        {
+            return Int16.MaxValue;
+        }
+
+        public override XElement Save()
+        {
+            throw new NotImplementedException();
+        }
+    }
+    
     [ProtoContract(SkipConstructor = true)]
     public class ColorRepository : IWorkspaceLoadable
     {
         [ProtoMember(3)]
         public ObservableCollection<int> Anzeigeindizes;
         [ProtoMember(2)]
-        public List<DominoColor> colors; //todo - nur vorrübergehend public
+        public List<IDominoColor> colors; //todo - nur vorrübergehend public
         [ProtoMember(1)]
         private EmptyDomino first;
         public int Length
@@ -197,11 +232,11 @@ namespace DominoPlanner.Core
                 else if (index != 0 && index <= colors.Count) colors[index - 1] = (DominoColor)value;
             }
         }
-        public int IndexOf(DominoColor color)
+        public int IndexOf(IDominoColor color)
         {
             return colors.IndexOf(color);
         }
-        public void Add(DominoColor color)
+        public void Add(IDominoColor color)
         {
             colors.Add(color);
             Anzeigeindizes.Add((Anzeigeindizes.Count == 0) ? 0 : Anzeigeindizes.Max() + 1);
@@ -210,9 +245,9 @@ namespace DominoPlanner.Core
         {
             first = new EmptyDomino();
             Anzeigeindizes = new ObservableCollection<int>();
-            colors = new List<DominoColor>();
+            colors = new List<IDominoColor>();
         }
-        public void MoveUp(DominoColor color)
+        public void MoveUp(IDominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
@@ -225,7 +260,7 @@ namespace DominoPlanner.Core
             }
             Anzeigeindizes[index]--;
         }
-        public void MoveDown(DominoColor color)
+        public void MoveDown(IDominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
