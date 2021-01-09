@@ -283,13 +283,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void RefreshList()
         {
             int counter = 0;
+            
             if (ColorRepository.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _ColorList.Add(new ColorListEntry() { DominoColor = ColorRepository.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1, ValueChanged = PropertyValueChanged });
             }
-            foreach (DominoColor domino in ColorRepository.RepresentionForCalculation.OfType<DominoColor>())
+            foreach (IDominoColor domino in ColorRepository.RepresentionForCalculation.OfType<IDominoColor>())
             {
-                _ColorList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = ColorRepository.Anzeigeindizes[counter], ValueChanged = PropertyValueChanged });
+                if (domino is EmptyDomino)
+                    continue;
+                var entry = ColorListEntry.ColorListEntryFactory(domino, ColorRepository, 0);
+                entry.ValueChanged = PropertyValueChanged;
+                entry.SortIndex = ColorRepository.Anzeigeindizes[counter];
+                _ColorList.Add(entry);
                 counter++;
             }
         }
@@ -510,14 +516,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            for (int i = 0; i < ColorRepository.Anzeigeindizes.Count; i++)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    var array = _ColorList.Where(x => !(x.DominoColor is EmptyDomino)).ToArray();
-                    array.ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
-                    break;
+                _ColorList[i+1].SortIndex = ColorRepository.Anzeigeindizes[i];
             }
-            UnsavedChanges = false;
             RaisePropertyChanged("ColorList");
         }
         #endregion
