@@ -267,14 +267,14 @@ xmlns:parent="clr-namespace:DominoPlanner.Usage"
                                 <StackPanel Orientation="Vertical">
                                     <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="Add Color">
                                     <i:Interaction.Behaviors>
-                                                <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                <ia:EventTriggerBehavior EventName="Click">
                                                     <ia:ChangePropertyAction PropertyName="IsChecked" Value="False" TargetObject="{Binding #PopupButton}"/>
                                                 </ia:EventTriggerBehavior>
                                             </i:Interaction.Behaviors>
                                     </parent:ImageButton>
                                     <parent:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColorMix}" Content="Add colormix">
                                     <i:Interaction.Behaviors>
-                                                <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                <ia:EventTriggerBehavior EventName="Click">
                                                     <ia:ChangePropertyAction PropertyName="IsChecked" Value="False" TargetObject="{Binding #PopupButton}"/>
                                                 </ia:EventTriggerBehavior>
                                             </i:Interaction.Behaviors>

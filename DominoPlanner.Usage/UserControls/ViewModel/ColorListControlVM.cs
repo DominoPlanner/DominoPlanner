@@ -516,8 +516,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (_ColorList.Count < ColorRepository.Anzeigeindizes.Count + 1)
+                return; // this happens if we add a new color
             for (int i = 0; i < ColorRepository.Anzeigeindizes.Count; i++)
             {
+                
                 _ColorList[i+1].SortIndex = ColorRepository.Anzeigeindizes[i];
             }
             RaisePropertyChanged("ColorList");
