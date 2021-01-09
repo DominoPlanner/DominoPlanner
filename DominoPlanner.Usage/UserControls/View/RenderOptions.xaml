@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="350"
              x:Class="DominoPlanner.Usage.UserControls.View.RenderOptions">
     <Grid Margin="5" x:Name="LayoutRoot">
-        <DockPanel>
+        <StackPanel>
             <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" IsVisible="{Binding ShowImageSize}" Grid.Row="0">
                 <TextBlock VerticalAlignment="Center" >Image size (larger side):</TextBlock>
                 <NumericUpDown Width="100" HorizontalAlignment="Right" Minimum="200" Maximum="{Binding MaxSize}" Value="{Binding ImageSize}"/>
@@ -20,7 +20,7 @@
             </DockPanel>
 
             <CheckBox  Height="26" VerticalContentAlignment="Center" Margin="0, 5, 0, 0" IsVisible="{Binding Collapsible}" VerticalAlignment="Center" IsChecked="{Binding Collapse}" Grid.Row="3">Remove spaces between dominoes</CheckBox>
-        </DockPanel>
+        </StackPanel>
 
     </Grid>
 </UserControl>

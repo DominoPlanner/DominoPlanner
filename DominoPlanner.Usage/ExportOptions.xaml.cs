@@ -10,6 +10,9 @@ namespace DominoPlanner.Usage
         public ExportOptions()
         {
             this.InitializeComponent();
+            var dc = new ExportOptionVM();
+            DataContext = dc;
+            dc.PropertyChanged += ExpVM_PropertyChanged;
 #if DEBUG
             //this.AttachDevTools();
 #endif
@@ -17,7 +20,7 @@ namespace DominoPlanner.Usage
         public ExportOptions(IDominoProvider provider)
         {
             InitializeComponent();
-            var dc = new ExportOptionsVM(provider);
+            var dc = new ProjectExportOptionsVM(provider);
             DataContext = dc;
             dc.PropertyChanged += ExpVM_PropertyChanged;
         }
@@ -26,7 +29,7 @@ namespace DominoPlanner.Usage
         {
             if (e.PropertyName.Equals("Close"))
             {
-                this.Close(((ExportOptionsVM)DataContext).result);
+                this.Close(((ExportOptionVM)DataContext).result);
             }
         }
 

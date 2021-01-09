@@ -14,8 +14,8 @@
                 BackgroundColor="{Binding BackgroundColor}"
                 DrawBorders="{Binding DrawBorders}"
                 Collapsible="{Binding Expandable}"
-                Collapse="{Binding Collapsed}"/>
-
+                Collapse="{Binding Collapsed}"
+                ShowImageSize="{Binding ShowImageSize}"/>
             <DockPanel DockPanel.Dock="Bottom">
                 <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsCancel="True" Command="{Binding Cancel}">Cancel</Button>
                 <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True" Command="{Binding OK}">OK</Button>

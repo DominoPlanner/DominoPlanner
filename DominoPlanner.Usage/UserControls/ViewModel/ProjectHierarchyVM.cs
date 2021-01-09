@@ -473,7 +473,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        [ContextMenuAttribute("Remove", "Icons/remove.ico", index: 4)]
+        [ContextMenuAttribute("Remove", "Icons/remove.ico", index: 5)]
         public void Remove()
         {
             if (Parent != null)
@@ -487,6 +487,50 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (index >= 0) OpenProjectSerializer.RemoveOpenProject(index);
             }
         }
+        [ContextMenuAttribute("Export all", "Icons/image.ico", index: 4)]
+        public async Task ExportImagesAsync()
+        {
+            ExportOptions exp = new ExportOptions();
+            bool collapsed = false;
+            bool drawBorders = false;
+            Color background = Colors.Transparent;
+            if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
+            {
+                ExportOptionVM dc = exp.DataContext as ExportOptionVM;
+                collapsed = dc.Collapsed;
+                drawBorders = dc.DrawBorders;
+                background = dc.BackgroundColor;
+            }
+            else
+            {
+                return;
+            }
+
+            OpenFolderDialog openFolderDialog = new OpenFolderDialog();
+            openFolderDialog.InitialDirectory = PathRoot;
+            string exportDirectory = await openFolderDialog.ShowAsync(MainWindowViewModel.GetWindow());;
+            ExportImages(exportDirectory, collapsed, drawBorders, background);
+        }
+
+        public void ExportImages(string exportDirectory, bool collapsed, bool drawBorders, Color background)
+        {
+            if (!Directory.Exists(exportDirectory))
+            {
+                Directory.CreateDirectory(exportDirectory);
+            }
+            foreach (DominoWrapperNodeVM child in Children)
+            {
+                if (child is DocumentNodeVM documentNodeVM)
+                {
+                    documentNodeVM.ExportImage(Path.Combine(exportDirectory, $"{documentNodeVM.Name}.png"), collapsed, drawBorders, background);
+                }
+                else if(child is AssemblyNodeVM assemblyNodeVM)
+                {
+                    assemblyNodeVM.ExportImages(Path.Combine(exportDirectory, assemblyNodeVM.Name), collapsed, drawBorders, background);
+                }
+            }
+        }
+
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
         public void ShowProperties()
         {
@@ -650,20 +694,43 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             ExportImage(true);
         }
+
+        public async void ExportImage(string exportPath, bool collapsed, bool drawBorders, Color background, int width = 0)
+        {
+            if (string.IsNullOrWhiteSpace(exportPath))
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+                saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = "PNG files" });
+                exportPath = await saveFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+            }
+            if (!string.IsNullOrWhiteSpace(exportPath))
+            {
+                if (File.Exists(exportPath))
+                {
+                    File.Delete(exportPath);
+                }
+                DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(exportPath);
+            }
+        }
+
         public async void ExportImage(bool userDefinedExport)
         {
             try
             {
-                int width = 2000;
+                int width = 0;
                 bool collapsed = false;
                 bool drawBorders = false;
+
+                drawBorders = true;
+
                 Color background = Colors.Transparent;
                 if (userDefinedExport)
                 {
                     ExportOptions exp = new ExportOptions(DocumentModel.Obj);
                     if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
                     {
-                        var dc = exp.DataContext as ExportOptionsVM;
+                        var dc = exp.DataContext as ProjectExportOptionsVM;
                         width = dc.ImageSize;
                         collapsed = dc.Collapsed;
                         drawBorders = dc.DrawBorders;
@@ -674,20 +741,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         return;
                     }
                 }
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                
-                saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = "PNG files" });
-                //saveFileDialog.RestoreDirectory = true;
-                var result = await saveFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
-                if (result != "")
-                {
-                    if (File.Exists(result))
-                    {
-                        File.Delete(result);
-                    }
-                    DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(result);
-
-                }
+                ExportImage(string.Empty, collapsed, drawBorders, background, width);
             }
             catch (Exception ex) { await Errorhandler.RaiseMessage("Export failed" + ex, "Error", Errorhandler.MessageType.Error); }
         }
