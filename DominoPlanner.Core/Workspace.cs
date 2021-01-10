@@ -82,7 +82,9 @@ namespace DominoPlanner.Core
             return Instance.resolvedPaths.Where(x => x.reference == reference && x.RelativePath == relativePath).FirstOrDefault();
         }
         public static string AbsolutePathFromReference(ref string relativePath, IWorkspaceLoadable reference)
-        {   
+        {
+            if(relativePath.Contains("\\")) relativePath = relativePath.Replace("\\", "/");
+            
             bool resolved = false;
             bool createResolution = false;
             string absolutePath = "";

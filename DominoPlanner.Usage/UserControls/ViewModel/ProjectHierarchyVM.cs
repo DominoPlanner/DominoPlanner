@@ -11,6 +11,7 @@ using System.Windows;
 using Avalonia.Controls;
 using DominoPlanner.Usage.Serializer;
 using Avalonia.Media;
+using System.Diagnostics;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -159,7 +160,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         [ContextMenuAttribute("Open Folder", "Icons/folder_tar.ico", Index = 10)]
         public void OpenFolder()
         {
+#if win        
             System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{ AbsolutePath}\"");
+#else
+            Process.Start(new ProcessStartInfo(Path.GetDirectoryName(AbsolutePath)) { UseShellExecute = true });
+#endif
+
         }
         public async void OpenInternal()
         {

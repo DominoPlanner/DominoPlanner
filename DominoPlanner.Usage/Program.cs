@@ -80,6 +80,7 @@ namespace DominoPlanner.Usage
         /// </summary>
         public void StartServer()
         {
+#if win
             Thread = new Thread((pipeName) =>
             {
                 _isRunning = true;
@@ -116,6 +117,7 @@ namespace DominoPlanner.Usage
                 }
             });
             Thread.Start(NamedPipeName);
+#endif
         }
 
         /// <summary>
@@ -142,6 +144,7 @@ namespace DominoPlanner.Usage
         /// <param name="connectTimeout"></param>
         public bool Write(string text, int connectTimeout = 300)
         {
+#if win
             using (var client = new NamedPipeClientStream(NamedPipeName))
             {
                 try
@@ -160,12 +163,14 @@ namespace DominoPlanner.Usage
                 {
                     writer.AutoFlush = true;
                     writer.Write(text);
-                    #if win
                     client.WaitForPipeDrain();
-                    #endif
                 }
             }
             return true;
+        }
+#else
+            return false;
+#endif
         }
     }
 }
