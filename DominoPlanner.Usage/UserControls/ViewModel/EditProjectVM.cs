@@ -317,10 +317,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _DominoList[i].ProjectCount.Add(0);
                 }
 
-                if (projectCounts.Length > i + 1)
+                if (projectCounts.Length > i)
                 {
-                    _DominoList[i].ProjectCount[0] = projectCounts[i + 1];
-                    _DominoList[i].ProjectCount[1] = selectedColors[i + 1];
+                    _DominoList[i].ProjectCount[0] = projectCounts[i];
+                    _DominoList[i].ProjectCount[1] = selectedColors[i];
                 }
                 else
                 {
@@ -334,26 +334,29 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             // Setup Columns
             ColorColumnConfig = new AvaloniaList<ColorControl.Column>
             {
-                new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
-                new ColorControl.Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true },
-                new ColorControl.Column() { DataField = "DominoColor.count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize=true },
+                new ColorControl.Column() { DataField = ".", Header = "", Class = "Color" },
+                new ColorControl.Column() { DataField = "Name", Header = "Name", Width = new GridLength(100), CanResize = true },
+                new ColorControl.Column() { DataField = "Count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize=true },
                 new ColorControl.Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField = "DominoColor.count" },
                 new ColorControl.Column() { DataField = "ProjectCount[1]", Header = "Selected" }
             };
 
             _DominoList.Clear();
             int counter = 0;
-
-            foreach (DominoColor domino in CurrentProject.colors.RepresentionForCalculation.OfType<DominoColor>())
-            {
-                _DominoList.Add(new ColorListEntry() { DominoColor = domino, SortIndex = CurrentProject.colors.Anzeigeindizes[counter] });
-                counter++;
-            }
-
             if (CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
             {
                 _DominoList.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
             }
+
+            foreach (IDominoColor domino in CurrentProject.colors.colors)
+            {
+                var cur = ColorListEntry.ColorListEntryFactory(domino, CurrentProject.colors, 2);
+                cur.SortIndex = CurrentProject.colors.Anzeigeindizes[counter];
+                _DominoList.Add(cur);
+                counter++;
+            }
+
+            
         }
         private void SelectAll()
         {

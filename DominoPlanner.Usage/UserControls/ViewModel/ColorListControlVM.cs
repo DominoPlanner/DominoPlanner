@@ -26,6 +26,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ProjectColorList()
         {
             ProjectProperty.Changed.AddClassHandler<ColorControl>(ProjectChanged);
+            ColorsProperty.Changed.AddClassHandler<ColorControl>(ProjectChanged);
         }
 
         private void ProjectChanged(ColorControl sender, AvaloniaPropertyChangedEventArgs args)
@@ -43,8 +44,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 HeaderRow = GetDepth(Project);
             header.Children.Clear();
             FillHeader(header);
+            int current = FillColorMixHeader(header, ColumnConfig.Count);
             if (Project != null)
-                PopulateHeaderColumns(header, Project, 0, ColumnConfig.Count);
+                PopulateHeaderColumns(header, Project, 0, current);
 
             var itemscontrol = this.Find<ItemsControl>("ItemsControl");
             // for content, we have to define it inside a lambda function
@@ -53,11 +55,58 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Grid g = new Grid();
                 g.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
                 FillTemplate(g);
+                var result = FillColorMixColumns(g, ColumnConfig.Count);
                 if (Project != null)
-                    PopulateColumns(g, Project, ColumnConfig.Count, 0);
+                    PopulateColumns(g, Project, result.Item1, result.Item2);
                 return g;
             });
             itemscontrol.ItemTemplate = template;
+        }
+        public int FillColorMixHeader(Grid header, int startcolumn)
+        {
+            int count = Colors.OfType<ColorMixEntry>().Count();
+            if (count == 0) return startcolumn;
+            foreach (ColorMixEntry c in Colors.OfType<ColorMixEntry>())
+            {
+                // create columns
+                var cdef = new ColumnDefinition() { Width = new GridLength(100) };
+                header.ColumnDefinitions.Add(cdef);
+                // set header
+                var tb = new ContentControl() { [!ContentProperty] = new Binding(path: $"Colors[{Colors.IndexOf(c)}].Name") };
+                tb.Classes.Add("Header");
+                Grid.SetColumn(tb, startcolumn);
+                Grid.SetRow(tb, 1);
+                Grid.SetRowSpan(tb, HeaderRow + 1);
+                header.Children.Add(tb);
+                startcolumn++;
+            }
+            // set header
+            var tb2 = new ContentControl() {Content = "Colormix colors" };
+            tb2.Classes.Add("Header");
+            Grid.SetColumn(tb2, startcolumn - count);
+            Grid.SetRow(tb2, 0);
+            Grid.SetColumnSpan(tb2, count);
+            header.Children.Add(tb2);
+            return startcolumn;
+        }
+        public (int, int) FillColorMixColumns(Grid g, int startcolumn)
+        {
+            int count = 0;
+            foreach (ColorMixEntry c in Colors.OfType<ColorMixEntry>())
+            {
+                g.ColumnDefinitions.Add(new ColumnDefinition {Width = new GridLength(100) });
+                var contentblock = new ContentControl()
+                {
+                    [!ContentProperty] = new Binding("ProjectCount[" + (count) + "]")
+                };
+                contentblock.Classes.Add("Content");
+                contentblock.Classes.Add("Project");
+                Grid.SetColumn(contentblock, startcolumn);
+                g.Children.Add(contentblock);
+                count++;
+                startcolumn++;
+            }
+            return (startcolumn, count);
         }
         public static int GetDepth(AssemblyNode assy)
         {
@@ -294,6 +343,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     continue;
                 var entry = ColorListEntry.ColorListEntryFactory(domino, ColorRepository, 0);
                 entry.ValueChanged = PropertyValueChanged;
+                if (entry is ColorMixEntry)
+                {
+                    entry.PropertyChanged += (s, a) =>
+                    {
+                        if (a.PropertyName == "Preview")
+                        {
+                            RecalculateColorMixCounts();
+                        }
+                    };
+                }
                 entry.SortIndex = ColorRepository.Anzeigeindizes[counter];
                 _ColorList.Add(entry);
                 counter++;
@@ -452,6 +511,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 op.Apply();
                 undoStack.Push(op);
                 UnsavedChanges = true;
+                ResetContent();
             }
         }
         private void Move(bool up)
@@ -483,6 +543,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 SelectedStone = op.added;
             }
             undoStack.Push(op);
+            ResetContent();
             UnsavedChanges = true;
         }
 
@@ -646,8 +707,48 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _warningLabelText; }
             set { _warningLabelText = value; TabPropertyChanged(ProducesUnsavedChanges: false); }
         }
+        public void RecalculateColorMixCounts()
+        {
+            int counter = 0;
+            var entries = ColorList.OfType<ColorMixEntry>();
+            for (int i = 0; i < ColorList.Count; i++)
+            {
+                ColorList[i].ProjectCount[ColorList[i].ProjectCount.Count - 1] = ColorList[i].ProjectCount.Last() - ColorList[i].ProjectCount.Take(entries.Count()).Sum();
+            }
+            foreach (ColorMixEntry c in ColorList.OfType<ColorMixEntry>())
+            {
+                for (int i = 0; i < ColorList.Count; i++)
+                {
+                    var cur = c.Components.Where(x => x.Index == i);
+                    if (cur.Count() != 0)
+                    {
+                        if (c.CountsAreAbsolute)
+                        {
+                            ColorList[i].ProjectCount[counter] = cur.Sum(x => x.Count);
+                        }
+                        else
+                        {
+                            ColorList[i].ProjectCount[counter] = (int)Math.Ceiling((decimal)cur.Sum(x => (double)x.Count / c.Components.Sum(x => x.Count) * c.ProjectCount.Last()));
+                        }
+                    }
+                }
+                counter++;
+            }
+            for (int i = 0; i < ColorList.Count; i++)
+            {
+                ColorList[i].ProjectCount[ColorList[i].ProjectCount.Count - 1] = ColorList[i].ProjectCount.Last() + ColorList[i].ProjectCount.Take(entries.Count()).Sum();
+            }
+        }
         async Task<int[]> AddProjectCounts(AssemblyNode assy)
         {
+            var res = ColorList.OfType<ColorMixEntry>();
+            for (int i = 0; i < ColorList.Count; i++)
+            { 
+                for (int j = 0; j < res.Count(); j++)
+                {
+                    ColorList[i].ProjectCount.Add(0);
+                }
+            }
             int[] sum = new int[assy.Obj.Colors.Length];
             foreach (var child in assy?.Obj.children)
             {
@@ -697,6 +798,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _ColorList[i].ProjectCount.Add(sum[i]);
                 }
             }
+            RecalculateColorMixCounts();
             return sum;
         }
 

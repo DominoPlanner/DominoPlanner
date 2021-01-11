@@ -66,7 +66,7 @@ namespace DominoPlanner.Usage
         }
 
 
-        public int Count
+        public virtual int Count
         {
             get { return DominoColor.count; }
             set { PropertyValueChanged(this, value); DominoColor.count = value; RaisePropertyChanged(); }
@@ -190,7 +190,7 @@ namespace DominoPlanner.Usage
         public bool CountsAreAbsolute
         {
             get { return Model.AbsoluteCount; }
-            set { Model.AbsoluteCount = value; RaisePropertyChanged(); }
+            set { Model.AbsoluteCount = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(Count)); }
         }
 
         private AvaloniaList<ColorMixComponentVM> components;
@@ -218,6 +218,16 @@ namespace DominoPlanner.Usage
         {
             get { return preview; }
             set { preview = value; RaisePropertyChanged(); }
+        }
+
+        public override int Count
+        {
+            get{
+                if (CountsAreAbsolute) return Components.Sum(x => x.Count);
+                else return 0;
+                }
+
+            set { }
         }
 
 
@@ -255,6 +265,7 @@ namespace DominoPlanner.Usage
                 x += width;
             }
             Preview = di;
+            
 
         }
 
