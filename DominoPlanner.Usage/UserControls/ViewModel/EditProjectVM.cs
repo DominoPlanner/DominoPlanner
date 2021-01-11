@@ -38,7 +38,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
             ClearSelection = new RelayCommand(o => { ClearFullSelection(true); });
             CopyCom = new RelayCommand(o => { Copy(); });
-            PasteCom = new RelayCommand(o => { Paste(); });
 
             AddRowAbove = new RelayCommand(o => { AddRow(false); });
             AddRowBelow = new RelayCommand(o => { AddRow(true); });
@@ -361,15 +360,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
         List<int> toCopy = new List<int>();
+
+        bool iscopying = false;
         private async void Copy()
         {
             if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
             ClearPastePositions();
-            if (selectedDominoes.Count < 0)
+            if (selectedDominoes.Count <= 0)
             {
                 await Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
                 return;
             }
+            iscopying = true;
             toCopy = new List<int>(selectedDominoes);
             startindex = selectedDominoes.Min();
             ClearFullSelection(true);
@@ -381,29 +383,94 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             catch (InvalidOperationException ex)
             {
                 await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                FinalizePaste(true);
             }
             UpdateUIElements();
         }
 
-        private async void Paste()
+        private async void Paste(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
+            bool pasteFailed = true;
             try
             {
                 if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
-                if (selectedDominoes.Count == 0) return;
-                int pasteindex = selectedDominoes.First();
-                RemoveFromSelectedDominoes(pasteindex);
-                ClearFullSelection(true);
-                PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
-                paste.Apply();
-                undoStack.Push(paste);
-                ClearPastePositions();
-                UpdateUIElements();
+                // find closest domino
+                int domino = FindDominoAtPosition(dominoPoint).idx;
+                if (PossiblePastePositions.Contains(domino))
+                {
+                    PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), domino);
+                    paste.Apply();
+                    undoStack.Push(paste);
+                    pasteFailed = false;
+                    if (e.KeyModifiers != KeyModifiers.Control)
+                    {
+                        SelectionTool.Select(paste.paste_target, true);
+                    }
+                    
+                }
             }
             catch (InvalidOperationException ex)
             {
                 await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
             }
+            finally
+            {
+                FinalizePaste(e.KeyModifiers != KeyModifiers.Control && !pasteFailed);
+            }
+        }
+        private void FinalizePaste(bool clearall)
+        {
+            if (clearall)
+            {
+                iscopying = false;
+                ClearPastePositions();
+            }
+            // refresh the preview in case we copied to the source domain
+            AdditionalDrawables.RemoveAll(PasteOverlays);
+            PasteOverlays = new List<CanvasDrawable>();
+            UpdateUIElements();
+        }
+        List<CanvasDrawable> PasteOverlays = new List<CanvasDrawable>();
+        Avalonia.Point lastreference;
+
+        private void DrawPasteOverlay(Avalonia.Point dominoPoint, PointerEventArgs e)
+        {
+            // display the dominoes to paste as a half-transparent overlay.
+            // reference point:
+            var reference_point = Dominoes[toCopy[0]].CenterPoint - dominoPoint;
+            if (PasteOverlays.Count == 0)
+            {
+                // create the overlays
+                foreach (int i in toCopy)
+                {
+                    var p = new SkiaSharp.SKPath();
+                    var points = Dominoes[i].CanvasPoints;
+                    if (points.Length > 1)
+                    {
+                        p.MoveTo(new SkiaSharp.SKPoint((float)points[0].X - (float)reference_point.X, (float)points[0].Y - (float)reference_point.Y));
+                        foreach (var point in points.Skip(1))
+                        {
+                            p.LineTo(new SkiaSharp.SKPoint((float)point.X - (float)reference_point.X, (float)point.Y - (float)reference_point.Y));
+                        }
+                    }
+                    var color = Dominoes[i].StoneColor.ToSKColor().WithAlpha(128);
+                    PasteOverlays.Add(new CanvasDrawable() { BeforeBorders = false, Paint = new SkiaSharp.SKPaint() { Color = color }, Path = p });
+                    }
+                AdditionalDrawables.AddRange(PasteOverlays);
+            }
+            else
+            {
+                // find out difference between current and last reference point
+                var shift = lastreference - reference_point;
+                var transform = SkiaSharp.SKMatrix.CreateTranslation((float)shift.X, (float)shift.Y);
+                System.Diagnostics.Debug.WriteLine(shift);
+                foreach (var stone in PasteOverlays)
+                {
+                    stone.Path.Transform(transform);
+                }
+            }
+            lastreference = reference_point;
+            Redraw();
         }
         public void ExecuteOperation(PostFilter pf)
         {
@@ -470,6 +537,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         internal override void KeyPressed(object sender, KeyEventArgs args)
         {
+            if (iscopying && args.Key == Key.Escape)
+            {
+                FinalizePaste(true);
+                args.Handled = true;
+            }
             if (!args.Handled)
                 SelectedTool.KeyPressed(args);
         }
@@ -678,13 +750,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         internal void Canvas_MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
         {
-            SelectedTool?.MouseMove(dominoPoint, e);
+            if (iscopying)
+            { 
+                DrawPasteOverlay(dominoPoint, e);
+            }
+            else
+            {
+                SelectedTool?.MouseMove(dominoPoint, e);
+            }
         }
+        
 
         internal void Canvas_MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            SelectedTool?.MouseUp(dominoPoint, e);
-            UpdateUIElements();
+            if (iscopying)
+            {
+                Paste(dominoPoint, e);
+                if (e.MouseButton == MouseButton.Right)
+                {
+                    FinalizePaste(true);
+                }
+            }
+            else
+            {
+                SelectedTool?.MouseUp(dominoPoint, e);
+                UpdateUIElements();
+            }
         }
         internal void Canvas_MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e)
         {

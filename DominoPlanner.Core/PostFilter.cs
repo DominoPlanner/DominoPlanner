@@ -420,7 +420,7 @@ namespace DominoPlanner.Core
         int position_source;
         int position_target;
         int[] paste_source;
-        int[] paste_target;
+        public int[] paste_target;
         int[] original_colors;
         public PasteFilter(ICopyPasteable reference, int position_source, int[] source_domain, int position_target)
         {

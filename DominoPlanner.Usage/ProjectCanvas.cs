@@ -453,11 +453,11 @@ namespace DominoPlanner.Usage
             shift_x = (float)pc.ShiftX;
             shift_y = (float)pc.ShiftY;
             zoom = (float)pc.Zoom;
-            unselectedBorderColor = new SKColor(pc.UnselectedBorderColor.R, pc.UnselectedBorderColor.G, pc.UnselectedBorderColor.B, pc.UnselectedBorderColor.A);
-            selectedBorderColor = new SKColor(pc.SelectedBorderColor.R, pc.SelectedBorderColor.G, pc.SelectedBorderColor.B, pc.SelectedBorderColor.A);
-            pasteHightlightColor = new SKColor(Colors.Violet.R, Colors.Violet.G, Colors.Violet.B, Colors.Violet.A);
+            unselectedBorderColor = pc.UnselectedBorderColor.ToSKColor();
+            selectedBorderColor = pc.SelectedBorderColor.ToSKColor();
+            pasteHightlightColor = Colors.Violet.ToSKColor();
             deletionHighlightColor = SKColors.Red;
-            selectionColor = new SKColor(pc.SelectionDomainColor.R, pc.SelectionDomainColor.G, pc.SelectionDomainColor.B, 255);
+            selectionColor = pc.SelectionDomainColor.ToSKColor();
             selectionPath = pc.SelectionDomain.Clone();
             this.project = pc.Project;
             // Transform the selection path into screen coordinates
@@ -465,7 +465,7 @@ namespace DominoPlanner.Usage
             this.ProjectHeight = (float)pc.ProjectHeight;
             this.ProjectWidth = (float)pc.ProjectWidth;
             this.above = pc.SourceImageAbove;
-            this.background = new SKColor(pc.BackgroundColor.R, pc.BackgroundColor.G, pc.BackgroundColor.B, pc.BackgroundColor.A);
+            this.background = pc.BackgroundColor.ToSKColor();
             this.AdditionalDrawables = pc.AdditionalDrawables;
 
             selectionPath?.Transform(transform);
@@ -586,7 +586,7 @@ namespace DominoPlanner.Usage
                     path.LineTo(PointToDisplaySkiaPoint(line));
                 path.Close();
 
-                canvas.DrawPath(path, new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
+                canvas.DrawPath(path, new SKPaint() { Color = c.ToSKColor(), IsAntialias = true, IsStroke = false }) ;
             }
         }
         private void DrawDominoBorder(SKCanvas canvas, EditingDominoVM vm)
@@ -628,6 +628,13 @@ namespace DominoPlanner.Usage
                         canvas.DrawPath(path, new SKPaint() { Color = unselectedBorderColor, IsAntialias = true, IsStroke = true, StrokeWidth = BorderSize / 2 * zoom });
                 }
             }
+        }
+    }
+    public static class ColorExtensions
+    {
+        public static SKColor ToSKColor(this Avalonia.Media.Color color)
+        {
+            return new SKColor(color.R, color.G, color.B, color.A);
         }
     }
 }

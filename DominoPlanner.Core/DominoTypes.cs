@@ -226,7 +226,7 @@ namespace DominoPlanner.Core
 
         public static implicit operator Avalonia.Point(Point v)
         {
-            throw new NotImplementedException();
+            return new Avalonia.Point(v.X, v.Y);
         }
     }
 }

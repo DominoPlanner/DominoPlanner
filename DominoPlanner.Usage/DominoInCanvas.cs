@@ -5,6 +5,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia;
 using System;
+using System.Linq;
 
 namespace DominoPlanner.Usage
 {
@@ -45,6 +46,13 @@ namespace DominoPlanner.Usage
             get
             {
                 return domino.GetPath(expanded: expanded).points;
+            }
+        }
+        public Core.Point CenterPoint
+        {
+            get
+            {
+                return new Core.Point(CanvasPoints.Average(x => x.X), CanvasPoints.Average(x => x.Y));
             }
         }
 
