@@ -83,7 +83,7 @@ namespace DominoPlanner.Core
         }
         public static string AbsolutePathFromReference(ref string relativePath, IWorkspaceLoadable reference)
         {
-            if(relativePath.Contains("\\")) relativePath = relativePath.Replace("\\", "/");
+            if (relativePath.Contains("\\")) relativePath = relativePath.Replace("\\", "/");
             
             bool resolved = false;
             bool createResolution = false;
@@ -125,7 +125,14 @@ namespace DominoPlanner.Core
                     {
                         if (!string.IsNullOrEmpty(resolution.AbsolutePath) && File.Exists(resolution.AbsolutePath))
                         {
-                            relativePath = Workspace.MakeRelativePath(basepath, resolution.AbsolutePath);
+                            if (Path.IsPathRooted(resolution.AbsolutePath))
+                            {
+                                relativePath = resolution.AbsolutePath;
+                            }
+                            else
+                            {
+                                relativePath = Workspace.MakeRelativePath(basepath, resolution.AbsolutePath);
+                            }
 
                             resolution.isResolved = true;
                             return resolution.AbsolutePath;
