@@ -22,6 +22,7 @@ namespace DominoPlanner.Usage
         #region CTOR
         public MainWindowViewModel()
         {
+            OsType = Environment.OSVersion.Platform;
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(GetWindow()); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
