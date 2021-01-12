@@ -43,6 +43,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 Img = (DrawingImage)temp;
             }
         }
+        public string HelpToolTip { get; protected set; }
 
         public DrawingImage Img { get; private set; }
 
@@ -115,6 +116,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "rect_selectDrawingImage";
             Name = "Select";
+            HelpToolTip = "Esc to clear selection\nr to trigger quick replace";
             SelectionTools = new ObservableCollection<SelectionDomain>() {
                 new RectangleSelection(parent), new CircleSelectionDomain(parent),
                 new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent), new FillBucketDomain(parent)};
@@ -145,6 +147,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 RaisePropertyChanged();
             }
+        }
+        private bool quickReplacePopupOpen;
+        public bool QuickReplacePopupOpen
+        {
+            get { return quickReplacePopupOpen; }
+            set { quickReplacePopupOpen = value; RaisePropertyChanged(); }
+
         }
 
         private ObservableCollection<SelectionDomain> selectionTools;
@@ -179,8 +188,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public override void KeyPressed(KeyEventArgs key)
         {
+            if (key.Key == Key.R)
+            {
+                QuickReplacePopupOpen = true;
+            }
             if (key.Key == Key.Escape)
             {
+                if (QuickReplacePopupOpen)
+                    QuickReplacePopupOpen = false;
+                else
                 parent.ClearFullSelection(true);
             }
         }

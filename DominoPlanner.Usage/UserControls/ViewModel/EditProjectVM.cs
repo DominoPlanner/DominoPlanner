@@ -50,6 +50,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseInPicture = new RelayCommand(o => { UICursor = new Cursor(StandardCursorType.Hand); });
             MouseOutPicture = new RelayCommand(o => { UICursor = null; });
             SelectAllCom = new RelayCommand(o => { SelectAll(); });
+            ChangeColorCom = new RelayCommand(o => { if (o is IDominoColor dc) ChangeColor(dc); });
             UnsavedChanges = false;
             SelectionTool = new SelectionToolVM(this);
             DisplaySettingsTool = new DisplaySettingsToolVM(this);
@@ -99,8 +100,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return additionalDrawables; }
             set { additionalDrawables = value; RaisePropertyChanged(); }
         }
-        
-
 
         public SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
@@ -550,10 +549,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             base.ResetContent();
             RefreshSize?.Invoke(this, EventArgs.Empty);
         }
-        private void ChangeColor()
+        private void ChangeColor(IDominoColor color = null)
         {
-            
-            SetColorOperation sco = new SetColorOperation(CurrentProject, selectedDominoes.ToArray(), CurrentProject.colors.RepresentionForCalculation.ToList().IndexOf(SelectedColor.DominoColor));
+            if (color == null)
+            {
+                color = SelectedColor.DominoColor;
+            }
+            SetColorOperation sco = new SetColorOperation(CurrentProject, selectedDominoes.ToArray(), CurrentProject.colors.RepresentionForCalculation.ToList().IndexOf(color));
             ClearFullSelection(true);
             ExecuteOperation(sco);
             UnsavedChanges = true;
@@ -939,6 +941,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _SelectAllCom;
 
         public ICommand SelectAllCom { get { return _SelectAllCom; } set { if (value != _SelectAllCom) { _SelectAllCom = value; } } }
+
+        private ICommand _ChangeColorCom;
+
+        public ICommand ChangeColorCom
+        {
+            get { return _ChangeColorCom; }
+            set { _ChangeColorCom = value; RaisePropertyChanged(); }
+        }
+
 
         #endregion
     }

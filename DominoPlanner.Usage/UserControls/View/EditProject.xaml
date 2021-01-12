@@ -6,6 +6,9 @@
              xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             
              xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
              mc:Ignorable="d"
              x:Class="DominoPlanner.Usage.UserControls.View.EditProject"
@@ -180,7 +183,7 @@
 
             <StackPanel Orientation="Horizontal" Margin="1, 1">
                 <Border BorderBrush="Black" BorderThickness="1" Width="30" Height="30">
-                    <Image Source="{Binding SelectedTool.Img}" Classes="ToolImage"/>
+                    <Image Source="{Binding SelectedTool.Img}" Classes="ToolImage" ToolTip.Tip="{Binding SelectedTool.HelpToolTip, StringFormat=Shortcuts:&#x0d;&#x0a;{0}}"/>
                 </Border>
                 <ContentControl Margin="2, 0, 0, 0" Content="{Binding SelectedTool}">
                     <!--ContentTemplate="{StaticResource DisplaySettingsTemplate}"-->
@@ -240,6 +243,36 @@
                                           AdditionalDrawables="{Binding AdditionalDrawables}"
                                           x:Name="ProjectCanvas"/>
                 </Border>
+                <Popup PlacementAnchor="Top" PlacementMode="Pointer" StaysOpen="False" IsOpen="{Binding SelectionTool.QuickReplacePopupOpen}">
+                    <StackPanel Orientation="Vertical">
+                        <ListBox Items="{Binding DominoList}" >
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type parent:ColorListEntry}">
+                                    <Rectangle Width="20" Height="20" Margin="1"
+                                    ToolTip.Tip="{Binding Name}" Stroke="Black" StrokeThickness="1">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="{Binding Color}"/>
+                                        </Rectangle.Fill>
+                                        <i:Interaction.Behaviors>
+                                            <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                <ia:InvokeCommandAction Command="{Binding #ProjectCanvas.DataContext.ChangeColorCom}" CommandParameter="{Binding DominoColor}"/>
+                                            </ia:EventTriggerBehavior>
+                                            <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                <ia:ChangePropertyAction TargetObject="{Binding #ProjectCanvas.DataContext.SelectionTool}" PropertyName="QuickReplacePopupOpen" Value="False"/>
+                                            </ia:EventTriggerBehavior>
+                                        </i:Interaction.Behaviors>
+                                    </Rectangle>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Width="160"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                        <TextBlock Margin="2" Text="Click color to replace" Foreground="Gray" FontStyle="Italic"/>
+                    </StackPanel>
+                </Popup>
             </Grid>
             <ListBox Background="Transparent"
                      BorderBrush="Transparent"
