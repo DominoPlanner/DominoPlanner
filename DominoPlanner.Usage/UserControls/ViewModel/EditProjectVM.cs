@@ -103,7 +103,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
-        public ZoomToolVM ZoomTool;
+        public ZoomToolVM ZoomTool { get; set; }
         public RulerToolVM RulerTool;
         public RowColumnInsertionVM RowColumnTool;
         #endregion

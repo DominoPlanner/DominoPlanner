@@ -128,7 +128,7 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:RulerToolVM}">
             <DockPanel Margin="5, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="18">
-
+                
                 <TextBlock Margin="0, 0" Text="{Binding Length, StringFormat=Current Length: {0:F2} mm}" VerticalAlignment="Center"/>
                 <CheckBox Margin="10,0,0,-1"  IsChecked="{Binding Snapping}" VerticalAlignment="Center">Snap to 5 degree increments (Toggle with Ctrl)</CheckBox>
                 <TextBlock TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" Margin="20, 0, 0, 0">
@@ -143,10 +143,17 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ZoomToolVM}">
             <StackPanel Orientation="Horizontal" Margin="5, 0">
+                <Button Margin="1, 0" ToolTip.Tip="1px on screen = 1mm in real world" Command="{Binding Zoom1To1}">
+                    1:1
+                </Button>
+                <Button Margin="1, 0" ToolTip.Tip="Show entire field" Command="{Binding ZoomToFit}">
+                    Fit
+                </Button>
                 <Button Margin="1, 0"  ToolTip.Tip="Zoom out" Command="{Binding ZoomOut}">
                     <Image Source="{StaticResource zoom_outDrawingImage}" Classes="ToolImage"/>
                 </Button>
-                <Slider HorizontalAlignment="Center" Minimum="1" Maximum="6" x:CompileBindings="False" Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
+                <Slider HorizontalAlignment="Center" Minimum="{Binding FitAllZoomValue}" Maximum="2" x:CompileBindings="False" 
+                Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
                 <Button Margin="1, 0"  ToolTip.Tip="Zoom in" Command="{Binding ZoomIn}">
                     <Image Source="{StaticResource zoom_inDrawingImage}" Classes="ToolImage"/>
                 </Button>
@@ -224,10 +231,10 @@
                                                                   ViewportSize="{Binding VerticalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}">
                 </ScrollBar>
                 <Border BorderBrush="Beige" BorderThickness="1">
-                    <parent:ProjectCanvas Project="{Binding Dominoes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True"
+                    <parent:ProjectCanvas Project="{Binding Dominoes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True" x:CompileBindings="True" x:DataType="vm:EditProjectVM"
                                           ShiftX="{Binding DisplaySettingsTool.HorizontalOffset}"
                                           ShiftY="{Binding DisplaySettingsTool.VerticalOffset}"
-                                          Zoom="{Binding DisplaySettingsTool.ZoomValue}"
+                                          Zoom="{Binding DisplaySettingsTool.ZoomValue, Mode=TwoWay}"
                                           SelectedDominoes="{Binding SelectedDominoes}"
                                           SelectedBorderColor="{Binding DisplaySettingsTool.SelectedColor}"
                                           UnselectedBorderColor="{Binding DisplaySettingsTool.BorderColor}"
@@ -241,6 +248,7 @@
                                           BorderSize="{Binding DisplaySettingsTool.BorderSize}"
                                           ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
                                           AdditionalDrawables="{Binding AdditionalDrawables}"
+                                          FitAllZoomValue="{Binding ZoomTool.FitAllZoomValue, Mode=OneWayToSource}"
                                           x:Name="ProjectCanvas"/>
                 </Border>
                 <Popup PlacementAnchor="Top" PlacementMode="Pointer" StaysOpen="False" IsOpen="{Binding SelectionTool.QuickReplacePopupOpen}">

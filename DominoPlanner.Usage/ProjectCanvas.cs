@@ -195,6 +195,13 @@ namespace DominoPlanner.Usage
         public static readonly StyledProperty<double> HorizontalSliderPosProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(HorizontalSliderPos));
 
 
+        public double FitAllZoomValue
+        {
+            get { return GetValue(FitAllZoomValueProperty); }
+            set { SetValue(FitAllZoomValueProperty, value); }
+        }
+        public static readonly StyledProperty<double> FitAllZoomValueProperty = AvaloniaProperty.Register<ProjectCanvas, double>(nameof(FitAllZoomValue));
+
         public double ProjectHeight { get; set; }
 
         public double ProjectWidth { get; set; }
@@ -240,6 +247,7 @@ namespace DominoPlanner.Usage
             ZoomProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
             HorizontalSliderPosProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateHorizontalSlider(o, e));
             AdditionalDrawablesProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => AdditionalDrawablesChanged(o, e));
+            BoundsProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateMinZoomValue());
             
         }
 
@@ -259,10 +267,9 @@ namespace DominoPlanner.Usage
             ForceRedraw = true;
         }
 
-        protected override Size ArrangeOverride(Size finalSize){
-            UpdateVerticalSlider(this, null);
-            UpdateHorizontalSlider(this, null);
-            return finalSize;
+        private void UpdateMinZoomValue()
+        {
+            FitAllZoomValue = Math.Min(Bounds.Width / ProjectWidth, Bounds.Height / ProjectHeight);
         }
 
         private void UpdateVerticalSlider(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
@@ -274,7 +281,9 @@ namespace DominoPlanner.Usage
                 VirtualVerticalSliderMax = Math.Max(ShiftY, ProjectHeight - Bounds.Height / Zoom);
                 VirtualVerticalSliderMin = Math.Min(ShiftY, 0);
                 var scaling_factor = 100.0 / (VirtualVerticalSliderMax - VirtualVerticalSliderMin);
-                VerticalSliderPos = newval * scaling_factor - VirtualVerticalSliderMin * scaling_factor;
+                var candidate = newval * scaling_factor - VirtualVerticalSliderMin * scaling_factor;
+                if (Math.Abs(candidate - VerticalSliderPos) > 0.01)
+                    VerticalSliderPos = candidate;
                 VerticalSliderSize = scaling_factor * Bounds.Height;
                 
                 Debug.WriteLine(VerticalSliderSize);
@@ -292,10 +301,12 @@ namespace DominoPlanner.Usage
             {
                 double newval = e == null || e.Property == ZoomProperty ? ShiftX : (double) e.NewValue;
                 // Binding to maximum or minimum doesn't work for some reason, so it's fixed
-                VirtualHorizontalSliderMax = Math.Max(ShiftY, ProjectWidth - Bounds.Width / Zoom);
-                VirtualHorizontalSliderMin = Math.Min(ShiftY, 0);
+                VirtualHorizontalSliderMax = Math.Max(ShiftX, ProjectWidth - Bounds.Width / Zoom);
+                VirtualHorizontalSliderMin = Math.Min(ShiftX, 0);
                 var scaling_factor = 100.0 / (VirtualHorizontalSliderMax - VirtualHorizontalSliderMin);
-                HorizontalSliderPos = newval * scaling_factor - VirtualHorizontalSliderMin * scaling_factor;
+                var candidate = newval * scaling_factor - VirtualHorizontalSliderMin * scaling_factor;
+                if (Math.Abs(candidate - HorizontalSliderPos) > 0.01)
+                    HorizontalSliderPos = candidate;
                 HorizontalSliderSize = scaling_factor * Bounds.Width;
                 
                 Debug.WriteLine(HorizontalSliderSize);
@@ -320,6 +331,7 @@ namespace DominoPlanner.Usage
             {
                 this.ProjectHeight = Project.Max(x => x.CanvasPoints.Length > 0 ? x.CanvasPoints.Max(y => y.Y) : 0);
                 this.ProjectWidth = Project.Max(x => x.CanvasPoints.Length > 0 ? x.CanvasPoints.Max(y => y.X) : 0);
+                UpdateMinZoomValue();
             }
         }
         protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -367,10 +379,13 @@ namespace DominoPlanner.Usage
                 // get the screen coordinate of the current point.
                 var p = ScreenPointToDominoCoordinates(e.GetPosition(this));
                 Debug.WriteLine("Computed position in domino coordinates: " + oldx + ", " + oldy);
+                var newzoom = Zoom;
                 if (delta > 0)
-                    Zoom *= 1.1;
+                    newzoom *= 1.1;
                 else
-                    Zoom *= 1 / 1.1;
+                    newzoom *= 1 / 1.1;
+                if (newzoom > FitAllZoomValue && newzoom < 2)
+                    Zoom = newzoom;
 
                 newx = (p.X - e.GetPosition(this).X / Zoom);
 
@@ -395,7 +410,12 @@ namespace DominoPlanner.Usage
 
 
         public override void Render(DrawingContext context)
-        {             
+        {
+
+            Debug.WriteLine("Bounds" + Bounds.Width);
+            UpdateVerticalSlider(this, null);
+            UpdateHorizontalSlider(this, null);
+            UpdateMinZoomValue();
             context.Custom(new DominoRenderer(this));
             ForceRedraw = false;
         }

@@ -1295,8 +1295,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "zoomDrawingImage";
             Name = "Zoom";
-            ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue += 1);
-            ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue -= 1);
+            ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue *= 1.1);
+            ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue /= 1.1);
+            Zoom1To1 = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue = 1);
+            ZoomToFit = new RelayCommand((o) =>
+            {
+                parent.DisplaySettingsTool.ZoomValue = FitAllZoomValue;
+                parent.DisplaySettingsTool.HorizontalOffset = 0; parent.DisplaySettingsTool.VerticalOffset = 0;
+            });
         }
         private ICommand _ZoomIn;
         public ICommand ZoomIn { get { return _ZoomIn; } set { if (value != _ZoomIn) { _ZoomIn = value; } } }
@@ -1304,6 +1310,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private ICommand _ZoomOut;
         public ICommand ZoomOut { get { return _ZoomOut; } set { if (value != _ZoomOut) { _ZoomOut = value; } } }
 
+        private double fitAllZoomValue;
+
+        public double FitAllZoomValue
+        {
+            get { return fitAllZoomValue; }
+            set { fitAllZoomValue = value; RaisePropertyChanged(); }
+        }
+
+        private ICommand _Zoom1To1;
+
+        public ICommand Zoom1To1
+        {
+            get { return _Zoom1To1; }
+            set { _Zoom1To1 = value; RaisePropertyChanged(); }
+        }
+        private ICommand _ZoomToFit;
+
+        public ICommand ZoomToFit
+        {
+            get { return _ZoomToFit; }
+            set { _ZoomToFit = value; RaisePropertyChanged(); }
+        }
     }
     public class RowColumnInsertionVM : EditingToolVM
     {
