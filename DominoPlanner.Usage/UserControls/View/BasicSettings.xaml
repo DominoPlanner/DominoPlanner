@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:conv="clr-namespace:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DominoPlanner.Usage.UserControls.View.BasicSettings">
@@ -17,25 +17,25 @@
     </UserControl.Styles>
     <UserControl.DataTemplates>
         <DataTemplate DataType="{x:Type vm:CalculationVM}">
-            <local:CalculationV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:CalculationV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:FieldReadoutVM}">
-            <local:FieldReadoutV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:FieldReadoutV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:NormalReadoutVM}">
-            <local:StructureReadoutV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:StructureReadoutV HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
-            <local:FieldSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:FieldSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:CreateRectangularStructureVM}">
-            <local:RectangularSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:RectangularSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:CreateCircleVM}">
-            <local:CircleSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:CircleSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:CreateSpiralVM}">
-            <local:SpiralSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
+            <view:SpiralSize HorizontalContentAlignment="Stretch" VerticalAlignment="Top"/>
         </DataTemplate>
 
     </UserControl.DataTemplates>
@@ -51,28 +51,28 @@
         <Image Grid.Row="0" Source="{Binding Path=CurrentPlan}"></Image>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Stretch">
             <StackPanel Margin="3">
-                <Expander Header="Shape settings" IsExpanded="True" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext}">
+                <Expander Header="{local:Gettext Basic Settings Header|Shape settings}" IsExpanded="True" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext}">
                 </Expander>
-                <Expander Header="Image treatment settings" IsExpanded="True" Content="{Binding ImageTreatmentVM}">
+                <Expander Header="{local:Gettext Basic Settings Header|Image treatment settings}" IsExpanded="True" Content="{Binding ImageTreatmentVM}">
                 </Expander>
-                <Expander Header="Color search settings" IsExpanded="True" Content="{Binding CalculationVM}">
+                <Expander Header="{local:Gettext Basic Settings Header|Color search settings}" IsExpanded="True" Content="{Binding CalculationVM}">
                 </Expander>
-                <Expander Header="Render options" HorizontalAlignment="Stretch" IsExpanded="True">
-                    <HeaderedContentControl Header="Preview options">
-                        <local:RenderOptions ShowImageSize="false"
+                <Expander Header="{local:Gettext Basic Settings Header|Render options}" HorizontalAlignment="Stretch" IsExpanded="True">
+                    <HeaderedContentControl Header="{local:Gettext Preview options}">
+                        <view:RenderOptions ShowImageSize="false"
                                              BackgroundColor="{Binding BackgroundColor}"
                                              Collapsible="{Binding Collapsible, Mode=OneWay}"
                                              Collapse="{Binding Collapsed}"
                                              DrawBorders="{Binding Draw_borders}"
-                                             ></local:RenderOptions>
+                                             ></view:RenderOptions>
                     </HeaderedContentControl>
                 </Expander>
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <conv:ImageButton Image="/Icons/draw_freehand.ico"
-                               Command="{Binding EditClick}" Content="Edit"/>
-            <conv:ImageButton Image="/Icons/file_export.ico" Content="Buildtools"
+            <local:ImageButton Image="/Icons/draw_freehand.ico"
+                               Command="{Binding EditClick}" Content="{local:Gettext Edit}"/>
+            <local:ImageButton Image="/Icons/file_export.ico" Content="{local:Gettext Buildtools}"
                               Command="{Binding BuildtoolsClick}" IsVisible="{Binding VisibleFieldplan}"/>
         </StackPanel>
     </Grid>

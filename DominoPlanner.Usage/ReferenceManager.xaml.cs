@@ -10,6 +10,7 @@ using System.IO;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     public class PathResolutionVM : ModelBase
     {
         private PathResolution model;
@@ -37,7 +38,7 @@ namespace DominoPlanner.Usage
 
                 //model.RelativePath = value;
                 RaisePropertyChanged();
-                RaisePropertyChanged("IsResolved");
+                RaisePropertyChanged(nameof(IsResolved));
             }
             get { return model.AbsolutePath; }
         }
@@ -57,10 +58,10 @@ namespace DominoPlanner.Usage
             if (IsResolved) return;
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Directory = Path.GetDirectoryName(Path.GetFullPath(Path.Combine(ParentPath, RelativePath)));
-            ofd.Title = $"Locate file {Path.GetFileName(RelativePath)}";
+            ofd.Title = string.Format(_("Locate file {0}"), Path.GetFileName(RelativePath));
             string extension = Path.GetExtension(RelativePath);
-            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { extension.Replace(".", "") }, Name = $"{extension} files" });
-            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
+            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { extension.Replace(".", "") }, Name = string.Format(GetParticularString("Files of type {0}", "{0} files"), extension) });
+            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
             ofd.AllowMultiple = false;
             string[] result = await ofd.ShowAsync(ReferenceManagerViewModel.window);
             if (result != null && result.Length == 1 && File.Exists(result[0]))

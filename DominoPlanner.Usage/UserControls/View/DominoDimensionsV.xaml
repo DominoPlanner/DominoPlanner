@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="90"
              x:Class="DominoPlanner.Usage.UserControls.View.DominoDimensionsV">
     <Grid x:Name="LayoutRoot">
@@ -17,11 +18,11 @@
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Width</TextBlock>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0" Text="{local:Gettext Width:}"/>
             <NumericUpDown Minimum="0" Value="{Binding TangentialWidth}" Grid.Row="0" Grid.Column="1" Width="70" />
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2">Length</TextBlock>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2" Text="{local:Gettext Length:}"/>
             <NumericUpDown Minimum="0" Value="{Binding NormalWidth}" Grid.Column="3" Grid.Row="0" Width="70" />
-            <TextBlock Grid.Row="1" VerticalAlignment="Center">Distances:</TextBlock>
+            <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{local:Gettext Distances:}"/>
             <TextBlock Grid.Row="2" HorizontalAlignment="Right" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding TangentialDistanceText}"/>
             <NumericUpDown Minimum="0" Value="{Binding TangentialDistance}" Grid.Row="2" Grid.Column="1" Width="70" />
             <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding NormalDistanceText}"/>

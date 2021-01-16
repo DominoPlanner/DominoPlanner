@@ -8,8 +8,8 @@
         
         mc:Ignorable="d"
         x:Class="DominoPlanner.Usage.LiveBuildHelperV"
-        Title="FieldBlockViewer"
-        Height="600" Width="900"
+        Title="{local:Gettext FieldBlockViewer}"
+        Height="600" Width="800"
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
     <Window.Resources>
         <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
@@ -29,15 +29,15 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" ColumnDefinitions="300, 5, 300, *">
             <Grid Grid.Column="0" ColumnDefinitions="3*, 3*, 2*, 3*">
-                <TextBlock Grid.Column="0" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="0" Text="{local:Gettext Row:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
-                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
                 <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
-                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="0" Text="{local:Gettext Block:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
-                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
                 <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
@@ -124,10 +124,10 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
-                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
-                        <TextBlock>Show remaining colors</TextBlock>
+                        <TextBlock Text="{local:Gettext Show remaining colors}"/>
                         <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
                             <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
                         </Popup>

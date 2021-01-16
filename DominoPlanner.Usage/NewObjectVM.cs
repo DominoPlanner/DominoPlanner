@@ -15,8 +15,10 @@ using Avalonia.Controls.Templates;
 using Avalonia.Metadata;
 using System.Threading.Tasks;
 
+
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     public class NewObjectVM : ModelBase
     {
         #region CTOR
@@ -159,8 +161,8 @@ namespace DominoPlanner.Usage
             string AbsoluteColorPath = Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject);
             ViewModels.Add(new DominoProviderObjectEntry()
             {
-                Name = "Field",
-                Description = "Add a field based on an image",
+                Name = GetParticularString("The domino structure type", "Field"),
+                Description = _("Add a field based on an image"),
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateFieldVM(
@@ -170,8 +172,8 @@ namespace DominoPlanner.Usage
             });
             ViewModels.Add(new DominoProviderObjectEntry()
             {
-                Name = "Structure",
-                Description = "Add a structure (e.g. Wall) based on an image",
+                Name = GetParticularString("The domino structure type", "Structure"),
+                Description = _("Add a structure (e.g. Wall) based on an image"),
                 Icon = "/icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateRectangularStructureVM(
@@ -180,8 +182,8 @@ namespace DominoPlanner.Usage
             });
             ViewModels.Add(new DominoProviderObjectEntry()
             {
-                Name = "Circle",
-                Description = "Add a circle bomb based on an image",
+                Name = GetParticularString("The domino structure type", "Circle"),
+                Description = _("Add a circle bomb based on an image"),
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateCircleVM(
@@ -190,8 +192,8 @@ namespace DominoPlanner.Usage
             });
             ViewModels.Add(new DominoProviderObjectEntry()
             {
-                Name = "Spiral",
-                Description = "Add a spiral based on an image",
+                Name = GetParticularString("The domino structure type", "Spiral"),
+                Description = _("Add a spiral based on an image"),
                 Icon = "/Icons/insert_table.ico",
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateSpiralVM(
@@ -200,8 +202,8 @@ namespace DominoPlanner.Usage
             });
             ViewModels.Add(new NewAssemblyEntry(parentProject)
             {
-                Name = "Subproject",
-                Description = "Add a subproject with the same color list",
+                Name = _("Subproject"),
+                Description = _("Add a subproject with the same color list"),
                 Icon = "/Icons/folder_txt.ico",
                 ImageInformation = new NoImageInformation()
             });
@@ -282,15 +284,15 @@ namespace DominoPlanner.Usage
             }
             catch
             {
-                await Errorhandler.RaiseMessage("The image file is not readable, please select another file", "Invalid file", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("The image file is not readable, please select another file"), _("Invalid file"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                 InternPictureName = oldfilename;
             }
         }
         private async void OpenNewImage()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = "Image files" });
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All Files" });
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = _("Image files") });
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All Files") });
             openFileDialog.AllowMultiple = false;
             var result = await openFileDialog.ShowAsync(NewObjectVM.Window);
             if (result != null && result.Length != 0)
@@ -314,7 +316,7 @@ namespace DominoPlanner.Usage
 
             if (string.IsNullOrEmpty(finalImagePath) || string.IsNullOrWhiteSpace(finalImagePath))
             {
-                await Errorhandler.RaiseMessage("Please choose an image", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("Please choose an image"), _("Missing Values"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                 InternPictureName = finalImagePath;
                 return false;
             }
@@ -332,7 +334,7 @@ namespace DominoPlanner.Usage
             }
             catch (IOException)
             {
-                await Errorhandler.RaiseMessage("Copying the image into the project folder failed.\nPlease check the permissions to this file.", "", Errorhandler.MessageType.Warning, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("Copying the image into the project folder failed.\nPlease check the permissions to this file."), "", Errorhandler.MessageType.Warning, NewObjectVM.Window);
                 InternPictureName = finalImagePath;
                 return false;
             }
@@ -398,12 +400,12 @@ namespace DominoPlanner.Usage
 
                 if (File.Exists(resultPath))
                 {
-                    await Errorhandler.RaiseMessage("This name is already in use in this project.\n Please choose a different Name.", "Error!", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                    await Errorhandler.RaiseMessage(_("This name is already in use in this project.\n Please choose a different Name."), _("Error!"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
                 {
-                    await Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                    await Errorhandler.RaiseMessage(_("You forgot to choose a name."), _("Missing Values"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 try
@@ -412,7 +414,7 @@ namespace DominoPlanner.Usage
 
                     if (!finalizeResult)
                     {
-                        throw new OperationCanceledException("Finalize failed");
+                        throw new OperationCanceledException(_("Finalize failed"));
                     }
                 }
                 catch (Exception ex)
@@ -421,7 +423,7 @@ namespace DominoPlanner.Usage
                     Workspace.CloseFile(Provider.CurrentProject);
                     ImageInformation.RevertChangesToFileSystem();
                     if (!(ex is OperationCanceledException))
-                        await Errorhandler.RaiseMessage("Project creation failed. Error mesage: \n" + ex.Message + "\n The created files have been deleted", "Failes creation", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                        await Errorhandler.RaiseMessage(string.Format(_("Project creation failed. Error mesage: \n{0}\n The created files have been deleted"), ex.Message), _("Error"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                     return null;
                 }
                 Provider.CurrentProject.Save();
@@ -431,7 +433,7 @@ namespace DominoPlanner.Usage
             }
             catch (Exception es)
             {
-                await Errorhandler.RaiseMessage("Could not create a new Project!" + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, "Error!", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("Could not create a new Project!") + "\n" + es + "\n" + es.InnerException + "\n" + es.StackTrace, _("Error"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                 return null;
             }
         }
@@ -451,7 +453,7 @@ namespace DominoPlanner.Usage
         {
             if (string.IsNullOrEmpty(filename) || string.IsNullOrWhiteSpace(filename))
             {
-                await Errorhandler.RaiseMessage("You forgot to choose a name.", "Missing Values", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("You forgot to choose a name."), _("Missing Values"), Errorhandler.MessageType.Error, NewObjectVM.Window);
                 return null;
             }
             string newProject = Path.Combine(ProjectPath, "Planner Files", filename);
@@ -465,7 +467,7 @@ namespace DominoPlanner.Usage
                 {
                     if (Directory.Exists(newProject))
                     {
-                        await Errorhandler.RaiseMessage("A subassembly with this name already exists. Please choose a different name", "Error",
+                        await Errorhandler.RaiseMessage(_("A subassembly with this name already exists. Please choose a different name"), _("Error"),
                             Errorhandler.MessageType.Error, NewObjectVM.Window);
                         return null;
                     }
@@ -486,7 +488,7 @@ namespace DominoPlanner.Usage
             catch
             {
                 if (Directory.Exists(newProject)) Directory.Delete(newProject, true);
-                await Errorhandler.RaiseMessage("Project creation failed. The file system changes have been reverted", "Error", Errorhandler.MessageType.Error, NewObjectVM.Window);
+                await Errorhandler.RaiseMessage(_("Project creation failed. The file system changes have been reverted"), _("Error"), Errorhandler.MessageType.Error, NewObjectVM.Window);
             }
             return null;
         }

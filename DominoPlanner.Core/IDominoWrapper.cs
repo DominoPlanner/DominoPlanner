@@ -63,7 +63,13 @@ namespace DominoPlanner.Core
         {
             get
             {
+                if (Path.IsPathRooted(_colorPath))
+                {
+                    // Something went horribly wrong. Make it a relative path again.
+                    _colorPath = Workspace.MakeRelativePath(Workspace.Find(this), _colorPath);
+                }
                 return _colorPath;
+                
             }
             set
             {

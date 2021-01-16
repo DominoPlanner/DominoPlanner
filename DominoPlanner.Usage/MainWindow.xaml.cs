@@ -17,18 +17,17 @@ namespace DominoPlanner.Usage
         public MainWindow()
         {
             // Find out current locale if started for the first time. Needs to be done after app is started, but before first window is shown
-            Properties.Settings.Default.Upgrade();
-            if (Properties.Settings.Default.FirstStartup)
+            var vm =  new MainWindowViewModel();
+            if (vm.FirstStartup)
             {
                 var currentLocale = System.Globalization.CultureInfo.CurrentCulture;
                 var selectedLang = Localizer.GetAllLocales().Contains(currentLocale) ? currentLocale.Name : "en-US";
-                Properties.Settings.Default.Language = selectedLang;
+                Localizer.Language = selectedLang;
                 Localizer.LocalizerInstance.LoadLanguage(selectedLang);
-                Properties.Settings.Default.Save();
             }
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel();
+            DataContext = vm;
             KeyDown += (o, e) => KeyPressedHandler(o, e);
             Opened += (o, e) => MainWindow_Initialized();
             PipeManager = new NamedPipeManager("DominoPlanner");

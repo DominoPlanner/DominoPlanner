@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
     class CreateFieldVM : DominoProviderVM
     {
         #region CTOR
@@ -14,16 +15,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             AllowRegeneration = false;
             Field_templates = new List<StandardSize>
             {
-                new StandardSize("8mm", new Sizes(8, 8, 24, 8)),
-                new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)),
-                new StandardSize("User Size", new Sizes(10, 10, 10, 10))
+                new StandardSize(_("8mm"), new Sizes(8, 8, 24, 8)),
+                new StandardSize(_("Tortoise"), new Sizes(0, 48, 24, 0)),
+                new StandardSize(GetParticularString("User defined field dimensions", "User Size"), new Sizes(10, 10, 10, 10))
             };
             ReloadSizes();
             AllowRegeneration = AllowRegenerate;
             Refresh();
             if (fieldParameters.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
-            TargetSizeAffectedProperties = new string[] {"Length", "Height" };
+            TargetSizeAffectedProperties = new string[] {nameof(Length), nameof(Height) };
         }
         #endregion
 
@@ -211,7 +212,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedItem != value)
                 {
                     var tempSelItem = _SelectedItem;
-                    if (_SelectedItem?.Name=="User Size")
+                    if (_SelectedItem?.Name==GetParticularString("User defined field dimensions", "User Size"))
                     {
                         _SelectedItem.Sizes.a = HorizontalDistance;
                         _SelectedItem.Sizes.b = HorizontalSize;
@@ -227,7 +228,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _SelectedItem = value;
                     if (SelectedItem == null)
                         return;
-                    if (SelectedItem.Name.Equals("User Size"))
+                    if (SelectedItem.Name.Equals(GetParticularString("User defined field dimensions", "User Size")))
                         CanChange = true;
                     else
                         CanChange = false;
@@ -283,9 +284,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         protected override void PostCalculationUpdate()
         {
-            TabPropertyChanged("Length", ProducesUnsavedChanges: false);
-            TabPropertyChanged("Height", ProducesUnsavedChanges: false);
-            TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(Length), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(Height), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(DominoCount), ProducesUnsavedChanges: false);
         }
         private void UpdateSizes()
         {

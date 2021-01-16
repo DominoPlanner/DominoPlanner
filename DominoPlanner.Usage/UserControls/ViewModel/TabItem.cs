@@ -11,6 +11,7 @@ using System.Windows.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
     public sealed class TabItem : ModelBase
     {
         #region CTOR
@@ -48,7 +49,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             else
             {
-                throw new InvalidOperationException("Incorrect file extension");
+                throw new InvalidOperationException(_("Incorrect file extension"));
             }
         }
 
@@ -235,8 +236,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_CurrentProject != value)
                 {
                     _CurrentProject = value;
-                    TabPropertyChanged("VisibleFieldplan", ProducesUnsavedChanges: false);
-                    TabPropertyChanged("Collapsible", ProducesUnsavedChanges: false);
+                    TabPropertyChanged(nameof(VisibleFieldplan), ProducesUnsavedChanges: false);
+                    TabPropertyChanged(nameof(Collapsible), ProducesUnsavedChanges: false);
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }

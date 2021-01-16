@@ -10,7 +10,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Width="650" CanResize="False" Icon="/Icons/DominoCalculator.ico" Height="635"
         x:Class="DominoPlanner.Usage.NewObject"
-        Title="NewObject">
+        Title="{local:Gettext Window title|New object}">
     <Window.DataTemplates>
         <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
             <View:FieldSize HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
@@ -28,7 +28,7 @@
 
         <DataTemplate DataType="{x:Type local:SingleImageInformation}">
             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={}Image Source: {0}}"
+                <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={local:Gettext 'Image Source: {0}'}}"
                            Margin="5" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
                 <Border DockPanel.Dock="Bottom" Background="White" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" DragDrop.AllowDrop="True" local:FileDragDropHelper.IsFileDragDropEnabled="True" local:FileDragDropHelper.FileDragDropTarget="{Binding Path=.}">
                     <ContentControl Content="{Binding InternPictureName}">
@@ -37,7 +37,7 @@
                                 <Image Source="{Binding DataContext, RelativeSource={RelativeSource Self}, Converter={StaticResource BitmapValueConverter}}"></Image>
                             </DataTemplate>
                             <DataTemplate x:Key="EmptyImageTemplate">
-                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Click to select an image</TextBlock>
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{local:Gettext Click to select an image\\n(or drop it here)}"></TextBlock>
                             </DataTemplate>
                         </ContentControl.Resources>
                         <ContentControl.DataTemplates>
@@ -58,7 +58,7 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:NewAssemblyEntry}">
             <StackPanel Orientation="Vertical">
-                <TextBlock>Color path (inherited from parent):</TextBlock>
+                <TextBlock Text="{local:Gettext Color path (inherited from parent):}"/>
                 <TextBlock Margin="5, 0, 0, 0" Text="{Binding ColorPath}" TextWrapping="Wrap"/>
             </StackPanel>
         </DataTemplate>
@@ -72,14 +72,14 @@
         <DockPanel Margin="2" VerticalAlignment="Stretch">
             <local:ImageButton DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                                Image="/Icons/ok.ico" IsDefault="True"
-                               Content="Create" Command="{Binding CreateIt}"/>
+                               Content="{local:Gettext Create}" Command="{Binding CreateIt}"/>
             <StackPanel DockPanel.Dock="Right" >
-                <TextBlock>Object specific settings:</TextBlock>
+                <TextBlock Text="{local:Gettext Object specific settings:}"></TextBlock>
                 <ContentControl Margin="5" Content="{Binding CurrentViewModel}" Width="300"/>
             </StackPanel>
             <Border DockPanel.Dock="Right" Width="1" BorderBrush="Black" BorderThickness="1"></Border>
             <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="5">
-                <TextBlock Text="Filename:" VerticalAlignment="Center" >
+                <TextBlock Text="{local:Gettext Filename:}" VerticalAlignment="Center" >
 
                 </TextBlock>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Text="{Binding Extension}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
@@ -88,7 +88,7 @@
             <ListBox Margin="5" DockPanel.Dock="Top" SelectedIndex="{Binding SelectedType}" Items="{Binding ViewModels}" HorizontalAlignment="Stretch" Height="250" VerticalAlignment="Top" BorderThickness="2">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="0" BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch" Width="363">
+                        <Border Margin="0" BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="2, 2, 2, 4">
                                 <Image Source="{Binding Icon}" Height="36" VerticalAlignment="Center"/>
                                 <StackPanel Margin="3, 0, 0, 0" Orientation="Vertical">

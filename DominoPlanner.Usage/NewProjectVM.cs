@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage
 {
@@ -16,7 +17,7 @@ namespace DominoPlanner.Usage
         {
             SelectedPath = UserSettings.Instance.StandardProjectPath;
             sPath = UserSettings.Instance.StandardColorArray;
-            ProjectName = "New Project";
+            ProjectName = _("New Project");
             rbStandard = true;
             rbCustom = false; //damit die Labels passen
             SelectFolder = new RelayCommand(o => { SelectProjectFolder(); });
@@ -43,7 +44,7 @@ namespace DominoPlanner.Usage
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    await Errorhandler.RaiseMessage("This folder already exists. Please choose another project name.", "Existing Folder", Errorhandler.MessageType.Error, window);
+                    await Errorhandler.RaiseMessage(_("This folder already exists. Please choose another project name."), GetParticularString("Error on project creation", "Existing Folder"), Errorhandler.MessageType.Error, window);
                     return;
                 }
 
@@ -53,7 +54,8 @@ namespace DominoPlanner.Usage
                 Directory.CreateDirectory(Path.Combine(projectpath, "Planner Files"));
 
                 DominoAssembly main = new DominoAssembly();
-                main.Save(Path.Combine(projectpath, ProjectName + "." + Declares.ProjectExtension));
+                var projectfilename = ProjectName + "." +  Declares.ProjectExtension;
+                main.Save(Path.Combine(projectpath, projectfilename));
 
                 if (File.Exists(sPath))
                 {
@@ -64,12 +66,12 @@ namespace DominoPlanner.Usage
 
                 main.Save();
 
-                await Errorhandler.RaiseMessage($"The project {ProjectName}.{Declares.ProjectExtension} has been created", "Created", Errorhandler.MessageType.Info, window);
+                await Errorhandler.RaiseMessage(string.Format(_("The project {0} has been created"), projectfilename), _("Project created"), Errorhandler.MessageType.Info, window);
                 Close = true;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Project creation failed: {0}", e.ToString());
+                Console.WriteLine(_("Project creation failed: {0}"), e.ToString());
             }
         }
 
@@ -80,8 +82,8 @@ namespace DominoPlanner.Usage
             {
                 openFileDialog.Directory = sPath;
                 openFileDialog.AllowMultiple = false;
-                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ColorExtension }, Name = "Color files" });
-                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
+                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ColorExtension }, Name = _("Color files") });
+                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
             }
             catch (Exception) { }
             var result = openFileDialog.ShowDialog();

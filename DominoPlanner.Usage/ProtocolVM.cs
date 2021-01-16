@@ -13,6 +13,7 @@ using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     public enum Corner
     {
         TopLeft,
@@ -504,7 +505,7 @@ namespace DominoPlanner.Usage
                 DefaultExtension = ".xlsx",
                 InitialFileName = Titel
             };
-            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = "Excel Document" });
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
             var result = dlg.ShowDialog();
             if (result != null && result != "")
             {
@@ -515,7 +516,7 @@ namespace DominoPlanner.Usage
                     process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
                     process.Start();
                 }
-                catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
 
@@ -526,7 +527,7 @@ namespace DominoPlanner.Usage
                 DefaultExtension = ".html",
                 InitialFileName = Titel
             };
-            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = "Hypertext Markup Language" });
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
             var filename = dlg.ShowDialog();
             if (filename != null && filename != "")
             {
@@ -541,7 +542,7 @@ namespace DominoPlanner.Usage
                     process.StartInfo = new ProcessStartInfo(filename) { UseShellExecute = true };
                     process.Start();
                 }
-                catch (Exception ex) { await Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
 #endregion

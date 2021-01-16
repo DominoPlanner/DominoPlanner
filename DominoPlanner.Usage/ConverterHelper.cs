@@ -17,6 +17,7 @@ using ThemeEditor.Controls.ColorPicker;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     class ConverterHelper
     {
     }
@@ -191,10 +192,10 @@ namespace DominoPlanner.Usage
         {
             return value switch
             {
-                FloydSteinbergDithering _ => "Floyd/Steinberg Dithering",
-                JarvisJudiceNinkeDithering _ => "Jarvis/Judice/Ninke Dithering",
-                StuckiDithering _ => "Stucki Dithering",
-                _ => "No Dithering",
+                FloydSteinbergDithering _ => _("Floyd/Steinberg Dithering"),
+                JarvisJudiceNinkeDithering _ => _("Jarvis/Judice/Ninke Dithering"),
+                StuckiDithering _ => _("Stucki Dithering"),
+                _ => _("No Dithering"),
             };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -231,10 +232,10 @@ namespace DominoPlanner.Usage
         {
             return value switch
             {
-                Cie1976Comparison _ => "CIE-76 (ISO 12647)",
-                CmcComparison _ => "CMC (l:c)",
-                Cie94Comparison _ => "CIE-94 (DIN 99)",
-                _ => "CIE-Delta E 2000",
+                Cie1976Comparison _ => _("CIE-76 (ISO 12647)"),
+                CmcComparison _ => _("CMC (l:c)"),
+                Cie94Comparison _ => _("CIE-94 (DIN 99)"),
+                _ => _("CIE-Delta E 2000"),
             };
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -466,7 +467,7 @@ namespace DominoPlanner.Usage
             if (value == null)
                 return "";
             if (value is int i && i == int.MaxValue)
-                return "(infinite)";
+                return _("(infinite)");
 
             return value.ToString();
         }

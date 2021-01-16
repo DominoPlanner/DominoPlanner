@@ -27,8 +27,8 @@ namespace DominoPlanner.Usage
                 this.Key = key;
             else
             {
-                this.Key = splitted[0];
-                this.Context = splitted[1];
+                this.Key = splitted[1];
+                this.Context = splitted[0];
             }
         }
         public GettextExtension(string key, params object[] @params)
@@ -90,7 +90,22 @@ namespace DominoPlanner.Usage
             return false;
         } // LoadLanguage
 
-        public string Language { get; private set; } = Properties.Settings.Default.Language;
+        private static string _Language;
+        [SettingsAttribute("MainWindowViewModel", "en-US")]
+        public static string Language
+        {
+            get { 
+                return (string) UserSettingsSerializer.Instance.GetPropertyValue("MainWindowViewModel", "Language");
+            }
+            set
+            {
+                if (_Language != value)
+                {
+                    _Language = value;
+                    UserSettingsSerializer.Instance.AddPropertyValue("MainWindowViewModel", "Language", value);
+                }
+            }
+        }
 
         public string this[string key]
         {

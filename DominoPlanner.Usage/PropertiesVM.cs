@@ -15,6 +15,7 @@ using System.Windows.Input;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     public class PropertiesVM : ModelBase
     {
         public object Model { get; set; }
@@ -273,7 +274,7 @@ namespace DominoPlanner.Usage
             switch (value)
             {
                 case Exception ex:
-                    return "Exception of type " + ex.GetType() + ":\n" + ex.StackTrace;
+                    return string.Format(_("Exception of type {0}"), ex.GetType()) + ":\n" + ex.StackTrace;
                 case System.Collections.IList ie:
                     var type = ie.GetType();
                     var membertype = (type.GenericTypeArguments.Count() > 0 ? type.GenericTypeArguments[0] : null) ?? type.GetElementType();

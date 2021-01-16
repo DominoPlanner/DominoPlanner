@@ -2,21 +2,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignHeight="50" d:DesignWidth="200"
              x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"
              >
     <UserControl.Resources>
-        <parent:FilterQualityToIntConverter x:Key="EnumToIntConverter"/>
-        <parent:FilterQualityToStringConverter x:Key="InterToStringConverter"/>
+        <local:FilterQualityToIntConverter x:Key="EnumToIntConverter"/>
+        <local:FilterQualityToStringConverter x:Key="InterToStringConverter"/>
     </UserControl.Resources>
     <Grid>
-        <HeaderedContentControl Header="{Binding ResizeQuality, Converter={StaticResource InterToStringConverter}, StringFormat=Resize Quality: {0}}">
+        <HeaderedContentControl Header="{Binding ResizeQuality, Converter={StaticResource InterToStringConverter}, StringFormat={local:Gettext 'Resize Quality: {0}'}}">
             <Grid ColumnDefinitions="1*, 3*, 1.5*">
-                <TextBlock Grid.Column="0" Text="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Text="{local:Gettext Rough interpolation|Pixel}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="2" 
                         IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding ResizeQuality, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
-                <TextBlock Grid.Column="2" Text="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext Fine interpolation|Smooth}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
         </HeaderedContentControl>
     </Grid>

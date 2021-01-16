@@ -7,7 +7,7 @@
         xmlns:intl="using:System.Globalization"
         x:Class="DominoPlanner.Usage.SetStandardV"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        Title="Set Standard" Height="600" Width="650" DataContext="SetStandardVM" Icon="/Icons/DominoCalculator.ico" CanResize="False">
+        Title="{local:Gettext Window title|Settings}" Height="600" Width="650" DataContext="SetStandardVM" Icon="/Icons/DominoCalculator.ico" CanResize="False">
     <DockPanel LastChildFill="True">
         <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Language (restart required)}">
             <ComboBox Items="{Binding Languages}" SelectedItem="{Binding CurrentLanguage}">
@@ -25,20 +25,20 @@
         </HeaderedContentControl>
         <HeaderedContentControl DockPanel.Dock="Top">
             <StackPanel>
-                <Label Content="Select a standard folder to store your projects in:" DockPanel.Dock="Top"/>
+                <Label Content="{local:Gettext Select a standard folder to store your projects in:}" DockPanel.Dock="Top"/>
                 <DockPanel DockPanel.Dock="Top">
-                    <local:ImageButton Image="/Icons/open.ico" DockPanel.Dock="Right" Content="Choose" Command="{Binding SetStandardPath}"/>
+                    <local:ImageButton Image="/Icons/open.ico" DockPanel.Dock="Right" Content="{local:Gettext Choose}" Command="{Binding SetStandardPath}"/>
                     <Label Content="{Binding standardpath}" VerticalAlignment="Center"/>
                 </DockPanel>
             </StackPanel>
         </HeaderedContentControl>
-        <HeaderedContentControl Header="Default color list" DockPanel.Dock="Top">
+        <HeaderedContentControl Header="{local:Gettext Default color list}" DockPanel.Dock="Top">
             <DockPanel>
                 <DockPanel LastChildFill="False" DockPanel.Dock="Top" >
                     <local:ImageButton DockPanel.Dock="Right" Command="{Binding SetStandardColor}"
-                                       Image="/Icons/open.ico" Content="Open Colorlist" />
+                                       Image="/Icons/open.ico" Content="{local:Gettext Open color list}" />
                     <local:ImageButton DockPanel.Dock="Right" Command="{Binding ClearList}"
-                                       Image="/Icons/new.ico" Content="New List" />
+                                       Image="/Icons/new.ico" Content="{local:Gettext New List}" />
                 </DockPanel>
                 <View:ColorListControl DataContext="{Binding ColorVM}" DockPanel.Dock="Top" />
             </DockPanel>

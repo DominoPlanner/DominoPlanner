@@ -192,7 +192,7 @@ namespace DominoPlanner.Usage
         public ContextMenuAttribute(string header, string imageSource, 
             string activated, bool isVisible = true, int index = 0)
         {
-            Header = header;
+            Header = Localizer._(header);
             ImageSource = imageSource;
             Activated = activated;
             IsVisible = isVisible;
@@ -201,7 +201,7 @@ namespace DominoPlanner.Usage
         public ContextMenuAttribute(string header, string imageSource,
             bool activated = true, bool isVisible = true, int index = 0)
         {
-            Header = header;
+            Header = Localizer._(header);
             ImageSource = imageSource;
             Activated = activated.ToString();
             IsVisible = isVisible;

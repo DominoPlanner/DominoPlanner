@@ -20,11 +20,10 @@ using SkiaSharp;
 using Avalonia.Data.Converters;
 using DominoPlanner.Core.RTree;
 using Avalonia.Collections;
-using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
-
+    using static Localizer;
     public class EditingToolVM : ModelBase
     {
         public EditProjectVM parent;

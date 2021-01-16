@@ -10,6 +10,7 @@ namespace DominoPlanner.Usage
 {
     static class ExtensionMethods
     {
+    // TODO: These methods must be removed
         public static string[] ShowDialog(this OpenFileDialog ofd)
         {
             return ofd.ShowAsync(MainWindowViewModel.GetWindow()).GetAwaiter().GetResult();
