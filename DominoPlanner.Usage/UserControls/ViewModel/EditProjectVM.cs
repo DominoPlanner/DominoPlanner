@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Avalonia.Input;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -293,7 +294,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     break;
             }
             UnsavedChanges = false;
-            RaisePropertyChanged("DominoList");
+            RaisePropertyChanged(nameof(DominoList));
         }
         public void UpdateUIElements()
         {
@@ -332,10 +333,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColorColumnConfig = new AvaloniaList<ColorControl.Column>
             {
                 new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
-                new ColorControl.Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true },
-                new ColorControl.Column() { DataField = "DominoColor.count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize=true },
-                new ColorControl.Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField = "DominoColor.count" },
-                new ColorControl.Column() { DataField = "ProjectCount[1]", Header = "Selected" }
+                new ColorControl.Column() { DataField = "DominoColor.name", Header = _("Name"), Width = new GridLength(100), CanResize = true },
+                new ColorControl.Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(70), CanResize=true },
+                new ColorControl.Column() { DataField = "ProjectCount[0]", Header = GetParticularString("Number of stones used in current field", "Used"), HighlightDataField = "DominoColor.count" },
+                new ColorControl.Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Number of stones currently selected", "Selected") }
             };
 
             _DominoList.Clear();
@@ -362,11 +363,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         bool iscopying = false;
         private async void Copy()
         {
-            if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
+            if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage(_("Copy/Paste is not supported in this project."), "Copy", Errorhandler.MessageType.Warning);
             ClearPastePositions();
             if (selectedDominoes.Count <= 0)
             {
-                await Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Nothing to copy!"), _("No selection"), Errorhandler.MessageType.Error);
                 return;
             }
             iscopying = true;
@@ -380,7 +381,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
                 FinalizePaste(true);
             }
             UpdateUIElements();
@@ -391,7 +392,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             bool pasteFailed = true;
             try
             {
-                if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
+                if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage(_("Copy/Paste is not supported in this project."), _("Paste"), Errorhandler.MessageType.Warning);
                 // find closest domino
                 int domino = FindDominoAtPosition(dominoPoint).idx;
                 if (PossiblePastePositions.Contains(domino))
@@ -409,7 +410,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
             finally
             {
@@ -584,13 +585,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     else
                     {
-                        await Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage(_("Adding rows is not supported in this project."), _("Add Row"), Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
@@ -615,13 +616,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     else
                     {
-                        await Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage(_("Adding columns is not supported in this project."), _("Add Row"), Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
@@ -651,12 +652,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    await Errorhandler.RaiseMessage("Could not remove a row in this project.", "Remove Row", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage(_("Removing rows is not supported in this project."), _("Remove Row"), Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
@@ -686,12 +687,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 else
                 {
-                    await Errorhandler.RaiseMessage("Could not remove a column in this project.", "Remove Column", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage(_("Removing columns is not supported in this project."), _("Remove Column"), Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                await Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
         internal void ClearFullSelection(bool undoable = false)

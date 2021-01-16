@@ -2,7 +2,10 @@
 using DominoPlanner.Core;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
@@ -28,6 +31,17 @@ namespace DominoPlanner.Usage
             }
 
             ColorVM = new ColorListControlVM(StandardColorPath);
+
+            Languages = Localizer.GetAllLocales().OrderBy(x => x.DisplayName).ToList();
+            var Selected = Languages.Where(x => x.Name == Properties.Settings.Default.Language);
+            if (Selected.Count() != 0)
+            {
+                CurrentLanguage = Selected.First();
+            }
+            else
+            {
+                CurrentLanguage = new CultureInfo("en-US");
+            }
         }
 
         #region prop
@@ -44,6 +58,21 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public List<CultureInfo> Languages { get; set; }
+
+        private CultureInfo culture;
+
+        public CultureInfo CurrentLanguage
+        {
+            get { return culture; }
+            set { culture = value;
+                Properties.Settings.Default.Language = value.Name;
+                Properties.Settings.Default.Save();
+                RaisePropertyChanged();
+            }
+        }
+
 
         private string _standardpath;
         public string standardpath

@@ -1,0 +1,569 @@
+# German translations for PACKAGE package
+# German translation for PACKAGE.
+# Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-16 17:35+0100\n"
+"PO-Revision-Date: 2021-01-16 17:36+0100\n"
+"Last-Translator: EMAIL@ADDRESS\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:146
+msgid "1px on screen = 1mm in real world"
+msgstr "1px auf dem Bildschirm = 1mm real"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:69
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:155
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:249
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:27
+msgid "Add Existing"
+msgstr "Hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:586
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:616
+msgid "Add Row"
+msgstr "Zeile einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:253
+msgid "Add Row above selected stone"
+msgstr "Zeile über ausgewähltem Stein hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:254
+msgid "Add Row below selected stone"
+msgstr "Zeile unterhalb ausgewähltem Stein hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:256
+msgid "Add column at the left from the selected stone"
+msgstr "Spalte links des ausgewählten Steins hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:255
+msgid "Add column at the right from the selected stone"
+msgstr "Spalte rechts des ausgewählten Steins hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:75
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:256
+msgid "Add column left"
+msgstr "Spalte links einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:74
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:255
+msgid "Add column right"
+msgstr "Spalte rechts einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:31
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:163
+msgid "Add existing Field/Structure"
+msgstr "Bestehendes Feld/Struktur hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:30
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:158
+msgid "Add existing project"
+msgstr "Bestehendes Projekt hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:72
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:253
+msgid "Add row above"
+msgstr "Zeile darüber einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:73
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:254
+msgid "Add row below"
+msgstr "Zeile darunter einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:31
+msgid "Add to selection"
+msgstr "Zur Auswahl hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1373
+msgid "Add/Delete Rows/Columns"
+msgstr "Zeilen/Spalten löschen oder einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:616
+msgid "Adding columns is not supported in this project."
+msgstr "Das Einfügen von Spalten wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:586
+msgid "Adding rows is not supported in this project."
+msgstr "Das Einfügen von Zeilen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:552
+msgid "All changes saved"
+msgstr "Alle Änderungen gespeichert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:544
+msgid "All files saved"
+msgstr "Alle Dateien gespeichert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:315
+msgid "Amount:"
+msgstr "Anzahl:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:99
+msgid "Background Color:"
+msgstr "Hintergrundfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:302
+msgid "Basic Settings"
+msgstr "Grundeinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:106
+msgid "Border Color:"
+msgstr "Linienfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:109
+msgid "Border Size:"
+msgstr "Linienstärke:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:87
+msgid "Boundary treatment:"
+msgstr "Rand:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:304
+msgid "Buildtools"
+msgstr "Aufbauwerkzeuge"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:537
+msgid "Circle selection"
+msgstr "Kreisförmige Auswahl"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:211
+msgid "Clear Selection"
+msgstr "Auswahl aufheben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:77
+msgid "Clear selection"
+msgstr "Auswahl aufheben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:281
+msgid "Click color to replace"
+msgstr "Farbe durch Anklicken ersetzen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:180
+msgid "Coming soon!"
+msgstr "Dies ist eine Baustelle!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:66
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:227
+msgid "Copy"
+msgstr "Kopieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:367
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:396
+msgid "Copy/Paste is not supported in this project."
+msgstr "Kopieren/Einfügen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:521
+msgid "Could not create new Project!"
+msgstr "Erstellung eines neuen Projekts gescheitert!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:132
+msgid "Current Length: {0:F2} mm"
+msgstr "Aktuelle Länge: {0:F2} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:438
+msgid "Damaged File"
+msgstr "Datei beschädigt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:136
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:320
+msgid "Dimensions: {0} mm x {1} mm"
+msgstr "Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:119
+msgid "Display image above dominoes"
+msgstr "Quellbild über den Steinen anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:116
+msgid "Display image below dominoes"
+msgstr "Quellbild unter den Steinen anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:63
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:216
+msgid "Editing"
+msgstr "Bearbeiten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:404
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:449
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:554
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:385
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:414
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:592
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:622
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:656
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:690
+msgid "Error"
+msgstr "Fehler"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:404
+msgid "Error loading opened projects!"
+msgstr "Fehler beim Laden geöffneter Projekte!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:554
+msgid "Error saving changes"
+msgstr "Fehler beim Speichern von Änderungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:539
+msgid "Error saving files!"
+msgstr "Fehler beim Speichern von Dateien!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:521
+msgid "Error!"
+msgstr "Fehler!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:120
+msgid ""
+"Esc to clear selection\n"
+"r to trigger quick replace"
+msgstr ""
+"Esc hebt Auswahl auf\n"
+"r: Schnellersetzung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:91
+msgid "Exclude dominoes on selection boundary"
+msgstr "Steine auf der Grenze des Auswahlbereichs ausschließen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:238
+msgid "Flip Horizontally"
+msgstr "Horizontal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:243
+msgid "Flip Vertically"
+msgstr "Vertikal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:673
+msgid "Freehand selection"
+msgstr "Freihandauswahl"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:114
+msgid "Image overlay transparency:"
+msgstr "Bildtransparenz:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:83
+msgid "Include diagonals"
+msgstr "Inklusive Diagonalen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:88
+msgid "Include dominoes on selection boundary"
+msgstr "Steine auf der Grenze des Auswahlbereichs einschließen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:74
+msgid "Invert selection"
+msgstr "Auswahl umkehren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:12
+msgid "Language (restart required)"
+msgstr "Sprache (Neustart erforderlich)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:37
+msgid "Left mouse button: add, right mouse button: remove"
+msgstr "Linke Maustaste: hinzufügen, rechte Maustaste: entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1164
+msgid "Measure distance"
+msgstr "Abstand messen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:237
+msgid "Mirror"
+msgstr "Spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:73
+msgid "Missing Color Table"
+msgstr "Farbenliste fehlt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:337
+msgid "Name"
+msgstr "Name"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:306
+msgid "Name:"
+msgstr "Name:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:18
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:137
+msgid "New"
+msgstr "Neu"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:22
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:145
+msgid "New Field/Structure"
+msgstr "Neues Feld/Struktur hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:21
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:140
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:371
+msgid "No selection"
+msgstr "Nichts ausgewählt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:371
+msgid "Nothing to copy!"
+msgstr "Nichts zum Kopieren ausgewählt!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:313
+msgid "Open Folder"
+msgstr "Ordner öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:123
+msgid "Open Image:"
+msgstr "Bild öffnen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:124
+msgid "Open image"
+msgstr "Bild öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:396
+msgid "Paste"
+msgstr "Einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:461
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:507
+msgid "Please choose"
+msgstr "Bitte auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:461
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:507
+msgid "Please choose a project folder."
+msgstr "Bitte einen Ordner zum Speichern der Projekte auswählen."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:73
+msgid "Please create a default color table."
+msgstr "Bitte erstelle deine Standard-Farbenliste."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:575
+msgid "Polygon selection"
+msgstr "Polygon-Auswahlbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:507
+msgid "Rectangle selection"
+msgstr "Rechteck-Auswahlbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:49
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:200
+msgid "Redo"
+msgstr "Wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:71
+msgid "Redo selection operation"
+msgstr "Letzten Auswahlvorgang wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:80
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:258
+msgid "Remove"
+msgstr "Entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:685
+msgid "Remove Column"
+msgstr "Spalte löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:651
+msgid "Remove Row"
+msgstr "Zeile löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:42
+msgid "Remove from selection"
+msgstr "Von Auswahl entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:84
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:263
+msgid "Remove selected columns"
+msgstr "Ausgewählte Spalten löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:83
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:262
+msgid "Remove selected rows"
+msgstr "Ausgewählte Zeilen löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:685
+msgid "Removing columns is not supported in this project."
+msgstr "Das Löschen von Spalten wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:651
+msgid "Removing rows is not supported in this project."
+msgstr "Das Löschen von Zeilen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:309
+msgid "Rows:"
+msgstr "Zeilen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:36
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:39
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:174
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:177
+msgid "Save"
+msgstr "Speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:539
+#, csharp-format
+msgid "Save aborted, unable to save file {0}"
+msgstr "Speichern abgebrochen: Datei {0} konnte nicht gespeichert werden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:40
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:182
+msgid "Save all"
+msgstr "Alles speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:366
+#, csharp-format
+msgid "Save unsaved changes of {0}?"
+msgstr "Ungespeicherte Änderungen in {0} speichern?"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:119
+msgid "Select"
+msgstr "Auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:212
+msgid ""
+"Select all stones in the color selected in the list below. \n"
+"If some stones are selected this function only applies to the selected "
+"stones."
+msgstr ""
+"Alle Steine in der gewählten Farbe auswählen\n"
+"Wenn bereits Steine ausgewählt sind, wird die Auswahl aller andersfarbiger "
+"Steine aufgehoben."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:741
+msgid "Select connected area"
+msgstr "Zusammenhängenden Bereich auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:212
+msgid "Select stones in selected color"
+msgstr "Steine in ausgewählter Farbe auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:340
+msgctxt "Number of stones currently selected"
+msgid "Selected"
+msgstr "Ausgewählt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:30
+msgid "Selection Mode:"
+msgstr "Auswahlmodus:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:47
+msgid "Selection Shape:"
+msgstr "Auswahlform:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:58
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:208
+msgid "Set Defaults"
+msgstr "Voreinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:55
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:193
+msgid ""
+"Shortcuts:\n"
+"{0}"
+msgstr ""
+"Tastenkürzel:\n"
+"{0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:149
+msgid "Show entire field"
+msgstr "Ganzes Feld zeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:133
+msgid "Snap to 5 degree increments (Toggle with Ctrl)"
+msgstr "In 5-Grad-Schritten einrasten (mit Strg umschalten)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:312
+msgid "Stones/Row:"
+msgstr "Steine pro Zeile:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:544
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:552
+msgid "Success"
+msgstr "Erfolgreich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:438
+#, csharp-format
+msgid ""
+"The main project file of project {0} was damaged. An attempt to restore the "
+"file has been unsuccessful. \n"
+"The project will be removed from the list of opened projects."
+msgstr ""
+"Die Hauptdatei des Projekts {0}  wurde als beschädigt erkannt. Ein Versuch, "
+"die Datei wiederherzustellen, war nicht erfolgreich.\n"
+"Das Projekt wird aus der Liste der offenen Projekte entfernt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:338
+msgctxt "Number of stones available"
+msgid "Total"
+msgstr "Gesamt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:449
+#, csharp-format
+msgid ""
+"Unable to load project {0}. It might have been moved or damaged. \n"
+"Please re-add it at its current location.\n"
+"\n"
+"The project has been removed from the list of opened projects."
+msgstr ""
+"Projekt {0} konnte nicht geladen werden. Es könnte verschoben oder "
+"beschädigt worden sein.\n"
+"Bitte füge es an seinem aktuellen Speicherplatz erneut hinzu.\n"
+"\n"
+"Das Projekt wurde als der Liste der offenen Projekte entfernt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:48
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:192
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:45
+msgid "Undo Redo"
+msgstr "Rückgängig/Wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:68
+msgid "Undo last selection operation"
+msgstr "Letzten Auswahlvorgang rückgängig machen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:339
+msgctxt "Number of stones used in current field"
+msgid "Used"
+msgstr "Verwendet"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:923
+msgctxt "DisplaySettingsTool"
+msgid "View Properties"
+msgstr "Anzeigeeinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:366
+msgid "Warning"
+msgstr "Warnung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:278
+msgid "Workspace"
+msgstr "Arbeitsbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1297
+msgid "Zoom"
+msgstr "Zoom"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:157
+msgid "Zoom in"
+msgstr "Hineinzoomen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:152
+msgid "Zoom out"
+msgstr "Herauszoomen"
+
+#~ msgid "Set Standards"
+#~ msgstr "Voreinstellungen"

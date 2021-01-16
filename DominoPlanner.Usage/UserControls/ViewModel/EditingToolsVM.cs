@@ -20,6 +20,7 @@ using SkiaSharp;
 using Avalonia.Data.Converters;
 using DominoPlanner.Core.RTree;
 using Avalonia.Collections;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -121,8 +122,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public SelectionToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "rect_selectDrawingImage";
-            Name = "Select";
-            HelpToolTip = "Esc to clear selection\nr to trigger quick replace";
+            Name = _("Select");
+            HelpToolTip = _("Esc to clear selection\nr to trigger quick replace");
             SelectionTools = new ObservableCollection<SelectionDomain>() {
                 new RectangleSelection(parent), new CircleSelectionDomain(parent),
                 new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent), new FillBucketDomain(parent)};
@@ -509,7 +510,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public RectangleSelection(EditProjectVM parent) : base(parent)
         {
             Image = "rect_selectDrawingImage";
-            Name = "Rectangle";
+            Name = _("Rectangle selection");
         }
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
@@ -539,7 +540,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public CircleSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "round_selectDrawingImage";
-            Name = "Circle";
+            Name = _("Circle selection");
         }
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
@@ -577,7 +578,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public PolygonSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "poly_selectDrawingImage";
-            Name = "Polygon";
+            Name = _("Polygon selection");
             points = new List<Avalonia.Point>();
             SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
             
@@ -675,7 +676,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public FreehandSelectionDomain(EditProjectVM parent) : base(parent)
         {
             Image = "freehand_selectDrawingImage";
-            Name = "Freehand";
+            Name = _("Freehand selection");
             SelectionShape = new SKPath();
             MouseDownPoint = new Avalonia.Point(-1, -1);
             SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
@@ -713,7 +714,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
             var last = points.Last();
-            Debug.WriteLine("Hit, Length: " + points.Count);
             if ((last.X - pos.X) * (last.X - pos.X) + (last.Y - pos.Y) * (last.Y - pos.Y) > 3)
             {
                 points.Add(pos);
@@ -744,7 +744,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             this.parent = parent;
             Image = "fill_bucketDrawingImage";
-            Name = "Fill area";
+            Name = _("Select connected area");
         }
 
         public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
@@ -926,7 +926,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public DisplaySettingsToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "display_settingsDrawingImage";
-            Name = "View Properties";
+            Name = GetParticularString("DisplaySettingsTool", "View Properties");
             ShowImageClick = new RelayCommand(o => { ShowImage(); });
 
             if (parent.CurrentProject != null && parent.CurrentProject.PrimaryImageTreatment != null)
@@ -1318,7 +1318,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public RulerToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "ruler2DrawingImage";
-            Name = "Measure distance";
+            Name = _("Measure distance");
             MakeInvisible();
         }
         public override void KeyPressed(KeyEventArgs keyArgs)
@@ -1451,7 +1451,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ZoomToolVM(EditProjectVM parent) : base(parent)
         {
             Image = "zoomDrawingImage";
-            Name = "Zoom";
+            Name = _("Zoom");
             ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue *= 1.1);
             ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue /= 1.1);
             Zoom1To1 = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue = 1);
@@ -1527,7 +1527,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public RowColumnInsertionVM(EditProjectVM parent) : base(parent)
         {
             Image = "add_delete_rowDrawingImage";
-            Name = "Add/Delete Rows";
+            Name = _("Add/Delete Rows/Columns");
             
         }
         private bool insertionMode = true;

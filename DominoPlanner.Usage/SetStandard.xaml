@@ -4,22 +4,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View"
+        xmlns:intl="using:System.Globalization"
         x:Class="DominoPlanner.Usage.SetStandardV"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Title="Set Standard" Height="600" Width="650" DataContext="SetStandardVM" Icon="/Icons/DominoCalculator.ico" CanResize="False">
     <DockPanel LastChildFill="True">
-        <Label Content="Select a standard folder to store your projects in:" DockPanel.Dock="Top"/>
-        <DockPanel DockPanel.Dock="Top">
-            <local:ImageButton Image="/Icons/open.ico" DockPanel.Dock="Right" Content="Choose" Command="{Binding SetStandardPath}"/>
-            <Label Content="{Binding standardpath}" VerticalAlignment="Center"/>
-        </DockPanel>
-        <DockPanel LastChildFill="False" DockPanel.Dock="Top" >
-            <Label Content="Default color list:" VerticalAlignment="Center"/>
-            <local:ImageButton DockPanel.Dock="Right" Command="{Binding SetStandardColor}"
-                               Image="/Icons/open.ico" Content="Open Colorlist" />
-            <local:ImageButton DockPanel.Dock="Right" Command="{Binding ClearList}"
-                               Image="/Icons/new.ico" Content="New List" />
-        </DockPanel>
-        <View:ColorListControl DataContext="{Binding ColorVM}" DockPanel.Dock="Top" />
+        <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Language (restart required)}">
+            <ComboBox Items="{Binding Languages}" SelectedItem="{Binding CurrentLanguage}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type intl:CultureInfo}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding DisplayName}"></TextBlock>
+                            <TextBlock Text=" ("></TextBlock>
+                            <TextBlock Text="{Binding Name}"/>
+                            <TextBlock>)</TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </HeaderedContentControl>
+        <HeaderedContentControl DockPanel.Dock="Top">
+            <StackPanel>
+                <Label Content="Select a standard folder to store your projects in:" DockPanel.Dock="Top"/>
+                <DockPanel DockPanel.Dock="Top">
+                    <local:ImageButton Image="/Icons/open.ico" DockPanel.Dock="Right" Content="Choose" Command="{Binding SetStandardPath}"/>
+                    <Label Content="{Binding standardpath}" VerticalAlignment="Center"/>
+                </DockPanel>
+            </StackPanel>
+        </HeaderedContentControl>
+        <HeaderedContentControl Header="Default color list" DockPanel.Dock="Top">
+            <DockPanel>
+                <DockPanel LastChildFill="False" DockPanel.Dock="Top" >
+                    <local:ImageButton DockPanel.Dock="Right" Command="{Binding SetStandardColor}"
+                                       Image="/Icons/open.ico" Content="Open Colorlist" />
+                    <local:ImageButton DockPanel.Dock="Right" Command="{Binding ClearList}"
+                                       Image="/Icons/new.ico" Content="New List" />
+                </DockPanel>
+                <View:ColorListControl DataContext="{Binding ColorVM}" DockPanel.Dock="Top" />
+            </DockPanel>
+        </HeaderedContentControl>
     </DockPanel>
 </Window>
