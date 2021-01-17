@@ -498,19 +498,19 @@ namespace DominoPlanner.Usage
                 var delta = dt1 - dt2;
                 if (delta.Days > 0)
                 {
-                    return string.Format("{0} days ago", delta.ToString("%d"));
+                    return string.Format(GetPluralString("{0} day ago", "{0} days ago", delta.Days), delta.Days);
                 }
                 else if (delta.Hours > 0)
                 {
-                    return string.Format("{0} hours ago", delta.ToString("%h"));
+                    return string.Format(GetPluralString("{0} hour ago", "{0} hours ago", delta.Hours), delta.Hours);
                 }
                 else if (delta.Minutes > 0)
                 {
-                    return string.Format("{0} minutes ago", delta.ToString("%m"));
+                    return string.Format(GetPluralString("{0} minute ago", "{0} minutes ago", delta.Minutes), delta.Minutes);
                 }
                 else 
                 {
-                    return string.Format("{0} seconds ago", delta.ToString("%s"));
+                    return string.Format(GetPluralString("{0} second ago", "{0} seconds ago", delta.Seconds), delta.Seconds);
                 }
             }
             return null;

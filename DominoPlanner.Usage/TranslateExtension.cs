@@ -142,6 +142,14 @@ namespace DominoPlanner.Usage
         {
             return LocalizerInstance[key, context];
         }
+        public static string GetPluralString(string text, string pluralText, int n)
+        {
+            if (LocalizerInstance.catalog != null)
+            {
+                return LocalizerInstance.catalog.GetPluralString(text, pluralText, n);
+            }
+            return n == 1 ? text : pluralText; 
+        }
     }
 
 }

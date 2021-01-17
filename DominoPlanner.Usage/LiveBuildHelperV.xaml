@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         x:Class="DominoPlanner.Usage.LiveBuildHelperV"
         Title="{local:Gettext FieldBlockViewer}"
-        Height="600" Width="800"
+        Height="600" Width="900"
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
     <Window.Resources>
         <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
@@ -64,9 +64,9 @@
                             <ia:ChangePropertyAction PropertyName="IsVisible" Value="True"/>
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
-                    <Button Content="Go To Last Pin" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
+                    <Button Content="{local:Gettext Go To Last Pin}" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
                         <ToolTip.Tip>
-                            <MultiBinding StringFormat="{}Go to Row: {0}, Block {1}">
+                            <MultiBinding StringFormat="{local:Gettext 'Go to Row {0}, Block {1}'}">
                                 <Binding Path="PositionSnapshots[0].Row"/>
                                 <Binding Path="PositionSnapshots[0].Column"/>
                             </MultiBinding>
@@ -98,13 +98,13 @@
                                                     </i:Interaction.Behaviors>
                                                     <TextBlock DockPanel.Dock="Left" FontWeight="Bold">
                                                         <TextBlock.Text>
-                                                            <MultiBinding StringFormat="{}Row: {0}, Block {1}">
+                                                            <MultiBinding StringFormat="{local:Gettext 'Row {0}, Block {1}'}">
                                                                 <Binding Path="Row"/>
                                                                 <Binding Path="Column"/>
                                                             </MultiBinding>
                                                         </TextBlock.Text>
                                                     </TextBlock>
-                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={}Creation Time: {0}}">
+                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={local:Gettext 'Creation Time: {0}'}}">
                                                         <TextBlock.Text>
                                                             <MultiBinding Converter="{StaticResource DateTimeDifferenceConverter}">
                                                                 <Binding Source="{StaticResource ticker}" Path="Now" Mode="OneWay"/>
@@ -116,7 +116,7 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-                                    <TextBlock Text="Click Pin to activate" Margin="0, 5"/>
+                                    <TextBlock Text="{local:Gettext Click Pin to activate}" Margin="0, 5"/>
                                 </StackPanel>
                             </Border>
                         </Popup>
