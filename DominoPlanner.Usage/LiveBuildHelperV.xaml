@@ -9,11 +9,13 @@
         mc:Ignorable="d"
         x:Class="DominoPlanner.Usage.LiveBuildHelperV"
         Title="FieldBlockViewer"
-        Height="600" Width="800"
+        Height="600" Width="900"
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
     <Window.Resources>
         <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
         <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
+        <local:IsSnapshottedConverter x:Key="IsSnapshottedConverter"/>
+        <local:DateTimeDifferenceConverter x:Key="DateTimeDifferenceConverter"/>
     </Window.Resources>
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="PointerPressed">
@@ -39,6 +41,88 @@
                 <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+            
+            <StackPanel Grid.Column="4" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                <ToggleButton Width="30" Height="30" Command="{Binding MakePositionSnapshot}" CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}" ToolTip.Tip="Pin this location to remember it later on">
+                    <ToggleButton.IsChecked>
+                        <MultiBinding Converter="{StaticResource IsSnapshottedConverter}">
+                            <Binding Path="PositionSnapshots" Mode="TwoWay"/>
+                            <Binding Path="SelectedRow"/>
+                            <Binding Path="SelectedBlock"/>
+                        </MultiBinding>
+                    </ToggleButton.IsChecked>
+                    <ToggleButton.Content>
+                        <Image Source="{StaticResource pinDrawingImage}"/>
+                    </ToggleButton.Content>
+                </ToggleButton>
+                <StackPanel Orientation="Horizontal">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding PositionSnapshots.Count}" Value="0">
+                            <ia:ChangePropertyAction PropertyName="IsVisible" Value="False"/>
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior ComparisonCondition="NotEqual" Binding="{Binding PositionSnapshots.Count}" Value="0">
+                            <ia:ChangePropertyAction PropertyName="IsVisible" Value="True"/>
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Button Content="Go To Last Pin" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
+                        <ToolTip.Tip>
+                            <MultiBinding StringFormat="{}Go to Row: {0}, Block {1}">
+                                <Binding Path="PositionSnapshots[0].Row"/>
+                                <Binding Path="PositionSnapshots[0].Column"/>
+                            </MultiBinding>
+                        </ToolTip.Tip>
+                    </Button>
+                    <StackPanel Orientation="Vertical">
+                        <ToggleButton Name="PinDropButton" Height="30">
+                            <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"
+                                                          Data="M 2 0 L 6 4 L 10 0 Z"/>
+
+                        </ToggleButton>
+                        <Popup IsOpen="{Binding #PinDropButton.IsChecked, Mode=TwoWay}" StaysOpen="False">
+                            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Vertical" Margin="2">
+                                    <ListBox Items="{Binding PositionSnapshots}" Width="200" BorderThickness="0" Padding="0">
+                                        <ListBox.Resources>
+                                            <local:Ticker x:Key="ticker"/>
+                                        </ListBox.Resources>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type local:PositionSnapshot}">
+                                                <DockPanel LastChildFill="False" Background="Transparent">
+                                                    <i:Interaction.Behaviors>
+                                                        <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                            <ia:InvokeCommandAction CommandParameter="{Binding .}" Command="{Binding #PinDropButton.DataContext.GoToPositionSnapshot}"/>
+                                                            <ia:ChangePropertyAction TargetObject="{Binding #PinDropButton}" PropertyName="IsChecked" Value="False"/>
+                                                        </ia:EventTriggerBehavior>
+                                                    </i:Interaction.Behaviors>
+                                                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}Row: {0}, Block {1}">
+                                                                <Binding Path="Row"/>
+                                                                <Binding Path="Column"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={}Creation Time: {0}}">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource DateTimeDifferenceConverter}">
+                                                                <Binding Source="{StaticResource ticker}" Path="Now" Mode="OneWay"/>
+                                                                <Binding Path="CreationTime"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock Text="Click Pin to activate" Margin="0, 5"/>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
                 <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">

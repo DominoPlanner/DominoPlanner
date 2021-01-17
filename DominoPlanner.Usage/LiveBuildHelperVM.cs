@@ -16,6 +16,8 @@ using Avalonia.Collections;
 using static DominoPlanner.Usage.ColorControl;
 using Avalonia.Data.Converters;
 using System.Globalization;
+using System.Timers;
+using System.ComponentModel;
 
 namespace DominoPlanner.Usage
 {
@@ -43,6 +45,14 @@ namespace DominoPlanner.Usage
             CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / BlockSize)));
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { CurrentBlock.Focus(); });
+            PositionSnapshots = new ObservableCollection<PositionSnapshot>();
+            MakePositionSnapshot = new RelayCommand(o => {
+                PositionSnapshots.RemoveAll(x => x.Column == SelectedBlock && x.Row == SelectedRow);
+                if ((bool)o == true)
+                    PositionSnapshots.Insert(0, new PositionSnapshot() { Column = SelectedBlock, Row = SelectedRow });
+                RaisePropertyChanged(nameof(PositionSnapshots));
+            });
+            GoToPositionSnapshot = new RelayCommand(o => { if (o is PositionSnapshot ps) { SelectedBlock = ps.Column; SelectedRow = ps.Row; } });
             ColumnConfig = new AvaloniaList<Column>
             {
                 new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
@@ -265,6 +275,14 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+        private ObservableCollection<PositionSnapshot> _Snapshots;
+
+        public ObservableCollection<PositionSnapshot> PositionSnapshots
+        {
+            get { return _Snapshots; }
+            set { _Snapshots = value; RaisePropertyChanged(); }
+        }
+
 
         #endregion
 
@@ -418,6 +436,9 @@ namespace DominoPlanner.Usage
                     if (SelectedRow < CountRow)
                         SelectedRow++;
                     break;
+                case Key.P:
+                    MakePositionSnapshot.Execute(true);
+                    break;
                 default:
                     break;
             }
@@ -431,8 +452,112 @@ namespace DominoPlanner.Usage
         private ICommand _SizeChanged;
         public ICommand SizeChanged { get { return _SizeChanged; } set { if (value != _SizeChanged) { _SizeChanged = value; } } }
 
+        private ICommand _GoToPositionSnapshot;
+
+        public ICommand GoToPositionSnapshot
+        {
+            get { return _GoToPositionSnapshot; }
+            set { _GoToPositionSnapshot = value;  RaisePropertyChanged();  }
+        }
+        private ICommand _MakePositionSnapshot;
+
+        public ICommand MakePositionSnapshot
+        {
+            get { return _MakePositionSnapshot; }
+            set { _MakePositionSnapshot = value; RaisePropertyChanged(); }
+        }
+
+
+    }
+    public class IsSnapshottedConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 3 && values[0] is IEnumerable<PositionSnapshot> list && values[1] is int Row && values[2] is int Block)
+            {
+                return list.Where(x => (x.Column == Block && x.Row == Row)).Count() != 0;
+            }
+            return false;
+        }
+    }
+    public class DateTimeDifferenceConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 2 && values[0] is DateTime dt1 && values[1] is DateTime dt2)
+            {
+                var delta = dt1 - dt2;
+                if (delta.Days > 0)
+                {
+                    return string.Format("{0} days ago", delta.ToString("%d"));
+                }
+                else if (delta.Hours > 0)
+                {
+                    return string.Format("{0} hours ago", delta.ToString("%h"));
+                }
+                else if (delta.Minutes > 0)
+                {
+                    return string.Format("{0} minutes ago", delta.ToString("%m"));
+                }
+                else 
+                {
+                    return string.Format("{0} seconds ago", delta.ToString("%s"));
+                }
+            }
+            return null;
+        }
     }
 
+    public class PositionSnapshot : ModelBase
+    {
+        public PositionSnapshot()
+        {
+            CreationTime = DateTime.Now;
+        }
+        private int row;
+
+        public int Row
+        {
+            get { return row; }
+            set { row = value; RaisePropertyChanged();  }
+        }
+        private int column;
+
+        public int Column
+        {
+            get { return column; }
+            set { column = value; RaisePropertyChanged(); }
+        }
+        private DateTime dateTime;
+
+        public DateTime CreationTime
+        {
+            get { return dateTime; }
+            set { dateTime = value; RaisePropertyChanged(); }
+        }
+
+
+    }
+    public class Ticker : ModelBase
+    {
+        public Ticker()
+        {
+            Timer timer = new Timer();
+            timer.Interval = 1000; // 1 second updates
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+        }
+
+        public DateTime Now
+        {
+            get { return DateTime.Now; }
+        }
+
+        void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            RaisePropertyChanged(nameof(Now));
+        }
+    }
     public class ColorAmount : ModelBase
     {
         public ColorAmount(string colorName, int amount)

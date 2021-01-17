@@ -47,7 +47,7 @@ namespace DominoPlanner.Usage
 
         private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space || e.Key == Key.P)
             {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
                 var mainGrid = this.Get<Grid>("MG");
