@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-17 15:45+0100\n"
-"PO-Revision-Date: 2021-01-17 15:45+0100\n"
+"POT-Creation-Date: 2021-01-17 17:09+0100\n"
+"PO-Revision-Date: 2021-01-17 17:09+0100\n"
 "Last-Translator: EMAIL@ADDRESS\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -784,6 +784,10 @@ msgstr "Vertikal spiegeln"
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:197
 msgid "Floyd/Steinberg Dithering"
 msgstr "Floyd/Steinberg-Dithering"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:205
+msgid "Font size:"
+msgstr "Schriftgröße:"
 
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:672
 msgid "Freehand selection"
@@ -1825,7 +1829,7 @@ msgstr "Herauszoomen"
 msgid "of"
 msgstr "von"
 
-#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:493
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:501
 #, csharp-format
 msgid "{0} day ago"
 msgid_plural "{0} days ago"
@@ -1843,21 +1847,21 @@ msgstr "{0}-Dateien"
 msgid "{0} has been removed!"
 msgstr "{0} wurde entfernt!"
 
-#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:497
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:505
 #, csharp-format
 msgid "{0} hour ago"
 msgid_plural "{0} hours ago"
 msgstr[0] "Vor {0} Stunde"
 msgstr[1] "Vor {0} Stunden"
 
-#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:501
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:509
 #, csharp-format
 msgid "{0} minute ago"
 msgid_plural "{0} minutes ago"
 msgstr[0] "Vor {0} Minute"
 msgstr[1] "Vor {0} Minuten"
 
-#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:505
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:513
 #, csharp-format
 msgid "{0} second ago"
 msgid_plural "{0} seconds ago"
