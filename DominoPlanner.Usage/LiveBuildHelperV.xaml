@@ -196,11 +196,15 @@
                                     <Binding Path="Bounds.Width" ElementName="StoneBox"/>
                                 </MultiBinding>
                             </Border.Width>
-                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="18" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="{Binding #TitleBox.DataContext.FontSize}" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Bottom" Margin="5">
+                <TextBlock Text="Font size:" VerticalAlignment="Center"/>
+                <NumericUpDown Value="{Binding FontSize}" Width="60" Minimum="5"></NumericUpDown>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

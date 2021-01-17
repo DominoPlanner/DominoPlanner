@@ -44,5 +44,8 @@
     <Setting Name="ProtocolVM_StonesPerBlock" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
+    <Setting Name="LiveBuildHelperVM_FontSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">18</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

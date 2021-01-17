@@ -190,5 +190,17 @@ namespace DominoPlanner.Usage.Properties {
                 this["ProtocolVM_StonesPerBlock"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("18")]
+        public int LiveBuildHelperVM_FontSize {
+            get {
+                return ((int)(this["LiveBuildHelperVM_FontSize"]));
+            }
+            set {
+                this["LiveBuildHelperVM_FontSize"] = value;
+            }
+        }
     }
 }
