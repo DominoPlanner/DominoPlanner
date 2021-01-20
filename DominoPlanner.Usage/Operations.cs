@@ -136,8 +136,8 @@ namespace DominoPlanner.Usage
     {
         public override bool NewEditingValue => false;
         public EditProjectVM Cmodel { get => (EditProjectVM)OldViewModel; }
-        private int current_width;
-        private int current_height;
+        private List<RowColumnHistoryDefinition> ColumnHistoryDefinitions;
+        private List<RowColumnHistoryDefinition> RowHistoryDefinitions;
         private DominoTransfer last;
         public EditingDeactivatedOperation(EditProjectVM editProjectVM) : base(editProjectVM)
         {
@@ -149,12 +149,10 @@ namespace DominoPlanner.Usage
             last = (DominoTransfer)Cmodel.CurrentProject.Last.Clone();
             if (Cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
-                current_width = rowc.current_width;
-                current_height = rowc.current_height;
+                ColumnHistoryDefinitions = rowc.ColumnHistory;
+                RowHistoryDefinitions = rowc.RowHistory;
             }
-            //((EditProjectVM)OldViewModel).DisplaySettingsTool.cleanEvents();
             base.Apply();
-            //((DominoProviderVM)OldViewModel).Refresh();
 
         }
 
@@ -163,8 +161,8 @@ namespace DominoPlanner.Usage
             Cmodel.CurrentProject.Last = last;
             if (Cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
-                rowc.current_width = current_width;
-                rowc.current_height = current_height;
+                rowc.ColumnHistory = ColumnHistoryDefinitions;
+                rowc.RowHistory = RowHistoryDefinitions;
             }
             base.Undo();
             Cmodel.RecreateCanvasViewModel();

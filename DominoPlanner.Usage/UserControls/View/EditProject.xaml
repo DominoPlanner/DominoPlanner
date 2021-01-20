@@ -241,7 +241,7 @@
                                           SelectionDomain="{Binding SelectionTool.CurrentSelectionDomain.SelectionShape}"
                                           SelectionDomainColor="{Binding SelectionTool.CurrentSelectionDomain.CurrentSelectionMode, Converter={StaticResource SelectionModeColorConverter}}"
                                           SelectionDomainVisible="{Binding SelectionTool.CurrentSelectionDomain.SelectionPathVisible}"
-                                          SourceImage="{Binding DisplaySettingsTool.FilteredImage}"
+                                          SourceImage="{Binding DisplaySettingsTool.SlicedImage}"
                                           SourceImageOpacity="{Binding DisplaySettingsTool.ImageOpacity}"
                                           SourceImageAbove="{Binding DisplaySettingsTool.Above}"
                                           BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"

@@ -285,8 +285,6 @@ namespace DominoPlanner.Usage
                 if (Math.Abs(candidate - VerticalSliderPos) > 0.01)
                     VerticalSliderPos = candidate;
                 VerticalSliderSize = scaling_factor * Bounds.Height;
-                
-                Debug.WriteLine(VerticalSliderSize);
             }
             else if (e.Property == VerticalSliderPosProperty && !double.IsNaN((double)e.NewValue))
             {
@@ -308,8 +306,6 @@ namespace DominoPlanner.Usage
                 if (Math.Abs(candidate - HorizontalSliderPos) > 0.01)
                     HorizontalSliderPos = candidate;
                 HorizontalSliderSize = scaling_factor * Bounds.Width;
-                
-                Debug.WriteLine(HorizontalSliderSize);
             }
             else if (e.Property == HorizontalSliderPosProperty && !double.IsNaN((double)e.NewValue))
             {
@@ -323,6 +319,7 @@ namespace DominoPlanner.Usage
         {
             if (SourceImage!= null)
                 OriginalImage = SourceImage.Copy();
+            ProjectChanged();
         }
 
         private void ProjectChanged()
@@ -411,8 +408,10 @@ namespace DominoPlanner.Usage
 
         public override void Render(DrawingContext context)
         {
-
-            Debug.WriteLine("Bounds" + Bounds.Width);
+            if (this.ProjectWidth == 0  || double.IsInfinity(this.ProjectWidth))
+            {
+                ProjectChanged();
+            }
             UpdateVerticalSlider(this, null);
             UpdateHorizontalSlider(this, null);
             UpdateMinZoomValue();
@@ -490,7 +489,7 @@ namespace DominoPlanner.Usage
 
             selectionPath?.Transform(transform);
             selectionVisible = pc.SelectionDomainVisible;
-            bitmap = pc.OriginalImage;
+            bitmap = pc.SourceImage;
             bitmapopacity = (byte)(pc.SourceImageOpacity * 255);
             BorderSize = pc.BorderSize;
         }
@@ -554,14 +553,20 @@ namespace DominoPlanner.Usage
         }
         private void DrawAdditionals(SKCanvas canvas, bool beforeBorders)
         {
-            foreach (CanvasDrawable d in AdditionalDrawables)
+            try
             {
-                if (d.BeforeBorders == beforeBorders)
+                foreach (CanvasDrawable d in AdditionalDrawables.ToList())
                 {
-                    var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
-                    d.Render(canvas, transform);
+                    if (d == null)
+                        continue;
+                    if (d.BeforeBorders == beforeBorders)
+                    {
+                        var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
+                        d.Render(canvas, transform);
+                    }
                 }
             }
+            catch {} // happens mostly when AdditionalDrawables is modified during a render pass. This triggers a redraw anyway, so let's ignore it
         }
         private void DrawImage(SKCanvas canvas)
         {
@@ -569,6 +574,7 @@ namespace DominoPlanner.Usage
                 return;
             var height = Bounds.Height / ProjectHeight / zoom * bitmap.Height;
             var width = Bounds.Width / ProjectWidth / zoom * bitmap.Width;
+            Console.WriteLine($"({ProjectHeight}, {ProjectWidth})");
             var x = shift_x / ProjectWidth * bitmap.Width;
             var y = shift_y / ProjectHeight * bitmap.Height;
             canvas.DrawBitmap(bitmap, 

@@ -23,7 +23,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             selectedDominoes = new AvaloniaList<int>();
             UnsavedChanges = false;
             CurrentProject = dominoProvider;
-            dominoTransfer = dominoProvider.Last;
 
             _DominoList = new ObservableCollection<ColorListEntry>();
 
@@ -76,7 +75,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region fields
 
 
-        internal DominoTransfer dominoTransfer;
+        internal DominoTransfer dominoTransfer => CurrentProject.Last;
 
         internal AvaloniaList<int> selectedDominoes;
         public AvaloniaList<int> SelectedDominoes
@@ -498,6 +497,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ClearCanvas(false);
                 RecreateCanvasViewModel();
                 UpdateUIElements();
+                DisplaySettingsTool.SliceImage();
                 if (undoStack.Count == 0) UnsavedChanges = false;
             }
             else
@@ -527,6 +527,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ClearCanvas(false);
                 RecreateCanvasViewModel();
                 UpdateUIElements();
+                DisplaySettingsTool.SliceImage();
             }
             else
             {
@@ -579,6 +580,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
+                        DisplaySettingsTool.SliceImage();
                     }
                     else
                     {
@@ -609,6 +611,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
+                        DisplaySettingsTool.SliceImage();
                     }
                     else
                     {
@@ -643,6 +646,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(deleteRows);
                         RecreateCanvasViewModel();
+                        DisplaySettingsTool.SliceImage();
                     }
                 }
                 else
@@ -677,6 +681,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         ClearCanvas();
                         ExecuteOperation(deleteColumns);
                         RecreateCanvasViewModel();
+                        DisplaySettingsTool.SliceImage();
                     }
                 }
                 else

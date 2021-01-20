@@ -9,13 +9,63 @@ namespace DominoPlanner.Core
 {
     public partial class FieldParameters : ICopyPasteable, IRowColumnAddableDeletable
     {
+        // We store the current size of the field in form of its Row/Column history.
+        // See a description in DisplaySettingsToolVM
         public void ResetSize()
         {
-            current_width = Length;
+            ResetSize(Length);
+        }
+        // Reset size should only be called if we really want to destroy the row history! 
+        // Likely when changing the Length/Height or when going back to basic settings.
+        public void ResetSize(int number_of_columns)
+        {
+            if (Last != null)
+            {
+                ResetRowHistory(Last.Length / number_of_columns);
+                ResetColumnHistory(number_of_columns);
+            }
+        }
+        public void ResetRowHistory(int rows)
+        {
+            if (Last != null)
+            {
+                RowHistory = Enumerable.Range(0, rows).Select(x => new RowColumnHistoryDefinition() { OriginalPosition = x}).ToList();
+            }
+        }
+        public void ResetColumnHistory(int columns)
+        {
+            if (Last != null)
+            {
+                ColumnHistory = Enumerable.Range(0, columns).Select(x => new RowColumnHistoryDefinition() { OriginalPosition = x}).ToList();
+            }
         }
         [ProtoMember(50)]
-        public int current_width { get; set; }
-        public int current_height { get => Last.Length / current_width; set { } }
+        public int old_current_width;
+        [ProtoAfterDeserialization]
+        public void RestoreCurrentWidth() {
+            if (old_current_width != 0 && ColumnHistory.Count == 0)
+            {
+                // we won't be able to guess which rows / columns have been deleted, so we don't even try. However we have to restore the values of current_width and current_height, 
+                // and make sure they are updated correctly on later insertion/deletion progresses
+                ResetSize(old_current_width);
+                old_current_width = 0;
+            }
+            // if we ever encounter errors here, the best way forward would probably be to check 
+            // whether the sizes make sense (i.e. rowHistory.Length = Last.Length / columnHistory.Length)
+            // and otherwise destroy the row history
+        }
+        [ProtoBeforeSerialization]
+        public void Test()
+        {
+            Console.WriteLine(RowHistory);
+        }
+        public int current_width { get => ColumnHistory.Count; set { } }
+        public int current_height { get => RowHistory.Count; set { } }
+        [ProtoMember(51)]
+        public List<RowColumnHistoryDefinition> RowHistory { get; set; }
+        [ProtoMember(52)]
+        public List<RowColumnHistoryDefinition> ColumnHistory { get; set; }
+
         public bool IsValidPastePosition(int source_position, int target_position)
         {
             return true;
@@ -138,5 +188,21 @@ namespace DominoPlanner.Core
         {
             return new PositionWrapper() { X = index % new_width, Y = index / new_width, CountInsideCell = 0 };
         }
+
+        public double GetColumnPhysicalWidth(int index, int current_width)
+        {
+            if (index < 0 || index >= current_width)
+                return 0;
+            return HorizontalDistance + HorizontalSize;
+        }
+
+        public double GetRowPhysicalHeight(int index, int current_height)
+        {
+            if (index < 0 || index >= current_height)
+                return 0;
+            return VerticalDistance + VerticalSize;
+        }
+        public int getOriginalHeight() => Height;
+        public int getOriginalWidth() => Length;
     }
 }

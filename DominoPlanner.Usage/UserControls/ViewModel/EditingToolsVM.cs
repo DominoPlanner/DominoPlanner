@@ -87,11 +87,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             for (int i = 0; i < ToSelect.Count; i++)
             {
-                oldState[i] = reference.parent.IsSelected(ToSelect[i]);
-                if (positiveselect)
-                    reference.parent.AddToSelectedDominoes(ToSelect[i]);
-                else
-                    reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+                if (ToSelect[i] < reference.parent.CurrentProject.Last.Length)
+                {
+                    oldState[i] = reference.parent.IsSelected(ToSelect[i]);
+                    if (positiveselect)
+                        reference.parent.AddToSelectedDominoes(ToSelect[i]);
+                    else
+                        reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+                }
             }
         }
 
@@ -99,13 +102,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             for (int i = 0; i < ToSelect.Count; i++)
             {
-                if (oldState[i])
+                if (ToSelect[i] < reference.parent.CurrentProject.Last.Length)
                 {
-                    reference.parent.AddToSelectedDominoes(ToSelect[i]);
-                }
-                else
-                {
-                    reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+                    if (oldState[i])
+                    {
+                        reference.parent.AddToSelectedDominoes(ToSelect[i]);
+                    }
+                    else
+                    {
+                        reference.parent.RemoveFromSelectedDominoes(ToSelect[i]);
+                    }
                 }
             }
         }
@@ -944,19 +950,170 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                 }
             }
+            SliceImage();
             Expandable = parent.CurrentProject is FieldParameters;
         }
-        private SKBitmap _FilteredImage;
-
-        public SKBitmap FilteredImage
+        public void SliceImage()
         {
-            get { return _FilteredImage; }
+            
+            if (parent.CurrentProject is IRowColumnAddableDeletable irc && FilteredImage != null)
+            {   
+                // The basic idea here is that we save the history which columns are "original" and which have been inserted. 
+                // Whenever the Width or Height of a structure is changed, the ColumnHistory is resetted to be a list: Range(0, Height). 
+                // Note: Border Columns / Rows are not in the history, as they are never deleted.
+                // When we 
+                //  - delete a row, we delete the corresponding index in the history. That way we notice that there is a part of the image we don't have to draw.
+                //    - undo deletion, we reinsert the history definition, so the image gets drawn as before.
+                //  - add a row, we add an entry to the history with OriginalIndex = null, indicating that for this row, nothing has to be drawn
+                //    - undo a deletion, we remove the inserted history definition.
+
+
+                int OriginalNumberOfColumns = irc.getOriginalWidth();
+                int OriginalNumberOfRows = irc.getOriginalHeight();
+
+                // This is basically the same as Last.GetPhysicalExpandedWidth / Height. We need this to know the scaling factor of the image. The image will not be scaled proportionally, but will be fitted to
+                // the structure.
+                double totalOriginalWidth = Enumerable.Range(-1, OriginalNumberOfColumns + 2).Select(x => irc.GetColumnPhysicalWidth(x, OriginalNumberOfColumns)).Sum();
+                double totalOriginalHeight = Enumerable.Range(-1, OriginalNumberOfRows + 2).Select(x => irc.GetRowPhysicalHeight(x, OriginalNumberOfRows)).Sum();
+
+                // These functions serve as shortcuts to get the Width/Height of a Column/Row index, in the original / current state. 
+                // Again the indices are -1 for the left / top border, 0..Height-1 for the "normal" rows and Height for the last row.  
+                double original_colwidth(int i)  => irc.GetColumnPhysicalWidth(i, OriginalNumberOfColumns) / totalOriginalWidth * FilteredImage.Width;
+                double original_rowheight(int i)  => irc.GetRowPhysicalHeight(i, OriginalNumberOfRows) / totalOriginalHeight * FilteredImage.Height;
+
+                double current_colwidth(int i)  => irc.GetColumnPhysicalWidth(i, irc.current_width) / totalOriginalWidth * FilteredImage.Width;
+                double current_rowheight(int i)  => irc.GetRowPhysicalHeight(i, irc.current_height) / totalOriginalHeight * FilteredImage.Height;
+
+                // create a copy of the insertion history, but with first and last row/column added
+                // This way we don't have to give special treatment to the borders of walls
+                List<RowColumnHistoryDefinition> CloneAndPad(IEnumerable<RowColumnHistoryDefinition> hist, int LastIndex)
+                {
+                    var list = hist.ToList();
+                    list.Add(new RowColumnHistoryDefinition() {OriginalPosition = LastIndex});
+                    list.Insert(0, new RowColumnHistoryDefinition() { OriginalPosition= -1});
+                    return list;
+                }
+                // Note that we insert the right/bottom border with the Original index -> If there is a column inserted at the last possible position (directly before the border), 
+                // it is correctly classified as "inserted" that way! (Indices in the History = ALWAYS original index)
+                var ColHistory = CloneAndPad(irc.ColumnHistory, OriginalNumberOfColumns);
+                var RowHistory = CloneAndPad(irc.RowHistory, OriginalNumberOfRows);
+                // This function takes a history and an index i and returns the last subsequent index where History[j + i] = History[i] + j.
+                // For inserted rows, we will see 7- 8- 9- null - 10 and stop at 9, and for deleted rows, we will see 7- 8- 9- 11-12 and stop at 9 as well.
+                int GetLastSubsequent(List<RowColumnHistoryDefinition> history, int index)
+                {
+                    int lastvalue;
+                    if (history[index].OriginalPosition == null)
+                        return index;
+                    else
+                        lastvalue = (int) history[index].OriginalPosition ;
+                    while (true)
+                    {
+                        if (index+1 == history.Count || history[index+1].OriginalPosition == null || history[index+1].OriginalPosition != lastvalue +1)
+                            return index;
+                        else
+                            index += 1;
+                            lastvalue += 1;
+                    }
+                }
+                // Initialize the target picture
+                int TotalTargetPixelWidth = (int) Enumerable.Range(-1, irc.current_width + 2).Select(x => current_colwidth(x)).Sum();
+                int TotalTargetPixelHeight = (int) Enumerable.Range(-1, irc.current_height + 2).Select(x => current_rowheight(x)).Sum();
+                Console.WriteLine($"Target size: ({TotalTargetPixelWidth}, {TotalTargetPixelHeight})");
+                SKBitmap result = new SKBitmap(TotalTargetPixelWidth, TotalTargetPixelHeight);
+                SKCanvas canvas = new SKCanvas(result);
+                // This is where the actual magic happens. 
+                // Depending on the start index "index", We basically have 3 cases to handle:
+                //  - Index is an inserted row. Increase the target coordinate, but don't change the source coordinate. We indicate with draw=false that we don't want to draw this region.
+                //  - Index is an original row. So we definitely have to draw it. 
+                //     - First, figure out up until which index we have to draw (GetLastSubsequent method). 
+                //     - Accordingly, increase the source and target coordinate by the same amount.
+                //     - Now check whether after the last drawn row, there are rows which have been deleted. In that case, we have to increase the source coordinate even further, 
+                //       without modifying the target coordinate. We check this by searching the next original row, and if the difference is larger than 1, the rows in between have been deleted.
+                
+                (double, double, int, bool, double) HandleIndex(List<RowColumnHistoryDefinition> history, int index, bool column)
+                {
+                    double increase_source_coord_by = 0;
+                    double increase_target_coord_by = 0;
+                    double additional_source_increase_by = 0;
+                    int increase_index_by = 0;
+                    bool draw = false;
+                    var orig_index = index-1;
+                    if (history[index].OriginalPosition == null)
+                    {
+                        // this row has been inserted. Increase the target coordinate, and leave the source coordinate be.
+                        increase_index_by = 1;
+                        increase_target_coord_by = column? current_colwidth(index) : current_rowheight(index);
+                    }
+                    else
+                    {
+                        // this is an original row, so we need to draw it. 
+                        draw = true;
+                        var until = GetLastSubsequent(history, index);
+                        increase_index_by = until - index + 1;
+                        increase_source_coord_by = Enumerable.Range(index, increase_index_by).Select(x => column ? original_colwidth((int)history[x].OriginalPosition) : original_rowheight((int)history[x].OriginalPosition)).Sum();
+                        increase_target_coord_by = increase_source_coord_by;
+                        // Has the next row(s) been deleted? In this case we need to increase the source coordinate further by the amount of deleted rows. 
+                        var nextOriginal = history.FindIndex(index + increase_index_by, x => x.OriginalPosition != null);
+                        if (nextOriginal != -1)
+                        {
+                            int count = (int)history[nextOriginal].OriginalPosition - (int)history[until].OriginalPosition - 1;
+                            if (count >= 0) // otherwise something went horribly wrong
+                                additional_source_increase_by = Enumerable.Range(index, (int)history[nextOriginal].OriginalPosition - (int)history[until].OriginalPosition - 1).Select(x => column ? original_colwidth(x) : original_rowheight(x)).Sum();
+                        }
+                    }
+                    
+                    return (increase_source_coord_by, increase_target_coord_by, increase_index_by, draw, additional_source_increase_by);
+                }
+                // Now lets get to the actual drawing code. As we insert Rows/Columns, we can partition the image and treat rows / columns in a nested fashion.
+                double x_source = 0;
+                double x_target = 0; 
+                for (int i = 0; i < ColHistory.Count; )
+                {
+                    double y_source = 0;
+                    double y_target = 0;
+                    var (delta_source_x, delta_target_x, delta_i, draw, add_source_x) = HandleIndex(ColHistory, i, true);
+                    if (draw)
+                    {
+                        for (int j = 0; j < RowHistory.Count; )
+                        {
+                            var (delta_source_y, delta_target_y, delta_j, draw2, add_source_y) = HandleIndex(RowHistory, j, false);
+                            if (draw2)
+                            {
+                                canvas.DrawBitmap(FilteredImage, 
+                                                 new SKRect((float)x_source, (float) y_source, (float) (x_source + delta_source_x), (float) (y_source + delta_source_y)), 
+                                                 new SKRect((float)x_target, (float) y_target, (float) (x_target + delta_target_x), (float) (y_target + delta_target_y)));
+                                Console.WriteLine($"Draw, Source=({x_source}, {y_source}, w={delta_source_x}, w={delta_source_y}), Target = ({x_target}, {y_target}, w={delta_target_x}, w={delta_target_y})");
+                                 
+                            }
+                            j += delta_j;
+                            y_source += delta_source_y + add_source_y;
+                            y_target += delta_target_y;
+                        }
+                    }
+                    x_source += delta_source_x + add_source_x;
+                    x_target += delta_target_x;
+                    i += delta_i;
+                }
+                SlicedImage = result.Copy();
+            }
+            else
+            {
+                // for Spirals / Circles, we don't have do deal with this at all :)
+                SlicedImage = FilteredImage;
+            }
+        }
+        private SKBitmap FilteredImage;
+        private SKBitmap _SlicedImage;
+
+        public SKBitmap SlicedImage
+        {
+            get { return _SlicedImage; }
             set
             {
-                if (_FilteredImage != value)
+                if (_SlicedImage != value)
                 {
                     
-                    _FilteredImage = value;
+                    _SlicedImage = value;
                     
                     RaisePropertyChanged();
                 }

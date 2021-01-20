@@ -67,7 +67,7 @@ namespace DominoPlanner.Core
                 if (hasinLeftRight ? value >= 0 : value > 0 && value != _length)
                 {
                     _length = value;
-                    _current_width = value;
+                    ResetColumnHistory(value);
                     shapesValid = false;
                 }
             }
@@ -91,6 +91,7 @@ namespace DominoPlanner.Core
                 if (hasinTopBottom ? value >= 0 : value > 0 && value != _height)
                 {
                     _height = value;
+                    ResetRowHistory(value);
                     shapesValid = false;
                 }
             }

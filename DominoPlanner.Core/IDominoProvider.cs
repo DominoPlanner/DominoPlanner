@@ -81,8 +81,10 @@ namespace DominoPlanner.Core
                 {
                     _editing = value;
                     shapesValid = false;
-                    if (this is IRowColumnAddableDeletable)
+                    if (this is IRowColumnAddableDeletable && !value)
                     {
+                        // we only want to reset the size when we switch from editing away.
+                        // (otherwise, we also reset it when loading the file and editing is active)
                         (this as IRowColumnAddableDeletable).ResetSize();
                     }
                 }

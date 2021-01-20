@@ -71,6 +71,14 @@ namespace DominoPlanner.Core
             old_colors = new int[domain.Length];
         }
     }
+    [ProtoBuf.ProtoContract]
+    public class RowColumnHistoryDefinition
+    {
+        [ProtoBuf.ProtoMember(1)]
+        public virtual int? OriginalPosition { get; set; }
+
+        public bool IsInserted {get => OriginalPosition == null;}
+    }
     public interface IRowColumnAddableDeletable
     {
         void ResetSize();
@@ -95,6 +103,16 @@ namespace DominoPlanner.Core
         int getLengthOfTypicalRowColumn(bool column);
 
         (int startindex, int endindex) getIndicesOfCell(int row, int col, int target_width, int target_height);
+
+        List<RowColumnHistoryDefinition> RowHistory { get; set; }
+        List<RowColumnHistoryDefinition> ColumnHistory { get; set; }
+
+        double GetColumnPhysicalWidth(int index, int current_width);
+
+        double GetRowPhysicalHeight(int index, int current_height);
+
+        int getOriginalWidth();
+        int getOriginalHeight();
     }
     public struct PositionWrapper
     {
@@ -133,7 +151,7 @@ namespace DominoPlanner.Core
         public override void Undo()
         {
             ((IDominoProvider)reference).Last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
+                AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _, out _);
         }
     }
     public class DeleteRows : PostFilter
@@ -141,6 +159,8 @@ namespace DominoPlanner.Core
         IRowColumnAddableDeletable reference;
         int[] positions;
         PositionWrapper[] remaining_positions;
+
+        RowColumnHistoryDefinition[] deleted_history;
         int[][] oldShapes;
         public DeleteRows(IRowColumnAddableDeletable reference, int[] positions)
         {
@@ -151,12 +171,12 @@ namespace DominoPlanner.Core
         {
             ((IDominoProvider)reference).Last.shapes =
                 AddDeleteHelper.DeleteRowColumn(reference, false, AddDeleteHelper.IndicesToPositions(reference, positions), 
-                out remaining_positions, out oldShapes);
+                out remaining_positions, out oldShapes, out deleted_history);
         }
         public override void Undo()
         {
             ((IDominoProvider)reference).Last.shapes =
-                AddDeleteHelper.AddRowColumn(reference, false, remaining_positions, oldShapes, out _);
+                AddDeleteHelper.AddRowColumn(reference, false, remaining_positions, oldShapes, out _, deleted_history);
         }
     }
     public class AddColumns : AddRowColumn
@@ -175,7 +195,8 @@ namespace DominoPlanner.Core
         public override void Undo()
         {
             ((IDominoProvider)reference).Last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _);
+                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, added_indizes), out _, out _, out _); 
+                // in this case we don't need to preserve deleted history, as the inserted history had the original position "null" anyway
         }
     }
     public class DeleteColumns : PostFilter
@@ -184,6 +205,8 @@ namespace DominoPlanner.Core
         int[] positions;
         PositionWrapper[] remaining_positions;
         int[][] oldShapes;
+
+        RowColumnHistoryDefinition[] deleted_history;
         public DeleteColumns(IRowColumnAddableDeletable reference, int[] position)
         {
             if (reference.current_height == 0) throw new InvalidOperationException();
@@ -193,12 +216,12 @@ namespace DominoPlanner.Core
         public override void Apply()
         {
             ((IDominoProvider)reference).Last.shapes =
-                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, positions), out remaining_positions, out oldShapes);
+                AddDeleteHelper.DeleteRowColumn(reference, true, AddDeleteHelper.IndicesToPositions(reference, positions), out remaining_positions, out oldShapes, out deleted_history);
         }
         public override void Undo()
         {
             ((IDominoProvider)reference).Last.shapes =
-                AddDeleteHelper.AddRowColumn(reference, true, remaining_positions, oldShapes, out _);
+                AddDeleteHelper.AddRowColumn(reference, true, remaining_positions, oldShapes, out _, deleted_history);
         }
     }
     public static class AddDeleteHelper
@@ -214,7 +237,7 @@ namespace DominoPlanner.Core
         }
         public static int[] getDistinct(bool column, IRowColumnAddableDeletable reference, PositionWrapper[] positions)
         {
-            int max_index = column ? reference.current_width : reference.current_height; 
+            int max_index = column ? reference.current_width : reference.current_height;
             int[] counts = new int[max_index + 1];
             for (int i = 0; i < positions.Length; i++)
             {
@@ -224,12 +247,13 @@ namespace DominoPlanner.Core
             }
             return counts;
         }
-        public static IDominoShape[] DeleteRowColumn(IRowColumnAddableDeletable reference, bool column, PositionWrapper[] positions, 
-            out PositionWrapper[] remaining_positions, out int[][] deleted_shapes)
+        public static IDominoShape[] DeleteRowColumn(IRowColumnAddableDeletable reference, bool column, PositionWrapper[] positions,
+            out PositionWrapper[] remaining_positions, out int[][] deleted_shapes, out RowColumnHistoryDefinition[] deletedHistory)
         {
             int[] distinct = getDistinct(column, reference, positions);
+            distinct = distinct.Select(x => x > 0 ? 1 : 0).ToArray();
             distinct[distinct.Length - 1] = 0;
-            int total_deleted = distinct.Sum(x => x > 0 ? 1 : 0);
+            int total_deleted = distinct.Sum();
             if (total_deleted == 0)
                 throw new InvalidOperationException("Nothing to delete. Borders can't be deleted.");
             int new_width = reference.current_width - (column ? total_deleted : 0);
@@ -241,7 +265,7 @@ namespace DominoPlanner.Core
             int rowcollength = deleted_shapes.Length / total_deleted;
             for (int i = -1; i < distinct.Length; i++)
             {
-                if (i != -1 && i != distinct.Length - 1 && distinct[i] > 0)
+                if (i != -1 && i != distinct.Length - 1 && distinct[i] == 1)
                 {
 
                     deleted_shapes[deleted_counter] = reference.ExtractRowColumn(column, i);
@@ -257,18 +281,17 @@ namespace DominoPlanner.Core
                          0, -deleted_counter, new_width, new_height, column);
                 }
             }
-            reference.current_width = new_width;
-            reference.current_height = new_height;
+            deletedHistory = AddDeleteToRCHistory(reference, distinct, column, true).ToArray();
             return new_shapes;
         }
-        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference, bool column, 
-            PositionWrapper[] positions, int[][] shapes, out int[] inserted_positions)
+        public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference, bool column,
+            PositionWrapper[] positions, int[][] shapes, out int[] inserted_positions, RowColumnHistoryDefinition[] history_to_reinsert = null)
         {
-            int total_added = positions.Length;
+            int[] distinct = getDistinct(column, reference, positions);
+            int total_added = distinct.Sum();
             int new_width = reference.current_width + (column ? total_added : 0);
             int new_height = reference.current_height + (!column ? total_added : 0);
-            int[] distinct = getDistinct(column, reference, positions);
-            total_added = distinct.Sum();
+            
             IDominoShape[] new_shapes = reference.getNewShapes(new_width, new_height);
             int typicallength = reference.getLengthOfTypicalRowColumn(column);
             List<int> insertedPositions = new List<int>();
@@ -288,11 +311,52 @@ namespace DominoPlanner.Core
                 copyColors(reference, new_shapes, -1, column ? reference.current_height : reference.current_width, i, i,
                      0, added_counter, new_width, new_height, column);
             }
-            reference.current_width = new_width;
-            reference.current_height = new_height;
+            AddDeleteToRCHistory(reference, distinct, column, false, history_to_reinsert);
             inserted_positions = insertedPositions.ToArray();
             return new_shapes;
         }
+        public static List<RowColumnHistoryDefinition> AddDeleteToRCHistory(IRowColumnAddableDeletable reference, int[] DistinctInsertionPositions, bool column, bool delete,
+            RowColumnHistoryDefinition[] history_to_reinsert = null)
+        {
+            bool reinsert = false;
+            int history_counter = 0;
+            var history_ordered = history_to_reinsert?.OrderByDescending(x => x.OriginalPosition).ToArray();
+            if (history_to_reinsert != null && !delete && DistinctInsertionPositions.Sum() == history_to_reinsert.Length)
+            {
+                reinsert = true;
+            }
+            // we need to insert backwards into the history, that way the later indices don't move back during the operation
+            var hist = column ? reference.ColumnHistory : reference.RowHistory;
+            var result = new List<RowColumnHistoryDefinition>();
+            for (int i = DistinctInsertionPositions.Length - 1; i >= 0; i--)
+            {
+                if (delete)
+                {
+                    if  (DistinctInsertionPositions[i] > 0)
+                    {
+                        result.Add(hist[i]);
+                        hist.RemoveAt(i);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < DistinctInsertionPositions[i]; j++)
+                    {
+                        if (reinsert)
+                        {
+                            hist.Insert(i, history_ordered[history_counter]);
+                            history_counter++;
+                        }
+                        else
+                        {
+                            hist.Insert(i, new RowColumnHistoryDefinition() { OriginalPosition = null});
+                        }
+                    }
+                }
+            }
+            return delete ? result : null;
+        }
+
         public static IDominoShape[] AddRowColumn(IRowColumnAddableDeletable reference,
             bool column, int position, bool southeast, int count, int color, out int[] inserted_positions)
         {
@@ -393,7 +457,7 @@ namespace DominoPlanner.Core
                     {
                         result.Add(new InsertionHelper() { DrawPosition = lastend, Before = false, Index = last_column[0] });
                     }
-                    
+
                 }
                 return result;
             }

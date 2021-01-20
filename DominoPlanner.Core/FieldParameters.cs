@@ -127,7 +127,7 @@ namespace DominoPlanner.Core
                 if (value > 0 && value != _length)
                 {
                     _length = value;
-                    current_width = value;
+                    ResetColumnHistory(value);
                     shapesValid = false;
                 }
             }
@@ -148,6 +148,7 @@ namespace DominoPlanner.Core
                 if (value > 0 && value != _height)
                 {
                     _height = value;
+                    ResetRowHistory(value);
                     shapesValid = false;
                 }
             }
@@ -202,8 +203,11 @@ namespace DominoPlanner.Core
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
             if (!LastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            current_width = Last.FieldPlanLength;
-            current_height = Last.FieldPlanHeight;
+            if (current_width != Last.FieldPlanLength)
+            {
+                //Likely, something went wrong during row/column operations. Discard history
+                ResetSize(Last.FieldPlanLength);
+            }
             int[,] result = new int[current_width, current_height];
             for (int i = 0; i < current_width; i++)
             {
