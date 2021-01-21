@@ -60,9 +60,9 @@ namespace DominoPlanner.Core
             }
         }
         [ProtoMember(51)]
-        public List<RowColumnHistoryDefinition> RowHistory { get; set; }
+        public List<RowColumnHistoryDefinition> RowHistory { get; set; } = new List<RowColumnHistoryDefinition>();
         [ProtoMember(52)]
-        public List<RowColumnHistoryDefinition> ColumnHistory { get; set; }
+        public List<RowColumnHistoryDefinition> ColumnHistory { get; set; } = new List<RowColumnHistoryDefinition>();
 
         public bool IsValidPastePosition(int source_position, int target_position)
         {
