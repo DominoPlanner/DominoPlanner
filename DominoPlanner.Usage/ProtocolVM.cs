@@ -334,7 +334,10 @@ namespace DominoPlanner.Usage
         [SettingsAttribute("ProtocolVM")]
         public int StonesPerBlock
         {
-            get { return _StonesPerBlock; }
+            get 
+            { 
+                return _StonesPerBlock > 0 ? _StonesPerBlock : 1; 
+            }
             set
             {
                 if (_StonesPerBlock != value)

@@ -6,6 +6,7 @@ using System;
 using System.Configuration;
 using System.Text;
 using Avalonia;
+using System.IO;
 
 namespace DominoPlanner.Usage
 {
@@ -15,6 +16,9 @@ namespace DominoPlanner.Usage
         public MainWindow()
         {
             InitializeComponent();
+
+            CopyResources();
+
             DataContext = new MainWindowViewModel();
             KeyDown += (o, e) => KeyPressedHandler(o, e);
             Opened += (o, e) => MainWindow_Initialized();
@@ -49,6 +53,7 @@ namespace DominoPlanner.Usage
             {
                 if (await mwvm.CloseAllTabs())
                 {
+                    mwvm.SaveSettings();
                     if (!should_really_close)
                     {
                         should_really_close = true;
@@ -90,6 +95,15 @@ namespace DominoPlanner.Usage
         {
             AvaloniaXamlLoader.Load(this);
         }
-        
+        private void CopyResources()
+        {
+            if (!File.Exists(UserSettings.UserSettingsPath))
+            {
+                if (File.Exists("./Resources/UserSettings.xml"))
+                {
+                    File.Copy(".Resources/UserSettings.xml", UserSettings.UserSettingsPath);
+                }
+            }
+        }
     }
 }

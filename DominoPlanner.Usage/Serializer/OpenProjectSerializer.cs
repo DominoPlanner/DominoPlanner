@@ -11,7 +11,7 @@ namespace DominoPlanner.Usage.Serializer
 {
     static class OpenProjectSerializer
     {
-        static string path = Properties.Settings.Default.OpenProjectList;
+        static string path = UserSettings.Instance.OpenProjectList;
 
         public static bool Create()
         {

@@ -417,16 +417,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filters.Add(
-                new FileDialogFilter() { Extensions = new List<string> {Properties.Settings.Default.ProjectExtension, Properties.Settings.Default.ObjectExtension }, Name = "All DominoPlanner files" });
+                new FileDialogFilter() { Extensions = new List<string> {Declares.ProjectExtension, Declares.ObjectExtension }, Name = "All DominoPlanner files" });
             openFileDialog.Filters.Add(
-               new FileDialogFilter() { Extensions = new List<string> { Properties.Settings.Default.ObjectExtension }, Name = "Object files" });
+               new FileDialogFilter() { Extensions = new List<string> { Declares.ObjectExtension }, Name = "Object files" });
             openFileDialog.Filters.Add(
-                new FileDialogFilter() { Extensions = new List<string> {Properties.Settings.Default.ProjectExtension }, Name = "Project files" });
+                new FileDialogFilter() { Extensions = new List<string> {Declares.ProjectExtension }, Name = "Project files" });
             var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 string extension = Path.GetExtension(result[0]).ToLower();
-                if (extension == "." + Properties.Settings.Default.ObjectExtension.ToLower())
+                if (extension == "." + Declares.ObjectExtension.ToLower())
                 {
                     try
                     {
@@ -439,7 +439,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         await Errorhandler.RaiseMessage("Error loading file", "Error", Errorhandler.MessageType.Error);
                     }
                 }
-                else if (extension == "." +Properties.Settings.Default.ProjectExtension.ToLower())
+                else if (extension == "." +Declares.ProjectExtension.ToLower())
                 {
                     try
                     {
@@ -546,7 +546,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public static async Task<AssemblyNode> RestoreAssembly(string projectpath, string colorlistPath = null)
         {
             string colorpath = Path.Combine(Path.GetDirectoryName(projectpath), "Planner Files");
-            var colorres = Directory.EnumerateFiles(colorpath, $"*.{Properties.Settings.Default.ColorExtension}");
+            var colorres = Directory.EnumerateFiles(colorpath, $"*.{Declares.ColorExtension}");
             // restore project if colorfile exists
             if (colorlistPath == null && colorres.First() == null)
             {
@@ -555,7 +555,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             colorlistPath ??= colorres.First();
             Workspace.CloseFile(projectpath);
             if (File.Exists(projectpath))
-                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.{Properties.Settings.Default.ProjectExtension}"));
+                File.Copy(projectpath, Path.Combine(Path.GetDirectoryName(projectpath), $"backup_{DateTime.Now.ToLongTimeString().Replace(":", "_")}.{Declares.ProjectExtension}"));
             DominoAssembly newMainNode = new DominoAssembly();
             newMainNode.Save(projectpath);
             newMainNode.ColorPath = Workspace.MakeRelativePath(projectpath, colorlistPath);
@@ -563,7 +563,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 try
                 {
-                    var assembly = Directory.EnumerateFiles(path, $"*.{Properties.Settings.Default.ProjectExtension}").
+                    var assembly = Directory.EnumerateFiles(path, $"*.{Declares.ProjectExtension}").
                         Where(x => Path.GetFileName(x).Contains("backup_")).FirstOrDefault();
                     if (string.IsNullOrEmpty(assembly)) continue;
                     AssemblyNode an = new AssemblyNode(Workspace.MakeRelativePath(projectpath, assembly), newMainNode);
@@ -571,7 +571,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 catch { } // if error on add assembly, don't add assembly
             }
-            foreach (string path in Directory.EnumerateFiles(colorpath, "*." + Properties.Settings.Default.ObjectExtension))
+            foreach (string path in Directory.EnumerateFiles(colorpath, "*." + Declares.ObjectExtension))
             {
                 try
                 {

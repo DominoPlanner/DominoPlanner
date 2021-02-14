@@ -16,7 +16,7 @@ using System.Windows.Input;
 using Avalonia.Input;
 
 namespace DominoPlanner.Usage
-{
+{    
     class MainWindowViewModel : ModelBase
     {
         #region CTOR
@@ -32,7 +32,6 @@ namespace DominoPlanner.Usage
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
             FileListClickCommand = new RelayCommand(o => { OpenItemFromPath(o); });
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
-            
         }
         public static string ShareDirectory
         {
@@ -41,7 +40,7 @@ namespace DominoPlanner.Usage
 #if DEBUG
                 return Environment.CurrentDirectory;
 #else
-                return Properties.Settings.Default.SharePath;
+                return SharePath;
 #endif
             }
 
@@ -49,25 +48,20 @@ namespace DominoPlanner.Usage
 
         internal async void AfterStartupChecks()
         {
-            
-            Properties.Settings.Default.Upgrade();
-            if (Properties.Settings.Default.FirstStartup)
+            if (FirstStartup)
             {
-                var share_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
-                Properties.Settings.Default.SharePath = share_path;
-                Properties.Settings.Default.StandardColorArray = Path.Combine(share_path, "colors." + Properties.Settings.Default.ColorExtension);
-                var project_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
-                Properties.Settings.Default.StandardProjectPath = project_path;
-                Properties.Settings.Default.OpenProjectList = Path.Combine(share_path, "OpenProjects.xml");
-                Properties.Settings.Default.StructureTemplates = Path.Combine("Resources", "Structures.xml");
-                Directory.CreateDirectory(project_path);
-                Directory.CreateDirectory(share_path);
+                SharePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
+                UserSettings.Instance.StandardColorArray = Path.Combine(SharePath, "colors." + Declares.ColorExtension);
+                UserSettings.Instance.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
+                UserSettings.Instance.OpenProjectList = Path.Combine(SharePath, "OpenProjects.xml");
+                UserSettings.Instance.StructureTemplates = Path.Combine("Resources", "Structures.xml");
+                Directory.CreateDirectory(UserSettings.Instance.StandardProjectPath);
+                Directory.CreateDirectory(SharePath);
                 OpenProjectSerializer.Create();
-                Properties.Settings.Default.FirstStartup = false;
+                FirstStartup = false;
             }
-            Properties.Settings.Default.Save();
 
-            while (!File.Exists(Properties.Settings.Default.StandardColorArray))
+            while (!File.Exists(UserSettings.Instance.StandardColorArray))
             {
                await Errorhandler.RaiseMessage("Please create a default color table.", "Missing Color Table", Errorhandler.MessageType.Info);
                await new SetStandardV().ShowDialog(GetWindow());
@@ -181,6 +175,36 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        private bool _FirstStartup = true;
+        [SettingsAttribute("MainWindowViewModel")]
+        public bool FirstStartup
+        {
+            get { return _FirstStartup; }
+            set
+            {
+                if (_FirstStartup != value)
+                {
+                    _FirstStartup = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private string _SharePath;
+        [SettingsAttribute("MainWindowViewModel")]
+        public string SharePath
+        {
+            get { return _SharePath; }
+            set
+            {
+                if (_SharePath != value)
+                {
+                    _SharePath = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
 
         #region Command
@@ -233,6 +257,10 @@ namespace DominoPlanner.Usage
         //    }
         //}
 
+        internal void SaveSettings()
+        {
+            UserSettingsSerializer.Instance.SaveSettings();
+        }
         /// <summary>
         /// Clickevent wenn in der Baumstruktur ein Projektnode geklickt wird
         /// </summary>
@@ -254,7 +282,7 @@ namespace DominoPlanner.Usage
         {
             string path = param.ToString();
             string ex = Path.GetExtension(path).ToLower();
-            if (ex == "." + Properties.Settings.Default.ColorExtension.ToLower() || ex == "." + Properties.Settings.Default.ObjectExtension.ToLower())
+            if (ex == "." + Declares.ColorExtension.ToLower() || ex == "." + Declares.ObjectExtension.ToLower())
             {
                 OpenItem(GetTab(path) ?? new UserControls.ViewModel.TabItem(path));
             }
@@ -291,11 +319,11 @@ namespace DominoPlanner.Usage
             {
                 var fn = s.Trim();
                 var ext = Path.GetExtension(fn).ToLower();
-                if (ext == "." + Properties.Settings.Default.ObjectExtension.ToLower() || ext == "." + Properties.Settings.Default.ColorExtension.ToLower())
+                if (ext == "." + Declares.ObjectExtension.ToLower() || ext == "." + Declares.ColorExtension.ToLower())
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == "." + Properties.Settings.Default.ProjectExtension.ToLower())
+                else if (ext == "." + Declares.ProjectExtension.ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)
@@ -408,7 +436,7 @@ namespace DominoPlanner.Usage
         private async void LoadProject(OpenProject newProject)
         {
             bool remove = true;
-            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{Properties.Settings.Default.ProjectExtension}");
+            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{Declares.ProjectExtension}");
             if (File.Exists(projectpath))
             {
                 remove = false;
@@ -487,7 +515,7 @@ namespace DominoPlanner.Usage
         private async void AddProject_Exists()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Properties.Settings.Default.ProjectExtension }, Name = Properties.Settings.Default.ProjectExtension });
+            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension });
             //openFileDialog.RestoreDirectory = true;
             var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
             if (result != null && result.Length == 1 && File.Exists(result[0]))

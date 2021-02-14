@@ -11,11 +11,11 @@ namespace DominoPlanner.Usage
     {
         public SetStandardVM()
         {
-            var StandardColorPath = Properties.Settings.Default.StandardColorArray;
+            var StandardColorPath = UserSettings.Instance.StandardColorArray;
             SetStandardColor = new RelayCommand(o => { SetColorPath(); });
             SetStandardPath = new RelayCommand(o => { SetStandardPathOpen(); });
             ClearList = new RelayCommand(o => { ClearListMet(); });
-            standardpath = Properties.Settings.Default.StandardProjectPath;
+            standardpath = UserSettings.Instance.StandardProjectPath;
 
             if (!File.Exists(StandardColorPath))
             {
@@ -54,8 +54,7 @@ namespace DominoPlanner.Usage
                 if (_standardpath != value)
                 {
                     _standardpath = value;
-                    Properties.Settings.Default.StandardProjectPath = value;
-                    Properties.Settings.Default.Save();
+                    UserSettings.Instance.StandardProjectPath = value;
                     RaisePropertyChanged();
                 }
             }
@@ -77,15 +76,15 @@ namespace DominoPlanner.Usage
 
         private async void SetColorPath()
         {
-            var StandardColorPath = Properties.Settings.Default.StandardColorArray;
+            var StandardColorPath = UserSettings.Instance.StandardColorArray;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
                 openFileDialog.Directory = ColorVM.FilePath;
                 openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
                 {
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Properties.Settings.Default.ColorExtension,  "clr", "farbe"}, Name = "All color files"},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Properties.Settings.Default.ColorExtension }, Name = "DominoPlanner 3.x color files"},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = "All color files"},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension }, Name = "DominoPlanner 3.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = "DominoPlanner 2.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = "Dominorechner color files"},
                 };

@@ -61,22 +61,21 @@ namespace DominoPlanner.Usage
                 if (attributes.Any())
                 {
                     var attribute = (SettingsAttribute)attributes[0];
-                    propertyInfo.SetValue(this, ReadSetting<object>(attribute.ClassName, attribute.PropertyName));
+                    object value = ReadSetting(attribute.ClassName, attribute.PropertyName);
+                    if (value != null)
+                    {
+                        propertyInfo.SetValue(this, value);
+                    }
                 }
             }
         }
-        public T ReadSetting<T>(string vmname, string propertyname)
+        public object ReadSetting(string vmname, string propertyname)
         {
-            var o = Properties.Settings.Default[vmname + "_" + propertyname];
-            if (o is T o2)
-                return o2;
-            else
-                return default;
+            return UserSettingsSerializer.Instance.GetPropertyValue(vmname, propertyname);
         }
         public void WriteSetting<T>(string vmname, string propertyname, T value)
         {
-            Properties.Settings.Default[vmname + "_" + propertyname] = value;
-            Properties.Settings.Default.Save();
+            UserSettingsSerializer.Instance.AddPropertyValue(vmname, propertyname, value);
         }
 
 

@@ -154,7 +154,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var names = new List<string>();
             try
             {
-                string structurepath = Path.Combine(MainWindowViewModel.ShareDirectory, Properties.Settings.Default.StructureTemplates);
+                string structurepath = Path.Combine(MainWindowViewModel.ShareDirectory, UserSettings.Instance.StructureTemplates);
                 if (!File.Exists(structurepath))
                 {
                     Debug.WriteLine("Structure file not found");
