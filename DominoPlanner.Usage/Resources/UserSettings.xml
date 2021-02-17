@@ -36,11 +36,6 @@
   </LiveBuildHelperVM>
   <MainWindowViewModel>
     <Property>
-      <PropertyName>SharePath</PropertyName>
-      <PropertyValue
-        DataType="System.String">%localappdata%/DominoPlanner</PropertyValue>
-    </Property>
-    <Property>
       <PropertyName>FirstStartup</PropertyName>
       <PropertyValue
         DataType="System.Boolean">True</PropertyValue>

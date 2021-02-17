@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Text;
 using Avalonia;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace DominoPlanner.Usage
 {
@@ -16,8 +17,6 @@ namespace DominoPlanner.Usage
         public MainWindow()
         {
             InitializeComponent();
-
-            CopyResources();
 
             DataContext = new MainWindowViewModel();
             KeyDown += (o, e) => KeyPressedHandler(o, e);
@@ -61,7 +60,8 @@ namespace DominoPlanner.Usage
                     }
                 }
             }
-            PipeManager.StopServer();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                PipeManager.StopServer();
         }
         private void KeyPressedHandler(object sender, KeyEventArgs args)
         {
@@ -94,16 +94,6 @@ namespace DominoPlanner.Usage
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-        }
-        private void CopyResources()
-        {
-            if (!File.Exists(UserSettings.UserSettingsPath))
-            {
-                if (File.Exists("./Resources/UserSettings.xml"))
-                {
-                    File.Copy(".Resources/UserSettings.xml", UserSettings.UserSettingsPath);
-                }
-            }
         }
     }
 }

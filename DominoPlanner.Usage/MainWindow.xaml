@@ -103,7 +103,6 @@
     <Window.Resources>
         <local:PathToImageConverter x:Key="PathToImageConverter"/>
         <local:FilenameToImageConverter x:Key="FilenameToThumbnailConverter"/>
-        <local:OsToVisiblityConverter x:Key="OsToVisibility"/>
     </Window.Resources>
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+N" Command="{Binding NewFieldStruct}"/>
@@ -128,7 +127,7 @@
             <RowDefinition MaxHeight="25" Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0" IsVisible="{Binding OsType, Converter={StaticResource OsToVisibility}}" Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" >
+        <Menu Grid.Row="0" IsVisible="{Binding ShowWindowMenu}" Height="25" VerticalAlignment="Top" Margin="0,0,0.286,0" Background="#7FF0F0F0" >
             <MenuItem>
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">

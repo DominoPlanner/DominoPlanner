@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Input;
+using System.Runtime.InteropServices;
 
 namespace DominoPlanner.Usage
 {    
@@ -23,6 +24,7 @@ namespace DominoPlanner.Usage
         public MainWindowViewModel()
         {
             OsType = Environment.OSVersion.Platform;
+            ShowWindowMenu = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(GetWindow()); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
@@ -40,7 +42,7 @@ namespace DominoPlanner.Usage
 #if DEBUG
                 return Environment.CurrentDirectory;
 #else
-                return SharePath;
+                return UserSettings.AppDataPath;
 #endif
             }
 
@@ -48,15 +50,35 @@ namespace DominoPlanner.Usage
 
         internal async void AfterStartupChecks()
         {
+            try
+            {
+                if (!File.Exists(UserSettings.UserSettingsPath))
+                {
+                    FileInfo fi = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "./Resources/UserSettings.xml");
+                    if (fi.Exists)
+                    {
+                        File.Copy(fi.FullName, UserSettings.UserSettingsPath);
+                    }
+                }
+            }
+            catch (Exception) { }
+
             if (FirstStartup)
             {
-                SharePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DominoPlanner");
-                UserSettings.Instance.StandardColorArray = Path.Combine(SharePath, "colors." + Declares.ColorExtension);
+                UserSettings.Instance.StandardColorArray = Path.Combine(UserSettings.AppDataPath, "colors.DColor");
+                if (!File.Exists(UserSettings.Instance.StandardColorArray) && File.Exists(AppDomain.CurrentDomain.BaseDirectory + "./Resources/lamping.DColor"))
+                {
+                    File.Copy(AppDomain.CurrentDomain.BaseDirectory + "./Resources/lamping.DColor", UserSettings.Instance.StandardColorArray);
+                }
                 UserSettings.Instance.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
-                UserSettings.Instance.OpenProjectList = Path.Combine(SharePath, "OpenProjects.xml");
-                UserSettings.Instance.StructureTemplates = Path.Combine("Resources", "Structures.xml");
+                UserSettings.Instance.OpenProjectList = Path.Combine(UserSettings.AppDataPath, "OpenProjects.xml");
+                if (!File.Exists(UserSettings.Instance.OpenProjectList))
+                {
+                    File.Create(UserSettings.Instance.OpenProjectList).Close();
+                }
+                UserSettings.Instance.StructureTemplates = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Structures.xml");
                 Directory.CreateDirectory(UserSettings.Instance.StandardProjectPath);
-                Directory.CreateDirectory(SharePath);
+                Directory.CreateDirectory(UserSettings.AppDataPath);
                 OpenProjectSerializer.Create();
                 FirstStartup = false;
             }
@@ -176,6 +198,20 @@ namespace DominoPlanner.Usage
             }
         }
 
+        private bool _ShowWindowMenu;
+        public bool ShowWindowMenu
+        {
+            get { return _ShowWindowMenu; }
+            set
+            {
+                if(_ShowWindowMenu == value)
+                {
+                    _ShowWindowMenu = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private bool _FirstStartup = true;
         [SettingsAttribute("MainWindowViewModel")]
         public bool FirstStartup
@@ -186,21 +222,6 @@ namespace DominoPlanner.Usage
                 if (_FirstStartup != value)
                 {
                     _FirstStartup = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private string _SharePath;
-        [SettingsAttribute("MainWindowViewModel")]
-        public string SharePath
-        {
-            get { return _SharePath; }
-            set
-            {
-                if (_SharePath != value)
-                {
-                    _SharePath = value;
                     RaisePropertyChanged();
                 }
             }

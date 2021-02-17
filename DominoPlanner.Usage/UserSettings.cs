@@ -57,6 +57,13 @@ namespace DominoPlanner.Usage
                     }
                     _AppDataPath = Path.Combine(_AppDataPath, "DominoPlanner");
                 }
+                try
+                {
+                    if (!Directory.Exists(_AppDataPath))
+                    {
+                        Directory.CreateDirectory(_AppDataPath);
+                    }
+                }catch(Exception ex) { }
                 return _AppDataPath; 
             }
         }

@@ -35,7 +35,7 @@ namespace DominoPlanner.Usage
             settings.Indent = true;
             settings.NewLineOnAttributes = true;
 
-            using(XmlWriter xmlWriter = XmlWriter.Create(@"C:\Users\johan\Downloads\exporttest\UserSettings.xml", settings))
+            using(XmlWriter xmlWriter = XmlWriter.Create(UserSettings.UserSettingsPath, settings))
             {
                 xmlWriter.WriteStartElement("UserSettings");
 

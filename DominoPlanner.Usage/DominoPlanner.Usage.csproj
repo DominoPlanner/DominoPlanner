@@ -9,6 +9,17 @@
     <Company>DominoPlanner</Company>
     <Authors>Jonathan Neuhauser, Johannes Linnenbrink</Authors>
     <Product>DominoPlanner</Product>
+        
+    <CFBundleName>DominoPlanner</CFBundleName> 
+    <CFBundleDisplayName>DominoPlanner</CFBundleDisplayName>
+    <CFBundleIdentifier>com.DominoPlanner</CFBundleIdentifier>
+    <CFBundleVersion>1.0.0</CFBundleVersion>
+    <CFBundlePackageType>AAPL</CFBundlePackageType>
+    <CFBundleExecutable>DominoPlanner.Usage</CFBundleExecutable>
+    <CFBundleIconFile>DominoCalculator</CFBundleIconFile> <!-- Will be copied from output directory -->
+    <NSPrincipalClass>DominoPlanner.Usage.MainWindow</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+    <CFBundleShortVersionString>1.0.0</CFBundleShortVersionString>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="ExportOptions.xaml" />
@@ -117,6 +128,7 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0-rc1" />
 
 
+    <PackageReference Include="Dotnet.Bundle" Version="*" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Icons\*"></AvaloniaResource>
@@ -210,6 +222,9 @@
     <ProjectReference Include="..\DominoPlanner.Core\DominoPlanner.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Remove="Icons\DominoCalculator.icns" />
+  </ItemGroup>
+  <ItemGroup>
     <AvaloniaResource Include="Resources\Icons.xaml"></AvaloniaResource>
     <Resource Include="Resources\UserSettings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -218,9 +233,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Update="Resources\Lamping %28en%29.DColor">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Resources\lamping.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -228,6 +240,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\UserSettings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Lamping %28en%29.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
