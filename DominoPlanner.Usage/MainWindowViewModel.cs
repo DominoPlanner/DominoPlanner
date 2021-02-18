@@ -24,7 +24,7 @@ namespace DominoPlanner.Usage
         public MainWindowViewModel()
         {
             OsType = Environment.OSVersion.Platform;
-            ShowWindowMenu = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            ShowWindowMenu = !RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
             MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(GetWindow()); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
@@ -204,7 +204,7 @@ namespace DominoPlanner.Usage
             get { return _ShowWindowMenu; }
             set
             {
-                if(_ShowWindowMenu == value)
+                if(_ShowWindowMenu != value)
                 {
                     _ShowWindowMenu = value;
                     RaisePropertyChanged();
