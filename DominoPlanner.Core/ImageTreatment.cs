@@ -286,7 +286,8 @@ namespace DominoPlanner.Core
         LinearExact = 1,
         Cubic = 2,
         Area = 3,
-        Lanczos4 = 3
+        Lanczos4 = 3,
+        Unset=5
     }
     [ProtoContract(SkipConstructor =true)]
     public class FieldReadout : ImageTreatment
@@ -298,14 +299,31 @@ namespace DominoPlanner.Core
         /// Bicubic eignet sich für Fotos, NearestNeighbor für Logos
         /// </summary>
         [ProtoMember(1)]
-        public Inter ResizeMode
+        private Inter ResizeMode
         {
             get => _resizeMode;
             set
             {
-                if (_resizeMode != value)
+                _resizeMode = value;
+                if (value == Inter.Nearest )
+                    ResizeQuality = SKFilterQuality.Low;
+                else if (value == Inter.Linear || value == Inter.LinearExact || value == Inter.Cubic)
+                    ResizeQuality = SKFilterQuality.Medium;
+                else
+                    ResizeQuality = SKFilterQuality.High;
+                _resizeMode = Inter.Unset;
+            }
+        }
+        private SKFilterQuality _resizeQuality;
+        [ProtoMember(2)]
+        public SKFilterQuality ResizeQuality
+        {
+            get => _resizeQuality;
+            set
+            {
+                if (_resizeQuality != value)
                 {
-                    _resizeMode = value;
+                    _resizeQuality = value;
                     colorsValid = false;
                 }
             }
@@ -314,13 +332,13 @@ namespace DominoPlanner.Core
         private SKBitmap resizedImage;
 
         #region constructors
-        public FieldReadout(FieldParameters parent, string relativeImagePath, Inter resizeMode) : base(relativeImagePath, parent)
+        public FieldReadout(FieldParameters parent, string relativeImagePath, SKFilterQuality resizeQuality) : base(relativeImagePath, parent)
         {
-            ResizeMode = resizeMode;
+            ResizeQuality = resizeQuality;
         }
-        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, Inter resizeMode) : base(imageWidth, imageHeight, parent)
+        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, SKFilterQuality resizeQuality) : base(imageWidth, imageHeight, parent)
         {
-            ResizeMode = resizeMode;
+            ResizeQuality = resizeQuality;
         }
         #endregion
         #region overrides
@@ -328,7 +346,7 @@ namespace DominoPlanner.Core
         {
             int length = shapes.FieldPlanLength;
             int height = shapes.FieldPlanHeight;
-            resizedImage = imageFiltered.Resize(new SKImageInfo(length, height), SKFilterQuality.High);
+            resizedImage = imageFiltered.Resize(new SKImageInfo(length, height), ResizeQuality);
             using (var image = resizedImage)
             {
                 Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (xi) =>

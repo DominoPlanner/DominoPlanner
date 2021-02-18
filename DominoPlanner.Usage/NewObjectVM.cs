@@ -165,7 +165,7 @@ namespace DominoPlanner.Usage
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateFieldVM(
                     new FieldParameters(50, 50, Colors.Transparent, AbsoluteColorPath,
-                    8, 8, 24, 8, 5000, Inter.Lanczos4, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
+                    8, 8, 24, 8, 5000, SkiaSharp.SKFilterQuality.High, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
             ViewModels.Add(new DominoProviderObjectEntry()
@@ -339,7 +339,7 @@ namespace DominoPlanner.Usage
             string relPicturePath = $@"..\Source Image\{finalImagePath}";
             if (provider is FieldParameters f)
             {
-                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, Inter.Lanczos4);
+                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, SkiaSharp.SKFilterQuality.High);
             }
             else
             {

@@ -131,15 +131,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             get => CurrentModel as FieldReadout;
         }
-        public Inter ResizeMode
+        public SkiaSharp.SKFilterQuality ResizeQuality
         {
-            get => FRModel.ResizeMode;
+            get => FRModel.ResizeQuality;
             set
             {
-                if (FRModel.ResizeMode != value)
+                if (FRModel.ResizeQuality != value)
                 {
                     PropertyValueChanged(this, value);
-                    FRModel.ResizeMode = value;
+                    FRModel.ResizeQuality = value;
                     RaisePropertyChanged();
                 }
             }

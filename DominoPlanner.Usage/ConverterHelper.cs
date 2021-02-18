@@ -128,11 +128,11 @@ namespace DominoPlanner.Usage
         }
     }
 
-    public class InterToStringConverter : IValueConverter
+    public class FilterQualityToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((Inter)value).ToString();
+            return ((SkiaSharp.SKFilterQuality)value).ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -140,7 +140,7 @@ namespace DominoPlanner.Usage
             throw new NotImplementedException();
         }
     }
-    public sealed class DiffusionModeToIntConverter : IValueConverter
+    public sealed class FilterQualityToIntConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -152,23 +152,21 @@ namespace DominoPlanner.Usage
                 var val = (int)(double)value;
                 return val switch
                 {
-                    0 => Inter.Nearest,
-                    1 => Inter.Linear,
-                    3 => Inter.Area,
-                    4 => Inter.Cubic,
-                    _ => Inter.Nearest,
+                    0 => SkiaSharp.SKFilterQuality.Low,
+                    1 => SkiaSharp.SKFilterQuality.Medium,
+                    2 => SkiaSharp.SKFilterQuality.High,
+                    _ => SkiaSharp.SKFilterQuality.Low,
                 };
             }
 
             if (value.GetType().IsEnum)
             {
-                var val = (Inter)value;
+                var val = (SkiaSharp.SKFilterQuality)value;
                 return val switch
                 {
-                    Inter.Nearest => 0,
-                    Inter.Linear => 1,
-                    Inter.Area => 3,
-                    Inter.Cubic => 4,
+                    SkiaSharp.SKFilterQuality.Low => 0,
+                    SkiaSharp.SKFilterQuality.Medium => 1,
+                    SkiaSharp.SKFilterQuality.High => 2,
                     _ => 0,
                 };
             }

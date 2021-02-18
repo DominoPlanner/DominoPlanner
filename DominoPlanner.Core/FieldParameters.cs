@@ -156,7 +156,7 @@ namespace DominoPlanner.Core
         #endregion properties
         #region constructors
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int width, int height,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
         {
             ColorPath = colors;
             HorizontalDistance = horizontalDistance;
@@ -165,18 +165,18 @@ namespace DominoPlanner.Core
             VerticalDistance = verticalDistance;
             Length = width;
             Height = height;
-            PrimaryImageTreatment = new FieldReadout(this, imagePath, scalingMode);
+            PrimaryImageTreatment = new FieldReadout(this, imagePath, scalingQuality);
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
         }
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
-            : this(filepath, imagePath, colors, horizontalDistance, horizontalSize, verticalSize, verticalDistance, 1, 1, scalingMode, colorMode, ditherMode, iterationInformation)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+            : this(filepath, imagePath, colors, horizontalDistance, horizontalSize, verticalSize, verticalDistance, 1, 1, scalingQuality, colorMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
         public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
         {
 
             ColorPath = colors;
@@ -184,7 +184,7 @@ namespace DominoPlanner.Core
             HorizontalSize = horizontalSize;
             VerticalSize = verticalSize;
             VerticalDistance = verticalDistance;
-            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode)
+            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingQuality)
             {
                 Background = background
             };
