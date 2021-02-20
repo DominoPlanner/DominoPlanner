@@ -65,7 +65,7 @@ namespace DominoPlanner.Core
                 if (value.Contains("\\")) value = value.Replace("\\", "/");
 
                 _colorPath = value;
-                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
+                colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ColorPath, this));
             }
         }
         public ColorRepository colors;

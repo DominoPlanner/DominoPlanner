@@ -69,7 +69,7 @@ namespace DominoPlanner.Core
         }
         public static string AbsolutePathFromReferenceLoseUpdate(string relativePath, IWorkspaceLoadable reference)
         {
-            return AbsolutePathFromReference(ref relativePath, reference);
+            return AbsolutePathFromReference(relativePath, reference);
         }
         public static PathResolution FindResolution(string relativePath, IWorkspaceLoadable reference)
         {
@@ -81,7 +81,7 @@ namespace DominoPlanner.Core
             }
             return Instance.resolvedPaths.Where(x => x.reference == reference && x.RelativePath == relativePath).FirstOrDefault();
         }
-        public static string AbsolutePathFromReference(ref string relativePath, IWorkspaceLoadable reference)
+        public static string AbsolutePathFromReference(string relativePath, IWorkspaceLoadable reference)
         {
             if (relativePath.Contains("\\")) relativePath = relativePath.Replace("\\", "/");
             
@@ -125,15 +125,6 @@ namespace DominoPlanner.Core
                     {
                         if (!string.IsNullOrEmpty(resolution.AbsolutePath) && File.Exists(resolution.AbsolutePath))
                         {
-                            if (Path.IsPathRooted(resolution.AbsolutePath))
-                            {
-                                relativePath = resolution.AbsolutePath;
-                            }
-                            else
-                            {
-                                relativePath = Workspace.MakeRelativePath(basepath, resolution.AbsolutePath);
-                            }
-
                             resolution.isResolved = true;
                             return resolution.AbsolutePath;
                         }
@@ -215,7 +206,7 @@ namespace DominoPlanner.Core
         private static Out LoadInternal<FullType, LoadType, Out>
             (ref string relativePath, IWorkspaceLoadable reference, Func<LoadType, Out> func, Func<FullType, Out> func2) where FullType : IWorkspaceLoadable where LoadType : IWorkspaceLoadable
         {
-            var absPath = AbsolutePathFromReference(ref relativePath, reference);
+            var absPath = AbsolutePathFromReference(relativePath, reference);
             return LoadInternal(absPath, func, func2);
         }
         public static T Load<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadable
@@ -261,7 +252,7 @@ namespace DominoPlanner.Core
         }
         public static ObservableCollection<ImageFilter> LoadImageFilters<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadImageFilter
         {
-            return LoadImageFilters<T>(AbsolutePathFromReference(ref relativePath, reference));
+            return LoadImageFilters<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static Tuple<string, int[]> LoadColorList<T>(string absolutePath) where T: IWorkspaceLoadColorList
         {
@@ -272,7 +263,7 @@ namespace DominoPlanner.Core
         } 
         public static Tuple<string, int[]> LoadColorList<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
-            return LoadColorList<T>(AbsolutePathFromReference(ref relativePath, reference));
+            return LoadColorList<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static bool LoadEditingState<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {
@@ -280,7 +271,7 @@ namespace DominoPlanner.Core
         }
         public static bool LoadEditingState<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
-            return LoadEditingState<T>(AbsolutePathFromReference(ref relativePath, reference));
+            return LoadEditingState<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static bool LoadHasProtocolDefinition<T>(string absolutePath) where T : IWorkspaceLoadColorList
         {
@@ -289,7 +280,7 @@ namespace DominoPlanner.Core
         }
         public static bool LoadHasProtocolDefinition<T>(ref string relativePath, IWorkspaceLoadable reference) where T : IWorkspaceLoadColorList
         {
-            return LoadHasProtocolDefinition<T>(AbsolutePathFromReference(ref relativePath, reference));
+            return LoadHasProtocolDefinition<T>(AbsolutePathFromReference(relativePath, reference));
         }
         public static byte[] LoadThumbnailFromStream(Stream stream)
         {
@@ -304,8 +295,7 @@ namespace DominoPlanner.Core
         }
         public static void CloseFile(string relativePath, IWorkspaceLoadable reference)
         {
-            CloseFile(AbsolutePathFromReference(ref 
-                relativePath, reference));
+            CloseFile(AbsolutePathFromReference(relativePath, reference));
         }
         public static void CloseFile(IWorkspaceLoadable reference)
         {

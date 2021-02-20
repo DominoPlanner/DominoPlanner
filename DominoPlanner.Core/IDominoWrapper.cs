@@ -68,14 +68,14 @@ namespace DominoPlanner.Core
             {
                 if (value.Contains("\\")) value = value.Replace("\\", "/");
                 _colorPath = value;
-                Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
+                Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ColorPath, this));
             }
         }
         public string AbsoluteColorPath
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(ref _colorPath, this);
+                return Workspace.AbsolutePathFromReference(ColorPath, this);
             }
         }
         public ColorRepository Colors { get; private set; }
@@ -140,7 +140,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(ref _relativePath, parent);
+                return Workspace.AbsolutePathFromReference(RelativePath, parent);
             }
         }
         private IDominoProvider _obj;
@@ -265,7 +265,7 @@ namespace DominoPlanner.Core
             get
             {
                 // update relative path in case it changed
-                _ = AbsolutePath;
+                //_ = AbsolutePath;
                 return path;
             }
             set
@@ -283,7 +283,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(ref path, parent);
+                return Workspace.AbsolutePathFromReference(Path, parent);
             }
         }
 

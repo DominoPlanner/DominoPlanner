@@ -137,7 +137,7 @@ namespace DominoPlanner.Core
         }
         public override void UpdateMat()
         {
-            To_blend = SKBitmap.Decode(Workspace.AbsolutePathFromReference(ref _filepath, parent));
+            To_blend = SKBitmap.Decode(Workspace.AbsolutePathFromReference(FilePath, parent));
         }
         public BlendFileFilter()
         {

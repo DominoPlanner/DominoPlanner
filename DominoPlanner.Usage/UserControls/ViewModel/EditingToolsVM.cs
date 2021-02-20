@@ -941,7 +941,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     if (bff != null)
                     {
                         string relativePath = bff.FilePath;
-                        string absolutePath = Core.Workspace.AbsolutePathFromReference(ref relativePath, parent.CurrentProject);
+                        string absolutePath = Core.Workspace.AbsolutePathFromReference(relativePath, parent.CurrentProject);
                         if (File.Exists(absolutePath))
                         {
                             FilteredImage = SKBitmap.Decode(absolutePath);
