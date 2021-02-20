@@ -231,7 +231,7 @@ namespace DominoPlanner.Usage
 
 
         private bool _HasNoProperties;
-        [SettingsAttribute("ProtocolVM")]
+        [SettingsAttribute("ProtocolVM", false)]
         public bool HasNoProperties
         {
             get { return _HasNoProperties; }
@@ -248,7 +248,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasShortProperties;
-        [SettingsAttribute("ProtocolVM")]
+        [SettingsAttribute("ProtocolVM", true)]
         public bool HasShortProperties
         {
             get { return _HasShortProperties; }
@@ -265,7 +265,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasExtendedProperties;
-        [SettingsAttribute("ProtocolVM")]
+        [SettingsAttribute("ProtocolVM", false)]
         public bool HasExtendedProperties
         {
             get { return _HasExtendedProperties; }
@@ -316,7 +316,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _UseBlocks;
-        [SettingsAttribute("ProtocolVM")]
+        [SettingsAttribute("ProtocolVM", true)]
         public bool UseBlocks
         {
             get { return _UseBlocks; }
@@ -331,7 +331,7 @@ namespace DominoPlanner.Usage
             }
         }
         private int _StonesPerBlock;
-        [SettingsAttribute("ProtocolVM")]
+        [SettingsAttribute("ProtocolVM", 50)]
         public int StonesPerBlock
         {
             get 

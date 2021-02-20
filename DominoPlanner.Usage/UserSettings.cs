@@ -78,7 +78,7 @@ namespace DominoPlanner.Usage
 
         private string _StandardProjectPath;
 
-        [SettingsAttribute("UserSettings")]
+        [SettingsAttribute("UserSettings", "")]
         public string StandardProjectPath
         {
             get { return _StandardProjectPath; }
@@ -93,7 +93,7 @@ namespace DominoPlanner.Usage
         }
 
         private string _StandardColorArray;
-        [SettingsAttribute("UserSettings")]
+        [SettingsAttribute("UserSettings", ".Resources/lamping.DColor")]
         public string StandardColorArray
         {
             get { return _StandardColorArray; }
@@ -108,7 +108,7 @@ namespace DominoPlanner.Usage
         }
 
         private string _StructureTemplates;
-        [SettingsAttribute("UserSettings")]
+        [SettingsAttribute("UserSettings", ".Resources/Structures.xml")]
         public string StructureTemplates
         {
             get { return _StructureTemplates; }
@@ -123,7 +123,7 @@ namespace DominoPlanner.Usage
         }
 
         private string _OpenProjectList;
-        [SettingsAttribute("UserSettings")]
+        [SettingsAttribute("UserSettings", "")]
         public string OpenProjectList
         {
             get { return _OpenProjectList; }

@@ -57,14 +57,20 @@ namespace DominoPlanner.Usage
             var propertyInfos = this.GetType().GetProperties();
             foreach (var propertyInfo in propertyInfos)
             {
-                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true);
-                if (attributes.Any())
+                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true).FirstOrDefault();
+                if (attributes is SettingsAttribute settingsAttribute)
                 {
-                    var attribute = (SettingsAttribute)attributes[0];
-                    object value = ReadSetting(attribute.ClassName, attribute.PropertyName);
+                    object value = ReadSetting(settingsAttribute.ClassName, settingsAttribute.PropertyName);
                     if (value != null)
                     {
                         propertyInfo.SetValue(this, value);
+                    }
+                    else
+                    {
+                        if (settingsAttribute.DefaultValue.GetType() == propertyInfo.PropertyType)
+                        {
+                            propertyInfo.SetValue(this, settingsAttribute.DefaultValue);
+                        }
                     }
                 }
             }
@@ -84,11 +90,13 @@ namespace DominoPlanner.Usage
     {
         public string ClassName{ get; set; }
         public string PropertyName { get; set; }
+        public object DefaultValue { get; set; }
 
-        public SettingsAttribute(string className, [CallerMemberName] string propertyName = null)
+        public SettingsAttribute(string className, object defaultValue, [CallerMemberName] string propertyName = null)
         {
             ClassName = className;
             PropertyName = propertyName;
+            DefaultValue = defaultValue;
         }
     }
 

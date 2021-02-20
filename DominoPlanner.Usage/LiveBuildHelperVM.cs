@@ -283,7 +283,7 @@ namespace DominoPlanner.Usage
             set { _Snapshots = value; RaisePropertyChanged(); }
         }
         private int _FontSize;
-        [SettingsAttribute("LiveBuildHelperVM")]
+        [SettingsAttribute("LiveBuildHelperVM", 18)]
         public int FontSize
         {
             get { return _FontSize; }

@@ -213,7 +213,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _FirstStartup = true;
-        [SettingsAttribute("MainWindowViewModel")]
+        [SettingsAttribute("MainWindowViewModel", true)]
         public bool FirstStartup
         {
             get { return _FirstStartup; }
