@@ -242,7 +242,7 @@
     <None Update="Resources\UserSettings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Lamping %28en%29.DColor">
+    <None Update="Resources\lamping %28de%29.DColor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

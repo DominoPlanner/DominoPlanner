@@ -80,7 +80,6 @@ namespace DominoPlanner.Usage
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.Directory = ColorVM.FilePath;
                 openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
                 {
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = "All color files"},
@@ -88,8 +87,7 @@ namespace DominoPlanner.Usage
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = "DominoPlanner 2.x color files"},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = "Dominorechner color files"},
                 };
-                var share_path = MainWindowViewModel.ShareDirectory;
-                openFileDialog.Directory = Path.Combine(share_path, "Resources");
+                openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
             }
             catch (Exception) { }
             var result = await openFileDialog.ShowAsync(window);
