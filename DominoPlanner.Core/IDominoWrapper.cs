@@ -52,6 +52,7 @@ namespace DominoPlanner.Core
     [ProtoContract]
     public class DominoAssembly : IWorkspaceLoadable
     {
+        public bool ColorListBroken;
         [ProtoMember(1, OverwriteList =true)]
         public ObservableCollection<IDominoWrapper> children;
         [ProtoMember(2)]
@@ -68,14 +69,22 @@ namespace DominoPlanner.Core
             {
                 if (value.Contains("\\")) value = value.Replace("\\", "/");
                 _colorPath = value;
-                Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ColorPath, this));
+                try
+                {
+                    Colors = Workspace.Load<ColorRepository>(Workspace.AbsolutePathFromReference(ref _colorPath, this));
+                }
+                catch (ProtoException)
+                {
+                    ColorListBroken = true;
+                }
+
             }
         }
         public string AbsoluteColorPath
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(ColorPath, this);
+                return Workspace.AbsolutePathFromReference(ref _colorPath, this);
             }
         }
         public ColorRepository Colors { get; private set; }
@@ -140,7 +149,10 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(RelativePath, parent);
+                string newrelpath = _relativePath;
+                var result = Workspace.AbsolutePathFromReference(ref newrelpath, parent);
+                RelativePath = newrelpath;
+                return result;
             }
         }
         private IDominoProvider _obj;
@@ -265,7 +277,7 @@ namespace DominoPlanner.Core
             get
             {
                 // update relative path in case it changed
-                //_ = AbsolutePath;
+                _ = AbsolutePath;
                 return path;
             }
             set
@@ -283,7 +295,7 @@ namespace DominoPlanner.Core
         {
             get
             {
-                return Workspace.AbsolutePathFromReference(Path, parent);
+                return Workspace.AbsolutePathFromReference(ref path, parent);
             }
         }
 

@@ -327,6 +327,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 this.BrokenReference = true;
             }
+            catch (InvalidDataException)
+            {
+                this.BrokenFile = true;
+            }
         }
         internal override void PostReferenceRestoration()
         {
@@ -614,6 +618,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
+
+        public bool BrokenFile { get; private set; }
     }
     public class ColorNodeVM : NodeVM
     {

@@ -453,6 +453,8 @@ namespace DominoPlanner.Usage
                     AssemblyNode mainnode = new AssemblyNode(projectpath);
                     // check if the file can be deserialized properly
                     node = new AssemblyNodeVM(mainnode, OpenItem, RemoveNodeFromTabs, GetTab);
+                    if (node.BrokenFile || (node.Model as AssemblyNode).Obj.ColorListBroken)
+                        remove = true;
                 }
                 catch (Exception)
                 {
