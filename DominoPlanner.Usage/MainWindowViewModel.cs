@@ -50,26 +50,10 @@ namespace DominoPlanner.Usage
 
         internal async void AfterStartupChecks()
         {
-            try
-            {
-                if (!File.Exists(UserSettings.UserSettingsPath))
-                {
-                    FileInfo fi = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "./Resources/UserSettings.xml");
-                    if (fi.Exists)
-                    {
-                        File.Copy(fi.FullName, UserSettings.UserSettingsPath);
-                    }
-                }
-            }
-            catch (Exception) { }
 
             if (FirstStartup)
             {
                 UserSettings.Instance.StandardColorArray = Path.Combine(UserSettings.AppDataPath, "colors.DColor");
-                if (!File.Exists(UserSettings.Instance.StandardColorArray) && File.Exists(AppDomain.CurrentDomain.BaseDirectory + "./Resources/lamping.DColor"))
-                {
-                    File.Copy(AppDomain.CurrentDomain.BaseDirectory + "./Resources/lamping.DColor", UserSettings.Instance.StandardColorArray);
-                }
                 UserSettings.Instance.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
                 UserSettings.Instance.OpenProjectList = Path.Combine(UserSettings.AppDataPath, "OpenProjects.xml");
                 if (!File.Exists(UserSettings.Instance.OpenProjectList))
