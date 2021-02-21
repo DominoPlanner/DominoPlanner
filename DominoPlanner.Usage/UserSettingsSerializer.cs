@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
@@ -63,56 +64,41 @@ namespace DominoPlanner.Usage
         {
             if (File.Exists(UserSettings.UserSettingsPath))
             {
-                using (XmlReader xmlReader = XmlReader.Create(UserSettings.UserSettingsPath))
+                XDocument xDocument = XDocument.Load(UserSettings.UserSettingsPath);
+                if (xDocument.FirstNode != null && xDocument.FirstNode is XElement rootNode && rootNode.Name.LocalName.Equals("UserSettings"))
                 {
-                    xmlReader.Read();
-                    xmlReader.Read();
-                    xmlReader.Read();
-                    if (xmlReader.IsStartElement() && xmlReader.Name.Equals("UserSettings"))
+                    foreach (XElement classElement in rootNode.Nodes().ToList().OfType<XElement>())
                     {
-                        xmlReader.Read();
-                        xmlReader.Read();
-                        while (xmlReader.IsStartElement())
+                        string currentElement = classElement.Name.LocalName;
+                        List<PropertyValue> propValue = new List<PropertyValue>();
+                        foreach (XElement propertyElement in classElement.Nodes().ToList().OfType<XElement>())
                         {
-                            string currentElement = string.Empty;
-                            currentElement = xmlReader.Name;
-                            List<PropertyValue> propValue = new List<PropertyValue>();
-                            xmlReader.Read();
-                            xmlReader.Read();
-                            while (xmlReader.IsStartElement() && xmlReader.Name.Equals("Property"))
+                            PropertyValue currentValue = new PropertyValue();
+                            foreach (XElement propertyValue in propertyElement.Nodes().ToList().OfType<XElement>())
                             {
-                                PropertyValue currentValue = new PropertyValue();
-                                xmlReader.Read();
-                                xmlReader.Read();
-                                if (xmlReader.Name.Equals("PropertyName"))
+                                if (propertyValue.Name.LocalName.Equals("PropertyName"))
                                 {
-                                    xmlReader.Read();
-                                    currentValue.PropertyName = xmlReader.Value;
-                                    xmlReader.Read();
-                                }
-                                xmlReader.Read();
-                                xmlReader.Read();
-                                if (xmlReader.Name.Equals("PropertyValue"))
-                                {
-                                    Type valueType = typeof(string);
-                                    if (xmlReader.HasAttributes)
+                                    if (propertyValue.FirstNode is XText propName)
                                     {
-                                        valueType = Type.GetType(xmlReader.GetAttribute(0));
+                                        currentValue.PropertyName = propName.Value;
                                     }
-                                    xmlReader.Read();
-                                    currentValue.Value = Convert.ChangeType(xmlReader.Value, valueType); ;
-                                    xmlReader.Read();
                                 }
-                                propValue.Add(currentValue);
-                                xmlReader.Read();
-                                xmlReader.Read();
-                                xmlReader.Read();
-                                xmlReader.Read();
+                                else if (propertyValue.Name.LocalName.Equals("PropertyValue"))
+                                {
+                                    if (propertyValue.FirstNode is XText pValue)
+                                    {
+                                        Type valueType = typeof(string);
+                                        if (propertyValue.FirstAttribute is XAttribute attribute)
+                                        {
+                                            valueType = Type.GetType(attribute.Value);
+                                        }
+                                        currentValue.Value = Convert.ChangeType(pValue.Value, valueType);
+                                    }
+                                }
                             }
-                            PropertyValues.Add(currentElement, propValue);
-                            xmlReader.Read();
-                            xmlReader.Read();
+                            propValue.Add(currentValue);
                         }
+                        PropertyValues.Add(currentElement, propValue);
                     }
                 }
             }
