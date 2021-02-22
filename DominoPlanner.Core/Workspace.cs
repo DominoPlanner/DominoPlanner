@@ -352,6 +352,7 @@ namespace DominoPlanner.Core
             toPath = toPath.Replace("\\", "/");
 
             string relativePath = Path.GetRelativePath(fromPath, toPath);
+            relativePath = relativePath.Replace("\\", "/");
             if(relativePath.StartsWith("../"))
             {
                 relativePath = relativePath.Replace("../", "");
