@@ -347,19 +347,15 @@ namespace DominoPlanner.Core
         {
             if (string.IsNullOrEmpty(fromPath)) return toPath;
             if (string.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
-            Uri fromUri = new Uri(fromPath);
-            Uri toUri = new Uri(toPath);
 
-            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
+            fromPath = fromPath.Replace("\\", "/");
+            toPath = toPath.Replace("\\", "/");
 
-            Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
-
-            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+            string relativePath = Path.GetRelativePath(fromPath, toPath);
+            if(relativePath.StartsWith("../"))
             {
-                relativePath = relativePath.Replace("\\", "/");
+                relativePath = relativePath.Replace("../", "");
             }
-
             return relativePath;
         }
         
