@@ -8,79 +8,80 @@
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:i18n="clr-namespace:DominoPlanner.Usage"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Width="800" Height="450"
         x:Class="DominoPlanner.Usage.MainWindow" Closing="Window_Closing" x:CompileBindings="True" x:DataType="local:MainWindowViewModel"
-        Title="DominoPlanner.Avalonia" Icon="/Icons/DominoCalculator.ico">
+        Title="DominoPlanner" Icon="/Icons/DominoCalculator.ico">
 
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="New">
+            <NativeMenuItem Header="{local:Gettext New}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="New Project" Command="{Binding NewProject}" Gesture="Alt+N"/>
-                        <NativeMenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" Gesture="Ctrl+N"/>
+                        <NativeMenuItem Header="{local:Gettext New Project}" Command="{Binding NewProject}" Gesture="Alt+N"/>
+                        <NativeMenuItem Header="{local:Gettext New Field/Structure}" Command="{Binding NewFieldStruct}" Gesture="Ctrl+N"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
 
-            <NativeMenuItem Header="Add Existing">
+            <NativeMenuItem Header="{local:Gettext Add Existing}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Add existing project" Command="{Binding AddExistingProject}"/>
-                        <NativeMenuItem Header="Add existing Field/Structure" Command="{Binding AddExistingItem}"/>
+                        <NativeMenuItem Header="{local:Gettext Add existing project}" Command="{Binding AddExistingProject}"/>
+                        <NativeMenuItem Header="{local:Gettext Add existing Field/Structure}" Command="{Binding AddExistingItem}"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
 
-            <NativeMenuItem Header="Save">
+            <NativeMenuItem Header="{local:Gettext Save}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Save" Command="{Binding SaveCurrentOpen}" Gesture="Ctrl+S"/>
-                        <NativeMenuItem Header="Save all" Command="{Binding SaveAll}" Gesture="Ctrl+Alt+S"/>
+                        <NativeMenuItem Header="{local:Gettext Save}" Command="{Binding SaveCurrentOpen}" Gesture="Ctrl+S"/>
+                        <NativeMenuItem Header="{local:Gettext Save all}" Command="{Binding SaveAll}" Gesture="Ctrl+Alt+S"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
 
-            <NativeMenuItem Header="Undo Redo">
+            <NativeMenuItem Header="{local:Gettext Undo Redo}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Undo" Command="{Binding SelectedTab.Content.UndoComm}" Gesture="Ctrl+Z"/>
-                        <NativeMenuItem Header="Redo" Command="{Binding SelectedTab.Content.RedoComm}" Gesture="Ctrl+Shift+Z"/>
+                        <NativeMenuItem Header="{local:Gettext Undo}" Command="{Binding SelectedTab.Content.UndoComm}" Gesture="Ctrl+Z"/>
+                        <NativeMenuItem Header="{local:Gettext Redo}" Command="{Binding SelectedTab.Content.RedoComm}" Gesture="Ctrl+Shift+Z"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
         </NativeMenu>
 
-        <NativeMenuItem Header="Settings">
+        <NativeMenuItem Header="{local:Gettext Settings}">
             <NativeMenuItem.Menu>
                 <NativeMenu>
-                    <NativeMenuItem Header="Set Standards" Command="{Binding MenuSetStandard}" Gesture="Ctrl+R"/>
+                    <NativeMenuItem Header="{local:Gettext Set Defaults}" Command="{Binding MenuSetStandard}" Gesture="Ctrl+R"/>
                 </NativeMenu>
             </NativeMenuItem.Menu>
         </NativeMenuItem>
 
-        <NativeMenuItem Header="Editing">
+        <NativeMenuItem Header="{local:Gettext Editing}">
             <NativeMenuItem.Menu>
                 <NativeMenu x:CompileBindings="False">
-                    <NativeMenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Ctrl+C"/>
-                    <NativeMenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Ctrl+V"/>
+                    <NativeMenuItem Header="{local:Gettext Copy}" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Ctrl+C"/>
+                    <NativeMenuItem Header="{local:Gettext Paste}" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Ctrl+V"/>
 
-                    <NativeMenuItem Header="Add">
+                    <NativeMenuItem Header="{local:Gettext Add}">
                         <NativeMenuItem.Menu>
                             <NativeMenu>
-                                <NativeMenuItem Header="Add row above" Command="{Binding SelectedTab.Content.AddRowAbove}" Gesture="Alt+W"/>
-                                <NativeMenuItem Header="Add row below" Command="{Binding SelectedTab.Content.AddRowBelow}" Gesture="Alt+S"/>
-                                <NativeMenuItem Header="Add column right" Command="{Binding SelectedTab.Content.AddColumnRight}" Gesture="Alt+D"/>
-                                <NativeMenuItem Header="Add column left" Command="{Binding SelectedTab.Content.AddColumnLeft}" Gesture="Alt+A" />
+                                <NativeMenuItem Header="{local:Gettext Add row above}" Command="{Binding SelectedTab.Content.AddRowAbove}" Gesture="Alt+W"/>
+                                <NativeMenuItem Header="{local:Gettext Add row below}" Command="{Binding SelectedTab.Content.AddRowBelow}" Gesture="Alt+S"/>
+                                <NativeMenuItem Header="{local:Gettext Add column right}" Command="{Binding SelectedTab.Content.AddColumnRight}" Gesture="Alt+D"/>
+                                <NativeMenuItem Header="{local:Gettext Add column left}" Command="{Binding SelectedTab.Content.AddColumnLeft}" Gesture="Alt+A" />
                             </NativeMenu>
                         </NativeMenuItem.Menu>
                     </NativeMenuItem>
 
-                    <NativeMenuItem Header="Remove">
+                    <NativeMenuItem Header="{local:Gettext Remove}">
                         <NativeMenuItem.Menu>
                             <NativeMenu>
-                                <NativeMenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" Gesture="Alt+R"/>
-                                <NativeMenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" Gesture="Alt+C"/>
+                                <NativeMenuItem Header="{local:Gettext Remove selected rows}" Command="{Binding SelectedTab.Content.RemoveRows}" Gesture="Alt+R"/>
+                                <NativeMenuItem Header="{local:Gettext Remove selected columns}" Command="{Binding SelectedTab.Content.RemoveColumns}" Gesture="Alt+C"/>
                             </NativeMenu>
                         </NativeMenuItem.Menu>
                     </NativeMenuItem>
@@ -132,15 +133,15 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/new.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">New</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext New}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
-                <MenuItem Header="New Project" Command="{Binding NewProject}" InputGesture="Alt+N">
+                <MenuItem Header="{local:Gettext New Project}" Command="{Binding NewProject}" InputGesture="Alt+N">
                     <MenuItem.Icon>
                         <Image Source="/Icons/new.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="New Field/Structure" Command="{Binding NewFieldStruct}" InputGesture="Ctrl+N" >
+                <MenuItem Header="{local:Gettext New Field/Structure}" Command="{Binding NewFieldStruct}" InputGesture="Ctrl+N" >
                     <MenuItem.Icon>
                         <Image Source="/Icons/new.ico"/>
                     </MenuItem.Icon>
@@ -150,15 +151,15 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/add.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Add Existing</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Add}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
-                <MenuItem Header="Add existing project" Command="{Binding AddExistingProject}">
+                <MenuItem Header="{local:Gettext Add existing project}" Command="{Binding AddExistingProject}">
                     <MenuItem.Icon>
                         <Image Source="/Icons/add.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Add existing Field/Structure" Command="{Binding AddExistingItem}">
+                <MenuItem Header="{local:Gettext Add existing Field/Structure}" Command="{Binding AddExistingItem}">
                     <MenuItem.Icon>
                         <Image Source="/Icons/add.ico"/>
                     </MenuItem.Icon>
@@ -169,15 +170,15 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/Save.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Save</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Save}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
-                <MenuItem Header="Save" Command="{Binding SaveCurrentOpen}" InputGesture="Ctrl+S">
+                <MenuItem Header="{local:Gettext Save}" Command="{Binding SaveCurrentOpen}" InputGesture="Ctrl+S">
                     <MenuItem.Icon>
                         <Image Source="/Icons/Save.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save all" Command="{Binding SaveAll}" InputGesture="Ctrl+Alt+S" >
+                <MenuItem Header="{local:Gettext Save all}" Command="{Binding SaveAll}" InputGesture="Ctrl+Alt+S" >
                     <MenuItem.Icon>
                         <Image Source="/Icons/Save_All.ico"/>
                     </MenuItem.Icon>
@@ -187,7 +188,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/edit_undo.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Undo</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Undo}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
@@ -195,7 +196,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/edit_redo.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Redo</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Redo}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
@@ -203,7 +204,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/properties.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Set Standards</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Set Defaults}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
@@ -211,7 +212,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/draw_freehand.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Editing</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Editing}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
                 <i:Interaction.Behaviors>
@@ -222,43 +223,43 @@
                         <ia:ChangePropertyAction TargetObject="{Binding #EditingMenuItem}" PropertyName="IsVisible" Value="true"/>
                     </ia:DataTriggerBehavior>
                 </i:Interaction.Behaviors>
-                <MenuItem Header="Copy" Command="{Binding SelectedTab.Content.CopyCom}" InputGesture="Ctrl+C">
+                <MenuItem Header="{local:Gettext Copy}" Command="{Binding SelectedTab.Content.CopyCom}" InputGesture="Ctrl+C">
                     <MenuItem.Icon>
                         <Image Source="/Icons/Copy.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Paste" Command="{Binding SelectedTab.Content.PasteCom}" InputGesture="Ctrl+V">
+                <MenuItem Header="{local:Gettext Paste}" Command="{Binding SelectedTab.Content.PasteCom}" InputGesture="Ctrl+V">
                     <MenuItem.Icon>
                         <Image Source="/Icons/Paste.ico"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <!--MenuItem Header="Mirror">
-                    <MenuItem Header="Flip Horizontally" Command="{Binding SelectedTab.Content.FlipHorizontallyCom}">
+                <!--MenuItem Header="{local:Gettext Mirror}">
+                    <MenuItem Header="{local:Gettext Flip Horizontally}" Command="{Binding SelectedTab.Content.FlipHorizontallyCom}">
                         <MenuItem.Icon>
                             <Image Source="Icons/flip hori.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Flip Vertically" Command="{Binding SelectedTab.Content.FlipVerticallyCom}">
+                    <MenuItem Header="{local:Gettext Flip Vertically}" Command="{Binding SelectedTab.Content.FlipVerticallyCom}">
                         <MenuItem.Icon>
                             <Image Source="Icons/flip vertical.ico"/>
                         </MenuItem.Icon>
                     </MenuItem>
                 </-->
-                <MenuItem Header="Add">
+                <MenuItem Header="{local:Gettext Add}">
                     <MenuItem.Icon>
                         <Image Source="/Icons/add.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Add row above" ToolTip.Tip="Add Row above selected stone" Command="{Binding SelectedTab.Content.AddRowAbove}" InputGesture="Alt+W"/>
-                    <MenuItem Header="Add row below" ToolTip.Tip="Add Row below selected stone" Command="{Binding SelectedTab.Content.AddRowBelow}" InputGesture="Alt+S"/>
-                    <MenuItem Header="Add column right" ToolTip.Tip="Add column at the right from the selected stone" Command="{Binding SelectedTab.Content.AddColumnRight}" InputGesture="Alt+D"/>
-                    <MenuItem Header="Add column left" ToolTip.Tip="Add column at the left from the selected stone" Command="{Binding SelectedTab.Content.AddColumnLeft}" InputGesture="Alt+A" />
+                    <MenuItem Header="{local:Gettext Add row above}" ToolTip.Tip="{local:Gettext Add Row above selected stone}" Command="{Binding SelectedTab.Content.AddRowAbove}" InputGesture="Alt+W"/>
+                    <MenuItem Header="{local:Gettext Add row below}" ToolTip.Tip="{local:Gettext Add Row below selected stone}" Command="{Binding SelectedTab.Content.AddRowBelow}" InputGesture="Alt+S"/>
+                    <MenuItem Header="{local:Gettext Add column right}" ToolTip.Tip="{local:Gettext Add column at the right from the selected stone}" Command="{Binding SelectedTab.Content.AddColumnRight}" InputGesture="Alt+D"/>
+                    <MenuItem Header="{local:Gettext Add column left}" ToolTip.Tip="{local:Gettext Add column at the left from the selected stone}" Command="{Binding SelectedTab.Content.AddColumnLeft}" InputGesture="Alt+A" />
                 </MenuItem>
-                <MenuItem Header="Remove">
+                <MenuItem Header="{local:Gettext Remove}">
                     <MenuItem.Icon>
                         <Image Source="/Icons/remove.ico"/>
                     </MenuItem.Icon>
-                    <MenuItem Header="Remove selected rows" Command="{Binding SelectedTab.Content.RemoveRows}" InputGesture="Alt+R"/>
-                    <MenuItem Header="Remove selected columns" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGesture="Alt+C"/>
+                    <MenuItem Header="{local:Gettext Remove selected rows}" Command="{Binding SelectedTab.Content.RemoveRows}" InputGesture="Alt+R"/>
+                    <MenuItem Header="{local:Gettext Remove selected columns}" Command="{Binding SelectedTab.Content.RemoveColumns}" InputGesture="Alt+C"/>
                 </MenuItem>
             </MenuItem>
             <MenuItem x:CompileBindings="False" Name="Workspace" Items="{Binding Source={x:Static core:Workspace.Instance}, Path=openedFiles}">
@@ -273,7 +274,7 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/Icons/open.ico" Margin="2"/>
-                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Workspace</TextBlock>
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center" Text="{local:Gettext Workspace}"></TextBlock>
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
@@ -308,7 +309,7 @@
                                     </TextBlock>
                                     <!--<Grid.ContextMenu>
                     <ContextMenu>
-                      <MenuItem Header="Open Folder" Command="{Binding OpenFolderCommand}">
+                      <MenuItem Header="{local:Gettext Open Folder}" Command="{Binding OpenFolderCommand}">
                         <MenuItem.Icon>
                           <Image Source="/Icons/folder_tar.ico"/>
                         </MenuItem.Icon>

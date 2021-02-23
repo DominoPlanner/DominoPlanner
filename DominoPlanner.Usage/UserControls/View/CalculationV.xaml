@@ -2,55 +2,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+             xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              x:Class="DominoPlanner.Usage.UserControls.View.CalculationV">
     <UserControl.DataTemplates>
-        <DataTemplate DataType="{x:Type local:IterativeColorRestrictionVM}">
+        <DataTemplate DataType="{x:Type vm:IterativeColorRestrictionVM}">
             <Grid Margin="0, 2, 0, 0" ColumnDefinitions="203*, 36*" RowDefinitions="Auto, 2, Auto">
 
                 <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-0.143,0.429" ColumnDefinitions="1.5*, 2.5*, 2*">
-                    <TextBlock Grid.Column="0">Penalty:</TextBlock>
+                    <TextBlock Grid.Column="0" Text="{local:Gettext Penalty:}"/>
                     <Slider Value="{Binding Weight}" Grid.Column="1" Minimum="0" Maximum="0.5" Margin="0,5,0,0" SmallChange="0.01" TickFrequency="0" LargeChange="0.1" TickPlacement="BottomRight" />
                     <NumericUpDown Value="{Binding Weight}" Grid.Column="2" Minimum="0" Maximum="0.5" Increment="0.001" FormatString="F3"></NumericUpDown>
                 </Grid>
                 <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0.143,-0.143,0.286" ColumnDefinitions="2*, *">
-                    <TextBlock VerticalAlignment="Center" Grid.Column="0">Number of attempts:</TextBlock>
+                    <TextBlock VerticalAlignment="Center" Grid.Column="0" Text="{local:Gettext Number of attempts:}"/>
                     <NumericUpDown Value="{Binding Iterations}" Grid.Column="1" Minimum="1" VerticalAlignment="Stretch"></NumericUpDown>
                 </Grid>
             </Grid>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type local:NoColorRestrictionVM}">
+        <DataTemplate DataType="{x:Type vm:NoColorRestrictionVM}">
             <Grid></Grid>
         </DataTemplate>
     </UserControl.DataTemplates>
     <UserControl.Resources>
-        <parent:BoolToImageConverter x:Key="BoolToImageConverter"></parent:BoolToImageConverter>
-        <parent:ColorModeToIntConverter x:Key="ColorModeToIntConverter"/>
-        <parent:ColorModeToStringConverter x:Key="ColorModeToStringConverter"/>
-        <parent:DitheringToIntConverter x:Key="DitheringToIntConverter"/>
-        <parent:DitheringToStringConverter x:Key="DitheringToStringConverter"/>
-        <parent:IterationInformationToBooleanConverter x:Key="IterationInformationToBooleanConverter"/>
+        <local:BoolToImageConverter x:Key="BoolToImageConverter"></local:BoolToImageConverter>
+        <local:ColorModeToIntConverter x:Key="ColorModeToIntConverter"/>
+        <local:ColorModeToStringConverter x:Key="ColorModeToStringConverter"/>
+        <local:DitheringToIntConverter x:Key="DitheringToIntConverter"/>
+        <local:DitheringToStringConverter x:Key="DitheringToStringConverter"/>
+        <local:IterationInformationToBooleanConverter x:Key="IterationInformationToBooleanConverter"/>
     </UserControl.Resources>
     <Grid>
         <StackPanel>
-            <HeaderedContentControl Header="{Binding ColorMode, Converter={StaticResource ColorModeToStringConverter}, StringFormat=Color Comparison: {0}}">
+            <HeaderedContentControl Header="{Binding ColorMode, Converter={StaticResource ColorModeToStringConverter}, StringFormat={local:Gettext 'Color Comparison: {0}'}}">
                 <Grid ColumnDefinitions="1*, 3*, 1.5*">
-                    <TextBlock Grid.Column="0" Text="Fast" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Text="{local:Gettext Fast}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                     <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="3" Value="{Binding ColorMode, Converter={StaticResource ColorModeToIntConverter}}" TickPlacement="BottomRight"/>
-                    <TextBlock Grid.Column="2" Text="Accurate" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{local:Gettext Accurate}" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 </Grid>
             </HeaderedContentControl>
-            <HeaderedContentControl Header="{Binding Dithering, Converter={StaticResource DitheringToStringConverter}, StringFormat=Diffusion: {0}}">
+            <HeaderedContentControl Header="{Binding Dithering, Converter={StaticResource DitheringToStringConverter}, StringFormat={local:Gettext 'Dithering method|Diffusion: {0}'}}">
                 <Grid ColumnDefinitions="1*, 3*, 1.5*">
-                    <TextBlock Grid.Column="0" Text="None" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Text="{local:Gettext Dithering Method|None}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                     <Slider Grid.Column="1" Margin="0, 5, 0, 0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="3" Value="{Binding Dithering, Converter={StaticResource DitheringToIntConverter}}" TickPlacement="BottomRight"/>
-                    <TextBlock Grid.Column="2" Text="Slow" HorizontalAlignment="Right" VerticalAlignment="Center"  />
+                    <TextBlock Grid.Column="2" Text="{local:Gettext Slow}" HorizontalAlignment="Right" VerticalAlignment="Center"  />
                 </Grid>
             </HeaderedContentControl>
-            <HeaderedContentControl Header="Transparency Threshold">
+            <HeaderedContentControl Header="{local:Gettext Transparency Threshold}">
                 <Grid ColumnDefinitions="1*, 3*, 1.5*">
                     <TextBlock Grid.Column="0" Text="0" HorizontalAlignment="Left" VerticalAlignment="Center" />
                     <Slider Margin="0, 5, 0, 0" Grid.Column="1" TickFrequency="0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Minimum="0" Maximum="255" Value="{Binding TransparencySetting}" TickPlacement="BottomRight"/>
@@ -60,15 +60,15 @@
             <HeaderedContentControl >
                 <HeaderedContentControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding IterationInformation, Converter={StaticResource IterationInformationToBooleanConverter}}">Try to match Available dominoes</CheckBox>
-                        <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}, Path=DataContext}" Margin="10, 0, 0, 0" Height="20" Width="20" BorderBrush="Transparent" Background="Transparent" Command="{Binding OpenPopup}" ToolTip.Tip="Show usage of colors">
+                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding IterationInformation, Converter={StaticResource IterationInformationToBooleanConverter}}" Content="{local:Gettext Try to match Available dominoes}"/>
+                        <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}, Path=DataContext}" Margin="10, 0, 0, 0" Height="20" Width="20" BorderBrush="Transparent" Background="Transparent" Command="{Binding OpenPopup}" ToolTip.Tip="{local:Gettext Show usage of colors}">
                             <StackPanel >
                                 <Image Source="{Binding Converter={StaticResource BoolToImageConverter}, Path=ColorRestrictionFulfilled}"></Image>
                                 <Popup Name="myPopup" IsOpen="{Binding PopupOpen}" StaysOpen="False">
-                                    <parent:ColorControl Grid.Row="2" MaxHeight="250"
+                                    <local:ColorControl Grid.Row="2" MaxHeight="250"
                                          ColumnConfig="{Binding ColorColumnConfig}"
                                          Colors="{Binding SortedColors}" >
-                                    </parent:ColorControl>
+                                    </local:ColorControl>
                                 </Popup>
                             </StackPanel>
                         </Button>

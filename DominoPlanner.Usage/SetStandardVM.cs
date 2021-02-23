@@ -2,11 +2,15 @@
 using DominoPlanner.Core;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     class SetStandardVM : ModelBase
     {
         public SetStandardVM()
@@ -28,6 +32,17 @@ namespace DominoPlanner.Usage
             }
 
             ColorVM = new ColorListControlVM(StandardColorPath);
+
+            Languages = Localizer.GetAllLocales().OrderBy(x => x.DisplayName).ToList();
+            var Selected = Languages.Where(x => x.Name == Localizer.Language);
+            if (Selected.Count() != 0)
+            {
+                CurrentLanguage = Selected.First();
+            }
+            else
+            {
+                CurrentLanguage = new CultureInfo("en-US");
+            }
         }
 
         #region prop
@@ -44,6 +59,21 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public List<CultureInfo> Languages { get; set; }
+
+        private CultureInfo culture;
+
+        public CultureInfo CurrentLanguage
+        {
+            get { return culture; }
+            set { culture = value;
+                Localizer.Language = value.Name;
+                Properties.Settings.Default.Save();
+                RaisePropertyChanged();
+            }
+        }
+
 
         private string _standardpath;
         public string standardpath
@@ -82,10 +112,10 @@ namespace DominoPlanner.Usage
             {
                 openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
                 {
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = "All color files"},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension }, Name = "DominoPlanner 3.x color files"},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = "DominoPlanner 2.x color files"},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = "Dominorechner color files"},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = _("All color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension }, Name = _("DominoPlanner 3.x color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = _("DominoPlanner 2.x color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = _("Dominorechner color files")},
                 };
                 openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
             }
@@ -114,7 +144,7 @@ namespace DominoPlanner.Usage
                         catch
                         {
                             // file not readable
-                            await Errorhandler.RaiseMessage("Color repository file is invalid", "Error", Errorhandler.MessageType.Error);
+                            await Errorhandler.RaiseMessage(GetParticularString("When importing color list fails", "Color repository file is invalid"), _("Error"), Errorhandler.MessageType.Error);
                             return;
                         }
                     }

@@ -355,7 +355,7 @@ namespace DominoPlanner.Core
             relativePath = relativePath.Replace("\\", "/");
             if(relativePath.StartsWith("../"))
             {
-                relativePath = relativePath.Replace("../", "");
+                relativePath = relativePath.Substring(3);
             }
             return relativePath;
         }

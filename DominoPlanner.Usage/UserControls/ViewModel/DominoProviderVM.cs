@@ -2,13 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Input;
@@ -18,6 +15,8 @@ using Avalonia.Controls;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
+
     public class DominoProviderVM : DominoProviderTabItem
     {
         #region CTOR
@@ -35,10 +34,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             OpenPopup = new RelayCommand(x => PopupOpen = true);
 
             ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
-            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true });
-            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = "Total", Class="Count", Width = new GridLength(70), CanResize = true });
-            ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
-            ColorColumnConfig.Add(new Column() { DataField = "Weight", Header = "Weight" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = _("Name"), Width = new GridLength(100), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(70), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = GetParticularString("Number of stones used in current project", "Used"), HighlightDataField = "DominoColor.count" });
+            ColorColumnConfig.Add(new Column() { DataField = "Weight", Header = GetParticularString("Emphasis during calculation", "Weight") });
 
             AllowRegeneration = AllowRegenerate;
         }

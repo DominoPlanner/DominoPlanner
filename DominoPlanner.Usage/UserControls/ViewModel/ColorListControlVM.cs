@@ -21,6 +21,7 @@ using static DominoPlanner.Usage.ColorControl;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
     public class ProjectColorList : ColorControl
     {
         public ProjectColorList()
@@ -242,9 +243,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ColumnConfig = new AvaloniaList<Column>
             {
                 new Column() { DataField = "Color", Header = "", Class = "Color", CanResize = false },
-                new Column() { DataField = "Name", Header = "Name", Class = "Name",  CanResize = true, Width = new GridLength(100) },
-                new Column() { DataField = "Color", Header = "RGB", Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
-                new Column() { DataField = "Count", Header = "Count", Class="Count", CanResize = true, Width = new GridLength(70) }
+                new Column() { DataField = "Name", Header = _("Name"), Class = "Name",  CanResize = true, Width = new GridLength(100) },
+                new Column() { DataField = "Color", Header = _("RGB"), Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
+                new Column() { DataField = "Count", Header = GetParticularString("Total domino color count", "Count"), Class="Count", CanResize = true, Width = new GridLength(70) }
             };
 
             ShowProjects = false;
@@ -297,14 +298,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var p = new ExcelPackage();
             // content
-            var ws = p.Workbook.Worksheets.Add("Overview");
-            ws.Cells["A1"].Value = "Color Usage Overview";
+            var ws = p.Workbook.Worksheets.Add(_("Overview"));
+            ws.Cells["A1"].Value = _("Color Usage Overview");
             ws.Cells["A1"].Style.Font.Size = 15;
             var HeaderRow = ProjectColorList.GetDepth(DominoAssembly);
             // 
             var offset = HeaderRow + 4;
-            ws.Cells[offset - 1, 2].Value = "Color";
-            ws.Cells[offset - 1, 3].Value = "Available";
+            ws.Cells[offset - 1, 2].Value = _("Color");
+            ws.Cells[offset - 1, 3].Value = GetParticularString("Total color count available", "Available");
             for (int i = 0; i < ColorList.Count; i++)
             {
 
@@ -332,10 +333,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             
             
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.InitialFileName = "ColorList";
+            dlg.InitialFileName = GetParticularString("Default filename for color list", "ColorList");
             dlg.Filters = new List<FileDialogFilter>() {
-                new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = "Excel files" },
-                new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" }
+                new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
+                new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
             };
             var result = await dlg.ShowAsync(MainWindowViewModel.GetWindow());
             if (!string.IsNullOrEmpty(result))
@@ -349,7 +350,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    await Errorhandler.RaiseMessage("Save failed:" + ex.Message, "Fail", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage(string.Format(_("Save failed: {0}"),  ex.Message), _("Error"), Errorhandler.MessageType.Error);
                 }
             }
 
@@ -421,7 +422,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ws.Cells[top_offset, left_offset].Style.Font.Bold = true;
             // sum column
             int sum_col = left_offset + colspan;
-            ws.Cells[top_offset + 1, sum_col].Value = "Sum";
+            ws.Cells[top_offset + 1, sum_col].Value = _("Sum");
             ws.Cells[top_offset + 1, sum_col, header_rows + 3, sum_col].Merge = true;
             ws.Cells[top_offset + 1, sum_col].Style.Font.Italic = true;
             for (int i = 0; i < ColorList.Count; i++)
@@ -461,7 +462,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         UnsavedChanges = true;
                     }
                 }
-                TabPropertyChanged("ColorList", ProducesUnsavedChanges: false);
+                TabPropertyChanged(nameof(ColorList), ProducesUnsavedChanges: false);
             }
             catch (Exception) { }
         }
@@ -487,8 +488,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     DefaultExtension = Declares.ColorExtension
                 };
-                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ColorExtension }, Name = "Color files" });
-                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = "All files" });
+                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ColorExtension }, Name = _("Color files") });
+                ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
                 var filename = ofd.ShowDialog();
                 if (filename != null && filename != "")
                 {
@@ -516,7 +517,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     break;
             }
             UnsavedChanges = false;
-            RaisePropertyChanged("ColorList");
+            RaisePropertyChanged(nameof(ColorList));
         }
         #endregion
 
@@ -609,7 +610,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void ColorList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            RaisePropertyChanged("ColorList");
+            RaisePropertyChanged(nameof(ColorList));
         }
 
 
@@ -652,7 +653,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch
                     {
-                        await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(child_as.Path)}.", "Error", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage(string.Format(_("Unable to load counts from project {0}"), Path.GetFileNameWithoutExtension(child_as.Path)), _("Error"), Errorhandler.MessageType.Warning);
                     }
                 }
                 if (child is DocumentNode dn)
@@ -773,7 +774,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (added == null)
             {
-                repo.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, "New Color"));
+                repo.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, _("New Color")));
                 added = new ColorListEntry()
                 {
                     DominoColor = repo.RepresentionForCalculation.Last(),

@@ -33,7 +33,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 structure_index = 0;
             }
             UnsavedChanges = false;
-            TargetSizeAffectedProperties = new string[] { "sLength", "sHeight" };
+            TargetSizeAffectedProperties = new string[] { nameof(sLength), nameof(sHeight) };
         }
         #endregion
 
@@ -104,7 +104,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     _structure_index = value;
                     SelectedStructureElement = structures.ElementAt(_structure_index);
-                    TabPropertyChanged("VisibleFieldplan", ProducesUnsavedChanges: false);
+                    TabPropertyChanged(nameof(VisibleFieldplan), ProducesUnsavedChanges: false);
                     RaisePropertyChanged();
                     RefreshDescriptionImages();
                     if (temp_struct_index != -1)
@@ -145,8 +145,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         protected override void PostCalculationUpdate()
         {
-            TabPropertyChanged("sHeight", ProducesUnsavedChanges: false);
-            TabPropertyChanged("sLength", ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(sHeight), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(sLength), ProducesUnsavedChanges: false);
         }
         public static Tuple<List<XElement>, List<string>> StuctureTypes()
         {

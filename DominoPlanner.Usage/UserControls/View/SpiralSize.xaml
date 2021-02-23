@@ -2,12 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
              x:Class="DominoPlanner.Usage.UserControls.View.SpiralSize">
     <UserControl.Resources>
-        <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <local:BoolInverterConverter x:Key="BoolInverterConverter"/>
     </UserControl.Resources>
     <Grid>
         <StackPanel>
@@ -15,7 +15,7 @@
                 <HeaderedContentControl.Header>
                     <TextBlock>
                         <TextBlock.Text>
-                            <MultiBinding StringFormat="{}Spiral Dimensions: {0}mm x {1}mm">
+                            <MultiBinding StringFormat="{local:Gettext 'Spiral Dimensions: {0}mm x {1}mm'}">
                                 <Binding Path="PhysicalLength"></Binding>
                                 <Binding Path="PhysicalHeight"></Binding>
                             </MultiBinding>
@@ -24,48 +24,44 @@
                 </HeaderedContentControl.Header>
                 <StackPanel>
                     <DockPanel Margin="2" Grid.Row="0" VerticalAlignment="Top">
-                        <TextBlock Text="Structure Size [Dominoes]:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Structure Size (Dominoes):}" VerticalAlignment="Center"/>
                         <NumericUpDown IsEnabled="False" Value="{Binding DominoCount}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
                     </DockPanel>
                     <DockPanel LastChildFill="True" Margin="2" VerticalAlignment="Top">
-                        <TextBlock Text="Rotations:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Rotations:}" VerticalAlignment="Center"/>
                         <NumericUpDown Value="{Binding Rotations}" Minimum="0" MinWidth="80"/>
                     </DockPanel>
                     <DockPanel Margin="2">
-                        <TextBlock Text="Arms:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Arms:}" VerticalAlignment="Center"/>
                         <NumericUpDown Value="{Binding Arms}" Minimum="0" MinWidth="60" />
-                        <TextBlock Text="Lines per arm:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Lines per arm:}" VerticalAlignment="Center"/>
                         <NumericUpDown Value="{Binding Groups}" Minimum="0" MinWidth="60" />
                     </DockPanel>
                     <DockPanel Margin="2">
-                        <TextBlock Text="Shift:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Spiral|Shift:}" VerticalAlignment="Center"/>
                         <NumericUpDown Value="{Binding Shift}" MinWidth="60" Minimum="-50" Maximum="50" Increment="0.1" FormatString="F1"/>
 
-                        <TextBlock Text="Distance btw. arms:" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Distance btw. arms:}" VerticalAlignment="Center"/>
                         <NumericUpDown Value="{Binding DistanceBetweenArms}" Minimum="0"/>
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock>End mode:</TextBlock>
+                        <TextBlock Text="{local:Gettext Spiral arm end type|End mode:}" Margin="0, 0, 5, 0"/>
                         <RadioButton VerticalAlignment="Center" IsChecked="{Binding EndMode}">
-                            <TextBlock>
-                                Clip to circle
-                            </TextBlock>
+                            <TextBlock Text="{local:Gettext Clip to circle}"/>
                         </RadioButton>
                         <RadioButton Margin="5, 0, 0, 0" VerticalAlignment="Center" IsChecked="{Binding EndMode, Converter={StaticResource BoolInverterConverter}}">
-                            <TextBlock>
-                                Perpendicular end
-                            </TextBlock>
+                            <TextBlock Text="{local:Gettext Perpendicular end}"/>
                         </RadioButton>
                     </DockPanel>
                 </StackPanel>
             </HeaderedContentControl>
-            <HeaderedContentControl Header="Domino dimensions">
-                <local:DominoDimensionsV TangentialDistance="{Binding TangentialDistance}"
+            <HeaderedContentControl Header="{local:Gettext Domino dimensions}">
+                <view:DominoDimensionsV TangentialDistance="{Binding TangentialDistance}"
                                      NormalDistance="{Binding NormalDistance}"
                                      TangentialWidth="{Binding TangentialWidth}"
                                      NormalWidth="{Binding NormalWidth}"
-                                     NormalDistanceText="Btw. Lines&#10;inside arm"
-                                     TangentialDistanceText="Between&#10;Dominoes"/>
+                                     NormalDistanceText="{local:Gettext Btw. Lines\\ninside arm}"
+                                     TangentialDistanceText="{local:Gettext Between\\nDominoes}"/>
             </HeaderedContentControl>
 
         </StackPanel>

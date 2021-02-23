@@ -8,7 +8,7 @@
         
         mc:Ignorable="d"
         x:Class="DominoPlanner.Usage.LiveBuildHelperV"
-        Title="FieldBlockViewer"
+        Title="{local:Gettext FieldBlockViewer}"
         Height="600" Width="900"
         WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
     <Window.Resources>
@@ -29,15 +29,15 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" ColumnDefinitions="300, 5, 300, *">
             <Grid Grid.Column="0" ColumnDefinitions="3*, 3*, 2*, 3*">
-                <TextBlock Grid.Column="0" Text="Row:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="0" Text="{local:Gettext Row:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
-                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
                 <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
-                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="0" Text="{local:Gettext Block:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
                 <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
-                <TextBlock Grid.Column="2" Text="of" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
                 <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
             <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
@@ -64,9 +64,9 @@
                             <ia:ChangePropertyAction PropertyName="IsVisible" Value="True"/>
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
-                    <Button Content="Go To Last Pin" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
+                    <Button Content="{local:Gettext Go To Last Pin}" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
                         <ToolTip.Tip>
-                            <MultiBinding StringFormat="{}Go to Row: {0}, Block {1}">
+                            <MultiBinding StringFormat="{local:Gettext 'Go to Row {0}, Block {1}'}">
                                 <Binding Path="PositionSnapshots[0].Row"/>
                                 <Binding Path="PositionSnapshots[0].Column"/>
                             </MultiBinding>
@@ -98,13 +98,13 @@
                                                     </i:Interaction.Behaviors>
                                                     <TextBlock DockPanel.Dock="Left" FontWeight="Bold">
                                                         <TextBlock.Text>
-                                                            <MultiBinding StringFormat="{}Row: {0}, Block {1}">
+                                                            <MultiBinding StringFormat="{local:Gettext 'Row {0}, Block {1}'}">
                                                                 <Binding Path="Row"/>
                                                                 <Binding Path="Column"/>
                                                             </MultiBinding>
                                                         </TextBlock.Text>
                                                     </TextBlock>
-                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={}Creation Time: {0}}">
+                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={local:Gettext 'Creation Time: {0}'}}">
                                                         <TextBlock.Text>
                                                             <MultiBinding Converter="{StaticResource DateTimeDifferenceConverter}">
                                                                 <Binding Source="{StaticResource ticker}" Path="Now" Mode="OneWay"/>
@@ -116,7 +116,7 @@
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
-                                    <TextBlock Text="Click Pin to activate" Margin="0, 5"/>
+                                    <TextBlock Text="{local:Gettext Click Pin to activate}" Margin="0, 5"/>
                                 </StackPanel>
                             </Border>
                         </Popup>
@@ -124,10 +124,10 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
-                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
-                        <TextBlock>Show remaining colors</TextBlock>
+                        <TextBlock Text="{local:Gettext Show remaining colors}"/>
                         <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
                             <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
                         </Popup>
@@ -202,8 +202,8 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Bottom" Margin="5">
-                <TextBlock Text="Font size:" VerticalAlignment="Center"/>
-                <NumericUpDown Value="{Binding FontSize}" Width="60" Minimum="5"></NumericUpDown>
+                <TextBlock Text="{local:Gettext Font size:}" VerticalAlignment="Center"/>
+                <NumericUpDown Value="{Binding FontSize}" Margin="5, 0" Width="60" Minimum="5"></NumericUpDown>
             </StackPanel>
         </Grid>
     </Grid>

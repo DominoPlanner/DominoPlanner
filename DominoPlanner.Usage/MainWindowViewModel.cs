@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Input;
 using System.Runtime.InteropServices;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage
 {    
@@ -69,7 +70,7 @@ namespace DominoPlanner.Usage
 
             while (!File.Exists(UserSettings.Instance.StandardColorArray))
             {
-               await Errorhandler.RaiseMessage("Please create a default color table.", "Missing Color Table", Errorhandler.MessageType.Info);
+               await Errorhandler.RaiseMessage(_("Please create a default color table."), _("Missing Color Table"), Errorhandler.MessageType.Info);
                await new SetStandardV().ShowDialog(GetWindow());
             }
             LoadProjectList();
@@ -395,7 +396,7 @@ namespace DominoPlanner.Usage
             bool remove = false;
             if (tabItem.Content.UnsavedChanges)
             {
-                var msgbox = MessageBoxManager.GetMessageBoxStandardWindow("Warning", $"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?",
+                var msgbox = MessageBoxManager.GetMessageBoxStandardWindow(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')),
                     ButtonEnum.YesNoCancel);
                 var result = await msgbox.ShowDialog(MainWindowViewModel.GetWindow());
                 if (result == ButtonResult.Yes)
@@ -433,7 +434,7 @@ namespace DominoPlanner.Usage
             }
             else
             {
-                await Errorhandler.RaiseMessage("Error loading opened projects!", "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Error loading opened projects!"), _("Error"), Errorhandler.MessageType.Error);
                 OpenProjectSerializer.Create();
             }
         }
@@ -469,7 +470,7 @@ namespace DominoPlanner.Usage
                     }
                     catch
                     {
-                        await Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt to restore the file has been unsuccessful. \nThe project will be removed from the list of opened projects.", "Damaged File", Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage(String.Format(_("The main project file of project {0} was damaged. An attempt to restore the file has been unsuccessful. \nThe project will be removed from the list of opened projects."), projectpath), _("Damaged File"), Errorhandler.MessageType.Error);
                         remove = true;
                     }
                 }
@@ -480,7 +481,7 @@ namespace DominoPlanner.Usage
             }
             if (remove)
             {
-                await Errorhandler.RaiseMessage($"Unable to load project {newProject.name}. It might have been moved or damaged. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects.", "Error!", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(string.Format(_("Unable to load project {0}. It might have been moved or damaged. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects."), newProject.name), _("Error"), Errorhandler.MessageType.Error);
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
             }
         }
@@ -492,7 +493,7 @@ namespace DominoPlanner.Usage
         {
             if (SelectedAssembly == null)
             {
-                await Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Please choose a project folder."), _("Please choose"), Errorhandler.MessageType.Error);
                 return;
             }
             SelectedAssembly.NewFieldStructure();
@@ -538,7 +539,7 @@ namespace DominoPlanner.Usage
         {
             if (SelectedAssembly == null)
             {
-                await Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Please choose a project folder."), _("Please choose"), Errorhandler.MessageType.Error);
                 return;
             }
             SelectedAssembly.AddExistingItem();
@@ -552,7 +553,7 @@ namespace DominoPlanner.Usage
                 OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}/{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
                 if (newProj == null)
                 {
-                    await Errorhandler.RaiseMessage("Could not create new Project!", "Error!", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage(_("Could not create new Project!"), _("Error!"), Errorhandler.MessageType.Error);
                     return;
                 }
                 LoadProject(newProj);
@@ -570,12 +571,12 @@ namespace DominoPlanner.Usage
                 {
                     if (!curTI.Content.Save())
                     {
-                        await Errorhandler.RaiseMessage("Error saving files!", string.Format("Stop saving, because could not save {0}", curTI.Header), Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage(_("Error saving files!"), string.Format(_("Save aborted, unable to save file {0}"), curTI.Header), Errorhandler.MessageType.Error);
                         return;
                     }
                 }
             }
-            await Errorhandler.RaiseMessage("Save all files", "Saves all files!", Errorhandler.MessageType.Info);
+            await Errorhandler.RaiseMessage(_("All files saved"), _("Success"), Errorhandler.MessageType.Info);
         }
         /// <summary>
         /// Save current project
@@ -583,9 +584,9 @@ namespace DominoPlanner.Usage
         private async void SaveCurrentOpenProject()
         {
             if (SelectedTab.Content.Save())
-                await Errorhandler.RaiseMessage("Save all changes!", "Save all changes", Errorhandler.MessageType.Info);
+                await Errorhandler.RaiseMessage(_("All changes saved"), _("Success"), Errorhandler.MessageType.Info);
             else
-                await Errorhandler.RaiseMessage("Error!", "Error saving changes!", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Error saving changes"), _("Error"), Errorhandler.MessageType.Error);
         }
         #endregion
     }

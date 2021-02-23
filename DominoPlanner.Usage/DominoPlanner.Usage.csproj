@@ -21,6 +21,10 @@
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
     <CFBundleShortVersionString>1.0.0</CFBundleShortVersionString>
   </PropertyGroup>
+  <!--<Target Name="BeforeBuild">
+      <Exec Command="C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonInteractive -executionpolicy Unrestricted -command &quot;&amp; { .\CompileTranslations.ps1 } &quot;" LogStandardErrorAsError="True" ContinueOnError="False" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    </Target>-->
+
   <ItemGroup>
     <None Remove="ExportOptions.xaml" />
     <None Remove="LiveBuildHelperV.xaml" />
@@ -121,6 +125,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0-rc1" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0-rc1" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0-rc1" />
+    <PackageReference Include="GetText.NET" Version="0.9.7" />
     <PackageReference Include="MessageBox.Avalonia" Version="0.10.6-rc1" />
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
@@ -132,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Icons\*"></AvaloniaResource>
+    <AvaloniaResource Include="locale\*\LC_MESSAGES\*"></AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="ExportOptions.xaml.cs">

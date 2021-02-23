@@ -6,10 +6,10 @@
         xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        xmlns:vm="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
+        xmlns:local="clr-namespace:DominoPlanner.Usage;assembly=DominoPlanner.Usage"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="DominoPlanner.Usage.PropertiesWindow" Icon="/Icons/DominoCalculator.ico"
-        Title="Properties">
+        Title="{local:Gettext Window title|Properties}">
     <Border Margin="2" BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1">
         <Grid Grid.IsSharedSizeScope="True" ColumnDefinitions="*" RowDefinitions="Auto, *">
             <Grid.Styles>
@@ -31,11 +31,11 @@
                         <ColumnDefinition Width="Auto" SharedSizeGroup="B" MinWidth="100"/>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="C" MinWidth="200"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Element"/>
+                    <TextBlock Grid.Column="0" Text="{local:Gettext PropertyViewer|Element}"/>
                     <GridSplitter Width="2" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
-                    <TextBlock Grid.Column="1" Text="Type"/>
+                    <TextBlock Grid.Column="1" Text="{local:Gettext PropertyViewer|Type}"/>
                     <GridSplitter Width="2" Grid.Column="1" ResizeDirection="Columns" HorizontalAlignment="Right"></GridSplitter>
-                    <TextBlock Grid.Column="2" Text="Value"/>
+                    <TextBlock Grid.Column="2" Text="{local:Gettext PropertyViewer|Value}"/>
                 </Grid>
             </Border>
             <ScrollViewer Grid.Row="1">
@@ -132,7 +132,7 @@
                                                 <TextBlock Grid.Column="1" Text="{Binding FullType}" Margin="2"/>
                                                 <ContentControl Grid.Column="2" Content="{Binding Value}">
                                                     <ContentControl.Resources>
-                                                        <vm:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
+                                                        <local:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
 
                                                     </ContentControl.Resources>
                                                     <ContentControl.DataTemplates>
@@ -141,7 +141,7 @@
                                                                 <StackPanel Orientation="Horizontal" ToolTip.Tip="{Binding ., Converter={StaticResource ObjectToStringConverter}}">
                                                                     <Image Width="15" Height="15" VerticalAlignment="Top" Margin="0, 5, 0, 0"  Source="{StaticResource ExceptionDI}">
                                                                     </Image>
-                                                                    <TextBlock Margin="2" Text="An Exception occured while evaluating this expression."/>
+                                                                    <TextBlock Margin="2" Text="{local:Gettext An Exception occured while evaluating this expression.}"/>
                                                                 </StackPanel>
                                                             </StackPanel>
                                                         </DataTemplate>
