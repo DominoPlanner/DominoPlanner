@@ -13,6 +13,7 @@ namespace DominoPlanner.Usage
         {
             AvaloniaXamlLoader.Load(this);
             Debug.WriteLine(Logger.IsEnabled(LogEventLevel.Information, "Binding"));
+            Name = "DominoPlanner";
         }
 
         public override void OnFrameworkInitializationCompleted()
