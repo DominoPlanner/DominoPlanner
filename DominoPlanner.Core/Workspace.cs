@@ -345,21 +345,40 @@ namespace DominoPlanner.Core
         }
         public static string MakeRelativePath(string fromPath, string toPath)
         {
-            if (string.IsNullOrEmpty(fromPath)) return toPath;
-            if (string.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
+            DirectoryInfo fromDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(fromPath));
+            string parentFolderPath = new DirectoryInfo(Path.GetDirectoryName(toPath)).FullName;
 
-            fromPath = fromPath.Replace("\\", "/");
-            toPath = toPath.Replace("\\", "/");
-
-            string relativePath = Path.GetRelativePath(fromPath, toPath);
-            relativePath = relativePath.Replace("\\", "/");
-            if(relativePath.StartsWith("../"))
+            string relPath = string.Empty;
+            while (fromDirectoryInfo != null && !(parentFolderPath.StartsWith(fromDirectoryInfo.FullName) && (parentFolderPath.Contains(string.Format("{1}{0}{1}", Path.GetFileName(fromDirectoryInfo.FullName), Path.DirectorySeparatorChar)) || Path.GetFileName(parentFolderPath).Equals(Path.GetFileName(fromDirectoryInfo.FullName)))))
             {
-                relativePath = relativePath.Substring(3);
+                relPath += "../";
+                fromDirectoryInfo = fromDirectoryInfo.Parent;
             }
-            return relativePath;
+
+            if (fromDirectoryInfo == null)
+            {
+                relPath = toPath;
+            }
+            else
+            {
+                string tempPath = string.Empty;
+                DirectoryInfo toDirInfo = new DirectoryInfo(toPath);
+                while (toDirInfo.FullName.StartsWith(fromDirectoryInfo.FullName) && !toDirInfo.FullName.Equals(fromDirectoryInfo.FullName))
+                {
+                    if (string.IsNullOrEmpty(tempPath))
+                    {
+                        tempPath = toDirInfo.Name;
+                    }
+                    else
+                    {
+                        tempPath = toDirInfo.Name + "/" + tempPath;
+                    }
+                    toDirInfo = toDirInfo.Parent;
+                }
+                relPath += tempPath;
+            }
+            return relPath;
         }
-        
     }
     public static class ObservableCollectionExtensions
     {
