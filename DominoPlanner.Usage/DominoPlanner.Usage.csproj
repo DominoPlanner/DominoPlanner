@@ -26,6 +26,8 @@
     </Target>-->
 
   <ItemGroup>
+    <None Remove="AboutWindow.xaml" />
+    <None Remove="AUTHORS.txt" />
     <None Remove="ExportOptions.xaml" />
     <None Remove="LiveBuildHelperV.xaml" />
     <None Remove="MainWindow.xaml" />
@@ -48,8 +50,12 @@
     <None Remove="UserControls\View\RenderOptions.xaml" />
     <None Remove="UserControls\View\SpiralSize.xaml" />
     <None Remove="UserControls\View\StructureReadoutV.xaml" />
+    <None Remove="version.txt" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaXaml Include="AboutWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
     <AvaloniaXaml Include="ExportOptions.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -140,6 +146,9 @@
     <AvaloniaResource Include="locale\*\LC_MESSAGES\*"></AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Update="ExportOptions.xaml.cs">
       <DependentUpon>ExportOptions.xaml</DependentUpon>
     </Compile>
@@ -232,6 +241,8 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Resources\Icons.xaml"></AvaloniaResource>
+    <AvaloniaResource Include="AUTHORS.txt" />
+    <AvaloniaResource Include="version.txt" />
     <Resource Include="Resources\UserSettings.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -252,4 +263,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)\version.txt&quot;" />
+    </Target>
 </Project>

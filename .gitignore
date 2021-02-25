@@ -345,5 +345,6 @@ Installer/
 DominoPlannerSetup/
 /ColorPicker/
 /TestImages/field.DObject
+DominoPlanner.Usage/version.txt
 # Compiled Language Files
 *.mo

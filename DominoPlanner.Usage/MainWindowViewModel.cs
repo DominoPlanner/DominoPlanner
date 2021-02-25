@@ -34,6 +34,7 @@ namespace DominoPlanner.Usage
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
             SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
             FileListClickCommand = new RelayCommand(o => { OpenItemFromPath(o); });
+            OpenAbout = new RelayCommand(o => { OpenAboutDialog(); });
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
         }
         public static string ShareDirectory
@@ -237,6 +238,9 @@ namespace DominoPlanner.Usage
 
         private ICommand _FileListClickCommand;
         public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand = value; } } }
+
+        private ICommand _OpenAboutCommand;
+        public ICommand OpenAbout { get { return _OpenAboutCommand; } set { if (value != _OpenAboutCommand) { _OpenAboutCommand = value; } } }
 
         #endregion
 
@@ -587,6 +591,11 @@ namespace DominoPlanner.Usage
                 await Errorhandler.RaiseMessage(_("All changes saved"), _("Success"), Errorhandler.MessageType.Info);
             else
                 await Errorhandler.RaiseMessage(_("Error saving changes"), _("Error"), Errorhandler.MessageType.Error);
+        }
+        public async void OpenAboutDialog()
+        {
+            var aw = new AboutWindow();
+            await aw.ShowDialog(GetWindow());
         }
         #endregion
     }
