@@ -2,13 +2,15 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DominoPlanner"
-#define MyAppVersion "3.1"
+#define MyAppVersion GetVersionNumbersString("..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\DominoPlanner.Usage.exe")
 #define MyAppPublisher "DominoPlanner Team"
 #define MyAppURL "https://github.com/jhofinger/DominoPlanner"
 #define MyAppExeName  "DominoPlanner.Usage.exe"
    
 #expr Exec('dotnet','clean -c Release', "..\DominoPlanner.Usage") 
 #expr Exec('dotnet','publish -c Release /p:PublishProfile=Properties\PublishProfiles\win-x64.pubxml', "..\DominoPlanner.Usage") 
+#expr Exec('dotnet','clean -c Release', "..\DominoPlanner.PreviewHandler") 
+#expr Exec('dotnet','build', "..\DominoPlanner.PreviewHandler") 
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
