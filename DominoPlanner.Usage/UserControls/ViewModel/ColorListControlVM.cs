@@ -469,7 +469,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void AddNewColor()
         {
-            AddColorOperation op = new AddColorOperation(ColorRepository, _ColorList);
+            int CurrentIndex = SelectedStone == null ? -1 : ColorList.IndexOf(SelectedStone);
+            AddColorOperation op = new AddColorOperation(ColorRepository, _ColorList, CurrentIndex);
             op.Apply();
             if (op.added != null)
             {
@@ -510,11 +511,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            var tmp = _ColorList.Where(x => x.DominoColor is DominoColor);
+            // the first condition may be violated during insertion into the list
+            if (e.NewStartingIndex < tmp.Count() && e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    _ColorList.Where(x => x.DominoColor is DominoColor).ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
-                    break;
+                tmp.ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
             }
             UnsavedChanges = false;
             RaisePropertyChanged(nameof(ColorList));
@@ -765,20 +766,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private readonly ColorRepository repo;
         private readonly ObservableCollection<ColorListEntry> _ColorList;
         internal ColorListEntry added = null;
-        public AddColorOperation(ColorRepository repo, ObservableCollection<ColorListEntry> _ColorList)
+        private readonly int index;
+        public AddColorOperation(ColorRepository repo, ObservableCollection<ColorListEntry> _ColorList, int index)
         {
             this.repo = repo;
             this._ColorList = _ColorList;
+            this.index = index;
         }
         public override void Apply()
         {
             if (added == null)
             {
-                repo.Add(new DominoColor(Avalonia.Media.Colors.IndianRed, 0, _("New Color")));
+                var color = new DominoColor(Avalonia.Media.Colors.IndianRed, 0, _("New Color"));
+                
+                repo.Add(color, index);
                 added = new ColorListEntry()
                 {
-                    DominoColor = repo.RepresentionForCalculation.Last(),
-                    SortIndex = repo.Anzeigeindizes.Last(),
+                    DominoColor = color,
+                    SortIndex = repo.Anzeigeindizes[repo.IndexOf(color)],
                     ProjectCount = new ObservableCollection<int>(Enumerable.Repeat(0, _ColorList[0].ProjectCount.Count))
                 };
                 _ColorList.Add(added);

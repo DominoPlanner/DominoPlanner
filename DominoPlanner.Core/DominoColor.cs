@@ -201,10 +201,22 @@ namespace DominoPlanner.Core
         {
             return colors.IndexOf(color);
         }
-        public void Add(DominoColor color)
+        public void Add(DominoColor color, int index = -1)
         {
             colors.Add(color);
             Anzeigeindizes.Add((Anzeigeindizes.Count == 0) ? 0 : Anzeigeindizes.Max() + 1);
+            
+            int lastIndex = int.MaxValue;
+            while (true)
+            {
+                var currentIndex = SortedRepresentation.ToList().IndexOf(color);
+                if (currentIndex <= index + 1 || currentIndex == lastIndex || currentIndex < 0 || index < 0)
+                {
+                    break;
+                }
+                MoveUp(color);
+            }
+            
         }
         public ColorRepository()
         {
@@ -212,31 +224,35 @@ namespace DominoPlanner.Core
             Anzeigeindizes = new ObservableCollection<int>();
             colors = new List<DominoColor>();
         }
+        public static int GetNextSmallerIndex(Collection<int> array, int value)
+        {
+            var temp = array.Where(x => x < value).OrderBy(x => x);
+            return temp.Count() == 0 ? -1 : array.IndexOf(temp.Last());
+        }
         public void MoveUp(DominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
-            if (anzeigeindex == 0) throw new InvalidOperationException("Die Farbe ist bereits ganz oben");
-            int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex - 1);
-            if (position_neuer_index != -1)
-            {
-                // otherwise, the index is not currently in use
-                Anzeigeindizes[position_neuer_index]++;
-            }
-            Anzeigeindizes[index]--;
+            int nextSmaller = GetNextSmallerIndex(Anzeigeindizes, anzeigeindex);
+            if (nextSmaller == -1) throw new InvalidOperationException("Die Farbe ist bereits ganz oben");
+            // swap the two indices
+            Anzeigeindizes[index] = Anzeigeindizes[nextSmaller];
+            Anzeigeindizes[nextSmaller] = anzeigeindex;
+        }
+        public static int GetNextLargerIndex(Collection<int> array, int value)
+        {
+            var temp = array.Where(x => x > value).OrderBy(x => x);
+            return temp.Count() == 0 ? -1 : array.IndexOf(temp.First());
         }
         public void MoveDown(DominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
-            if (anzeigeindex == Anzeigeindizes.Max()) throw new InvalidOperationException("Die Farbe ist bereits ganz unten");
-            int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex + 1);
-            if (position_neuer_index != -1)
-            {
-                // otherwise, the index is not currently in use
-                Anzeigeindizes[position_neuer_index]--;
-            }
-            Anzeigeindizes[index]++;
+            int nextLarger = GetNextLargerIndex(Anzeigeindizes, anzeigeindex);
+            if (nextLarger == -1) throw new InvalidOperationException("Die Farbe ist bereits ganz unten");
+            // swap the two indices
+            Anzeigeindizes[index] = Anzeigeindizes[nextLarger];
+            Anzeigeindizes[nextLarger] = anzeigeindex;
         }
         public IEnumerable<IDominoColor> SortedRepresentation
         {
