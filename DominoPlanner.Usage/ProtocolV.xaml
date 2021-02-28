@@ -220,7 +220,7 @@
                         <NumericUpDown DockPanel.Dock="Right" Focusable="False" IsEnabled="{Binding UseBlocks}" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" />
                         <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Stones/Block}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </DockPanel>
-                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="{local:Gettext Hide color names}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"  Width="113"/>
+                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="{local:Gettext Hide color names}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
                 </DockPanel>
             </HeaderedContentControl>
