@@ -43,11 +43,11 @@ namespace DominoPlanner.Core
         public int old_current_width;
         [ProtoAfterDeserialization]
         public void RestoreCurrentWidth() {
-            if (old_current_width != 0 && (ColumnHistory == null || ColumnHistory.Count == 0))
+            if (old_current_width != 0 || (ColumnHistory == null || ColumnHistory.Count == 0))
             {
                 // we won't be able to guess which rows / columns have been deleted, so we don't even try. However we have to restore the values of current_width and current_height, 
                 // and make sure they are updated correctly on later insertion/deletion progresses
-                ResetSize(old_current_width);
+                ResetSize(old_current_width != 0 ? old_current_width : Last.FieldPlanLength);
                 old_current_width = 0;
             }
             // if we ever encounter errors here, the best way forward would probably be to check 
