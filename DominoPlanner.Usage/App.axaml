@@ -198,9 +198,11 @@
                 <ControlTemplate>
                     <Button Height="30" Margin="5" Command="{TemplateBinding Command}">
                         <StackPanel Orientation="Horizontal" Margin="10, 0">
-                            <Image Source="{TemplateBinding Image}" Height="20" VerticalAlignment="Center" Margin="0,  0, 5, 0"/>
-                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <StackPanel.Resources>
+                            <local:IsNotEmptyStringConverter x:Key="IsNotEmptyStringConverter"/>
+                        </StackPanel.Resources>
+                            <Image Source="{TemplateBinding Image}" Height="20" VerticalAlignment="Center"/>
+                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" IsVisible="{TemplateBinding Content, Converter={StaticResource IsNotEmptyStringConverter}}"  Margin="5, 0,0, 0"/>                        </StackPanel>
                     </Button>
                 </ControlTemplate>
             </Setter>

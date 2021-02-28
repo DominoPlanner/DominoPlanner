@@ -129,9 +129,9 @@
             </DockPanel>
             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Classes="OnlyNormalColors">
-                    <local:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" Content="{local:Gettext Move up}"/>
-                    <local:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" Content="{local:Gettext Move down}"/>
-                    <local:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" Content="{local:Gettext Add Color}"/>
+                    <local:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" ToolTip.Tip="{local:Gettext Move up}"/>
+                    <local:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" ToolTip.Tip="{local:Gettext Move down}"/>
+                    <local:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" ToolTip.Tip="{local:Gettext Add Color}"/>
                     <local:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
                                         Content="{local:Gettext Remove Selected}" ToolTip.Tip="{local:Gettext 'The color will not be used in new projects (and won\'t be available during editing)\, but it will not be deleted from existing projects.'}"/>
                     <local:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
