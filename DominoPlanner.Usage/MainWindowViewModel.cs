@@ -405,8 +405,7 @@ namespace DominoPlanner.Usage
                 var result = await msgbox.ShowDialog(MainWindowViewModel.GetWindow());
                 if (result == ButtonResult.Yes)
                 {
-                    tabItem.Content.Save();
-                    remove = true;
+                    remove = await SaveCurrentOpenProject();
                 }
                 if (result == ButtonResult.No)
                 {
@@ -585,12 +584,14 @@ namespace DominoPlanner.Usage
         /// <summary>
         /// Save current project
         /// </summary>
-        private async void SaveCurrentOpenProject()
+        private async Task<bool> SaveCurrentOpenProject()
         {
-            if (SelectedTab.Content.Save())
+            var result = SelectedTab.Content.Save();
+            if (result)
                 await Errorhandler.RaiseMessage(_("All changes saved"), _("Success"), Errorhandler.MessageType.Info);
             else
                 await Errorhandler.RaiseMessage(_("Error saving changes"), _("Error"), Errorhandler.MessageType.Error);
+            return result;
         }
         public async void OpenAboutDialog()
         {
