@@ -17,7 +17,11 @@
                     <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="{local:Gettext Single Pixel\\n(top left corner)}" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Corner}}" GroupName="a"/>
                     <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="{local:Gettext Average of\\nSource Area}" GroupName="a" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Average}}"/>
                 </Grid>
-                <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="{local:Gettext Fit Image to Structure Size}"></CheckBox>
+                <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="{local:Gettext Fit Image to Structure Size}" DockPanel.Dock="Top"></CheckBox>
+                <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center">
+                    <TextBlock VerticalAlignment="Center" Text="{local:Gettext Image background:}" ToolTip.Tip="{local:Gettext 'For transparent images, set background color here. In order to use transparency threshold, background must be transparent'}"/>
+                    <local:PopupColorPicker Color="{Binding Background, Mode=TwoWay}"></local:PopupColorPicker>
+                </DockPanel>
             </DockPanel>
         </HeaderedContentControl>
     </Grid>

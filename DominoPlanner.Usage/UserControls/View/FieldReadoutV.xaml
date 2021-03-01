@@ -12,12 +12,18 @@
     </UserControl.Resources>
     <Grid>
         <HeaderedContentControl Header="{Binding ResizeQuality, Converter={StaticResource InterToStringConverter}, StringFormat={local:Gettext 'Resize Quality: {0}'}}">
-            <Grid ColumnDefinitions="1*, 3*, 1.5*">
+        <DockPanel>
+            <Grid ColumnDefinitions="1*, 3*, 1.5*" DockPanel.Dock="Top">
                 <TextBlock Grid.Column="0" Text="{local:Gettext Rough interpolation|Pixel}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="2" 
                         IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding ResizeQuality, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
                 <TextBlock Grid.Column="2" Text="{local:Gettext Fine interpolation|Smooth}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
+                <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="1">
+                    <TextBlock VerticalAlignment="Center" Text="{local:Gettext Image background:}" ToolTip.Tip="{local:Gettext 'For transparent images, set background color here. In order to use transparency threshold, background must be transparent'}"/>
+                    <local:PopupColorPicker Color="{Binding Background, Mode=TwoWay}"></local:PopupColorPicker>
+                </DockPanel>
+            </DockPanel>
         </HeaderedContentControl>
     </Grid>
 </UserControl>

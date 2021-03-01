@@ -106,8 +106,12 @@ namespace DominoPlanner.Core
         }
         protected void UpdateSource()
         {
-            this.source = new SKBitmap(Width, Height);
-            // TODO set background
+            source = new SKBitmap(Width, Height);
+            using (SKCanvas canvas = new SKCanvas(source))
+            {
+                var bg = new SKColor(Background.R, Background.G, Background.B, Background.A);
+                canvas.Clear(bg);
+            }
             imageValid = false;
         }
         protected void ApplyImageFilters()
@@ -120,6 +124,7 @@ namespace DominoPlanner.Core
             }
             this.imageFiltered = imageFiltered;
             imageValid = true;
+            colorsValid = false;
         }
         protected ImageTreatment()
         {

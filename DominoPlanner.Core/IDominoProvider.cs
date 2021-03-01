@@ -234,7 +234,7 @@ namespace DominoPlanner.Core
                 SecondaryImageTreatment.colorsValid = true;
             }
             ct.ThrowIfCancellationRequested();
-            if (!PrimaryImageTreatment.colorsValid)
+            if (!PrimaryImageTreatment.colorsValid || !PrimaryImageTreatment.sourceValid)
             {
                 PrimaryImageTreatment.parent = this;
                 PrimaryImageTreatment.FillDominos(Last);
