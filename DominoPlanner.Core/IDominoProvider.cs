@@ -277,6 +277,7 @@ namespace DominoPlanner.Core
         /// <param name="parameters">Die Parameter des Protokolls.</param>
         public void SaveXLSFieldPlan(string path, ObjectProtocolParameters parameters)
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             FileInfo file = new FileInfo(path);
             if (file.Exists) file.Delete();
             ExcelPackage pack = new ExcelPackage(file);

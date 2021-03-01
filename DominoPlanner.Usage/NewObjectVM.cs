@@ -483,7 +483,7 @@ namespace DominoPlanner.Usage
                     dominoAssembly.ColorPath = Workspace.MakeRelativePath(assemblyPath,
                         Workspace.AbsolutePathFromReferenceLoseUpdate(parentProject.ColorPath, parentProject));
                     dominoAssembly.Save();
-                    AssemblyNode asn = new AssemblyNode(Workspace.MakeRelativePath(ProjectPath + "\\", assemblyPath), parentProject);
+                    AssemblyNode asn = new AssemblyNode(Workspace.MakeRelativePath(ProjectPath + "/", assemblyPath), parentProject);
                     parentProject.Save();
                     return asn;
                 }

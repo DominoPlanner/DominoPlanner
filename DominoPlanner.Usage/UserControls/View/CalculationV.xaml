@@ -64,7 +64,7 @@
                         <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}, Path=DataContext}" Margin="10, 0, 0, 0" Height="20" Width="20" BorderBrush="Transparent" Background="Transparent" Command="{Binding OpenPopup}" ToolTip.Tip="{local:Gettext Show usage of colors}">
                             <StackPanel >
                                 <Image Source="{Binding Converter={StaticResource BoolToImageConverter}, Path=ColorRestrictionFulfilled}"></Image>
-                                <Popup Name="myPopup" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                                <Popup Name="myPopup" IsOpen="{Binding PopupOpen, Mode=TwoWay}" StaysOpen="False">
                                     <local:ColorControl Grid.Row="2" MaxHeight="250"
                                          ColumnConfig="{Binding ColorColumnConfig}"
                                          Colors="{Binding SortedColors}" >

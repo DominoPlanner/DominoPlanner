@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
 using DominoPlanner.Core;
@@ -506,7 +508,17 @@ namespace DominoPlanner.Usage
                 InitialFileName = Titel
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
-            var result = dlg.ShowDialog();
+
+            string result = string.Empty;
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+                ProtocolV protView = desktopLifetime.Windows.OfType<ProtocolV>().FirstOrDefault();
+                if(protView != null)
+                {
+                    result = await dlg.ShowAsync(protView);
+                }
+            }
+
             if (result != null && result != "")
             {
                 try
@@ -528,7 +540,15 @@ namespace DominoPlanner.Usage
                 InitialFileName = Titel
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
-            var filename = dlg.ShowDialog();
+            string filename = string.Empty;
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+            {
+                ProtocolV protView = desktopLifetime.Windows.OfType<ProtocolV>().FirstOrDefault();
+                if (protView != null)
+                {
+                    filename = await dlg.ShowAsync(protView);
+                }
+            }
             if (filename != null && filename != "")
             {
 
