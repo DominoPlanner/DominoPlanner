@@ -64,6 +64,9 @@ namespace DominoPlanner.Usage
                 if (_CurrentViewModel != value)
                 {
                     _CurrentViewModel = value;
+                    // if we change object type, but never change anything on the right side, the target size won't update.
+                    if (CurrentImageInformation is SingleImageInformation si && CurrentViewModel is DominoProviderVM c)
+                        si.UpdateProvider(c);
                     RaisePropertyChanged();
                 }
             }
