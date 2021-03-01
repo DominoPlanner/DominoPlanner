@@ -30,6 +30,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
 
+            SetDominoCount = new RelayCommand(o =>
+            {
+                if (CurrentProject is ICountTargetable)
+                    DominoCount = (int)Math.Floor((double)o);
+            }
+            );
+
             EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
             OpenPopup = new RelayCommand(x => PopupOpen = true);
 
@@ -433,6 +440,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region Commands
         private ICommand _EditClick;
         public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
+
+        private ICommand _SetDominoCount;
+        public ICommand SetDominoCount { get { return _SetDominoCount; } set { if (value != _SetDominoCount) { _SetDominoCount = value; } } }
 
     #endregion
 

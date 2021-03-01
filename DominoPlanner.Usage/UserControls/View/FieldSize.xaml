@@ -5,6 +5,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
              mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="250"
              x:Class="DominoPlanner.Usage.UserControls.View.FieldSize">
     <UserControl.Resources>
@@ -28,7 +29,14 @@
 
                     <DockPanel DockPanel.Dock="Top"  VerticalAlignment="Top">
                         <TextBlock Text="{local:Gettext Field Size (Dominoes):}" VerticalAlignment="Center"/>
-                        <NumericUpDown Value="{Binding DominoCount}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
+                        <NumericUpDown Value="{Binding DominoCount, Mode=OneWay}" Minimum="0" Width="80" HorizontalAlignment="Left" Name="SizeUpDown">
+                            <NumericUpDown.Styles>
+                                <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
+                                    <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}"/>
+                                    <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}"/>
+                                </Style>
+                            </NumericUpDown.Styles>
+                        </NumericUpDown>
                     </DockPanel>
 
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="0, 5, 0, 0">

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="using:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
              mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
              x:Class="DominoPlanner.Usage.UserControls.View.RectangularSize">
     <Grid>
@@ -20,7 +21,14 @@
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
                     <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Structure Size:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <NumericUpDown Minimum="1" Value="{Binding DominoCount}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"/>
+                    <NumericUpDown Value="{Binding DominoCount, Mode=OneWay}" Minimum="0" Width="120" HorizontalAlignment="Left" Name="SizeUpDown">
+                            <NumericUpDown.Styles>
+                                <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
+                                    <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}"/>
+                                    <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}"/>
+                                </Style>
+                            </NumericUpDown.Styles>
+                        </NumericUpDown>
                     <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Amount Structure|Dominoes}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </DockPanel>
                 <ComboBox DockPanel.Dock="Top" Items="{Binding list}" SelectedIndex="{Binding structure_index}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
