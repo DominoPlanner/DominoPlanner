@@ -94,8 +94,6 @@ public class FileDragDropHelper : AvaloniaObject
             InitializeComponent();
             DataContext = novm;
             ((NewObjectVM)DataContext).CloseChanged += NewObject_CloseChanged;
-            // this breaks the MVVM pattern, but we need the current window to correctly raise dialogs
-            NewObjectVM.Window = this;
         }
 
         private void NewObject_CloseChanged(object sender, System.EventArgs e)

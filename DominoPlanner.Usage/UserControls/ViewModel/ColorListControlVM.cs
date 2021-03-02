@@ -338,7 +338,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
                 new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
             };
-            var result = await dlg.ShowAsync(MainWindowViewModel.GetWindow());
+            var result = await dlg.ShowAsyncWithParent<MainWindow>();
             if (!string.IsNullOrEmpty(result))
             {
                 try
@@ -485,7 +485,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (FilePath == string.Empty)
             {
-                SaveFileDialog ofd = new SaveFileDialog
+                /*SaveFileDialog ofd = new SaveFileDialog
                 {
                     DefaultExtension = Declares.ColorExtension
                 };
@@ -502,7 +502,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         return false;
                     }
-                }
+                }*/
+                return false;
             }
             ColorRepository.Save(FilePath);
             UnsavedChanges = false;

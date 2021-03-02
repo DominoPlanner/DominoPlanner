@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml.Linq;
 
@@ -509,15 +510,7 @@ namespace DominoPlanner.Usage
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
 
-            string result = string.Empty;
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-                ProtocolV protView = desktopLifetime.Windows.OfType<ProtocolV>().FirstOrDefault();
-                if(protView != null)
-                {
-                    result = await dlg.ShowAsync(protView);
-                }
-            }
+            string result = await dlg.ShowAsyncWithParent<ProtocolV>();
 
             if (result != null && result != "")
             {
@@ -531,7 +524,7 @@ namespace DominoPlanner.Usage
                 catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
-
+        
         public async void SaveHTMLFile()
         {
             SaveFileDialog dlg = new SaveFileDialog
@@ -540,15 +533,7 @@ namespace DominoPlanner.Usage
                 InitialFileName = Titel
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
-            string filename = string.Empty;
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-                ProtocolV protView = desktopLifetime.Windows.OfType<ProtocolV>().FirstOrDefault();
-                if (protView != null)
-                {
-                    filename = await dlg.ShowAsync(protView);
-                }
-            }
+            string filename = await dlg.ShowAsyncWithParent<ProtocolV>();
             if (filename != null && filename != "")
             {
 

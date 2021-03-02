@@ -8,7 +8,7 @@ namespace DominoPlanner.Usage
         public SetStandardV()
         {
             this.InitializeComponent();
-            DataContext = new SetStandardVM() { window = this };
+            DataContext = new SetStandardVM();
             
         }
 

@@ -63,7 +63,7 @@ namespace DominoPlanner.Usage
             ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { extension.Replace(".", "") }, Name = string.Format(GetParticularString("Files of type {0}", "{0} files"), extension) });
             ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
             ofd.AllowMultiple = false;
-            string[] result = await ofd.ShowAsync(ReferenceManagerViewModel.window);
+            string[] result = await ofd.ShowAsyncWithParent<ReferenceManager>();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 AbsolutePath = result[0];
@@ -81,7 +81,6 @@ namespace DominoPlanner.Usage
     }
     public class ReferenceManagerViewModel : ModelBase
     {
-        public static ReferenceManager window;
         public ObservableCollection<PathResolutionVM> VMs { get; set; }
         public ReferenceManagerViewModel()
         {
@@ -99,7 +98,6 @@ namespace DominoPlanner.Usage
         {
             this.InitializeComponent();
             this.DataContext = new ReferenceManagerViewModel();
-            ReferenceManagerViewModel.window = this;
         }
 
         private void InitializeComponent()

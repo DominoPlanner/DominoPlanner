@@ -27,12 +27,12 @@ namespace DominoPlanner.Usage
             OsType = Environment.OSVersion.Platform;
             ShowWindowMenu = !RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
-            MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(GetWindow()); });
+            MenuSetStandard = new RelayCommand(async o => { await new SetStandardV().ShowDialogWithParent<MainWindow>(); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
             AddExistingItem = new RelayCommand(o => { AddItem_Exists(); });
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
-            SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
+            SaveCurrentOpen = new RelayCommand(async o => { await SaveCurrentOpenProject(); });
             FileListClickCommand = new RelayCommand(o => { OpenItemFromPath(o); });
             OpenAbout = new RelayCommand(o => { OpenAboutDialog(); });
             Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
@@ -72,7 +72,7 @@ namespace DominoPlanner.Usage
             while (!File.Exists(UserSettings.Instance.StandardColorArray))
             {
                await Errorhandler.RaiseMessage(_("Please create a default color table."), _("Missing Color Table"), Errorhandler.MessageType.Info);
-               await new SetStandardV().ShowDialog(GetWindow());
+               await new SetStandardV().ShowDialogWithParent<MainWindow>();
             }
             LoadProjectList();
         }
@@ -93,14 +93,6 @@ namespace DominoPlanner.Usage
                     return false;
             }
             return true;
-        }
-        public static Window GetWindow()
-        {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-            {
-                return desktopLifetime.MainWindow;
-            }
-            return null;
         }
         private void RegisterNewViewModel(DominoProviderTabItem oldViewModel, DominoProviderTabItem newViewModel)
         {
@@ -402,7 +394,7 @@ namespace DominoPlanner.Usage
             {
                 var msgbox = MessageBoxManager.GetMessageBoxStandardWindow(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')),
                     ButtonEnum.YesNoCancel);
-                var result = await msgbox.ShowDialog(MainWindowViewModel.GetWindow());
+                var result = await msgbox.ShowDialogWithParent<MainWindow>();
                 if (result == ButtonResult.Yes)
                 {
                     remove = await SaveCurrentOpenProject();
@@ -528,7 +520,7 @@ namespace DominoPlanner.Usage
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension });
             //openFileDialog.RestoreDirectory = true;
-            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+            var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 {
@@ -550,7 +542,7 @@ namespace DominoPlanner.Usage
         private async void CreateNewProject()
         {
             NewProjectVM curNPVM = new NewProjectVM();
-            await new NewProject(curNPVM).ShowDialog(GetWindow());
+            await new NewProject(curNPVM).ShowDialogWithParent<MainWindow>();
             if (curNPVM.Close == true)
             {
                 OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}/{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
@@ -596,7 +588,7 @@ namespace DominoPlanner.Usage
         public async void OpenAboutDialog()
         {
             var aw = new AboutWindow();
-            await aw.ShowDialog(GetWindow());
+            await aw.ShowDialogWithParent<MainWindow>();
         }
         #endregion
     }

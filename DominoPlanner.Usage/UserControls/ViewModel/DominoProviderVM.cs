@@ -396,7 +396,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 DataContext = new ProtocolVM(CurrentProject, name, assemblyname)
             };
-            protocolV.Show(MainWindowViewModel.GetWindow());
+            protocolV.ShowWithParent<MainWindow>();
         }
         public void RefreshTargetSize()
         {

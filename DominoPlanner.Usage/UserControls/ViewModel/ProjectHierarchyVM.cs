@@ -173,7 +173,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (brokenReference)
             {
-                await new ReferenceManager().ShowDialog(MainWindowViewModel.GetWindow());
+                await new ReferenceManager().ShowDialogWithParent<MainWindow>();
                 Parent?.AssemblyModel.Save();
                 PostReferenceRestoration();
             }
@@ -416,7 +416,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             _("Add new object");
             NewObjectVM novm = new NewObjectVM(Path.GetDirectoryName(AbsolutePath), AssemblyModel.Obj);
-            await new NewObject(novm).ShowDialog(MainWindowViewModel.GetWindow()) ;
+            await new NewObject(novm).ShowDialogWithParent<MainWindow>() ;
             if (!novm.Close || novm.ResultNode == null) return;
             Children.Where(x => x.Model == novm.ResultNode).FirstOrDefault()?.Open();
         }
@@ -431,7 +431,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                new FileDialogFilter() { Extensions = new List<string> { Declares.ObjectExtension }, Name = _("Object files") });
             openFileDialog.Filters.Add(
                 new FileDialogFilter() { Extensions = new List<string> {Declares.ProjectExtension }, Name = _("Project files") });
-            var result = await openFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+            var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
                 string extension = Path.GetExtension(result[0]).ToLower();
@@ -472,7 +472,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             _("Rename");
             RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
-            if (await ro.ShowDialog<bool>(MainWindowViewModel.GetWindow()) == true)
+            if (await ro.GetDialogResultWithParent<MainWindow, bool>() == true)
             {
                 Workspace.CloseFile(AbsolutePath);
                 var new_path = Path.Combine(Path.GetDirectoryName(AbsolutePath), ((RenameObjectVM)ro.DataContext).NewName);
@@ -512,7 +512,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             bool collapsed = false;
             bool drawBorders = false;
             Color background = Colors.Transparent;
-            if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
+            if (await exp.GetDialogResultWithParent<MainWindow, bool>())
             {
                 ExportOptionVM dc = exp.DataContext as ExportOptionVM;
                 collapsed = dc.Collapsed;
@@ -525,8 +525,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
 
             OpenFolderDialog openFolderDialog = new OpenFolderDialog();
-            openFolderDialog.InitialDirectory = PathRoot;
-            string exportDirectory = await openFolderDialog.ShowAsync(MainWindowViewModel.GetWindow());;
+            openFolderDialog.Directory = PathRoot;
+            string exportDirectory = await openFolderDialog.ShowAsyncWithParent<MainWindow>();;
             ExportImages(exportDirectory, collapsed, drawBorders, background);
         }
 
@@ -549,11 +549,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         [ContextMenuAttribute("Properties", "Icons/properties.ico", index: 20)]
-        public void ShowProperties()
+        public async void ShowProperties()
         {
             _("Properties");
             PropertiesWindow pw = new PropertiesWindow(Model);
-            pw.ShowDialog(MainWindowViewModel.GetWindow());
+            await pw.ShowDialogWithParent<MainWindow>();
         }
         public static async Task<AssemblyNode> RestoreAssembly(string projectpath, string colorlistPath = null)
         {
@@ -724,7 +724,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
 
                 saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") });
-                exportPath = await saveFileDialog.ShowAsync(MainWindowViewModel.GetWindow());
+                exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
             }
             if (!string.IsNullOrWhiteSpace(exportPath))
             {
@@ -750,7 +750,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (userDefinedExport)
                 {
                     ExportOptions exp = new ExportOptions(DocumentModel.Obj);
-                    if (await exp.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
+                    if (await exp.GetDialogResultWithParent<MainWindow, bool>())
                     {
                         var dc = exp.DataContext as ProjectExportOptionsVM;
                         width = dc.ImageSize;
@@ -808,7 +808,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 var msgbox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(_("Delete?"), 
                 string.Format(_("Remove reference to file {0} from project {1}?\nThe file won't be permanently deleted."), Name, Parent.Name), MessageBox.Avalonia.Enums.ButtonEnum.YesNo, MessageBox.Avalonia.Enums.Icon.Warning);
-                if (await closeTab(this) && await msgbox.ShowDialog(MainWindowViewModel.GetWindow())  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
+                if (await closeTab(this) && await msgbox.ShowDialogWithParent<MainWindow>()  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
                 {
                     Parent.RemoveChild(this);
                     await Errorhandler.RaiseMessage(string.Format(_("{0} has been removed!"), Name), _("Removed"), Errorhandler.MessageType.Error);
@@ -827,7 +827,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             try
             {
                 RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
-                if (await closeTab(this) && await ro.ShowDialog<bool>(MainWindowViewModel.GetWindow()))
+                if (await closeTab(this) && await ro.GetDialogResultWithParent<MainWindow, bool>())
                 {
                     Workspace.CloseFile(DocumentModel.AbsolutePath);
                     string old_path = AbsolutePath;
@@ -848,7 +848,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             _("Properties");
             PropertiesWindow pw = new PropertiesWindow(Model);
-            await pw.ShowDialog(MainWindowViewModel.GetWindow());
+            await pw.ShowDialogWithParent<MainWindow>();
         }
     }
 }

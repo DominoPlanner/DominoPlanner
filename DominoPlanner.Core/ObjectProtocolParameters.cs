@@ -437,7 +437,7 @@ namespace DominoPlanner.Core
                     family = format.Substring(face + 6, b - face - 6);
                 }
                 f = new System.Drawing.Font(family, 12);
-            }catch(Exception ex) { }
+            } catch(Exception) { }
             return f;
         }
 

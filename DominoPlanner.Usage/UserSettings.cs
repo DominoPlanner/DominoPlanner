@@ -63,7 +63,7 @@ namespace DominoPlanner.Usage
                     {
                         Directory.CreateDirectory(_AppDataPath);
                     }
-                }catch(Exception ex) { }
+                } catch (Exception) { }
                 return _AppDataPath; 
             }
         }

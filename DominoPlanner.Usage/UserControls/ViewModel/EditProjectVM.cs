@@ -774,7 +774,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (iscopying)
             {
                 Paste(dominoPoint, e);
-                if (e.MouseButton == MouseButton.Right)
+                if (e.InitialPressMouseButton == MouseButton.Right)
                 {
                     FinalizePaste(true);
                 }

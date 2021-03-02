@@ -27,16 +27,15 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Methods
-        private void SelectProjectFolder()
+        private async void SelectProjectFolder()
         {
             OpenFolderDialog ofd = new OpenFolderDialog();
-            var result = ofd.ShowDialog();
+            var result = await ofd.ShowAsyncWithParent<NewProject>();
             if (result != null && result != "")
             {
                 SelectedPath = result;
             }
         }
-        public Window window;
 
         private async void CreateNewProject()
         {
@@ -44,7 +43,7 @@ namespace DominoPlanner.Usage
             {
                 if (Directory.Exists(Path.Combine(SelectedPath, ProjectName)))
                 {
-                    await Errorhandler.RaiseMessage(_("This folder already exists. Please choose another project name."), GetParticularString("Error on project creation", "Existing Folder"), Errorhandler.MessageType.Error, window);
+                    await Errorhandler.RaiseMessageWithParent<NewProject>(_("This folder already exists. Please choose another project name."), GetParticularString("Error on project creation", "Existing Folder"), Errorhandler.MessageType.Error);
                     return;
                 }
 
@@ -66,7 +65,7 @@ namespace DominoPlanner.Usage
 
                 main.Save();
 
-                await Errorhandler.RaiseMessage(string.Format(_("The project {0} has been created"), projectfilename), _("Project created"), Errorhandler.MessageType.Info, window);
+                await Errorhandler.RaiseMessageWithParent<NewProject>(string.Format(_("The project {0} has been created"), projectfilename), _("Project created"), Errorhandler.MessageType.Info);
                 Close = true;
             }
             catch (Exception e)
@@ -75,7 +74,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private void SelectColorArray()
+        private async void SelectColorArray()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
@@ -86,7 +85,7 @@ namespace DominoPlanner.Usage
                 openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
             }
             catch (Exception) { }
-            var result = openFileDialog.ShowDialog();
+            var result = await openFileDialog.ShowAsyncWithParent<NewProject>();
             if (result != null && result.Length == 1 && result[0] != "")
             {
                 sPath = result[0];

@@ -97,7 +97,7 @@ namespace DominoPlanner.Usage
         private async void SetStandardPathOpen()
         {
             OpenFolderDialog ofd = new OpenFolderDialog { Directory = standardpath };
-            var result = await ofd.ShowAsync(window);
+            var result = await ofd.ShowAsyncWithParent<SetStandardV>();
             if (result != null && !string.IsNullOrEmpty(result))
             {
                 standardpath = result;
@@ -120,7 +120,7 @@ namespace DominoPlanner.Usage
                 openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
             }
             catch (Exception) { }
-            var result = await openFileDialog.ShowAsync(window);
+            var result = await openFileDialog.ShowAsyncWithParent<SetStandardV>();
             if (result != null && result.Length != 0)
             {
                 var filename = result[0];
@@ -177,7 +177,6 @@ namespace DominoPlanner.Usage
         public ICommand SetStandardPath { get { return _SetStandardPath; } set { if (value != _SetStandardPath) { _SetStandardPath = value; } } }
 
         private ICommand _ClearList;
-        internal SetStandardV window;
 
         public ICommand ClearList { get { return _ClearList; } set { if (value != _ClearList) { _ClearList = value; } } }
 
