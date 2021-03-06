@@ -674,9 +674,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             }
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.RelativePath)}.", "Error", Errorhandler.MessageType.Warning);
+                        //await Errorhandler.RaiseMessage($"Unable to load counts from project {Path.GetFileNameWithoutExtension(dn.RelativePath)}.", "Error", Errorhandler.MessageType.Warning);
                     }
                 }
             }

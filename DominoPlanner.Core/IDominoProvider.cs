@@ -28,7 +28,8 @@ namespace DominoPlanner.Core
                 {
                     foreach (var shape in Last.shapes)
                     {
-                        counts[shape.Color]++;
+                        if (shape.Color < counts.Length)
+                            counts[shape.Color]++;
                     }
                 }
                 return counts;
