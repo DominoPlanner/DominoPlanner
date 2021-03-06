@@ -68,19 +68,19 @@
             <HeaderedContentControl  DockPanel.Dock="Bottom" Grid.Row="1" Header="{local:Gettext Domino dimensions}" Margin="0,5,0,0">
                 <DockPanel DockPanel.Dock="Top">
                     <DockPanel Margin="0,5,0,0" VerticalAlignment="Top" DockPanel.Dock="Top">
-                        <TextBlock Text="{local:Gettext Choose Standard:}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5, 0, 5, 0"/>
-                        <ComboBox SelectedItem="{Binding SelectedItem}" Items="{Binding Field_templates}" Margin="0, 0, 5, 0"/>
+                        <TextBlock Text="{local:Gettext Choose Standard:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ComboBox SelectedItem="{Binding SelectedItem}" Items="{Binding Field_templates}" Margin="5, 0, 5, 0"/>
                     </DockPanel>
 
-                    <Grid VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0, 5, 5, 0" ColumnDefinitions="5*, 3*, 5*, 3*" RowDefinitions="*, 2, *">
+                    <Grid VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0, 5, 5, 0" ColumnDefinitions="5*, 4*, 5*, 4*" RowDefinitions="*, 2, *">
                         <!--Field Distances and Dimensions-->
-                        <TextBlock Text="{local:Gettext Dist. inside line:}" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Distance\\ninside line:}" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         <NumericUpDown Minimum="0" Value="{Binding HorizontalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" Increment="1"  Margin="5,0,0,0" />
-                        <TextBlock Text="{local:Gettext Domino width:}" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        <TextBlock Text="{local:Gettext Domino\\nwidth:}" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" />
                         <NumericUpDown Minimum="1" Value="{Binding HorizontalSize}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" Increment="1"  Margin="5,0,0,0" />
-                        <TextBlock Text="{local:Gettext Domino depth:}" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext Domino\\ndepth:}" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"/>
                         <NumericUpDown Minimum="1" Value="{Binding VerticalSize}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="5,0,0,0" Increment="1" />
-                        <TextBlock Text="{local:Gettext Dist. btw. lines:}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBlock Text="{local:Gettext 'Distance\\nbtw. lines:'}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"/>
                         <NumericUpDown Minimum="0" Value="{Binding VerticalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="5,0,0,0" Increment="1" />
                     </Grid>
                 </DockPanel>

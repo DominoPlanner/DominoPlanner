@@ -212,7 +212,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedItem != value)
                 {
                     var tempSelItem = _SelectedItem;
-                    if (_SelectedItem?.Name==GetParticularString("User defined field dimensions", "User Size"))
+                    if (_SelectedItem?.Name==GetParticularString("User defined field dimensions (keep string short)", "User Size"))
                     {
                         _SelectedItem.Sizes.a = HorizontalDistance;
                         _SelectedItem.Sizes.b = HorizontalSize;
@@ -228,7 +228,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _SelectedItem = value;
                     if (SelectedItem == null)
                         return;
-                    if (SelectedItem.Name.Equals(GetParticularString("User defined field dimensions", "User Size")))
+                    if (SelectedItem.Name.Equals(GetParticularString("User defined field dimensions (keep string short)", "User Size")))
                         CanChange = true;
                     else
                         CanChange = false;
