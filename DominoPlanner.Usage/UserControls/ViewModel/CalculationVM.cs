@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Templates;
+using System.Windows.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -52,6 +53,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public NonEmptyCalculationVM(NonEmptyCalculation model) : base(model)
         {
             IterationInformationVM = IterationInformationVM.IterationInformationVMFactory(model.IterationInformation);
+            IterationInformationVM.ValueChanged = PropertyValueChanged;
+            IterationInformationChanged = new RelayCommand( (o) => {if (o is bool b) ChangeIterationInformation(b); });
+        }
+
+        private void ChangeIterationInformation(bool IsChecked)
+        {
+            if (!IsChecked && IterationInformation is NoColorRestriction)
+            {
+                IterationInformation = new IterativeColorRestriction(2, 0.1);
+            }
+            else if (IsChecked && IterationInformation is IterativeColorRestriction)
+            {
+                IterationInformation = new NoColorRestriction();
+            }
         }
         private NonEmptyCalculation NEModel
         {
@@ -65,7 +80,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             set
             {
-                if (value != NEModel.ColorMode)
+                if (!value.GetType().Equals(NEModel.ColorMode.GetType()))
                 {
                     PropertyValueChanged(this, value);
                     NEModel.ColorMode = value;
@@ -141,6 +156,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     RaisePropertyChanged();
                 }
             }
+        }
+        private ICommand _IterationInformationChanged;
+        public ICommand IterationInformationChanged
+        {
+            get { return _IterationInformationChanged; }
+            set { _IterationInformationChanged = value; RaisePropertyChanged(); }
         }
         
     }

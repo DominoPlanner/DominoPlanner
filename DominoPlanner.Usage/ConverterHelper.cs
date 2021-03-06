@@ -287,14 +287,7 @@ namespace DominoPlanner.Usage
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((bool)value)
-            {
-                return new IterativeColorRestriction(2, 0.1);
-            }
-            else
-            {
-                return new NoColorRestriction();
-            }
+            throw new NotImplementedException();
         }
     }
     public class BoolToImageConverter : IValueConverter

@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
              xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:local="clr-namespace:DominoPlanner.Usage"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              x:Class="DominoPlanner.Usage.UserControls.View.CalculationV">
@@ -60,7 +62,17 @@
             <HeaderedContentControl >
                 <HeaderedContentControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding IterationInformation, Converter={StaticResource IterationInformationToBooleanConverter}}" Content="{local:Gettext Try to match Available dominoes}"/>
+                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding IterationInformation, Converter={StaticResource IterationInformationToBooleanConverter}, Mode=OneWay}" 
+                                                             Content="{local:Gettext Try to match Available dominoes}">
+                            <i:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="Checked">
+                                    <ia:InvokeCommandAction Command="{Binding IterationInformationChanged}" CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}"/>
+                                </ia:EventTriggerBehavior>
+                                <ia:EventTriggerBehavior EventName="Unchecked">
+                                    <ia:InvokeCommandAction Command="{Binding IterationInformationChanged}" CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}"/>
+                                </ia:EventTriggerBehavior>
+                            </i:Interaction.Behaviors>
+                        </CheckBox>
                         <Button DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}, Path=DataContext}" Margin="10, 0, 0, 0" Height="20" Width="20" BorderBrush="Transparent" Background="Transparent" Command="{Binding OpenPopup}" ToolTip.Tip="{local:Gettext Show usage of colors}">
                             <StackPanel >
                                 <Image Source="{Binding Converter={StaticResource BoolToImageConverter}, Path=ColorRestrictionFulfilled}"></Image>
