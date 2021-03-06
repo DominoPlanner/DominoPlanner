@@ -7,6 +7,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300"
              x:Class="DominoPlanner.Usage.UserControls.View.CalculationV">
     <UserControl.DataTemplates>
@@ -77,7 +78,12 @@
                             <StackPanel >
                                 <Image Source="{Binding Converter={StaticResource BoolToImageConverter}, Path=ColorRestrictionFulfilled}"></Image>
                                 <Popup Name="myPopup" IsOpen="{Binding PopupOpen, Mode=TwoWay}" StaysOpen="False">
-                                    <local:ColorControl Grid.Row="2" MaxHeight="250"
+                                    <Popup.DataTemplates>
+                                        <DataTemplate DataType="{x:Type system:Double}">
+                                            <TextBlock Text="{Binding, StringFormat={}{0:0.###}}"/>
+                                        </DataTemplate>
+                                    </Popup.DataTemplates>
+                                    <local:ColorControl Grid.Row="2" MaxHeight="250" Width="400"
                                          ColumnConfig="{Binding ColorColumnConfig}"
                                          Colors="{Binding SortedColors}" >
                                     </local:ColorControl>

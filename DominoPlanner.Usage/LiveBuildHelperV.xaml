@@ -128,7 +128,7 @@
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
                         <TextBlock Text="{local:Gettext Show remaining colors}"/>
-                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
+                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False" Width="400">
                             <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
                         </Popup>
                     </StackPanel>
