@@ -152,7 +152,7 @@
                 <Button Margin="1, 0"  ToolTip.Tip="{parent:Gettext Zoom out}" Command="{Binding ZoomOut}">
                     <Image Source="{StaticResource zoom_outDrawingImage}" Classes="ToolImage"/>
                 </Button> 
-                <Slider HorizontalAlignment="Center" Minimum="{Binding FitAllZoomValue}" Maximum="2" x:CompileBindings="False" 
+                <Slider HorizontalAlignment="Center" Minimum="{Binding MinZoomValue}" Maximum="{Binding MaxZoomValue}" x:CompileBindings="False" 
                 Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
                 <Button Margin="1, 0"  ToolTip.Tip="{parent:Gettext Zoom in}" Command="{Binding ZoomIn}">
                     <Image Source="{StaticResource zoom_inDrawingImage}" Classes="ToolImage"/>

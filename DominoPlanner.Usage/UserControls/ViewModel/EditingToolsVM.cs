@@ -1451,8 +1451,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "zoomDrawingImage";
             Name = _("Zoom");
-            ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue *= 1.1);
-            ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue /= 1.1);
+            // todo: zoom relative to center? see ProjectCanvas
+            ZoomIn = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue = Math.Min(parent.DisplaySettingsTool.ZoomValue * 1.1, MaxZoomValue));
+            ZoomOut = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue = Math.Max(parent.DisplaySettingsTool.ZoomValue / 1.1, MinZoomValue));
             Zoom1To1 = new RelayCommand((o) => parent.DisplaySettingsTool.ZoomValue = 1);
             ZoomToFit = new RelayCommand((o) =>
             {
@@ -1471,7 +1472,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public double FitAllZoomValue
         {
             get { return fitAllZoomValue; }
-            set { fitAllZoomValue = value; RaisePropertyChanged(); }
+            set { fitAllZoomValue = value; RaisePropertyChanged(); RaisePropertyChanged(nameof(MinZoomValue)); }
+        }
+
+        public double MinZoomValue
+        {
+            get {return fitAllZoomValue/4; }
+        }
+        public double MaxZoomValue {
+            get {return 4; }
         }
 
         private ICommand _Zoom1To1;

@@ -381,7 +381,7 @@ namespace DominoPlanner.Usage
                     newzoom *= 1.1;
                 else
                     newzoom *= 1 / 1.1;
-                if (newzoom > FitAllZoomValue && newzoom < 2)
+                if (newzoom > FitAllZoomValue / 4 && newzoom < 4)
                     Zoom = newzoom;
 
                 newx = (p.X - e.GetPosition(this).X / Zoom);
