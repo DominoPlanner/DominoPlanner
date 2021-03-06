@@ -278,12 +278,12 @@
 		<PartDefinition HorizontalPosition="Left" VerticalPosition="Center" Width="28.284" Height="96">
 			<RectangleDomino x="0" y="0" Width="22.627" Height="48"/>
 			<RectangleDomino x="0" y="48" Width="16.971" Height="24"/>
+			<RectangleDomino x="16.971" y="24" Width="22.627" Height="48"/>
+			<RectangleDomino x="0" y="72" Width="39.598" Height="24"/>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Center" Width="56.568" Height="96">
 			<RectangleDomino x="0" y="0" Width="39.598" Height="24"/>
-			<RectangleDomino x="-11.313" y="24" Width="22.627" Height="48"/>
 			<RectangleDomino x="11.314" y="24" Width="28.284" Height="24"/>
-			<RectangleDomino x="-28.284" y="72" Width="39.598" Height="24"/>
 			<RectangleDomino x="11.314" y="72" Width="11.314" Height="24"/>
 			<RectangleDomino x="28.284" y="48" Width="16.971" Height="24"/>
 			<RectangleDomino x="28.284" y="72" Width="39.598" Height="24"/>
@@ -298,10 +298,10 @@
 		<PartDefinition HorizontalPosition="Left" VerticalPosition="Bottom" Width="28.284" Height="72">
 			<RectangleDomino x="0" y="0" Width="22.627" Height="48"/>
 			<RectangleDomino x="0" y="48" Width="16.971" Height="24"/>
+			<RectangleDomino x="16.971" y="24" Width="22.627" Height="48"/>
 		</PartDefinition>
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Bottom" Width="56.569" Height="72">
 			<RectangleDomino x="0" y="0" Width="39.598" Height="24"/>
-			<RectangleDomino x="-11.313" y="24" Width="22.627" Height="48"/>
 			<RectangleDomino x="11.314" y="24" Width="28.284" Height="24"/>
 			<RectangleDomino x="28.284" y="48" Width="16.971" Height="24"/>
 			<RectangleDomino x="45.255" y="24" Width="22.627" Height="48"/>
