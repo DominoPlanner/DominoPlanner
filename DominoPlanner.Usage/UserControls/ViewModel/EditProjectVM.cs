@@ -436,7 +436,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             // display the dominoes to paste as a half-transparent overlay.
             // reference point:
-            var reference_point = Dominoes[toCopy[0]].CenterPoint - dominoPoint;
+            var reference_point = Dominoes[toCopy.Min()].CenterPoint - dominoPoint;
             if (PasteOverlays.Count == 0)
             {
                 // create the overlays
@@ -800,9 +800,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public void RemoveFromSelectedDominoes(int i)
         {
+            selectedDominoes.Remove(i);
             if (DeSelectDominoVisual(i))
             {
-                selectedDominoes.Remove(i);
                 selectedColors[dominoTransfer[i].Color]--;
             }
         }
