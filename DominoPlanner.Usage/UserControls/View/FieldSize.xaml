@@ -50,9 +50,18 @@
                         <NumericUpDown Value="{Binding Height}" Margin="5, 0, 0, 0" IsEnabled="{Binding EditState}" Minimum="0" HorizontalAlignment="Stretch"/>
                     </DockPanel>
                     <DockPanel Margin="0, 5, 0, 0">
+                        <DockPanel.Styles>
+                            <Style Selector="ToggleSwitch /template/ Border#OuterBorder">
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleSwitchStrokeOffPressed}"/>
+                            </Style>
+                            <Style Selector="ToggleSwitch /template/ Ellipse#SwitchKnobOff">
+                                <Setter Property="Fill" Value="{DynamicResource ThemeBorderHighColor}"/>
+                            </Style>
+                        </DockPanel.Styles>
+                        
                         <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Falldown direction:}" Margin="0, 0, 5, 0"  HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <RadioButton DockPanel.Dock="Left" Content="{local:Gettext Field falldown direction|Horizontal}" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Horizontal}"/>
-                        <RadioButton DockPanel.Dock="Left" Content="{local:Gettext Field falldown direction|Vertical}" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5, 0, 0, 0" IsChecked="{Binding Horizontal, Converter={StaticResource BoolInverterConverter}}"/>
+                        <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Field falldown direction|Horizontal}" Margin="0, 0, 5, 0"  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ToggleSwitch OffContent="{local:Gettext Field falldown direction|Vertical}" OnContent="{local:Gettext Field falldown direction|Vertical}" IsChecked="{Binding !Horizontal}"/>
                     </DockPanel>
                 </DockPanel>
             </HeaderedContentControl>
