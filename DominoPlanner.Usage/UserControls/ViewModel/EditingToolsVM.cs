@@ -1201,6 +1201,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        private double dominoopacity = 1;
+        public double DominoOpacity
+        {
+            get { return dominoopacity; }
+            set
+            {
+                dominoopacity = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private bool above = false;
         public bool Above
         {

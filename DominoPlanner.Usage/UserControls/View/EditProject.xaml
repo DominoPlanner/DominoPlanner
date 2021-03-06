@@ -111,6 +111,10 @@
                 <Slider Margin="5, 0, 0, 0" Width="50" Minimum="0" Maximum="5" Value="{Binding BorderSize}"></Slider>
                 <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
 
+                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Domino opacity:}"/>
+                <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding DominoOpacity}" Minimum="0" Maximum="1"></Slider>
+                
+
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Image overlay transparency:}"/>
                 <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding ImageOpacity}" Minimum="0" Maximum="1"></Slider>
                 <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="ImagePosition" ToolTip.Tip="{parent:Gettext Display image below dominoes}" IsChecked="{Binding Above, Converter={StaticResource BoolInverterConverter}}">
@@ -245,6 +249,7 @@
                                           SourceImageOpacity="{Binding DisplaySettingsTool.ImageOpacity}"
                                           SourceImageAbove="{Binding DisplaySettingsTool.Above}"
                                           BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"
+                                          DominoOpacity="{Binding DisplaySettingsTool.DominoOpacity}"
                                           BorderSize="{Binding DisplaySettingsTool.BorderSize}"
                                           ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
                                           AdditionalDrawables="{Binding AdditionalDrawables}"

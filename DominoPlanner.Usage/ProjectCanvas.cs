@@ -136,6 +136,14 @@ namespace DominoPlanner.Usage
         }
         public static readonly StyledProperty<bool> SourceImageAboveProperty = AvaloniaProperty.Register<ProjectCanvas, bool>(nameof(SourceImageAbove));
 
+        public float DominoOpacity
+        {
+            get { return GetValue(DominoOpacityProperty); }
+            set { SetValue(DominoOpacityProperty, value); }
+        }
+        public static readonly StyledProperty<float> DominoOpacityProperty = AvaloniaProperty.Register<ProjectCanvas, float>(nameof(DominoOpacity), 0.2f);
+
+
         public Color BackgroundColor
         {
             get { return GetValue(BackgroundColorProperty); }
@@ -230,6 +238,7 @@ namespace DominoPlanner.Usage
             AffectsRender<ProjectCanvas>(SourceImageOpacityProperty);
             AffectsRender<ProjectCanvas>(SourceImageProperty);
             AffectsRender<ProjectCanvas>(SourceImageAboveProperty);
+            AffectsRender<ProjectCanvas>(DominoOpacityProperty);
             ProjectProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => ProjectChanged());
             SourceImageProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged());
             SourceImageOpacityProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SourceImageChanged());
@@ -452,6 +461,8 @@ namespace DominoPlanner.Usage
         private readonly float ProjectWidth;
         private readonly byte bitmapopacity;
         private readonly bool above;
+
+        private readonly byte dominoopacity;
         private readonly SKColor background;
         private AvaloniaList<CanvasDrawable> AdditionalDrawables;
         private readonly float BorderSize;
@@ -491,6 +502,7 @@ namespace DominoPlanner.Usage
             selectionVisible = pc.SelectionDomainVisible;
             bitmap = pc.SourceImage;
             bitmapopacity = (byte)(pc.SourceImageOpacity * 255);
+            dominoopacity = (byte)(pc.DominoOpacity * 255);
             BorderSize = pc.BorderSize;
         }
 
@@ -612,7 +624,7 @@ namespace DominoPlanner.Usage
                     path.LineTo(PointToDisplaySkiaPoint(line));
                 path.Close();
 
-                canvas.DrawPath(path, new SKPaint() { Color = c.ToSKColor(), IsAntialias = true, IsStroke = false }) ;
+                canvas.DrawPath(path, new SKPaint() { Color = c.ToSKColor(dominoopacity), IsAntialias = true, IsStroke = false }) ;
             }
         }
         private void DrawDominoBorder(SKCanvas canvas, EditingDominoVM vm)
@@ -661,6 +673,10 @@ namespace DominoPlanner.Usage
         public static SKColor ToSKColor(this Avalonia.Media.Color color)
         {
             return new SKColor(color.R, color.G, color.B, color.A);
+        }
+        public static SKColor ToSKColor(this Avalonia.Media.Color color, byte opacity)
+        {
+            return new SKColor(color.R, color.G, color.B, (byte)(color.A * opacity / 255d));
         }
     }
 }
