@@ -173,6 +173,11 @@ namespace DominoPlanner.Core
                 return _obj;
             }
         }
+        public void CloseFile()
+        {
+            Workspace.CloseFile(AbsolutePath);
+            _obj = null;
+        }
         public override int[] Counts
         {
             get

@@ -393,7 +393,7 @@ namespace DominoPlanner.Usage
             if (tabItem.Content.UnsavedChanges)
             {
                 var msgbox = MessageBoxManager.GetMessageBoxStandardWindow(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')),
-                    ButtonEnum.YesNoCancel);
+                    ButtonEnum.YesNoCancel, Icon.Warning);
                 var result = await msgbox.ShowDialogWithParent<MainWindow>();
                 if (result == ButtonResult.Yes)
                 {
@@ -401,6 +401,33 @@ namespace DominoPlanner.Usage
                 }
                 if (result == ButtonResult.No)
                 {
+                    // we need to close all files and remove all references to the DominoProvider, 
+                    // so the file can be reopened again from disk
+                    
+
+                    void RecurseProjects(AssemblyNodeVM assembly)
+                    {
+                        foreach (NodeVM node in assembly.Children)
+                        {
+                            if (node is AssemblyNodeVM assy)
+                                RecurseProjects(assy);
+                            else if (node is DocumentNodeVM dn)
+                            {
+                                try
+                                {
+                                    if (dn.AbsolutePath == tabItem.Path)
+                                        dn.DocumentModel.CloseFile();
+                                }
+                                catch
+                                {
+                                    // happens if one reference to another file is broken, in this case
+                                    // we simply don't care
+                                }
+                            }
+                        }
+                    }
+                    foreach (AssemblyNodeVM node in Projects)
+                        RecurseProjects(node);
                     remove = true;
                 }
             }
