@@ -515,6 +515,8 @@ namespace DominoPlanner.Usage
     }
     public class FieldPlanArrowsGridConverter : IMultiValueConverter
     {
+        public static string RowToolTip = _("Order of the first line in the protocol");
+        public static string ColToolTip = _("Order of separate lines in the protocol");
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Count == 4 && values[0] is bool orientation && values[1] is bool mirrorX && values[2] is bool mirrorY && parameter is string parameterString && values[3] is NaturalFieldPlanOrientation naturalOrientation)
@@ -538,6 +540,8 @@ namespace DominoPlanner.Usage
 
                 if (parameterString.Equals("HorizontalColor"))
                     return (!(currentOrientation.orientation ^ naturalOrientation.orientation)) ? Colors.Blue : Colors.LightBlue;
+                if (parameterString.Equals("HorizontalToolTip"))
+                    return (!(currentOrientation.orientation ^ naturalOrientation.orientation)) ? RowToolTip : ColToolTip;
 
                 if (parameterString.Equals("RightHorizontalVisibility"))
                     return left;
@@ -550,6 +554,8 @@ namespace DominoPlanner.Usage
 
                 if (parameterString.Equals("VerticalColor"))
                     return (currentOrientation.orientation ^ naturalOrientation.orientation) ? Colors.Blue : Colors.LightBlue;
+                if (parameterString.Equals("VerticalToolTip"))
+                    return (currentOrientation.orientation ^ naturalOrientation.orientation) ? RowToolTip : ColToolTip;
 
                 if (parameterString.Equals("BottomVerticalVisibility"))
                     return top;

@@ -20,6 +20,11 @@
         </Grid.ColumnDefinitions>
         <Grid x:Name="ParentGrid" Margin="5">
             <Grid>
+                <Grid.Styles>
+                    <Style Selector="Ellipse">
+                        <Setter Property="ToolTip.Tip" Value="{local:Gettext 'Click to define as top left corner of the protocol'}"/> 
+                    </Style>
+                </Grid.Styles>
                 <Grid.Height>
                     <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Height">
                         <Binding Path="CurrentPlan"/>
@@ -125,6 +130,14 @@
                                     </SolidColorBrush.Color>
                                 </SolidColorBrush>
                             </Setter>
+                            <Setter Property="ToolTip.Tip">
+                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalToolTip" >
+                                    <Binding Path="Orientation"/>
+                                    <Binding Path="MirrorX" />
+                                    <Binding Path="MirrorY" />
+                                    <Binding Path="NaturalOrientation" />
+                                </MultiBinding>
+                            </Setter>
                         </Style>
                     </Grid.Styles>
                     <Grid.Row>
@@ -172,6 +185,14 @@
                                         </MultiBinding>
                                     </SolidColorBrush.Color>
                                 </SolidColorBrush>
+                            </Setter>
+                            <Setter Property="ToolTip.Tip">
+                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalToolTip" >
+                                    <Binding Path="Orientation"/>
+                                    <Binding Path="MirrorX" />
+                                    <Binding Path="MirrorY" />
+                                    <Binding Path="NaturalOrientation" />
+                                </MultiBinding>
                             </Setter>
                         </Style>
                     </Grid.Styles>
