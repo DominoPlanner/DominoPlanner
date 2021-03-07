@@ -394,7 +394,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage(_("Copy/Paste is not supported in this project."), _("Paste"), Errorhandler.MessageType.Warning);
                 // find closest domino
-                int domino = FindDominoAtPosition(dominoPoint).idx;
+                int domino = FindDominoAtPosition(dominoPoint, int.MaxValue).idx;
                 if (PossiblePastePositions.Contains(domino))
                 {
                     PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), domino);
@@ -868,20 +868,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             return false;
         }
-        public EditingDominoVM FindDominoAtPosition(Avalonia.Point pos)
+        public EditingDominoVM FindDominoAtPosition(Avalonia.Point pos, int tolerance = 0)
         {
             double min_dist = int.MaxValue;
             EditingDominoVM result = null;
             foreach (var shape in Dominoes)
             {
-                if (shape.domino.IsInside(new Core.Point(pos.X, pos.Y))) return shape;
-                var rect = shape.domino.GetBoundingRectangle();
+                if (shape.domino.IsInside(new Core.Point(pos.X, pos.Y), expanded: DisplaySettingsTool.Expanded)) return shape;
+                var rect = shape.domino.GetContainer();
                 double dist = Math.Pow((rect.x + rect.width / 2) - pos.X, 2) + Math.Pow(rect.y + rect.height / 2 - pos.Y, 2);
-                if (min_dist > dist)
+                if (min_dist > dist && dist < tolerance)
                 {
                     min_dist = dist;
                     result = shape;
-
                 }
             }
             return result;

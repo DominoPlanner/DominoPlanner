@@ -78,14 +78,14 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract bool IsInside(Point point, double scaling_x, double scaling_y);
+        public abstract bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false);
         /// <summary>
         /// Überprüft, ob ein Punkt innerhalb des Steins liegt, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="point">Punkt, der geprüft werden soll</param>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public bool IsInside(Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
+        public bool IsInside(Point point, double scaling = 1, bool expanded = false) { return IsInside(point, scaling, scaling, expanded); }
         /// <summary>
         /// Überprüft, ob zwei Dominosteine gleich sind. 
         /// Berücksichtigt keine Unterschiede in der Protokolldefinition

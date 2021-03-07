@@ -490,7 +490,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 // single click 
                 boundingBox = new Rect(dominoPoint.X, dominoPoint.Y, 0, 0);
-                var r = parent.FindDominoAtPosition(pos);
+                var r = parent.FindDominoAtPosition(pos, 3); // we give the user a few pixels of tolerance (relative to domino size)
                 if (r != null) result.Add(r.idx);
                 ResetFlag = true;
             }
@@ -814,7 +814,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             List<int> neighbors = new List<int>();
 
-            var start = parent.FindDominoAtPosition(dominoPoint);
+            var start = parent.FindDominoAtPosition(dominoPoint, int.MaxValue); // in this case we don't care if we didn't directly hit a domino since we want to fill the region anyway
             if (start == null) return neighbors; // no domino was clicked
 
             RecursiveSearch(start.idx, neighbors);
@@ -1646,7 +1646,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
         public override void MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint, int.MaxValue);
             if (InsertionMode)
             {
                 parent.ClearFullSelection();
@@ -1693,7 +1693,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         private void PreviewInsertion(Avalonia.Point dominoPoint)
         {
             var closest_line = GetClosestLine(dominoPoint);
-            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint, int.MaxValue);
 
             var path = closest_line.GetPath(parent.PhysicalLength, parent.PhysicalHeight, Direction);
             parent.AdditionalDrawables.Remove(PreviewLine1);
@@ -1719,7 +1719,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 i.State &= ~EditingDominoStates.DeletionHighlight;
             
             parent.ClearFullSelection();
-            var closest_domino = parent.FindDominoAtPosition(dominoPoint);
+            var closest_domino = parent.FindDominoAtPosition(dominoPoint, int.MaxValue);
             int[] indices = null;
             if (parent.CurrentProject is IRowColumnAddableDeletable rc)
             {

@@ -96,12 +96,15 @@ namespace DominoPlanner.Core
 
         }
 
-        public override bool IsInside(Point point, double scaling_x, double scaling_y)
+        public override bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false)
         {
+            var width = (expanded ? ExpandedWidth : this.Width);
+
+            var height = (expanded ? ExpandedHeight : this.Height);
             if (point.X < x * scaling_x) return false;
-            if (point.X > (x + Width) * scaling_x) return false;
+            if (point.X > (x + width) * scaling_x) return false;
             if (point.Y < y * scaling_y) return false;
-            if (point.Y > (y + Height) * scaling_y) return false;
+            if (point.Y > (y + height) * scaling_y) return false;
             return true;
         }
 
@@ -178,7 +181,7 @@ namespace DominoPlanner.Core
             };
         }
 
-        public override bool IsInside(Point point, double scaling_x, double scaling_y)
+        public override bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false)
         {
             int i, j;
             bool c = false;
