@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Avalonia.Media;
 using SkiaSharp;
+using System.Linq;
 
 namespace DominoPlanner.Core
 {
@@ -435,9 +436,11 @@ namespace DominoPlanner.Core
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "called by protobuf after serialization")]
         private void RestoreShapes()
         {
+            if (colors.Length < Last.shapes.Max(x => x.Color))
+                throw new InvalidDataException("More colors are used in the project than are available in the color list.");
             if (PrimaryImageTreatment == null || PrimaryCalculation == null)
             {
-                throw new InvalidDataException();
+                throw new InvalidDataException("Probably a very old file, please convert with DominoPlanner 3.0.0alpha4");
             }
             Generate();
             Last.colors = colors;

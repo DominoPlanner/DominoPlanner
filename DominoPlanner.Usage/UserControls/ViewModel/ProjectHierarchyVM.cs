@@ -788,10 +788,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 BrokenReference = true;
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException ex)
             {
                 RemoveNodeFromProject();
-                await Errorhandler.RaiseMessage(string.Format(_("The file {0} is broken. \nIt has been removed from the project."), this.Name), _("File not readable"), Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(string.Format(_("The file {0} is broken. \nIt has been removed from the project."), this.Name) + "\n" + _("Additional information: ") + ex.Message, _("File not readable"), Errorhandler.MessageType.Error);
             }
             
         }
