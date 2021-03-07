@@ -287,11 +287,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    _DominoList.Where(x => x.DominoColor is DominoColor).ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
-                    break;
+                var filtered = _DominoList.Where(x => x.DominoColor is DominoColor);
+                if (e.NewStartingIndex < filtered.Count())
+                    filtered.ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
             }
             UnsavedChanges = false;
             RaisePropertyChanged(nameof(DominoList));

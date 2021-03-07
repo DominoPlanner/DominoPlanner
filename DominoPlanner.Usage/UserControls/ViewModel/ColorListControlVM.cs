@@ -679,10 +679,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         dn.RelativePath = relpath;
                         if (Path.GetFullPath(counts2.Item1) == Path.GetFullPath(assy.Obj.AbsoluteColorPath))
                         {
-                            sum = sum.Zip(counts2.Item2, (x, y) => x + y).ToArray();
-                            for (int i = 0; i < counts2.Item2.Length; i++)
+                            var currentColors = (counts2.Item2 ?? new int[1]).ToList();
+                            while (currentColors.Count < assy.Obj.Colors.Length)
                             {
-                                _ColorList[i].ProjectCount.Add(counts2.Item2[i]);
+                                // Edge case: A color has been added, but the count of the project has not been refreshed yet. 
+                                // This means that we just have to add zeros in the end. 
+                                // The other direction (more colors in the project than in the color list) should *never* happen, as we save the color list when we save the project.
+
+                                currentColors.Add(0); 
+                            }
+                            sum = sum.Zip(currentColors, (x, y) => x + y).ToArray();
+                            for (int i = 0; i < currentColors.Count; i++)
+                            {
+                                _ColorList[i].ProjectCount.Add(currentColors[i]);
                             }
                         }
                     }
