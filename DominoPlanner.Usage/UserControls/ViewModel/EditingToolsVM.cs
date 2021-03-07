@@ -122,7 +122,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "rect_selectDrawingImage";
             Name = _("Select");
-            HelpToolTip = _("Esc to clear selection\nr to trigger quick replace");
+            HelpToolTip = _("Esc: clear selection\nq: quick replace\n+/./-: toggle selection modes\nr/c/p/f/b: switch between selection tools");
             SelectionTools = new ObservableCollection<SelectionDomain>() {
                 new RectangleSelection(parent), new CircleSelectionDomain(parent),
                 new PolygonSelectionDomain(parent), new FreehandSelectionDomain(parent), new FillBucketDomain(parent)};
@@ -194,7 +194,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public override void KeyPressed(KeyEventArgs key)
         {
-            if (key.Key == Key.R)
+            if (key.Key == Key.Q)
             {
                 QuickReplacePopupOpen = true;
             }
@@ -204,6 +204,34 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     QuickReplacePopupOpen = false;
                 else
                 parent.ClearFullSelection(true);
+            }
+            if (CurrentSelectionDomain != null)
+            {
+                // These keys are for touchpad users
+                if (key.Key == Key.OemPlus || key.Key == Key.Add)
+                    CurrentSelectionDomain.SelectionMode = SelectionMode.Add;
+                else if (key.Key == Key.OemMinus || key.Key == Key.Subtract)
+                    CurrentSelectionDomain.SelectionMode = SelectionMode.Remove;
+                else if (key.Key == Key.OemPeriod)
+                    CurrentSelectionDomain.SelectionMode = SelectionMode.Neutral;
+            }
+            switch (key.Key)
+            {
+                case Key.C:
+                    CurrentSelectionDomain = SelectionTools.OfType<CircleSelectionDomain>().FirstOrDefault();
+                    break;
+                case Key.R:
+                    CurrentSelectionDomain = SelectionTools.OfType<RectangleSelection>().FirstOrDefault();
+                    break;
+                case Key.P:
+                    CurrentSelectionDomain = SelectionTools.OfType<PolygonSelectionDomain>().FirstOrDefault();
+                    break;
+                case Key.F:
+                    CurrentSelectionDomain = SelectionTools.OfType<FreehandSelectionDomain>().FirstOrDefault();
+                    break;
+                case Key.B:
+                    CurrentSelectionDomain = SelectionTools.OfType<FillBucketDomain>().FirstOrDefault();
+                    break;
             }
         }
         public void Select(IList<int> toSelect, bool select)
