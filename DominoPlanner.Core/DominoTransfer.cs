@@ -126,13 +126,13 @@ namespace DominoPlanner.Core
                         DominoRectangle rect = shapes[i].GetContainer(scalingFactor, expanded);
                         if (c.A != 0)
                         {
-                            canvas.DrawRect((int)rect.x + xShift, (int)rect.y + yShift, (int)rect.width, (int)rect.height, 
+                            canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height, 
                                 new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true  });
                         }
                         if (borders)
                         {
-                            canvas.DrawRect((int)rect.x + xShift, (int)rect.y + yShift, (int)rect.width, (int)rect.height,
-                                new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = false, IsStroke=true, StrokeWidth=1});
+                            canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height,
+                                new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = true, IsStroke=true, StrokeWidth=1});
                         }
                     }
                     else
