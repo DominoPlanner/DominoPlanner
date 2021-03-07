@@ -330,13 +330,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ws.Calculate();
             // auto fit unfortunately doesn't work for merged cells (project headers)
             //ws.Cells.AutoFitColumns();
-            
-            
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.InitialFileName = GetParticularString("Default filename for color list", "ColorList");
-            dlg.Filters = new List<FileDialogFilter>() {
-                new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
-                new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
+
+
+            SaveFileDialog dlg = new SaveFileDialog
+            {
+                InitialFileName = GetParticularString("Default filename for color list", "ColorList"),
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
+                    new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
+                },
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             var result = await dlg.ShowAsyncWithParent<MainWindow>();
             if (!string.IsNullOrEmpty(result))

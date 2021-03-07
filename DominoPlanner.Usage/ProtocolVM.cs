@@ -506,7 +506,8 @@ namespace DominoPlanner.Usage
             SaveFileDialog dlg = new SaveFileDialog
             {
                 DefaultExtension = ".xlsx",
-                InitialFileName = Titel
+                InitialFileName = Titel,
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
 
@@ -530,7 +531,8 @@ namespace DominoPlanner.Usage
             SaveFileDialog dlg = new SaveFileDialog
             {
                 DefaultExtension = ".html",
-                InitialFileName = Titel
+                InitialFileName = Titel,
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
             string filename = await dlg.ShowAsyncWithParent<ProtocolV>();

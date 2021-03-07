@@ -424,13 +424,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public async void AddExistingItem()
         {
             _("Add existing object");
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(
-                new FileDialogFilter() { Extensions = new List<string> {Declares.ProjectExtension, Declares.ObjectExtension }, Name = _("All DominoPlanner files") });
-            openFileDialog.Filters.Add(
-               new FileDialogFilter() { Extensions = new List<string> { Declares.ObjectExtension }, Name = _("Object files") });
-            openFileDialog.Filters.Add(
-                new FileDialogFilter() { Extensions = new List<string> {Declares.ProjectExtension }, Name = _("Project files") });
+            OpenFileDialog openFileDialog = new OpenFileDialog()
+            {
+                Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension, Declares.ObjectExtension }, Name = _("All DominoPlanner files") },
+                    new FileDialogFilter() { Extensions = new List<string> { Declares.ObjectExtension }, Name = _("Object files") },
+                    new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = _("Project files") }
+                },
+                Directory = this.GetInitialDirectory()
+            };
             var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
             {
@@ -524,8 +526,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return;
             }
 
-            OpenFolderDialog openFolderDialog = new OpenFolderDialog();
-            openFolderDialog.Directory = PathRoot;
+            OpenFolderDialog openFolderDialog = new OpenFolderDialog
+            {
+                Directory = this.GetInitialDirectory()
+            };
             string exportDirectory = await openFolderDialog.ShowAsyncWithParent<MainWindow>();;
             ExportImages(exportDirectory, collapsed, drawBorders, background);
         }
@@ -721,9 +725,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             if (string.IsNullOrWhiteSpace(exportPath))
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-
-                saveFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") });
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                {
+                    Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
+                    Directory = this.GetInitialDirectory()
+                };
                 exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
             }
             if (!string.IsNullOrWhiteSpace(exportPath))

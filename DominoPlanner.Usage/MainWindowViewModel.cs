@@ -507,19 +507,23 @@ namespace DominoPlanner.Usage
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
             }
         }
+        public async Task<bool> CheckIfParentProjectMissing()
+        {
+            if (SelectedAssembly == null)
+            {
+                await Errorhandler.RaiseMessage(_("Objects require a parent project, which contains the color list to be used. Please choose a parent project in the project panel."), _("Select parent project"), Errorhandler.MessageType.Error);
+                return true;
+            }
+            return false;
+        }
 
         /// <summary>
         /// Neues Unterprojekt starten
         /// </summary>
         private async void NewFieldStructure()
         {
-            if (SelectedAssembly == null)
-            {
-                await Errorhandler.RaiseMessage(_("Please choose a project folder."), _("Please choose"), Errorhandler.MessageType.Error);
-                return;
-            }
-            SelectedAssembly.NewFieldStructure();
-                       
+            if (!await CheckIfParentProjectMissing())
+                SelectedAssembly.NewFieldStructure();
         }
         AssemblyNodeVM SelectedAssembly
         {
@@ -544,8 +548,11 @@ namespace DominoPlanner.Usage
 
         private async void AddProject_Exists()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension });
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension } },
+                Directory = UserSettings.Instance.StandardProjectPath
+            };
             //openFileDialog.RestoreDirectory = true;
             var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
             if (result != null && result.Length == 1 && File.Exists(result[0]))
@@ -559,12 +566,8 @@ namespace DominoPlanner.Usage
 
         private async void AddItem_Exists()
         {
-            if (SelectedAssembly == null)
-            {
-                await Errorhandler.RaiseMessage(_("Please choose a project folder."), _("Please choose"), Errorhandler.MessageType.Error);
-                return;
-            }
-            SelectedAssembly.AddExistingItem();
+            if (!await CheckIfParentProjectMissing())
+                SelectedAssembly.AddExistingItem();
         }
         private async void CreateNewProject()
         {

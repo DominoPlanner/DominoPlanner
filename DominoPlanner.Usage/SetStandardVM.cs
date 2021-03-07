@@ -117,7 +117,12 @@ namespace DominoPlanner.Usage
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = _("DominoPlanner 2.x color files")},
                     new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = _("Dominorechner color files")},
                 };
-                openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
+                else
+                    // otherwise, the dialog is opened in the parent directory (see https://github.com/AvaloniaUI/Avalonia/issues/4141)
+                    // TODO: check macos
+                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
             }
             catch (Exception) { }
             var result = await openFileDialog.ShowAsyncWithParent<SetStandardV>();
