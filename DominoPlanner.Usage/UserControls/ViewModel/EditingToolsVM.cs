@@ -295,6 +295,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         public string Name { get; internal set; }
         public DrawingImage Img { get; private set; }
+
+        public char Shortcut { get; internal set; }
         private string image;
 
         public string Image
@@ -538,6 +540,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "rect_selectDrawingImage";
             Name = _("Rectangle selection");
+            Shortcut = 'r';
         }
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
@@ -568,6 +571,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "round_selectDrawingImage";
             Name = _("Circle selection");
+            Shortcut = 'c';
         }
         public override void UpdateShapeProperties(Avalonia.Point pos)
         {
@@ -606,6 +610,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "poly_selectDrawingImage";
             Name = _("Polygon selection");
+            Shortcut = 's';
             points = new List<Avalonia.Point>();
             SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
             
@@ -704,6 +709,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Image = "freehand_selectDrawingImage";
             Name = _("Freehand selection");
+            Shortcut = 'f'; 
             SelectionShape = new SKPath();
             MouseDownPoint = new Avalonia.Point(-1, -1);
             SelectionFillColor = Color.FromArgb(50, 100, 100, 100);
@@ -772,6 +778,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             this.parent = parent;
             Image = "fill_bucketDrawingImage";
             Name = _("Select connected area");
+            Shortcut = 'b';
         }
 
         public override void MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)

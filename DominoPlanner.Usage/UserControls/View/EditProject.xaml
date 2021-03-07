@@ -28,18 +28,18 @@
         <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Selection Mode:}"/>
-                <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Add to selection}"
+                <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Add to selection (+)}"
                              IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
                     Converter={StaticResource EnumBooleanConverter}, 
                     ConverterParameter={x:Static vm:SelectionMode.Add} }">
                     +
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Left mouse button: add\, right mouse button: remove}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
+                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Left mouse button: add\, right mouse button: remove (.)}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
                     Converter={StaticResource EnumBooleanConverter}, 
                     ConverterParameter={x:Static vm:SelectionMode.Neutral} }">
                     ±
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Remove from selection}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
+                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Remove from selection (-)}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
                     Converter={StaticResource EnumBooleanConverter}, 
                     ConverterParameter={x:Static vm:SelectionMode.Remove} }">
                     -
@@ -59,7 +59,14 @@
 
                     <ListBox.ItemTemplate>
                         <DataTemplate >
-                            <Image Classes="ToolImage" Source="{Binding Img}" ToolTip.Tip="{Binding Name}"/>
+                            <Image Classes="ToolImage" Source="{Binding Img}">
+                                <ToolTip.Tip>
+                                    <MultiBinding StringFormat="{}{0} ({1})">
+                                        <Binding Path="Name"/>
+                                        <Binding Path="Shortcut"/>
+                                    </MultiBinding>
+                                </ToolTip.Tip>
+                            </Image>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
