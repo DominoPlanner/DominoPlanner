@@ -162,11 +162,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void OpenFolder()
         {
             _("Open Folder");
-#if win
-            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{ AbsolutePath}\"");
-#else
             Process.Start(new ProcessStartInfo(Path.GetDirectoryName(AbsolutePath)) { UseShellExecute = true });
-#endif
 
         }
         public async void OpenInternal()

@@ -80,7 +80,7 @@ namespace DominoPlanner.Usage
         /// </summary>
         public void StartServer()
         {
-#if win
+#if _WINDOWS
             Thread = new Thread((pipeName) =>
             {
                 _isRunning = true;
@@ -144,7 +144,7 @@ namespace DominoPlanner.Usage
         /// <param name="connectTimeout"></param>
         public bool Write(string text, int connectTimeout = 300)
         {
-#if win
+#if _WINDOWS
             using (var client = new NamedPipeClientStream(NamedPipeName))
             {
                 try
@@ -167,7 +167,6 @@ namespace DominoPlanner.Usage
                 }
             }
             return true;
-        }
 #else
             return false;
 #endif

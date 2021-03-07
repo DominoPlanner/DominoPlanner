@@ -706,7 +706,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cle.ProjectCount.Clear();
             }
-            await AddProjectCounts(DominoAssembly);
+            if (DominoAssembly != null)
+            {
+                await AddProjectCounts(DominoAssembly);
+            }
 
         }
         #endregion

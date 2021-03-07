@@ -264,7 +264,7 @@
     </None>
   </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)\version.txt&quot;" />
+        <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)/version.txt&quot;" />
         <Exec 
       Command="git describe --long --always --dirty --exclude=* --abbrev=8"
       ConsoleToMSBuild="True"
@@ -273,4 +273,7 @@
       <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
     </Exec>
     </Target>
+    <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+        <DefineConstants>_WINDOWS</DefineConstants>
+    </PropertyGroup>
 </Project>
