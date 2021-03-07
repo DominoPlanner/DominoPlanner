@@ -17,7 +17,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 new StandardSize(_("8mm"), new Sizes(8, 8, 24, 8)),
                 new StandardSize(_("Tortoise"), new Sizes(0, 48, 24, 0)),
-                new StandardSize(GetParticularString("User defined field dimensions", "User Size"), new Sizes(10, 10, 10, 10))
+                new StandardSize(GetParticularString("User defined field dimensions (keep string short)", "User Size"), new Sizes(10, 10, 10, 10))
             };
             ReloadSizes();
             AllowRegeneration = AllowRegenerate;
