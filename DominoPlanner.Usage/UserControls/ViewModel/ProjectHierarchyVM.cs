@@ -474,21 +474,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             _("Rename");
             RenameObject ro = new RenameObject(Path.GetFileName(AbsolutePath));
-            if (await ro.GetDialogResultWithParent<MainWindow, bool>() == true)
+            if (await ro.GetDialogResultWithParent<MainWindow, bool>())
             {
-                Workspace.CloseFile(AbsolutePath);
-                var new_path = Path.Combine(Path.GetDirectoryName(AbsolutePath), ((RenameObjectVM)ro.DataContext).NewName);
-                File.Move(AbsolutePath, new_path);
+                var temp_path = AbsolutePath;
+                var new_path = Path.Combine(Path.GetDirectoryName(temp_path), ((RenameObjectVM)ro.DataContext).NewName);
+                File.Move(temp_path, new_path);
                 if (Parent == null)
-                {
-                    OpenProjectSerializer.RenameProject(AbsolutePath, new_path);
-                    AssemblyModel.Path = new_path;
-
-                }
-                else
-                {
-                    AssemblyModel.Path = Workspace.MakeRelativePath(Parent.AbsolutePath, new_path);
-                }
+                    OpenProjectSerializer.RenameProject(temp_path, new_path);
+                AssemblyModel.Path = new_path;
             }
         }
         [ContextMenuAttribute("Remove", "Icons/remove.ico", index: 5)]

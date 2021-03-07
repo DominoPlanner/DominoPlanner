@@ -143,11 +143,9 @@ namespace DominoPlanner.Core
 
                 if (value != _relativePath)
                 {
-                    if (_obj != null) Workspace.CloseFile(Obj);
+                    if (_obj != null) Workspace.RenameFile(Obj, value);
                     _relativePath = value;
-                    _obj = null;
                     RelativePathChanged?.Invoke(this, null);
-                    _ = Obj;
                 }
             }
         }
@@ -288,18 +286,21 @@ namespace DominoPlanner.Core
             get
             {
                 // update relative path in case it changed
-                _ = AbsolutePath;
+                try
+                {
+                    _ = AbsolutePath;
+                }
+                catch (FileNotFoundException) { } // we don't want to crash here during save
                 return path;
             }
             set
             {
                if (value.Contains("\\")) value = value.Replace("\\", "/");
                
-               if (_obj != null) Workspace.CloseFile(Obj);
+               if (_obj != null) Workspace.RenameFile(Obj, value);
 
                 path = value;
                 RelativePathChanged?.Invoke(this, null);
-                _obj = null;
             }
         }
         public string AbsolutePath

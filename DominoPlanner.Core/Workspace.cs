@@ -316,6 +316,19 @@ namespace DominoPlanner.Core
                 Instance.openedFiles.RemoveAll(x => x.Item1 == path);
             }
         }
+        public static void RenameFile(IWorkspaceLoadable reference, string newpath)
+        {
+            // Closing and reopening files is a terrible idea, especially for subassemblies, since it 
+            // messes up all the references. We don't have to do this however, as we can just rename 
+            // the reference in the workspace.
+            if (newpath.Contains("\\")) newpath = newpath.Replace("\\", "/");
+            var result = Instance.openedFiles.Where(x => x.Item2 == reference).ToList();
+            Instance.openedFiles.RemoveAll(x => x.Item2 == reference);
+            foreach (var r in result)
+            {
+                Instance.openedFiles.Add(new Tuple<string, IWorkspaceLoadable>(newpath, reference));
+            }
+        }
         public static void CloseFile(string relativePath, IWorkspaceLoadable reference)
         {
             CloseFile(AbsolutePathFromReference(ref 
