@@ -376,6 +376,7 @@ namespace DominoPlanner.Core
         public void Save(string filepath = "")
         {
             Workspace.Save(this, filepath);
+            Workspace.Save(colors); // TODO: Notify the Color tab that it has been saved. (low priority, doesn't really matter tbh)
         }
         #endregion
         #region events
