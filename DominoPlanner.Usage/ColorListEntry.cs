@@ -118,14 +118,34 @@ namespace DominoPlanner.Usage
                 if (_ProjectCount != value)
                 {
                     if (_ProjectCount != null)
-                        _ProjectCount.CollectionChanged -= ProjectCount_CollectionChanged; 
+                        _ProjectCount.CollectionChanged -= ProjectCount_CollectionChanged;
                     _ProjectCount = value;
-                    if(_ProjectCount != null)
+                    if (_ProjectCount != null)
                         _ProjectCount.CollectionChanged += ProjectCount_CollectionChanged;
                     RaisePropertyChanged();
                 }
             }
         }
+        public DominoColorState GetColorState()
+        {
+            return GetColorState(Deleted, ProjectCount);
+        }
+
+        public static DominoColorState GetColorState(bool deleted, ObservableCollection<int> counts)
+        {
+            if (!deleted)
+                return DominoColorState.Active;
+            foreach (int count in counts)
+                if (count > 0)
+                    return DominoColorState.Inactive;
+            return DominoColorState.Deleted;
+        }
         #endregion
+    }
+    public enum DominoColorState
+    {
+        Active,
+        Inactive,
+        Deleted
     }
 }

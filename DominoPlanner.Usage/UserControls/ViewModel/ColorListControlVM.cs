@@ -306,13 +306,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var offset = HeaderRow + 4;
             ws.Cells[offset - 1, 2].Value = _("Color");
             ws.Cells[offset - 1, 3].Value = GetParticularString("Total color count available", "Available");
-            for (int i = 0; i < ColorList.Count; i++)
+            ColorListWithoutDeleted = ColorList.Where(x => x.GetColorState() != DominoColorState.Deleted).ToList();
+            var TotalColors = ColorListWithoutDeleted.Count;
+            for (int i = 0; i < TotalColors; i++)
             {
-
                 ws.Cells[offset + i, 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                ws.Cells[offset + i, 1].Style.Fill.BackgroundColor.SetColor(ColorList[i].DominoColor.mediaColor.ToSD());
-                ws.Cells[offset + i, 2].Value = ColorList[i].DominoColor.name;
-                ws.Cells[offset + i, 3].Value = ColorList[i].DominoColor.count;
+                ws.Cells[offset + i, 1].Style.Fill.BackgroundColor.SetColor(ColorListWithoutDeleted[i].DominoColor.mediaColor.ToSD());
+                ws.Cells[offset + i, 2].Value = ColorListWithoutDeleted[i].DominoColor.name;
+                ws.Cells[offset + i, 3].Value = ColorListWithoutDeleted[i].DominoColor.count;
+                if (ColorListWithoutDeleted[i].GetColorState() == DominoColorState.Inactive)
+                {
+                    // mark deleted colors gray
+                    ws.Cells[offset + i, 1, offset + i, 3].Style.Font.Color.SetColor(255, 100, 100, 100);
+                }
             }
             ws.Cells[offset, 3].Value = ""; // Count of empty domino
 
@@ -321,12 +327,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
 
             // add lines 
-            ws.Cells[3, 3, 4 + ColorList.Count + HeaderRow, 3 + index].Style.Border.Right.Style
+            ws.Cells[3, 3, 4 + TotalColors + HeaderRow, 3 + index].Style.Border.Right.Style
                 = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
-            ws.Cells[2, 1, 3 + ColorList.Count + HeaderRow, 3 + index].Style.Border.Bottom.Style
+            ws.Cells[2, 1, 3 + TotalColors + HeaderRow, 3 + index].Style.Border.Bottom.Style
                 = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
             ws.Cells[3 + HeaderRow, 1, 3 + HeaderRow, 3 + index].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
-            ws.Cells[3 + HeaderRow + ColorList.Count, 1, 3 + HeaderRow + ColorList.Count, 3 + index].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
+            ws.Cells[3 + HeaderRow + TotalColors, 1, 3 + HeaderRow + TotalColors, 3 + index].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thick;
             ws.Calculate();
             // auto fit unfortunately doesn't work for merged cells (project headers)
             //ws.Cells.AutoFitColumns();
@@ -396,14 +402,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     else
                     {
-                        for (int i = 0; i < ColorList.Count; i++)
+                        for (int i = 0; i < ColorListWithoutDeleted.Count; i++)
                         {
-                            if (projectindex < ColorList[i].ProjectCount.Count)
+                            if (projectindex < ColorListWithoutDeleted[i].ProjectCount.Count)
                             {
-                                ws.Cells[header_rows + 4 + i, left_offset].Value = ColorList[i].ProjectCount[projectindex];
+                                ws.Cells[header_rows + 4 + i, left_offset].Value = ColorListWithoutDeleted[i].ProjectCount[projectindex];
                             }
                         }
-                        ws.Cells[header_rows + 4 + ColorList.Count, left_offset].Formula = $"SUM({ws.Cells[header_rows + 5, left_offset].Address}:{ws.Cells[header_rows + 3 + ColorList.Count, left_offset].Address})";
+                        ws.Cells[header_rows + 4 + ColorListWithoutDeleted.Count, left_offset].Formula = $"SUM({ws.Cells[header_rows + 5, left_offset].Address}:{ws.Cells[header_rows + 3 + ColorListWithoutDeleted.Count, left_offset].Address})";
                         projectindex++;
                     }
                     ws.Cells[top_offset, left_offset, header_rows + 3, left_offset].Merge = true;
@@ -428,15 +434,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             ws.Cells[top_offset + 1, sum_col].Value = _("Sum");
             ws.Cells[top_offset + 1, sum_col, header_rows + 3, sum_col].Merge = true;
             ws.Cells[top_offset + 1, sum_col].Style.Font.Italic = true;
-            for (int i = 0; i < ColorList.Count; i++)
+            for (int i = 0; i < ColorListWithoutDeleted.Count; i++)
             {
-                if (projectindex < ColorList[i].ProjectCount.Count)
+                if (projectindex < ColorListWithoutDeleted[i].ProjectCount.Count)
                 {
-                    ws.Cells[header_rows + 4 + i, sum_col].Value = ColorList[i].ProjectCount[projectindex];
+                    ws.Cells[header_rows + 4 + i, sum_col].Value = ColorListWithoutDeleted[i].ProjectCount[projectindex];
                     ws.Cells[header_rows + 4 + i, sum_col].Style.Font.Italic = true;
                 }
             }
-            ws.Cells[header_rows + 4 + ColorList.Count, sum_col].Formula = $"SUM({ws.Cells[header_rows + 5, sum_col].Address}:{ws.Cells[header_rows + 3 + ColorList.Count, sum_col].Address})";
+            ws.Cells[header_rows + 4 + ColorListWithoutDeleted.Count, sum_col].Formula = $"SUM({ws.Cells[header_rows + 5, sum_col].Address}:{ws.Cells[header_rows + 3 + ColorListWithoutDeleted.Count, sum_col].Address})";
             index++;
             projectindex++;
             return (index - start_column, projectindex - projectcount_startindex);
@@ -642,6 +648,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return _warningLabelText; }
             set { _warningLabelText = value; TabPropertyChanged(ProducesUnsavedChanges: false); }
         }
+
+        private List<ColorListEntry> ColorListWithoutDeleted { get; set; }
+
         async Task<int[]> AddProjectCounts(AssemblyNode assy)
         {
             int[] sum = new int[assy.Obj.Colors.Length];
@@ -711,16 +720,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         // deleted colors won't be used anymore
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] is bool deleted)
-                if (!deleted)
-                    return true;
-            if (values[1] is ObservableCollection<int> counts)
+            if (values[0] is bool deleted && values[1] is ObservableCollection<int> counts)
             {
-                foreach (int count in counts)
-                    if (count > 0)
-                        return true;
+                var state = ColorListEntry.GetColorState(deleted, counts);
+                if (state == DominoColorState.Deleted)
+                    return false;
             }
-            return false;
+            return true;
         }
     }
     public class MoveColorOperation : PostFilter
