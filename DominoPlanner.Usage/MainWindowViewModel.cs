@@ -85,6 +85,25 @@ namespace DominoPlanner.Usage
             }
         }
 
+        private async void CleanUpTabs(AssemblyNodeVM removedNode)
+        {
+            foreach (DominoWrapperNodeVM item in removedNode.Children)
+            {
+                if (item is AssemblyNodeVM assemblyNodeVM)
+                {
+                    CleanUpTabs(assemblyNodeVM);
+                }
+                else
+                {
+                    List<UserControls.ViewModel.TabItem> toClose = Tabs.Where(x => x.Path == item.AbsolutePath).ToList();
+                    foreach (var tabItem in toClose)
+                    {
+                        await RemoveItem(tabItem);
+                    }
+                }
+            }
+        }
+
         internal async Task<bool> CloseAllTabs()
         {
             while (Tabs.Count > 0)
@@ -157,11 +176,63 @@ namespace DominoPlanner.Usage
             {
                 if (_Projects != value)
                 {
+                    if(_Projects != null)
+                    {
+                        _Projects.CollectionChanged -= Children_CollectionChanged;
+                    }
                     _Projects = value;
+                    if (_Projects != null)
+                    {
+                        _Projects.CollectionChanged += Children_CollectionChanged;
+                    }
                     RaisePropertyChanged();
                 }
             }
         }
+
+        private void AddAssemblyNode(AssemblyNodeVM newAssemblyNode)
+        {
+            if (newAssemblyNode != null)
+            {
+                newAssemblyNode.Children.CollectionChanged += Children_CollectionChanged;
+                foreach (AssemblyNodeVM subChilds in newAssemblyNode.Children.OfType<AssemblyNodeVM>())
+                {
+                    AddAssemblyNode(subChilds);
+                }
+            }
+        }
+
+        private void RemovedAssemblyNode(AssemblyNodeVM removedAssemblyNode)
+        {
+            if (removedAssemblyNode != null)
+            {
+                removedAssemblyNode.Children.CollectionChanged -= Children_CollectionChanged;
+                CleanUpTabs(removedAssemblyNode);
+                foreach (AssemblyNodeVM subChilds in removedAssemblyNode.Children.OfType<AssemblyNodeVM>())
+                {
+                    RemovedAssemblyNode(subChilds);
+                }
+            }
+        }
+
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (AssemblyNodeVM assemblyNode in e.NewItems.OfType<AssemblyNodeVM>())
+                {
+                    AddAssemblyNode(assemblyNode);
+                }
+            }
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (AssemblyNodeVM oldAssemblynode in e.OldItems.OfType<AssemblyNodeVM>())
+                {
+                    RemovedAssemblyNode(oldAssemblynode);
+                }
+            }
+        }
+
         private PlatformID osType;
         public PlatformID OsType
         {
