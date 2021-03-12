@@ -1,29 +1,28 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DominoPlanner.Usage.UserControls.View.StructureReadoutV"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
              xmlns:core="clr-namespace:DominoPlanner.Core;assembly=DominoPlanner.Core"
-             mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="300">
     <UserControl.Resources>
-        <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
+        <local:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox DockPanel.Dock="Top" Header="Image readout">
+        <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Image readout}">
             <DockPanel>
-                <Grid Grid.Row="4" DockPanel.Dock="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Single Pixel&#10;(top left corner)" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Corner}}" GroupName="a"/>
-                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="Average of&#10;Source Area" GroupName="a" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Average}}"/>
+                <Grid Grid.Row="4" DockPanel.Dock="Top" ColumnDefinitions="*, *">
+                    <RadioButton Grid.Column="0" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="{local:Gettext Single Pixel\\n(top left corner)}" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Corner}}" GroupName="a"/>
+                    <RadioButton Grid.Column="1" HorizontalAlignment="Left" Margin="5" VerticalContentAlignment="Center" Content="{local:Gettext Average of\\nSource Area}" GroupName="a" IsChecked="{Binding AverageMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static core:AverageMode.Average}}"/>
                 </Grid>
-                <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="Fit Image to Structure Size"></CheckBox>
+                <CheckBox Margin="5" IsChecked="{Binding AllowStretch}" Grid.Row="6" Content="{local:Gettext Fit Image to Structure Size}" DockPanel.Dock="Top"></CheckBox>
+                <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center">
+                    <TextBlock VerticalAlignment="Center" Text="{local:Gettext Image background:}" ToolTip.Tip="{local:Gettext 'For transparent images, set background color here. In order to use transparency threshold, background must be transparent'}"/>
+                    <local:PopupColorPicker Color="{Binding Background, Mode=TwoWay}"></local:PopupColorPicker>
+                </DockPanel>
             </DockPanel>
-        </GroupBox>
+        </HeaderedContentControl>
     </Grid>
 </UserControl>

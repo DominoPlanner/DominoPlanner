@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Avalonia.Media;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using ProtoBuf;
 using System.IO;
 using System.ComponentModel;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -24,10 +25,10 @@ namespace DominoPlanner.Core
                 return mediaColor.ToString();
 
             }
-            set { mediaColor = (Color)ColorConverter.ConvertFromString(value); }
+            set { mediaColor = Color.Parse(value); }
         }
-        internal Emgu.CV.Structure.Lab labColor;
-        public abstract double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold);
+        internal Lab labColor;
+        public abstract double distance(SKColor color, IColorComparison comp, byte transparencyThreshold);
         private Color _mediacolor;
         [DisplayName ("Color")]
         public Color mediaColor
@@ -74,6 +75,10 @@ namespace DominoPlanner.Core
         }
         [Browsable(false)]
         public virtual bool show { get { return count != 0; } }
+
+        [ProtoMember(4)]
+        public bool Deleted { get; set; }
+
         public abstract XElement Save();
 
         public event EventHandler<string> PropertyChanged;
@@ -89,7 +94,7 @@ namespace DominoPlanner.Core
         {
             get { return true; }
         }
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
+        public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {
             if (color.Alpha < transparencyThreshold)
                 return 0;
@@ -102,18 +107,18 @@ namespace DominoPlanner.Core
         }
         public EmptyDomino()
         {
-            mediaColor = System.Windows.Media.Colors.Transparent;
+            mediaColor = Colors.Transparent;
             name = "[empty]";
         }
     }
     [ProtoContract(SkipConstructor = true)]
     public class DominoColor : IDominoColor
     {
-        public override double distance(Emgu.CV.Structure.Bgra color, IColorComparison comp, byte transparencyThreshold)
+        public override double distance(SKColor color, IColorComparison comp, byte transparencyThreshold)
         {
-            if (count == 0)
+            if (count == 0 || Deleted) // if count is zero or the color was deleted, don't use for computation
                 return Int32.MaxValue;
-            return comp.Distance(color.ToLab(), labColor);
+            return comp.Distance(color.SKToLab(), labColor);
         }
         public DominoColor(XElement source, int old_version)
         {
@@ -196,10 +201,22 @@ namespace DominoPlanner.Core
         {
             return colors.IndexOf(color);
         }
-        public void Add(DominoColor color)
+        public void Add(DominoColor color, int index = -1)
         {
             colors.Add(color);
             Anzeigeindizes.Add((Anzeigeindizes.Count == 0) ? 0 : Anzeigeindizes.Max() + 1);
+            
+            int lastIndex = int.MaxValue;
+            while (true)
+            {
+                var currentIndex = SortedRepresentation.ToList().IndexOf(color);
+                if (currentIndex <= index + 1 || currentIndex == lastIndex || currentIndex < 0 || index < 0)
+                {
+                    break;
+                }
+                MoveUp(color);
+            }
+            
         }
         public ColorRepository()
         {
@@ -207,23 +224,35 @@ namespace DominoPlanner.Core
             Anzeigeindizes = new ObservableCollection<int>();
             colors = new List<DominoColor>();
         }
+        public static int GetNextSmallerIndex(Collection<int> array, int value)
+        {
+            var temp = array.Where(x => x < value).OrderBy(x => x);
+            return temp.Count() == 0 ? -1 : array.IndexOf(temp.Last());
+        }
         public void MoveUp(DominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
-            if (anzeigeindex == 0) throw new InvalidOperationException("Die Farbe ist bereits ganz oben");
-            int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex - 1);
-            Anzeigeindizes[position_neuer_index]++;
-            Anzeigeindizes[index]--;
+            int nextSmaller = GetNextSmallerIndex(Anzeigeindizes, anzeigeindex);
+            if (nextSmaller == -1) throw new InvalidOperationException("Die Farbe ist bereits ganz oben");
+            // swap the two indices
+            Anzeigeindizes[index] = Anzeigeindizes[nextSmaller];
+            Anzeigeindizes[nextSmaller] = anzeigeindex;
+        }
+        public static int GetNextLargerIndex(Collection<int> array, int value)
+        {
+            var temp = array.Where(x => x > value).OrderBy(x => x);
+            return temp.Count() == 0 ? -1 : array.IndexOf(temp.First());
         }
         public void MoveDown(DominoColor color)
         {
             int index = IndexOf(color);
             int anzeigeindex = Anzeigeindizes[index];
-            if (anzeigeindex == Anzeigeindizes.Max()) throw new InvalidOperationException("Die Farbe ist bereits ganz unten");
-            int position_neuer_index = Anzeigeindizes.IndexOf(anzeigeindex + 1);
-            Anzeigeindizes[position_neuer_index]--;
-            Anzeigeindizes[index]++;
+            int nextLarger = GetNextLargerIndex(Anzeigeindizes, anzeigeindex);
+            if (nextLarger == -1) throw new InvalidOperationException("Die Farbe ist bereits ganz unten");
+            // swap the two indices
+            Anzeigeindizes[index] = Anzeigeindizes[nextLarger];
+            Anzeigeindizes[nextLarger] = anzeigeindex;
         }
         public IEnumerable<IDominoColor> SortedRepresentation
         {

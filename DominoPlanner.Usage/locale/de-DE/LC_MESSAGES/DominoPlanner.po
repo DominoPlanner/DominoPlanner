@@ -1,0 +1,1979 @@
+# German translations for PACKAGE package
+# German translation for PACKAGE.
+# Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-03-07 14:41+0100\n"
+"PO-Revision-Date: 2021-03-07 14:42+0100\n"
+"Last-Translator: EMAIL@ADDRESS\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.2\n"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:463
+msgid "(infinite)"
+msgstr "(unendlich)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:157
+msgid "1px on screen = 1mm in real world"
+msgstr "1px auf dem Bildschirm = 1mm real"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\CreateFieldVM.cs:18
+msgid "8mm"
+msgstr "8mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:471
+msgid ""
+"A subassembly with this name already exists. Please choose a different name"
+msgstr ""
+"Dieser Ordner existiert bereits. Bitte wähle einen anderen Projektnamen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:290
+msgid "About DominoPlanner"
+msgstr "Über DominoPlanner"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:46
+msgid "Accurate"
+msgstr "Genau"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:69
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:154
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:248
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:134
+msgid "Add Color"
+msgstr "Farbe hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:27
+msgid "Add Existing"
+msgstr "Hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:588
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:619
+msgid "Add Row"
+msgstr "Zeile einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:252
+msgid "Add Row above selected stone"
+msgstr "Zeile über ausgewähltem Stein hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:253
+msgid "Add Row below selected stone"
+msgstr "Zeile unterhalb ausgewähltem Stein hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:187
+msgid "Add a circle bomb based on an image"
+msgstr "Einen Circle aus einem Bild erstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:166
+msgid "Add a field based on an image"
+msgstr "Ein Feld aus einem Bild erstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:197
+msgid "Add a spiral based on an image"
+msgstr "Eine Spirale aus einem Bild erstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:177
+msgid "Add a structure (e.g. Wall) based on an image"
+msgstr "Eine Struktur (z.B. Wall) aus einem Bild erstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:207
+msgid "Add a subproject with the same color list"
+msgstr "Subprojekt mit der gleichen Farbenliste einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:255
+msgid "Add column at the left from the selected stone"
+msgstr "Spalte links des ausgewählten Steins hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:254
+msgid "Add column at the right from the selected stone"
+msgstr "Spalte rechts des ausgewählten Steins hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:75
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:255
+msgid "Add column left"
+msgstr "Spalte links einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:74
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:254
+msgid "Add column right"
+msgstr "Spalte rechts einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:31
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:162
+msgid "Add existing Field/Structure"
+msgstr "Bestehendes Feld/Struktur hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:426
+msgid "Add existing object"
+msgstr "Bestehendes Objekt hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:30
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:157
+msgid "Add existing project"
+msgstr "Bestehendes Projekt hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:417
+msgid "Add new object"
+msgstr "Neues Objekt hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:72
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:252
+msgid "Add row above"
+msgstr "Zeile darüber einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:73
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:253
+msgid "Add row below"
+msgstr "Zeile darunter einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:31
+msgid "Add to selection (+)"
+msgstr "Zur Auswahl hinzufügen (+)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1584
+msgid "Add/Delete Rows/Columns"
+msgstr "Zeilen/Spalten löschen oder einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:619
+msgid "Adding columns is not supported in this project."
+msgstr "Das Einfügen von Spalten wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:588
+msgid "Adding rows is not supported in this project."
+msgstr "Das Einfügen von Zeilen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:248
+msgid "Additional information shown at the end of the document"
+msgstr ""
+"Zusätzliche Informationen, die am Ende des Dokuments mit ausgegeben werden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:263
+msgid "Advanced Settings"
+msgstr "Erweiterte Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:430
+msgid "All DominoPlanner files"
+msgstr "Alle DominoPlanner-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:296
+msgid "All Files"
+msgstr "Alle Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:613
+msgid "All changes saved"
+msgstr "Alle Änderungen gespeichert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:115
+msgid "All color files"
+msgstr "Alle Farbenliste-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:85
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml.cs:64
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:346
+msgid "All files"
+msgstr "Alle Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:604
+msgid "All files saved"
+msgstr "Alle Dateien gespeichert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:327
+msgid "Amount:"
+msgstr "Anzahl:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\Properties.xaml:144
+msgid "An Exception occured while evaluating this expression."
+msgstr "Beim Auswerten dieses Ausdrucks ist ein Fehler aufgetreten."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:35
+msgid "Arms:"
+msgstr "Arme:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:308
+msgctxt "Total color count available"
+msgid "Available"
+msgstr "Verfügbar"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:18
+msgid ""
+"Average of\n"
+"Source Area"
+msgstr ""
+"Durchschnittsfarbe \n"
+"unter Stein"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:106
+msgid "Background Color:"
+msgstr "Hintergrundfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenderOptions.xaml:15
+msgid "Background color:"
+msgstr "Hintergrundfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:314
+msgid "Basic Settings"
+msgstr "Grundeinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:52
+msgid ""
+"Between\n"
+"Circles"
+msgstr ""
+"Zwischen \n"
+"Kreisen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:53
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:64
+msgid ""
+"Between\n"
+"Dominoes"
+msgstr ""
+"Zwischen \n"
+"Steinen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:38
+msgid "Block:"
+msgstr "Block:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:113
+msgid "Border Color:"
+msgstr "Linienfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:116
+msgid "Border Size:"
+msgstr "Linienstärke:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:274
+msgid "Border visibility"
+msgstr "Sichtbarkeit des Rahmens"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:94
+msgid "Boundary treatment:"
+msgstr "Rand:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:63
+msgid ""
+"Btw. Lines\n"
+"inside arm"
+msgstr ""
+"Zw. Lines \n"
+"innerh. Arm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:75
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:316
+msgid "Buildtools"
+msgstr "Aufbauwerkzeuge"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:235
+msgid "CIE-76 (ISO 12647)"
+msgstr "CIE-76 (ISO 12647)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:237
+msgid "CIE-94 (DIN 99)"
+msgstr "CIE-94 (DIN 99)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:238
+msgid "CIE-Delta E 2000"
+msgstr "CIE-Delta E 2000"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:236
+msgid "CMC (l:c)"
+msgstr "CMC (l:c)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ExportOptions.xaml:21
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenameObject.xaml:18
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:281
+msgid "Cell background color"
+msgstr "Hintergrundfarbe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:267
+msgid "Cell content:"
+msgstr "Zellinhalt:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:30
+msgid "Choose"
+msgstr "Auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:71
+msgid "Choose Standard:"
+msgstr "Voreinstellung wählen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:186
+msgctxt "The domino structure type"
+msgid "Circle"
+msgstr "Circle"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:20
+msgid "Circle Dimensions: {0}mm x {1}mm"
+msgstr "Circle-Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:573
+msgid "Circle selection"
+msgstr "Kreisförmige Auswahl"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:461
+msgid "Circular Reference"
+msgstr "Zyklische Referenz"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:222
+msgid "Clear Selection"
+msgstr "Auswahl aufheben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:84
+msgid "Clear selection"
+msgstr "Auswahl aufheben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:119
+msgid "Click Pin to activate"
+msgstr "Zum Aktivieren anklicken"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:293
+msgid "Click color to replace"
+msgstr "Farbe durch Anklicken ersetzen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:16
+msgid "Click to copy version to clipboard"
+msgstr "Klicken, um Versionsnummer in die Zwischenablage zu kopieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:25
+msgid "Click to define as top left corner of the protocol"
+msgstr ""
+"Klicken, um diese Ecke als obere linke Ecke des Feldplans zu definieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:40
+msgid ""
+"Click to select an image\n"
+"(or drop it here)"
+msgstr ""
+"Klicken, um ein Bild zu öffnen\n"
+"(oder ziehe es hier hin)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:50
+msgid "Clip to circle"
+msgstr "Am Kreis ausrichten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:277
+msgctxt "In HTML field protocol"
+msgid "Collapsed"
+msgstr "Kein Abstand"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:307
+msgid "Color"
+msgstr "Farbe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:126
+msgid "Color Amount:"
+msgstr "Gesamtanzahl:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:42
+msgid "Color Comparison: {0}"
+msgstr "Farbauslese-Algorithmus: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:124
+msgid "Color Name:"
+msgstr "Farbname:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:25
+msgid "Color Repository:"
+msgstr "Farbenliste:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:302
+msgid "Color Usage Overview"
+msgstr "Übersicht über die verwendeten Farben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:562
+msgid "Color file not found"
+msgstr "Farbdatei nicht gefunden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:84
+msgid "Color files"
+msgstr "Farbenliste-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:61
+msgid "Color path (inherited from parent):"
+msgstr "Pfad zur Farbenliste (von übergeordnetem Projekt geerbt)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:152
+msgctxt "When importing color list fails"
+msgid "Color repository file is invalid"
+msgstr "Ungültige Farbenlisten-Datei"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:58
+msgctxt "Basic Settings Header"
+msgid "Color search settings"
+msgstr "Farbzuordnungs-Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:343
+msgctxt "Default filename for color list"
+msgid "ColorList"
+msgstr "Farbenliste"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:191
+msgid "Coming soon!"
+msgstr "Dies ist eine Baustelle!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:66
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:226
+msgid "Copy"
+msgstr "Kopieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:366
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:395
+msgid "Copy/Paste is not supported in this project."
+msgstr "Kopieren/Einfügen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:338
+msgid ""
+"Copying the image into the project folder failed.\n"
+"Please check the permissions to this file."
+msgstr ""
+"Die Bilddatei konnte nicht in den Projektordner kopiert werden.\n"
+"Bitte überprüfe, ob du Leseberechtigungen auf die Datei hast."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:437
+msgid "Could not create a new Project!"
+msgstr "Erstellung eines neuen Projekts gescheitert!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:581
+msgid "Could not create new Project!"
+msgstr "Erstellung eines neuen Projekts gescheitert!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:775
+msgid ""
+"Could not generate a protocol. This structure type has no protocol "
+"definition."
+msgstr ""
+"Protokoll konnte nicht erstellt werden. Diese Struktur verfügt nicht über "
+"eine Protokolldefinition."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:818
+msgid "Could not remove the object!"
+msgstr "Objekt konnte nicht entfernt werden!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:248
+msgctxt "Total domino color count"
+msgid "Count"
+msgstr "Anzahl"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:75
+msgid "Create"
+msgstr "Erstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:107
+msgid "Creation Time: {0}"
+msgstr "Erstellt um: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:143
+msgid "Current Length: {0:F2} mm"
+msgstr "Aktuelle Länge: {0:F2} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:713
+msgid "Custom Image Export"
+msgstr "Benutzerdefinierter Bildexport"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:495
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:594
+msgid "Damaged File"
+msgstr "Datei beschädigt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:35
+msgid "Default color list"
+msgstr "Standard-Farbenliste"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:808
+msgid "Delete?"
+msgstr "Löschen?"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:252
+msgid "Detailed Properties"
+msgstr "Detailliert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:22
+msgid "Developed by:"
+msgstr "Entwickelt von:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:49
+msgctxt "Dithering method"
+msgid "Diffusion: {0}"
+msgstr "Fehlerstreuung: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:147
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:332
+msgid "Dimensions: {0} mm x {1} mm"
+msgstr "Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:238
+msgid "Display blocks (for template)"
+msgstr "In Blöcke aufteilen (für Kämme)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:130
+msgid "Display image above dominoes"
+msgstr "Quellbild über den Steinen anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:127
+msgid "Display image below dominoes"
+msgstr "Quellbild unter den Steinen anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:83
+msgid ""
+"Distance\n"
+"btw. lines:"
+msgstr ""
+"Abstand\n"
+"zw. Lines:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:77
+msgid ""
+"Distance\n"
+"inside line:"
+msgstr ""
+"Abstand\n"
+"innerh. Line:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:44
+msgid "Distance btw. arms:"
+msgstr ""
+"Abstand zw. \n"
+"Armen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\DominoDimensionsV.xaml:25
+msgid "Distances:"
+msgstr "Abstände:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:37
+msgid "Divisor:"
+msgstr "Divisor:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:81
+msgid ""
+"Domino\n"
+"depth:"
+msgstr ""
+"Stein-\n"
+"tiefe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:79
+msgid ""
+"Domino\n"
+"width:"
+msgstr ""
+"Stein-\n"
+"breite:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:283
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:289
+msgctxt "Cell or Text color"
+msgid "Domino color"
+msgstr "Steinfarbe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:47
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:68
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:58
+msgid "Domino dimensions"
+msgstr "Steinabmessungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:121
+msgid "Domino opacity:"
+msgstr "Steindeckkraft:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:18
+msgid "DominoPlanner"
+msgstr "DominoPlanner"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:117
+msgid "DominoPlanner 2.x color files"
+msgstr "DominoPlanner 2.x-Farbdateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:116
+msgid "DominoPlanner 3.x color files"
+msgstr "DominoPlanner 3.x-Farbdateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:24
+msgid "DominoPlanner ist free software, licensed under GNU GPL 3.0."
+msgstr "DominoPlanner ist freie Software, lizensiert unter GNU GPL 3.0."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:38
+msgid ""
+"DominoPlanner will create a folder containing all your project data.\n"
+"If you delete or move this folder, DominoPlanner won't open the \n"
+"project anymore. If it was moved, you can add it again.\n"
+"DominoPlanner will also create a 'Master Document' for your \n"
+"project, where your overall setup will be stored in. It contains e.g.\n"
+"the reference to all subprojects.\n"
+"If you select a cloud folder (e.g. Dropbox) as parent folder, you\n"
+"an share the project with a fellow domino artist.\n"
+"DominoPlanner will also copy the selected Domino Colors file to\n"
+"the project folder. You can edit it later on."
+msgstr ""
+"DominoPlanner wird einen Ordner erstellen, der alle Dateien des\n"
+"Projekts enthält.\n"
+"Wenn du diesen Ordner löschst oder verschiebst, kann das \n"
+"Projekt von DominoPlanner nicht mehr geöffnet werden. Wenn\n"
+"das Projekt verschoben wurde, kann es neu hinzugefügt werden.\n"
+"DominoPlanner wird ebenfalls ein \"Masterdokument\" für das \n"
+"Projekt erstellen, in dem die Anordnung der Objekte gespeichert\n"
+"wird. Die Datei enthält u.a. die Referenzen auf alle Unterdateien.\n"
+"Wenn du den Ordner in einen Cloud-Ordner (z.B. Dropbox) legst,\n"
+"kannst du das Projekt mit anderen gemeinsam bearbeiten.\n"
+"DominoPlanner wird auch die ausgewählte Farbenliste in den\n"
+"Projektordner kopieren. Du kannst sie später bearbeiten."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RectangularSize.xaml:32
+msgctxt "Amount Structure"
+msgid "Dominoes"
+msgstr "Steine"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:118
+msgid "Dominorechner color files"
+msgstr "Dominorechner-Farbdateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:35
+msgid "Donate"
+msgstr "Spenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenderOptions.xaml:19
+msgid "Draw Domino Borders"
+msgstr "Steinkanten zeichnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:74
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:63
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:215
+msgid "Editing"
+msgstr "Bearbeiten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\Properties.xaml:34
+msgctxt "PropertyViewer"
+msgid "Element"
+msgstr "Element"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:48
+msgctxt "Spiral arm end type"
+msgid "End mode:"
+msgstr "Enden:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:459
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:506
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:615
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:427
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:437
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:471
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:491
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:525
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:552
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandardVM.cs:152
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:362
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:670
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:384
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:413
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:594
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:625
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:660
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:695
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:450
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:767
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:818
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:842
+msgid "Error"
+msgstr "Fehler"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:450
+msgid "Error loading file"
+msgstr "Fehler beim Öffnen der Datei"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:459
+msgid "Error loading opened projects!"
+msgstr "Fehler beim Laden geöffneter Projekte!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:615
+msgid "Error saving changes"
+msgstr "Fehler beim Speichern von Änderungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:599
+msgid "Error saving files!"
+msgstr "Fehler beim Speichern von Dateien!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:581
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:404
+msgid "Error!"
+msgstr "Fehler!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:525
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:552
+msgid "Error: "
+msgstr "Fehler: "
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:125
+msgid ""
+"Esc: clear selection\n"
+"q: quick replace\n"
+"+/./-: toggle selection modes\n"
+"r/c/p/f/b: switch between selection tools"
+msgstr ""
+"Esc: Auswahl aufheben\n"
+"q: schnelles Ersetzen\n"
+"+/./-: zwischen Auswahlmodi umschalten\n"
+"r/c/p/f/b: zwischen Auswahlwerkzeugen umschalten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:512
+msgid "Excel Document"
+msgstr "Excel-Dokument"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:345
+msgid "Excel files"
+msgstr "Excel-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\PropertiesVM.cs:277
+#, csharp-format
+msgid "Exception of type {0}"
+msgstr "Ausnahme vom Typ {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:98
+msgid "Exclude dominoes on selection boundary"
+msgstr "Steine auf der Grenze des Auswahlbereichs ausschließen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:46
+msgctxt "Error on project creation"
+msgid "Existing Folder"
+msgstr "Ordner existiert bereits"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:505
+msgid "Export all"
+msgstr "Alles exportieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:707
+msgid "Export as Image"
+msgstr "Als Bild exportieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:767
+msgid "Export failed: "
+msgstr "Fehler beim Exportieren: "
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ExportOptions.xaml:9
+msgid "Export file {0}"
+msgstr "Datei {0} exportieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:142
+msgid "Export to Excel"
+msgstr "Nach Excel exportieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:62
+msgid "Falldown direction:"
+msgstr "Umfallrichtung:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:44
+msgid "Fast"
+msgstr "Schnell"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:165
+msgctxt "The domino structure type"
+msgid "Field"
+msgstr "Feld"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:21
+msgid "Field Dimensions: {0}mm x {1}mm"
+msgstr "Feld-Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:31
+msgid "Field Size (Dominoes):"
+msgstr "Feldgröße (Dominos):"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:299
+msgid "Field Viewer"
+msgstr "Feldplananzeige"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:11
+msgid "FieldBlockViewer"
+msgstr "Feldplananzeige"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:798
+msgid "File not readable"
+msgstr "Datei nicht lesbar"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:82
+msgid "Filename:"
+msgstr "Dateiname:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:418
+msgid "Finalize failed"
+msgstr "Finalisieren fehlgeschlagen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:20
+msgid "Fit Image to Structure Size"
+msgstr "Bild-Seitenverhältnis an Struktur anpassen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:42
+msgctxt "circle start shift"
+msgid "Fixed shift:"
+msgstr "Feste:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:237
+msgid "Flip Horizontally"
+msgstr "Horizontal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:242
+msgid "Flip Vertically"
+msgstr "Vertikal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:195
+msgid "Floyd/Steinberg Dithering"
+msgstr "Floyd/Steinberg-Dithering"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:205
+msgid "Font size:"
+msgstr "Schriftgröße:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:28
+msgid "For feature requests and bug reports, click here."
+msgstr "Idee gehabt oder Fehler gefunden? Hier klicken."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldReadoutV.xaml:23
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:22
+msgid ""
+"For transparent images, set background color here. In order to use "
+"transparency threshold, background must be transparent"
+msgstr ""
+"An dieser Stelle kann man die Hintergrundfarbe für das Auslesen "
+"transparenter Bilder festlegen. Um die Transparenz-Schwellwert-Funktion zu "
+"nutzen, muss der Hintergrund (teil)transparent sein"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:711
+msgid "Freehand selection"
+msgstr "Freihandauswahl"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:67
+msgid "Go To Last Pin"
+msgstr "Zum letzten Pin gehen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:69
+msgid "Go to Row {0}, Block {1}"
+msgstr "Gehe zu Zeile {0}, Block {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:272
+msgid ""
+"HTML Font Tag.\n"
+"The font tag is closed automatically. Not all HTML features are currently "
+"supported by Excel Export."
+msgstr ""
+"HTML Font-Tag.\n"
+"Der Font-Tag wird automatisch geschlossen. Nicht alle HTML-Features werden "
+"aktuell vom Excel-Export unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:49
+msgid "Height:"
+msgstr "Höhe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:244
+msgid "Hide color names"
+msgstr "Farbnamen nicht anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:63
+msgctxt "Field falldown direction"
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolVM.cs:537
+msgid "Hypertext Markup Language"
+msgstr "Hypertext Markup Language"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:31
+msgid "Image Source: {0}"
+msgstr "Speicherort: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldReadoutV.xaml:23
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:22
+msgid "Image background:"
+msgstr "Bild-Hintergrundfarbe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:295
+msgid "Image files"
+msgstr "Bilddateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:125
+msgid "Image overlay transparency:"
+msgstr "Bildtransparenz:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:14
+msgid "Image readout"
+msgstr "Ausleseeinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenderOptions.xaml:11
+msgid "Image size (larger side):"
+msgstr "Auflösung (längere Seite):"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:56
+msgctxt "Basic Settings Header"
+msgid "Image treatment settings"
+msgstr "Bildbehandungs-Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:90
+msgid "Include diagonals"
+msgstr "Inklusive Diagonalen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:95
+msgid "Include dominoes on selection boundary"
+msgstr "Steine auf der Grenze des Auswahlbereichs einschließen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\TabItem.cs:52
+msgid "Incorrect file extension"
+msgstr "Falsche Dateiendung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:291
+msgid "Intelligent"
+msgstr "Automatisch"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:288
+msgid "Invalid file"
+msgstr "Ungültige Datei"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:81
+msgid "Invert selection"
+msgstr "Auswahl umkehren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:284
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:290
+msgid "Inverted"
+msgstr "Invertiert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:196
+msgid "Jarvis/Judice/Ninke Dithering"
+msgstr "Jarvis/Judice/Ninke-Dithering"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:12
+msgid "Language (restart required)"
+msgstr "Sprache (Neustart erforderlich)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:37
+msgid "Left mouse button: add, right mouse button: remove (.)"
+msgstr "Linke Maustaste: hinzufügen, rechte Maustaste: entfernen (.)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\DominoDimensionsV.xaml:23
+msgid "Length:"
+msgstr "Breite:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:44
+msgctxt "Horizontal Field dimension"
+msgid "Length:"
+msgstr "Breite:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:35
+msgid "Let's start!"
+msgstr "Los geht's!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:37
+msgid "Lines per arm:"
+msgstr "Lines pro Arm:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml.cs:61
+#, csharp-format
+msgid "Locate file {0}"
+msgstr "Suche Datei {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:232
+msgid "Main Settings"
+msgstr "Grundlegende Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml:10
+msgctxt "Window title"
+msgid "Manage references"
+msgstr "Referenzen verwalten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1366
+msgid "Measure distance"
+msgstr "Abstand messen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:236
+msgid "Mirror"
+msgstr "Spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:258
+msgid "Mirror horizontally"
+msgstr "Horizontal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:259
+msgid "Mirror vertically"
+msgstr "Vertikal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:74
+msgid "Missing Color Table"
+msgstr "Farbenliste fehlt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:320
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:409
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:457
+msgid "Missing Values"
+msgstr "Fehlende Eingaben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:133
+msgid "Move down"
+msgstr "Runter schieben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:132
+msgid "Move up"
+msgstr "Hoch schieben"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:60
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:246
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\DominoProviderVM.cs:44
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:336
+msgid "Name"
+msgstr "Name"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:318
+msgid "Name:"
+msgstr "Name:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:18
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:136
+msgid "New"
+msgstr "Neu"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:790
+msgid "New Color"
+msgstr "Neue Farbe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:22
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:144
+msgid "New Field/Structure"
+msgstr "Neues Feld/Struktur hinzufügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:41
+msgid "New List"
+msgstr "Neue Liste"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:20
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:9
+msgctxt "Window title"
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenameObject.xaml:14
+msgid "New name:"
+msgstr "Neuer Name:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:13
+msgctxt "Window title"
+msgid "New object"
+msgstr "Neues Objekt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:63
+#, csharp-format
+msgctxt "Dominoes of the given color within the next {0}"
+msgid "Next {0}"
+msgstr "In nächsten {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:198
+msgid "No Dithering"
+msgstr "Kein Dithering"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:250
+msgid "No Properties"
+msgstr "Keine"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:775
+msgid "No Protocol definition"
+msgstr "Keine Protokolldefinition"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:370
+msgid "No selection"
+msgstr "Nichts ausgewählt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:51
+msgctxt "Dithering Method"
+msgid "None"
+msgstr "Keine"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:370
+msgid "Nothing to copy!"
+msgstr "Nichts zum Kopieren ausgewählt!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:23
+msgid "Number of attempts:"
+msgstr "Anzahl Versuche:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ExportOptions.xaml:22
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenameObject.xaml:20
+msgid "OK"
+msgstr "OK"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:431
+msgid "Object files"
+msgstr "Objekt-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObject.xaml:77
+msgid "Object specific settings:"
+msgstr "Objektspezifische Einstellungen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:514
+msgid ""
+"Objects require a parent project, which contains the color list to be used. "
+"Please choose a parent project in the project panel."
+msgstr ""
+"Objekte müssen als Teil eines Projekts angelegt werden, da dort die "
+"Farbenliste gespeichert ist. Bitte ein übergeordnetes Projekt im "
+"Projektbereich auswählen."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:786
+msgid "Open"
+msgstr "Öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:164
+msgid "Open Folder"
+msgstr "Ordner öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:134
+msgid "Open Image:"
+msgstr "Bild öffnen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:399
+msgid "Open color list"
+msgstr "Farbenliste öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:135
+msgid "Open image"
+msgstr "Bild öffnen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:519
+msgid "Order of separate lines in the protocol"
+msgstr "Richtung einer Zeile im Feldplan"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:518
+msgid "Order of the first line in the protocol"
+msgstr "Richtung einer Spalte im Feldplan"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:301
+msgid "Overview"
+msgstr "Übersicht"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:723
+msgid "PNG files"
+msgstr "PNG-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml:29
+msgid "Parent path"
+msgstr "Pfad des verweisenden Elements"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:395
+msgid "Paste"
+msgstr "Einfügen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:18
+msgid "Penalty:"
+msgstr "Strafwert:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:53
+msgid "Perpendicular end"
+msgstr "Senkrecht"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldReadoutV.xaml:17
+msgctxt "Rough interpolation"
+msgid "Pixel"
+msgstr "Pixel"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:320
+msgid "Please choose an image"
+msgstr "Bitte wähle ein Bild aus"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:74
+msgid "Please create a default color table."
+msgstr "Bitte erstelle deine Standard-Farbenliste."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:612
+msgid "Polygon selection"
+msgstr "Polygon-Auswahlbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:61
+msgid "Preview options"
+msgstr "Vorschaueinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:13
+msgid "Project Name:"
+msgstr "Name des Projekts:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:68
+msgid "Project created"
+msgstr "Projekt erstellt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:427
+#, csharp-format
+msgid ""
+"Project creation failed. Error mesage: \n"
+"{0}\n"
+" The created files have been deleted"
+msgstr ""
+"Projekt konnte nicht erstellt werden. Fehler: {0}. Die erzeugten Dateien "
+"wurden gelöscht"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:491
+msgid "Project creation failed. The file system changes have been reverted"
+msgstr ""
+"Projekterstellung fehlgeschlagen. Die Änderungen am Dateisystem wurden "
+"rückgängig gemacht"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:73
+#, csharp-format
+msgid "Project creation failed: {0}"
+msgstr "Projekterstellung fehlgeschlagen: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:432
+msgid "Project files"
+msgstr "Projekt-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:551
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:848
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\Properties.xaml:12
+msgctxt "Window title"
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:11
+msgctxt "Window title"
+msgid "Protocol"
+msgstr "Protokoll"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:247
+msgid "RGB"
+msgstr "RGB"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:41
+msgctxt "circle start shift"
+msgid "Random Shift"
+msgstr "Zufällige Verschiebung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:542
+msgid "Rectangle selection"
+msgstr "Rechteck-Auswahlbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:49
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:199
+msgid "Redo"
+msgstr "Wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:78
+msgid "Redo selection operation"
+msgstr "Letzten Auswahlvorgang wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml:32
+msgid "Relative path"
+msgstr "Relativer Pfad"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:62
+msgctxt "Remaining number of stones"
+msgid "Remaining"
+msgstr "Verbleibend"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:490
+msgid "Remove"
+msgstr "Entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:690
+msgid "Remove Column"
+msgstr "Spalte löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:655
+msgid "Remove Row"
+msgstr "Zeile löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:136
+msgid "Remove Selected"
+msgstr "Entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:805
+msgid "Remove from project"
+msgstr "Aus Projekt entfernen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:42
+msgid "Remove from selection (-)"
+msgstr "Von Auswahl entfernen (-)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:809
+#, csharp-format
+msgid ""
+"Remove reference to file {0} from project {1}?\n"
+"The file won't be permanently deleted."
+msgstr ""
+"Verweis auf Datei {0} aus Projekt {1} entfernen?\n"
+"Die Datei selbst wird nicht gelöscht."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:84
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:262
+msgid "Remove selected columns"
+msgstr "Ausgewählte Spalten löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:83
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:261
+msgid "Remove selected rows"
+msgstr "Ausgewählte Zeilen löschen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenderOptions.xaml:22
+msgid "Remove spaces between dominoes"
+msgstr "Abstände zwischen Steinen ausblenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:813
+msgid "Removed"
+msgstr "Entfernt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:690
+msgid "Removing columns is not supported in this project."
+msgstr "Das Löschen von Spalten wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:655
+msgid "Removing rows is not supported in this project."
+msgstr "Das Löschen von Zeilen wird in diesem Projekt nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:475
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:825
+msgid "Rename"
+msgstr "Umbenennen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RenameObject.xaml:10
+msgid "Rename file: {0}"
+msgstr "Datei {0} umbennen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:842
+msgid "Renaming object failed!"
+msgstr "Umbenennen der Datei fehlgeschlagen!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:60
+msgctxt "Basic Settings Header"
+msgid "Render options"
+msgstr "Zeicheneinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml:49
+msgid "Replace path"
+msgstr "Pfad ersetzen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:268
+msgid ""
+"Represents the text in a cell.\n"
+"%count% is replaced by the number of dominoes in the cell, %color% by the "
+"color name."
+msgstr ""
+"Format des Zellinhalts.\n"
+"%count% wird durch die Anzahl der Steine und %color% durch den Farbnamen "
+"ersetzt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldReadoutV.xaml:14
+msgid "Resize Quality: {0}"
+msgstr "Skalierqualität: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml:34
+msgid "Resolved absolute path"
+msgstr "Aufgelöster absoluter Pfad"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:138
+msgid "Restore Selected"
+msgstr "Wiederherstellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:33
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:31
+msgid "Rotations:"
+msgstr "Umdrehungen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:101
+msgid "Row {0}, Block {1}"
+msgstr "Zeile {0}, Block {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:32
+msgid "Row:"
+msgstr "Reihe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:321
+msgid "Rows:"
+msgstr "Zeilen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:36
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:39
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:173
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:176
+msgid "Save"
+msgstr "Speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:140
+msgid "Save Colors"
+msgstr "Farben speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:298
+msgid "Save Excel File"
+msgstr "Als Excel-Datei speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:599
+#, csharp-format
+msgid "Save aborted, unable to save file {0}"
+msgstr "Speichern abgebrochen: Datei {0} konnte nicht gespeichert werden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:40
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:181
+msgid "Save all"
+msgstr "Alles speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:300
+msgid "Save as HTML"
+msgstr "Als HTML-Datei speichern"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:362
+#, csharp-format
+msgid "Save failed: {0}"
+msgstr "Speichern fehlgeschlagen: {0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:395
+#, csharp-format
+msgid "Save unsaved changes of {0}?"
+msgstr "Ungespeicherte Änderungen in {0} speichern?"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:124
+msgid "Select"
+msgstr "Auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:28
+msgid "Select a standard folder to store your projects in:"
+msgstr "Wähle einen Standardordner, in dem deine Projekte gespeichert werden:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:223
+msgid ""
+"Select all stones in the color selected in the list below. \n"
+"If some stones are selected this function only applies to the selected "
+"stones."
+msgstr ""
+"Alle Steine in der gewählten Farbe auswählen\n"
+"Wenn bereits Steine ausgewählt sind, wird die Auswahl aller andersfarbiger "
+"Steine aufgehoben."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:780
+msgid "Select connected area"
+msgstr "Zusammenhängenden Bereich auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:27
+msgctxt "Color List on project creation"
+msgid "Select file"
+msgstr "Datei auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:514
+msgid "Select parent project"
+msgstr "Übergeordnetes Projekt auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:223
+msgid "Select stones in selected color"
+msgstr "Steine in ausgewählter Farbe auswählen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:18
+msgid ""
+"Select the file path for your project. \n"
+"Try using a Cloud Folder (e.g. dropbox) to share a project with a friend."
+msgstr ""
+"Wähle einen Speicherort für das Projekt aus.\n"
+"Verwende einen Cloud-Ordner (z.B. Dropbox), um das Projekt gemeinsam zu "
+"bearbeiten."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:339
+msgctxt "Number of stones currently selected"
+msgid "Selected"
+msgstr "Ausgewählt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:30
+msgid "Selection Mode:"
+msgstr "Auswahlmodus:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:47
+msgid "Selection Shape:"
+msgstr "Auswahlform:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:276
+msgctxt "In HTML field protocol"
+msgid "Separate"
+msgstr "Abstand zwischen Zellen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:58
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:207
+msgid "Set Defaults"
+msgstr "Voreinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:55
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\SetStandard.xaml:10
+msgctxt "Window title"
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\BasicSettings.xaml:54
+msgctxt "Basic Settings Header"
+msgid "Shape settings"
+msgstr "Steinpositions-Einstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:41
+msgctxt "Spiral"
+msgid "Shift:"
+msgstr "Verschiebung:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:251
+msgid "Short Properties"
+msgstr "Kurz"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:204
+msgid ""
+"Shortcuts:\n"
+"{0}"
+msgstr ""
+"Tastenkürzel:\n"
+"{0}"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:127
+msgid "Show History"
+msgstr "Vorherige Reihe darüber anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:160
+msgid "Show entire field"
+msgstr "Ganzes Feld zeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:772
+msgid "Show protocol"
+msgstr "Protokoll anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:130
+msgid "Show remaining colors"
+msgstr "Verbleibende Steine anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:77
+msgid "Show usage of colors"
+msgstr "Farbverwendung anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:251
+msgid "Shows Length, Height, and total amount of used dominoes"
+msgstr "Zeigt Länge, Breite und Gesamtzahl an Steinen an"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:252
+msgid "Shows a complete list of used colors"
+msgstr "Zeigt eine vollständige Liste der verwendeten Farben an"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\StructureReadoutV.xaml:17
+msgid ""
+"Single Pixel\n"
+"(top left corner)"
+msgstr ""
+"Einzelnes Pixel\n"
+"(obere linke Ecke)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:53
+msgid "Slow"
+msgstr "Langsam"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldReadoutV.xaml:20
+msgctxt "Fine interpolation"
+msgid "Smooth"
+msgstr "Genau"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:144
+msgid "Snap to 5 degree increments (Toggle with Ctrl)"
+msgstr "In 5-Grad-Schritten einrasten (mit Strg umschalten)"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:196
+msgctxt "The domino structure type"
+msgid "Spiral"
+msgstr "Spirale"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:18
+msgid "Spiral Dimensions: {0}mm x {1}mm"
+msgstr "Spiral-Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:242
+msgid "Stones/Block"
+msgstr "Steine pro Zeile"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:324
+msgid "Stones/Row:"
+msgstr "Steine pro Zeile:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:176
+msgctxt "The domino structure type"
+msgid "Structure"
+msgstr "Struktur"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RectangularSize.xaml:14
+msgid "Structure Dimensions: {0}mm x {1}mm"
+msgstr "Struktur-Abmessungen: {0} mm x {1} mm"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CircleSize.xaml:29
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\SpiralSize.xaml:27
+msgid "Structure Size (Dominoes):"
+msgstr "Strukturgröße (Dominos):"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\RectangularSize.xaml:23
+msgid "Structure Size:"
+msgstr "Struktur-Größe:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:197
+msgid "Stucki Dithering"
+msgstr "Stucki-Dithering"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:206
+msgid "Subproject"
+msgstr "Subprojekt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:604
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:613
+msgid "Success"
+msgstr "Erfolgreich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:434
+msgid "Sum"
+msgstr "Summe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:248
+msgid "Summary Settings"
+msgstr "Zusammenfassung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:17
+msgid "Super Folder Path:"
+msgstr "Enthaltender Ordner:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:271
+msgid "Text Format:"
+msgstr "Textformat:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:287
+msgid "Text color"
+msgstr "Textfarbe"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:136
+msgid ""
+"The color will not be used in new projects (and won't be available during "
+"editing), but it will not be deleted from existing projects."
+msgstr ""
+"Die Farbe wird nicht in neuen Projekten verwendet (und kann beim Bearbeiten "
+"nicht zugewiesen werden), aber wird nicht aus existierenden Projekten "
+"gelöscht."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:798
+#, csharp-format
+msgid ""
+"The file {0} is broken. \n"
+"It has been removed from the project."
+msgstr ""
+"Die Datei {0} ist beschädigt.\n"
+"Sie wurde aus dem Projekt entfernt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:288
+msgid "The image file is not readable, please select another file"
+msgstr ""
+"Die Bilddatei konnte nicht gelesen werden. Bitte wähle eine andere Datei aus"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:495
+#, csharp-format
+msgid ""
+"The main project file of project {0} was damaged. An attempt to restore the "
+"file has been unsuccessful. \n"
+"The project will be removed from the list of opened projects."
+msgstr ""
+"Die Hauptdatei des Projekts {0}  wurde als beschädigt erkannt. Ein Versuch, "
+"die Datei wiederherzustellen, war nicht erfolgreich.\n"
+"Das Projekt wird aus der Liste der offenen Projekte entfernt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:594
+#, csharp-format
+msgid ""
+"The project file {0} was damaged. An attempt has been made to restore the "
+"file."
+msgstr ""
+"Die Projektdatei {0} war beschädigt. Es wurde versucht, sie "
+"wiederherzustellen."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:68
+#, csharp-format
+msgid "The project {0} has been created"
+msgstr "Das Projekt {0} wurde erstellt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProjectVM.cs:46
+msgid "This folder already exists. Please choose another project name."
+msgstr ""
+"Dieser Ordner existiert bereits. Bitte wähle einen anderen Projektnamen."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:404
+msgid ""
+"This name is already in use in this project.\n"
+" Please choose a different Name."
+msgstr ""
+"Dieser Name wird bereits von einem anderen Objekt in diesem Projekt "
+"verwendet. Bitte wähle einen anderen Projektnamen."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:461
+msgid ""
+"This operation would create a circular dependency between assemblies. This "
+"is not supported."
+msgstr ""
+"Diese Operation würde eine zyklische Abhängigkeit zwischen Projekten "
+"erzeugen. Dies wird nicht unterstützt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\ColorListControl.xaml:73
+msgid "This subproject uses a different color list"
+msgstr "Dieses Subprojekt verwendet eine andere Farbenliste"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:34
+msgid "Tips:"
+msgstr "Tipps:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:235
+msgid "Title:"
+msgstr "Titel:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\CreateFieldVM.cs:19
+msgid "Tortoise"
+msgstr "Schildkrötenfeld"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:61
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\DominoProviderVM.cs:45
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:337
+msgctxt "Number of stones available"
+msgid "Total"
+msgstr "Gesamt"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:255
+msgid "Transform field plan"
+msgstr "Feldplan transformieren"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:56
+msgid "Transparency Threshold"
+msgstr "Schwellenwert für Transparenz"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:257
+msgid "Transpose field plan"
+msgstr "Diagonal spiegeln"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\CalculationV.xaml:67
+msgid "Try to match Available dominoes"
+msgstr "An verfügbare Steine anpassen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\Properties.xaml:36
+msgctxt "PropertyViewer"
+msgid "Type"
+msgstr "Typ"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ColorListControlVM.cs:670
+#, csharp-format
+msgid "Unable to load counts from project {0}"
+msgstr "Steineanzahlen aus Projekt {0} können nicht geladen werden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:506
+#, csharp-format
+msgid ""
+"Unable to load project {0}. It might have been moved or damaged. \n"
+"Please re-add it at its current location.\n"
+"\n"
+"The project has been removed from the list of opened projects."
+msgstr ""
+"Projekt {0} konnte nicht geladen werden. Es könnte verschoben oder "
+"beschädigt worden sein.\n"
+"Bitte füge es an seinem aktuellen Speicherplatz erneut hinzu.\n"
+"\n"
+"Das Projekt wurde als der Liste der offenen Projekte entfernt."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:48
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:191
+msgid "Undo"
+msgstr "Rückgängig"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:45
+msgid "Undo Redo"
+msgstr "Rückgängig/Wiederholen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:75
+msgid "Undo last selection operation"
+msgstr "Letzten Auswahlvorgang rückgängig machen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:26
+msgctxt "Color List on project creation"
+msgid "Use Standard"
+msgstr "Standard-Farbenliste"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditProjectVM.cs:338
+msgctxt "Number of stones used in current field"
+msgid "Used"
+msgstr "Verwendet"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\DominoProviderVM.cs:46
+msgctxt "Number of stones used in current project"
+msgid "Used"
+msgstr "Verwendet"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\CreateFieldVM.cs:20
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\CreateFieldVM.cs:215
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\CreateFieldVM.cs:231
+msgctxt "User defined field dimensions (keep string short)"
+msgid "User Size"
+msgstr "Benutzerdefiniert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:283
+msgid "Uses the color of the domino as cell background"
+msgstr "Steinfarbe als Zellhintergrund verwenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:289
+msgid "Uses the color of the domino as text color"
+msgstr "Steinfarbe als Zellhintergrund verwenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:284
+msgid "Uses the inverted color as cell background"
+msgstr "Invertierte Steinfarbe als Zellhintergrund verwenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:290
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:291
+msgid "Uses the inverted color as text color"
+msgstr "Invertierte Steinfarbe als Zellhintergrund verwenden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\Properties.xaml:38
+msgctxt "PropertyViewer"
+msgid "Value"
+msgstr "Wert"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\FieldSize.xaml:64
+msgctxt "Field falldown direction"
+msgid "Vertical"
+msgstr "Vertikal"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:963
+msgctxt "DisplaySettingsTool"
+msgid "View Properties"
+msgstr "Anzeigeeinstellungen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindowViewModel.cs:395
+msgid "Warning"
+msgstr "Warnung"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\DominoProviderVM.cs:47
+msgctxt "Emphasis during calculation"
+msgid "Weight"
+msgstr "Gewicht"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:239
+msgid ""
+"When activating this option, DominoPlanner will show blocks in the specified "
+"length.\n"
+"This should be the length of your domino template because it allows to "
+"easily check for mistakes selecting the right dominoes (e.g. you left out "
+"one domino)."
+msgstr ""
+"Wenn diese Option aktiviert wird, teilt DominoPlanner das Protokoll in "
+"Blöcke der spezifizierten Länge auf. \n"
+"Die Länge sollte der Länge deines Kamms entsprechen. So fallen Fehler leicht "
+"auf (z.B. ein Stein weggelassen)."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\DominoDimensionsV.xaml:21
+msgid "Width:"
+msgstr "Breite:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\MainWindow.xaml:277
+msgid "Workspace"
+msgstr "Arbeitsbereich"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\AboutWindow.xaml:32
+msgid "You can buy us a coffee here:"
+msgstr "Du kannst uns hier ein Bier kaufen:"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:409
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewObjectVM.cs:457
+msgid "You forgot to choose a name."
+msgstr "Du hast keinen Namen für das Objekt eingegeben."
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\EditingToolsVM.cs:1499
+msgid "Zoom"
+msgstr "Zoom"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:168
+msgid "Zoom in"
+msgstr "Hineinzoomen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:163
+msgid "Zoom out"
+msgstr "Herauszoomen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:34
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:40
+msgid "of"
+msgstr "von"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:501
+#, csharp-format
+msgid "{0} day ago"
+msgid_plural "{0} days ago"
+msgstr[0] "Vor {0} Tag"
+msgstr[1] "Vor {0} Tagen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ReferenceManager.xaml.cs:63
+#, csharp-format
+msgctxt "Files of type {0}"
+msgid "{0} files"
+msgstr "{0}-Dateien"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\ProjectHierarchyVM.cs:813
+#, csharp-format
+msgid "{0} has been removed!"
+msgstr "{0} wurde entfernt!"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:505
+#, csharp-format
+msgid "{0} hour ago"
+msgid_plural "{0} hours ago"
+msgstr[0] "Vor {0} Stunde"
+msgstr[1] "Vor {0} Stunden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:509
+#, csharp-format
+msgid "{0} minute ago"
+msgid_plural "{0} minutes ago"
+msgstr[0] "Vor {0} Minute"
+msgstr[1] "Vor {0} Minuten"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:513
+#, csharp-format
+msgid "{0} second ago"
+msgid_plural "{0} seconds ago"
+msgstr[0] "Vor {0} Sekunde"
+msgstr[1] "Vor {0} Sekunden"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\NewProject.xaml:37
+msgctxt "Linebreaks for Project creation help text"
+msgid ""
+"•\n"
+"•\n"
+"\n"
+"•\n"
+"\n"
+"\n"
+"•\n"
+"\n"
+"•"
+msgstr ""
+"•\n"
+"\n"
+"•\n"
+"\n"
+"\n"
+"•\n"
+"\n"
+"\n"
+"•\n"
+"\n"
+"•"

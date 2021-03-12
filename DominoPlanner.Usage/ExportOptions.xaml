@@ -1,27 +1,26 @@
-﻿<Window x:Class="DominoPlanner.Usage.ExportOptions"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:views="clr-namespace:DominoPlanner.Usage.UserControls.View"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="using:DominoPlanner.Usage"
         mc:Ignorable="d"
-        Title="{Binding Filename, StringFormat=Export file {0}}" Width="280" Height="200" ResizeMode="NoResize" Icon="Icons/DominoCalculator.ico">
+        x:Class="DominoPlanner.Usage.ExportOptions"
+        Title="{Binding Filename, StringFormat={local:Gettext 'Export file {0}'}}" Width="280" Height="200" CanResize="False" Icon="/Icons/DominoCalculator.ico">
     <Grid Margin="5">
         <DockPanel>
-        <views:RenderOptions DockPanel.Dock="Top"
-            ImageSize="{Binding ImageSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            MaxSize="{Binding MaxSize}"
-            BackgroundColor="{Binding BackgroundColor}"
-            DrawBorders="{Binding DrawBorders}"
-            Collapsible="{Binding Expandable}"
-            Collapse="{Binding Collapsed}"/>
-
-        <DockPanel DockPanel.Dock="Bottom">
-            <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsCancel="True" Command="{Binding Cancel}">Cancel</Button>
-            <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True" Command="{Binding OK}">OK</Button>
-        </DockPanel>
+            <views:RenderOptions DockPanel.Dock="Top"
+                ImageSize="{Binding ImageSize, Mode=TwoWay}"
+                MaxSize="{Binding MaxSize}"
+                BackgroundColor="{Binding BackgroundColor}"
+                DrawBorders="{Binding DrawBorders}"
+                Collapsible="{Binding Expandable}"
+                Collapse="{Binding Collapsed}"
+                ShowImageSize="{Binding ShowImageSize}"/>
+            <DockPanel DockPanel.Dock="Bottom">
+                <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Left" IsCancel="True" Command="{Binding Cancel}" Content="{local:Gettext Cancel}"/>
+                <Button Width="100" Height="24" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True" Command="{Binding OK}" Content="{local:Gettext OK}"/>
+            </DockPanel>
         </DockPanel>
     </Grid>
 </Window>

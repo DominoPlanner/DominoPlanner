@@ -1,24 +1,77 @@
-﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
+    public enum Corner
+    {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+    public struct NaturalFieldPlanOrientation
+    {
+        public bool orientation;
+        public bool x;
+        public bool y;
+        public NaturalFieldPlanOrientation(bool mirrorX, bool mirrorY, bool orientation ) // true = vertical
+        {
+            x = mirrorX;
+            y = mirrorY;
+            this.orientation = orientation;
+        }
+        public (bool, bool) GetCorner(bool left, bool top, bool currentOrientation)
+        {
+            var (templeft, temptop) = (left ^ x, top ^ y);
+            if (currentOrientation && templeft != temptop)
+            {
+                return (temptop, templeft);
+            }
+            else
+            {
+                return (templeft, temptop);
+            }
+        }
+    }
     class ProtocolVM : ModelBase
     {
+        private ICommand _ClipTopRight;
+        public ICommand ClipTopRight { get { return _ClipTopRight; } set { if (value != _ClipTopRight) { _ClipTopRight = value; } } }
+
+			private ICommand _ClickTopLeft;
+        public ICommand ClickTopLeft { get { return _ClickTopLeft; } set { if (value != _ClickTopLeft) { _ClickTopLeft = value; } } }
+
+
+			private ICommand _ClickBottomLeft;
+        public ICommand ClickBottomLeft { get { return _ClickBottomLeft; } set { if (value != _ClickBottomLeft) { _ClickBottomLeft = value; } } }
+
+			private ICommand _ClickBottomRight;
+        public ICommand ClickBottomRight { get { return _ClickBottomRight; } set { if (value != _ClickBottomRight) { _ClickBottomRight = value; } } }
+
+        private NaturalFieldPlanOrientation naturalOrientation;
+
+        public NaturalFieldPlanOrientation NaturalOrientation
+        {
+            get { return naturalOrientation; }
+            set { naturalOrientation = value; RaisePropertyChanged();  }
+        }
+
+
         #region CTOR
         public ProtocolVM(string filePath)
         {
@@ -38,12 +91,21 @@ namespace DominoPlanner.Usage
 
         #region fields
         Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
-        private ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
+        private readonly ObjectProtocolParameters currentOPP = new ObjectProtocolParameters();
         IDominoProvider DominoProvider;
         DominoTransfer dominoTransfer;
         #endregion
 
         #region prope
+
+        private double rotateAngle;
+
+        public double RotateAngle
+        {
+            get { return rotateAngle; }
+            set { rotateAngle = value; RaisePropertyChanged(); }
+        }
+
         private bool _DefaultBackColor;
         public bool DefaultBackColor
         {
@@ -173,6 +235,7 @@ namespace DominoPlanner.Usage
 
 
         private bool _HasNoProperties;
+        [SettingsAttribute("ProtocolVM", false)]
         public bool HasNoProperties
         {
             get { return _HasNoProperties; }
@@ -189,6 +252,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasShortProperties;
+        [SettingsAttribute("ProtocolVM", true)]
         public bool HasShortProperties
         {
             get { return _HasShortProperties; }
@@ -205,6 +269,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasExtendedProperties;
+        [SettingsAttribute("ProtocolVM", false)]
         public bool HasExtendedProperties
         {
             get { return _HasExtendedProperties; }
@@ -255,6 +320,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _UseBlocks;
+        [SettingsAttribute("ProtocolVM", true)]
         public bool UseBlocks
         {
             get { return _UseBlocks; }
@@ -268,11 +334,14 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-
         private int _StonesPerBlock;
+        [SettingsAttribute("ProtocolVM", 50)]
         public int StonesPerBlock
         {
-            get { return _StonesPerBlock; }
+            get 
+            { 
+                return _StonesPerBlock > 0 ? _StonesPerBlock : 1; 
+            }
             set
             {
                 if (_StonesPerBlock != value)
@@ -337,14 +406,26 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        private Bitmap _CurrentPlan;
+        public Bitmap CurrentPlan
+        {
+            get { return _CurrentPlan; }
+            set
+            {
+                if (_CurrentPlan != value)
+                {
+                    _CurrentPlan = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         #endregion
 
         #region Methods
         private void Init()
         {
-            StonesPerBlock = 50;
-            UseBlocks = true;
-            HasShortProperties = true;
             TextFormat = "<font face=\"Verdana\">";
             DefaultBackColor = true;
             IntelligentTextColor = true;
@@ -353,11 +434,59 @@ namespace DominoPlanner.Usage
             currentOPP.mirrorHorizontal = DominoProvider.FieldPlanDirection == Core.Orientation.Vertical;
             CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
 
+            NaturalOrientation = GetNaturalOrientation();
+
+            SkiaSharp.SKImage new_img = DominoProvider.Last.GenerateImage(1000, false).Snapshot();
+            CurrentPlan = Bitmap.DecodeToWidth(new_img.Encode().AsStream(), new_img.Width);
+
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
             SaveHTML = new RelayCommand(o => { SaveHTMLFile(); });
             SaveExcel = new RelayCommand(o => { SaveExcelFile(); });
 
             this.PropertyChanged += ProtocolVM_PropertyChanged;
+
+            ClickTopLeft = new RelayCommand(o => SetOrientation(false, false));
+            ClipTopRight = new RelayCommand(o => SetOrientation(true, false));
+            ClickBottomLeft = new RelayCommand(o => SetOrientation(false, true));
+            ClickBottomRight = new RelayCommand(o => SetOrientation(true, true));
+
+            // Special case: diagonal fields. We'll rotate the image so the arrows are correct again.
+            if (DominoProvider is StructureParameters structure && XElement.Parse(structure._structureDefinitionXML).Attribute("Name").Value == "Diagonal Field")
+            {
+                RotateAngle = 45;
+            }
+
+        }
+        private void SetOrientation(bool left, bool top)
+        {
+            var (target_left, target_top) = NaturalOrientation.GetCorner(left, top, Orientation);
+            if (MirrorX == target_left && MirrorY == target_top)
+                Orientation = !Orientation;
+            (target_left, target_top) = NaturalOrientation.GetCorner(left, top, Orientation);
+            MirrorX = target_left;
+            MirrorY = target_top;
+        }
+        private NaturalFieldPlanOrientation GetNaturalOrientation()
+        {
+            var field = DominoProvider.GetBaseField();
+            var topLeft = DominoProvider.Last.shapes.OrderBy(x => x.position.x).ThenBy(x => x.position.y).First();
+            var topRight = DominoProvider.Last.shapes.OrderByDescending(x => x.position.x).ThenBy(x => x.position.y).First();
+            var bottomLeft = DominoProvider.Last.shapes.OrderByDescending(x => x.position.y).ThenBy(x => x.position.x).First();
+
+            var horizontalDx = topRight.GetBoundingRectangle().xc - topLeft.GetBoundingRectangle().xc;
+            var horizontalDy = topRight.GetBoundingRectangle().yc - topLeft.GetBoundingRectangle().yc;
+            var verticalDx = bottomLeft.GetBoundingRectangle().xc - topLeft.GetBoundingRectangle().xc;
+            var verticalDy = bottomLeft.GetBoundingRectangle().yc - topLeft.GetBoundingRectangle().yc;
+            NaturalFieldPlanOrientation orientation = new NaturalFieldPlanOrientation();
+            
+            if (horizontalDx < 0)
+                orientation.x = true;
+            if (verticalDy < 0)
+                orientation.y = true;
+            orientation.orientation = !(Math.Abs(horizontalDx) - Math.Abs(horizontalDy) > 0);
+            //if (orientation.x ^ orientation.y)
+            //    orientation.orientation = !orientation.orientation;
+            return orientation;
         }
         private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -365,54 +494,67 @@ namespace DominoPlanner.Usage
         }
         private void ShowLiveHelper()
         {
-            LiveBuildHelperV lbhv = new LiveBuildHelperV();
-            lbhv.DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY);
-            lbhv.ShowDialog();
+            LiveBuildHelperV lbhv = new LiveBuildHelperV
+            {
+                DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY)
+            };
+            lbhv.Show();
         }
 
-        public void SaveExcelFile()
+        public async void SaveExcelFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+            SaveFileDialog dlg = new SaveFileDialog
             {
-                DefaultExt = ".xlsx",
-                Filter = "Excel Document (.xlsx)|*.xlsx",
-                FileName = Titel
+                DefaultExtension = ".xlsx",
+                InitialFileName = Titel,
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
 
-            if (dlg.ShowDialog() == true)
+            string result = await dlg.ShowAsyncWithParent<ProtocolV>();
+
+            if (result != null && result != "")
             {
                 try
                 {
-                    DominoProvider.SaveXLSFieldPlan(dlg.FileName, currentOPP); // Jojo hier Projektname einfügen
-                    Process.Start(dlg.FileName);
+                    DominoProvider.SaveXLSFieldPlan(result, currentOPP);
+                    var process = new Process();
+                    process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
+                    process.Start();
                 }
-                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
-
-        public void SaveHTMLFile()
+        
+        public async void SaveHTMLFile()
         {
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.DefaultExt = ".html";
-            dlg.Filter = "Hypertext Markup Language (.html)|*.html";
-            if (dlg.ShowDialog() == true)
+            SaveFileDialog dlg = new SaveFileDialog
             {
-                string filename = dlg.FileName;
+                DefaultExtension = ".html",
+                InitialFileName = Titel,
+                Directory = DialogExtensions.GetCurrentProjectPath()
+            };
+            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
+            string filename = await dlg.ShowAsyncWithParent<ProtocolV>();
+            if (filename != null && filename != "")
+            {
 
                 try
                 {
                     FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
                     StreamWriter sw = new StreamWriter(fs);
                     sw.Write(CurrentProtocol);
-                    fs.Close();
-                    Process.Start(filename);
+                    sw.Close();
+                    var process = new Process();
+                    process.StartInfo = new ProcessStartInfo(filename) { UseShellExecute = true };
+                    process.Start();
                 }
-                catch (Exception ex) { Errorhandler.RaiseMessage("Error: " + ex.Message, "Error", Errorhandler.MessageType.Error); }
+                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
-        #endregion
+#endregion
 
-        #region commands
+#region commands
         private ICommand _ShowliveBuildHelper;
         public ICommand ShowLiveBuildHelper { get { return _ShowliveBuildHelper; } set { if (value != _ShowliveBuildHelper) { _ShowliveBuildHelper = value; } } }
 
@@ -421,6 +563,6 @@ namespace DominoPlanner.Usage
 
         private ICommand _SaveExcel;
         public ICommand SaveExcel { get { return _SaveExcel; } set { if (value != _SaveExcel) { _SaveExcel = value; } } }
-        #endregion
+#endregion
     }
 }

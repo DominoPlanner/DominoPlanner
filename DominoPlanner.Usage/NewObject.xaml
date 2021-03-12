@@ -1,16 +1,17 @@
-﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
-        xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View" 
-        x:Class="DominoPlanner.Usage.NewObject"
+        xmlns:View="clr-namespace:DominoPlanner.Usage.UserControls.View"
         xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
-    xmlns:intr="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        mc:Ignorable="d"
-        Title="Add New Object" Width="650" ResizeMode="NoResize" Icon="Icons/DominoCalculator.ico" Height="635">
-    <Window.Resources>
+        xmlns:local="clr-namespace:DominoPlanner.Usage"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Width="650" CanResize="False" Icon="/Icons/DominoCalculator.ico" Height="635"
+        x:Class="DominoPlanner.Usage.NewObject"
+        Title="{local:Gettext Window title|New object}">
+    <Window.DataTemplates>
         <DataTemplate DataType="{x:Type vm:CreateFieldVM}">
             <View:FieldSize HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </DataTemplate>
@@ -23,64 +24,71 @@
         <DataTemplate DataType="{x:Type vm:CreateSpiralVM}">
             <View:SpiralSize HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </DataTemplate>
-        <DataTemplate x:Key="ImageTemplate">
-            <Image Source="{Binding DataContext, RelativeSource={RelativeSource Self}}"></Image>
-        </DataTemplate>
-        <DataTemplate x:Key="EmptyImageTemplate">
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Click to select an image</TextBlock>
-        </DataTemplate>
-        <local:ImageSelector x:Key="ImageSelector" EmptyImageTemplate="{StaticResource EmptyImageTemplate}"
-                             ImageTemplate="{StaticResource ImageTemplate}"/>
+
+
         <DataTemplate DataType="{x:Type local:SingleImageInformation}">
             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={}Image Source: {0}}" 
+                <TextBlock DockPanel.Dock="Top" Text="{Binding InternPictureName, StringFormat={local:Gettext 'Image Source: {0}'}}"
                            Margin="5" HorizontalAlignment="Stretch" TextWrapping="Wrap"/>
-                <Border DockPanel.Dock="Bottom" Background="White" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch">
-                    <ContentControl ContentTemplateSelector="{StaticResource ImageSelector}" Content="{Binding InternPictureName}">
+                <Border DockPanel.Dock="Bottom" Background="White" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Stretch" DragDrop.AllowDrop="True" local:FileDragDropHelper.IsFileDragDropEnabled="True" local:FileDragDropHelper.FileDragDropTarget="{Binding Path=.}">
+                    <ContentControl Content="{Binding InternPictureName}">
+                        <ContentControl.Resources>
+                            <DataTemplate x:Key="ImageTemplate">
+                                <Image Source="{Binding DataContext, RelativeSource={RelativeSource Self}, Converter={StaticResource BitmapValueConverter}}"></Image>
+                            </DataTemplate>
+                            <DataTemplate x:Key="EmptyImageTemplate">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{local:Gettext Click to select an image\\n(or drop it here)}"></TextBlock>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                        <ContentControl.DataTemplates>
+                            <local:ImageTemplateSelector ImageTemplate="{StaticResource ImageTemplate}"
+                                                         EmptyImageTemplate="{StaticResource EmptyImageTemplate} "/>
+                        </ContentControl.DataTemplates>
+                        <i:Interaction.Behaviors>
+                            <ia:EventTriggerBehavior EventName="PointerReleased">
+                                <ia:InvokeCommandAction Command="{Binding LoadNewImage}"/>
+                            </ia:EventTriggerBehavior>
+                        </i:Interaction.Behaviors>
                     </ContentControl>
-                        <intr:Interaction.Triggers>
-                            <intr:EventTrigger EventName="MouseDown">
-                                <intr:InvokeCommandAction Command="{Binding LoadNewImage}" CommandParameter="{Binding DataContext.CurrentViewModel, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
-                            </intr:EventTrigger>
-                        </intr:Interaction.Triggers>
                 </Border>
             </DockPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:NoImageInformation}">
-            
+
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:NewAssemblyEntry}">
             <StackPanel Orientation="Vertical">
-                <Label>Color path (inherited from parent):</Label>
-                <Label Margin="5, 0, 0, 0">
-                    <TextBlock Text="{Binding ColorPath}" TextWrapping="Wrap"/>
-                </Label>
+                <TextBlock Text="{local:Gettext Color path (inherited from parent):}"/>
+                <TextBlock Margin="5, 0, 0, 0" Text="{Binding ColorPath}" TextWrapping="Wrap"/>
             </StackPanel>
         </DataTemplate>
+
+    </Window.DataTemplates>
+    <Window.Resources>
+        <local:BitmapValueConverter x:Key="BitmapValueConverter"/>
     </Window.Resources>
     <Grid>
-        
-        <DockPanel RenderOptions.BitmapScalingMode="HighQuality" Margin="2" VerticalAlignment="Stretch">
-            <Button DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="5,5,5,5" Command="{Binding CreateIt}" IsDefault="True">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/ok.ico" Height="20" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Label Content="Create"/>
-                </StackPanel>
-            </Button>
+
+        <DockPanel Margin="2" VerticalAlignment="Stretch">
+            <local:ImageButton DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                               Image="/Icons/ok.ico" IsDefault="True"
+                               Content="{local:Gettext Create}" Command="{Binding CreateIt}"/>
             <StackPanel DockPanel.Dock="Right" >
-                <Label>Object specific settings:</Label>
-            <ContentControl Margin="5" Content="{Binding CurrentViewModel}" Width="300"/>
+                <TextBlock Text="{local:Gettext Object specific settings:}"></TextBlock>
+                <ContentControl Margin="5" Content="{Binding CurrentViewModel}" Width="300"/>
             </StackPanel>
-                <Border DockPanel.Dock="Right" Width="1" BorderBrush="Black" BorderThickness="1"></Border>
+            <Border DockPanel.Dock="Right" Width="1" BorderBrush="Black" BorderThickness="1"></Border>
             <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="5">
-                <Label Content="Filename:" />
-                <Label DockPanel.Dock="Right" Content="{Binding Extension}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
-                <TextBox VerticalContentAlignment="Center" TextWrapping="Wrap" Margin="5, 0, 0, 0" Text="{Binding filename, UpdateSourceTrigger=PropertyChanged}"  />
+                <TextBlock Text="{local:Gettext Filename:}" VerticalAlignment="Center" >
+
+                </TextBlock>
+                <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Text="{Binding Extension}" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                <TextBox VerticalContentAlignment="Center"  TextWrapping="Wrap" Margin="5, 0, 0, 0" Text="{Binding Filename}"  />
             </DockPanel>
-            <ListBox Margin="5" DockPanel.Dock="Top" SelectedIndex="{Binding SelectedType}" ItemsSource="{Binding ViewModels}" HorizontalAlignment="Stretch" Height="250" VerticalAlignment="Top" BorderThickness="2">
+            <ListBox Margin="5" DockPanel.Dock="Top" SelectedIndex="{Binding SelectedType}" Items="{Binding ViewModels}" HorizontalAlignment="Stretch" Height="250" VerticalAlignment="Top" BorderThickness="2">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="0" BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch" Width="363">
+                        <Border Margin="0" BorderThickness="0,0,0,1" BorderBrush="Black" HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="2, 2, 2, 4">
                                 <Image Source="{Binding Icon}" Height="36" VerticalAlignment="Center"/>
                                 <StackPanel Margin="3, 0, 0, 0" Orientation="Vertical">
@@ -92,9 +100,11 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
-            <ContentControl DockPanel.Dock="Top" Margin="5" Content="{Binding CurrentImageInformation}"/>
-            
+
+            <ContentControl DockPanel.Dock="Top" Margin="5" Content="{Binding CurrentImageInformation}">
+
+            </ContentControl>
+
         </DockPanel>
     </Grid>
 </Window>

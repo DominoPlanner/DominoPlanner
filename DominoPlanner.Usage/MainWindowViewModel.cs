@@ -1,103 +1,139 @@
-﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
-using Microsoft.Win32;
+using DominoPlanner.Core;
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using Avalonia.Input;
+using System.Runtime.InteropServices;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage
-{
+{    
     class MainWindowViewModel : ModelBase
     {
         #region CTOR
         public MainWindowViewModel()
         {
-            Properties.Settings.Default.Upgrade();
-            Properties.Settings.Default.StructureTemplates = Properties.Settings.Default.Properties["StructureTemplates"].DefaultValue.ToString();
-            if (Properties.Settings.Default.FirstStartup)
-            {
-                Properties.Settings.Default.StandardColorArray = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "colors" + Properties.Resources.ColorExtension);
-                Properties.Settings.Default.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner");
-                Properties.Settings.Default.OpenProjectList = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Appdata", "Local", "DominoPlanner", "OpenProjects.xml");
-                Directory.CreateDirectory(Path.GetDirectoryName(Properties.Settings.Default.StandardColorArray));
-                OpenProjectSerializer.Create();
-                Properties.Settings.Default.FirstStartup = false;
-            }
-            Properties.Settings.Default.Save();
-
-            while (!File.Exists(Properties.Settings.Default.StandardColorArray))
-            {
-                Errorhandler.RaiseMessage("Please create a defaultcolortable.", "Missing Color Table", Errorhandler.MessageType.Info);
-                new SetStandardV().ShowDialog();
-            }
-
+            OsType = Environment.OSVersion.Platform;
+            ShowWindowMenu = !RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             NewFieldStruct = new RelayCommand(o => { NewFieldStructure(); });
-            MenuSetStandard = new RelayCommand(o => { new SetStandardV().ShowDialog(); });
+            MenuSetStandard = new RelayCommand(async o => { await new SetStandardV().ShowDialogWithParent<MainWindow>(); });
             AddExistingProject = new RelayCommand(o => { AddProject_Exists(); });
             AddExistingItem = new RelayCommand(o => { AddItem_Exists(); });
             NewProject = new RelayCommand(o => { CreateNewProject(); });
             SaveAll = new RelayCommand(o => { SaveAllOpen(); });
-            SaveCurrentOpen = new RelayCommand(o => { SaveCurrentOpenProject(); });
+            SaveCurrentOpen = new RelayCommand(async o => { await SaveCurrentOpenProject(); });
             FileListClickCommand = new RelayCommand(o => { OpenItemFromPath(o); });
-            Tabs = new ObservableCollection<TabItem>();
-            Workspace.del = UpdateReference;
-            loadProjectList();
+            OpenAbout = new RelayCommand(o => { OpenAboutDialog(); });
+            Tabs = new ObservableCollection<UserControls.ViewModel.TabItem>();
+        }
+        public static string ShareDirectory
+        {
+            get
+            {
+#if DEBUG
+                return Environment.CurrentDirectory;
+#else
+                return UserSettings.AppDataPath;
+#endif
+            }
+
         }
 
-        internal bool CloseAllTabs()
+        internal async void AfterStartupChecks()
+        {
+
+            if (FirstStartup)
+            {
+                UserSettings.Instance.StandardColorArray = Path.Combine(UserSettings.AppDataPath, "colors.DColor");
+                UserSettings.Instance.StandardProjectPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "DominoPlanner");
+                UserSettings.Instance.OpenProjectList = Path.Combine(UserSettings.AppDataPath, "OpenProjects.xml");
+                if (!File.Exists(UserSettings.Instance.OpenProjectList))
+                {
+                    File.Create(UserSettings.Instance.OpenProjectList).Close();
+                }
+                UserSettings.Instance.StructureTemplates = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Structures.xml");
+                Directory.CreateDirectory(UserSettings.Instance.StandardProjectPath);
+                Directory.CreateDirectory(UserSettings.AppDataPath);
+                OpenProjectSerializer.Create();
+                FirstStartup = false;
+            }
+
+            while (!File.Exists(UserSettings.Instance.StandardColorArray))
+            {
+               await Errorhandler.RaiseMessage(_("Please create a default color table."), _("Missing Color Table"), Errorhandler.MessageType.Info);
+               await new SetStandardV().ShowDialogWithParent<MainWindow>();
+            }
+            LoadProjectList();
+        }
+
+        internal void KeyPressed(object sender, KeyEventArgs args)
+        {
+            if (!args.Handled)
+            {
+                SelectedTab?.KeyPressed(sender, args);
+            }
+        }
+
+        private async void CleanUpTabs(AssemblyNodeVM removedNode)
+        {
+            foreach (DominoWrapperNodeVM item in removedNode.Children)
+            {
+                if (item is AssemblyNodeVM assemblyNodeVM)
+                {
+                    CleanUpTabs(assemblyNodeVM);
+                }
+                else
+                {
+                    List<UserControls.ViewModel.TabItem> toClose = Tabs.Where(x => x.Path == item.AbsolutePath).ToList();
+                    foreach (var tabItem in toClose)
+                    {
+                        await RemoveItem(tabItem);
+                    }
+                }
+            }
+        }
+
+        internal async Task<bool> CloseAllTabs()
         {
             while (Tabs.Count > 0)
             {
-                if (!RemoveItem(Tabs.First()))
+                if (!(await RemoveItem(Tabs.First())))
                     return false;
             }
             return true;
         }
-        private string UpdateReference(string absolutePath, string parentPath)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.InitialDirectory = Path.GetDirectoryName(absolutePath);
-            ofd.Title = $"Locate file {Path.GetFileName(absolutePath)}";
-            Errorhandler.RaiseMessage($"The object {parentPath} contains a reference to the file {absolutePath}," +
-                $"which could not be located. Please find the file.", "Missing file", Errorhandler.MessageType.Error);
-            string extension = Path.GetExtension(absolutePath);
-            ofd.Filter = $"{extension} files|*{extension}|all files|*.*";
-            if (ofd.ShowDialog() == true && File.Exists(ofd.FileName))
-            {
-                return Workspace.MakeRelativePath(parentPath, ofd.FileName);
-            }
-
-            return "";
-        }
         private void RegisterNewViewModel(DominoProviderTabItem oldViewModel, DominoProviderTabItem newViewModel)
         {
-            TabItem tabItem = Tabs.Where(x => x.Content == oldViewModel).FirstOrDefault();
+            UserControls.ViewModel.TabItem tabItem = Tabs.Where(x => x.Content == oldViewModel).FirstOrDefault();
             tabItem.Content = newViewModel;
         }
         private void RegisterReplacementViewModel(DominoProviderTabItem oldVM, DominoProviderTabItem newVM)
         {
-            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            UserControls.ViewModel.TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
             tabItem.Content = newVM;
         }
         private DominoProviderTabItem GetNewViewModel(DominoProviderTabItem oldVM)
         {
-            TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
-            return TabItem.ViewModelGenerator(((DominoProviderTabItem) tabItem.Content).CurrentProject, tabItem.Path);
+            UserControls.ViewModel.TabItem tabItem = Tabs.Where(x => x.Content == oldVM).FirstOrDefault();
+            return UserControls.ViewModel.TabItem.ViewModelGenerator(((DominoProviderTabItem)tabItem.Content).CurrentProject, tabItem.Path);
         }
         #endregion
 
         #region prop
-        public ObservableCollection<TabItem> Tabs { get; set; }
-        private TabItem _SelectedTab;
-        public TabItem SelectedTab
+        public ObservableCollection<UserControls.ViewModel.TabItem> Tabs { get; set; }
+        private UserControls.ViewModel.TabItem _SelectedTab;
+        public UserControls.ViewModel.TabItem SelectedTab
         {
             get { return _SelectedTab; }
             set
@@ -106,11 +142,11 @@ namespace DominoPlanner.Usage
                 {
                     if (_SelectedTab != null)
                     {
-                        //if (_SelectedTab.Content is ColorListControlVM colorList)
-                        //{
-                        //    //hässlich aber tut... :D
-                        //    //colorList.DifColumns.Clear();
-                        //}
+                        if (value != null && value.Content is ColorListControlVM colorList)
+                        {
+                            // to fix a weird bug where changing the tab resets the count
+                            colorList.SelectedStone = null;
+                        }
                     }
                     _SelectedTab = value;
                     if (SelectedTab != null)
@@ -119,8 +155,8 @@ namespace DominoPlanner.Usage
                 }
             }
         }
-        private AssemblyNodeVM _SelectedProject;
-        public AssemblyNodeVM SelectedProject
+        private DominoWrapperNodeVM _SelectedProject;
+        public DominoWrapperNodeVM SelectedProject
         {
             get { return _SelectedProject; }
             set
@@ -140,7 +176,101 @@ namespace DominoPlanner.Usage
             {
                 if (_Projects != value)
                 {
+                    if(_Projects != null)
+                    {
+                        _Projects.CollectionChanged -= Children_CollectionChanged;
+                    }
                     _Projects = value;
+                    if (_Projects != null)
+                    {
+                        _Projects.CollectionChanged += Children_CollectionChanged;
+                    }
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private void AddAssemblyNode(AssemblyNodeVM newAssemblyNode)
+        {
+            if (newAssemblyNode != null)
+            {
+                newAssemblyNode.Children.CollectionChanged += Children_CollectionChanged;
+                foreach (AssemblyNodeVM subChilds in newAssemblyNode.Children.OfType<AssemblyNodeVM>())
+                {
+                    AddAssemblyNode(subChilds);
+                }
+            }
+        }
+
+        private void RemovedAssemblyNode(AssemblyNodeVM removedAssemblyNode)
+        {
+            if (removedAssemblyNode != null)
+            {
+                removedAssemblyNode.Children.CollectionChanged -= Children_CollectionChanged;
+                CleanUpTabs(removedAssemblyNode);
+                foreach (AssemblyNodeVM subChilds in removedAssemblyNode.Children.OfType<AssemblyNodeVM>())
+                {
+                    RemovedAssemblyNode(subChilds);
+                }
+            }
+        }
+
+        private void Children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (AssemblyNodeVM assemblyNode in e.NewItems.OfType<AssemblyNodeVM>())
+                {
+                    AddAssemblyNode(assemblyNode);
+                }
+            }
+            if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (AssemblyNodeVM oldAssemblynode in e.OldItems.OfType<AssemblyNodeVM>())
+                {
+                    RemovedAssemblyNode(oldAssemblynode);
+                }
+            }
+        }
+
+        private PlatformID osType;
+        public PlatformID OsType
+        {
+            get { return osType; }
+            set
+            {
+                if(osType != value)
+                {
+                    osType = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _ShowWindowMenu;
+        public bool ShowWindowMenu
+        {
+            get { return _ShowWindowMenu; }
+            set
+            {
+                if(_ShowWindowMenu != value)
+                {
+                    _ShowWindowMenu = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _FirstStartup = true;
+        [SettingsAttribute("MainWindowViewModel", true)]
+        public bool FirstStartup
+        {
+            get { return _FirstStartup; }
+            set
+            {
+                if (_FirstStartup != value)
+                {
+                    _FirstStartup = value;
                     RaisePropertyChanged();
                 }
             }
@@ -172,6 +302,9 @@ namespace DominoPlanner.Usage
         private ICommand _FileListClickCommand;
         public ICommand FileListClickCommand { get { return _FileListClickCommand; } set { if (value != _FileListClickCommand) { _FileListClickCommand = value; } } }
 
+        private ICommand _OpenAboutCommand;
+        public ICommand OpenAbout { get { return _OpenAboutCommand; } set { if (value != _OpenAboutCommand) { _OpenAboutCommand = value; } } }
+
         #endregion
 
         #region Methods
@@ -197,6 +330,10 @@ namespace DominoPlanner.Usage
         //    }
         //}
 
+        internal void SaveSettings()
+        {
+            UserSettingsSerializer.Instance.SaveSettings();
+        }
         /// <summary>
         /// Clickevent wenn in der Baumstruktur ein Projektnode geklickt wird
         /// </summary>
@@ -204,26 +341,34 @@ namespace DominoPlanner.Usage
         /// <param name="e"></param>
         private void Item_IsClicked(object sender, EventArgs e)
         {
-            OpenItem(TabItem.TabItemGenerator(sender as NodeVM));
+            try
+            {
+                OpenItem(UserControls.ViewModel.TabItem.TabItemGenerator(sender as NodeVM));
+                (sender as NodeVM).BrokenReference = false;
+            }
+            catch (FileNotFoundException)
+            {
+                (sender as NodeVM).BrokenReference = true;
+            }
         }
         private void OpenItemFromPath(object param)
         {
             string path = param.ToString();
             string ex = Path.GetExtension(path).ToLower();
-            if (ex == Properties.Resources.ColorExtension.ToLower() || ex == Properties.Resources.ObjectExtension.ToLower())
+            if (ex == "." + Declares.ColorExtension.ToLower() || ex == "." + Declares.ObjectExtension.ToLower())
             {
-                OpenItem(GetTab(path) ?? new TabItem(path));
+                OpenItem(GetTab(path) ?? new UserControls.ViewModel.TabItem(path));
             }
         }
-        private TabItem GetTab(NodeVM toOpen)
+        private UserControls.ViewModel.TabItem GetTab(NodeVM toOpen)
         {
             return GetTab(toOpen.AbsolutePath);
         }
-        private TabItem GetTab(string toOpen)
+        private UserControls.ViewModel.TabItem GetTab(string toOpen)
         {
             return Tabs.FirstOrDefault(x => Path.GetFullPath(x.Path).Equals(Path.GetFullPath(toOpen), StringComparison.OrdinalIgnoreCase));
         }
-        private void OpenItem(TabItem toOpen)
+        private void OpenItem(UserControls.ViewModel.TabItem toOpen)
         {
             if (!Tabs.Contains(toOpen))
             {
@@ -236,7 +381,7 @@ namespace DominoPlanner.Usage
                 }
                 if (toOpen.Content is EditProjectVM v)
                 {
-                    v.DisplaySettingsTool.ResetCanvas();
+                    v.RecreateCanvasViewModel();
                 }
             }
             SelectedTab = toOpen;
@@ -247,11 +392,11 @@ namespace DominoPlanner.Usage
             {
                 var fn = s.Trim();
                 var ext = Path.GetExtension(fn).ToLower();
-                if (ext == Properties.Resources.ObjectExtension.ToLower() || ext == Properties.Resources.ColorExtension.ToLower())
+                if (ext == "." + Declares.ObjectExtension.ToLower() || ext == "." + Declares.ColorExtension.ToLower())
                 {
                     OpenItemFromPath(fn);
                 }
-                else if (ext == Properties.Resources.ProjectExtension.ToLower())
+                else if (ext == "." + Declares.ProjectExtension.ToLower())
                 {
                     AssemblyNodeVM res = null;
                     foreach (AssemblyNodeVM p in Projects)
@@ -267,7 +412,7 @@ namespace DominoPlanner.Usage
                     if (File.Exists(fn))
                     {
                         OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(fn), Path.GetDirectoryName(fn));
-                        loadProject(openProject);
+                        LoadProject(openProject);
                     }
                 }
             }
@@ -287,7 +432,7 @@ namespace DominoPlanner.Usage
                 }
                 else
                 {
-                    SelectedProject = node.parent;
+                    SelectedProject = node.Parent;
                 }
             }
         }
@@ -296,36 +441,64 @@ namespace DominoPlanner.Usage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private bool MainWindowViewModel_CloseIt(TabItem tabItem)
+        private async Task<bool> MainWindowViewModel_CloseIt(UserControls.ViewModel.TabItem tabItem)
         {
-            return RemoveItem(tabItem);
+            return await RemoveItem(tabItem);
         }
-        private bool RemoveFileFromTabs(string path)
+        private async Task<bool> RemoveFileFromTabs(string path)
         {
             bool result = true;
-            foreach (TabItem tabItem in Tabs.Where(x => x.Path == path).ToArray())
+            foreach (UserControls.ViewModel.TabItem tabItem in Tabs.Where(x => x.Path == path).ToArray())
             {
-                result = result && RemoveItem(tabItem);
+                result = result && await RemoveItem(tabItem);
             }
             return result;
         }
-        private bool RemoveNodeFromTabs(NodeVM node)
+        private async Task<bool> RemoveNodeFromTabs(NodeVM node)
         {
-            return RemoveFileFromTabs(node.AbsolutePath);
+            return await RemoveFileFromTabs(node.AbsolutePath);
         }
-        private bool RemoveItem(TabItem tabItem)
+        private async Task<bool> RemoveItem(UserControls.ViewModel.TabItem tabItem)
         {
             bool remove = false;
             if (tabItem.Content.UnsavedChanges)
             {
-                System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show($"Save unsaved changes of {tabItem.Header.TrimEnd('*')}?", "Warning", System.Windows.Forms.MessageBoxButtons.YesNoCancel, System.Windows.Forms.MessageBoxIcon.Warning);
-                if (result == System.Windows.Forms.DialogResult.Yes)
+                var msgbox = MessageBoxManager.GetMessageBoxStandardWindow(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')),
+                    ButtonEnum.YesNoCancel, Icon.Warning);
+                var result = await msgbox.ShowDialogWithParent<MainWindow>();
+                if (result == ButtonResult.Yes)
                 {
-                    tabItem.Content.Save();
-                    remove = true;
+                    remove = await SaveCurrentOpenProject();
                 }
-                if (result == System.Windows.Forms.DialogResult.No)
+                if (result == ButtonResult.No)
                 {
+                    // we need to close all files and remove all references to the DominoProvider, 
+                    // so the file can be reopened again from disk
+                    
+
+                    void RecurseProjects(AssemblyNodeVM assembly)
+                    {
+                        foreach (NodeVM node in assembly.Children)
+                        {
+                            if (node is AssemblyNodeVM assy)
+                                RecurseProjects(assy);
+                            else if (node is DocumentNodeVM dn)
+                            {
+                                try
+                                {
+                                    if (dn.AbsolutePath == tabItem.Path)
+                                        dn.DocumentModel.CloseFile();
+                                }
+                                catch
+                                {
+                                    // happens if one reference to another file is broken, in this case
+                                    // we simply don't care
+                                }
+                            }
+                        }
+                    }
+                    foreach (AssemblyNodeVM node in Projects)
+                        RecurseProjects(node);
                     remove = true;
                 }
             }
@@ -341,7 +514,7 @@ namespace DominoPlanner.Usage
         /// <summary>
         /// Projektliste laden
         /// </summary>
-        private void loadProjectList()
+        private async void LoadProjectList()
         {
             Projects = new ObservableCollection<AssemblyNodeVM>();
             List<OpenProject> OpenProjects = OpenProjectSerializer.GetOpenProjects();
@@ -349,37 +522,39 @@ namespace DominoPlanner.Usage
             {
                 foreach (OpenProject curOP in OpenProjects)
                 {
-                    loadProject(curOP);
+                    LoadProject(curOP);
                 }
             }
             else
             {
-                Errorhandler.RaiseMessage("Error loading opened projects!", "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Error loading opened projects!"), _("Error"), Errorhandler.MessageType.Error);
                 OpenProjectSerializer.Create();
             }
         }
 
-        private void loadProject(OpenProject newProject)
+        private async void LoadProject(OpenProject newProject)
         {
             bool remove = true;
-            string projectpath = Path.Combine(newProject.path, $"{newProject.name}{Properties.Resources.ProjectExtension}");
+            string projectpath = Path.Combine(newProject.path, $"{newProject.name}.{Declares.ProjectExtension}");
             if (File.Exists(projectpath))
             {
                 remove = false;
-                
+
                 AssemblyNodeVM node = null;
-                
+
                 try
                 {
                     AssemblyNode mainnode = new AssemblyNode(projectpath);
                     // check if the file can be deserialized properly
                     node = new AssemblyNodeVM(mainnode, OpenItem, RemoveNodeFromTabs, GetTab);
+                    if (node.BrokenFile || (node.Model as AssemblyNode).Obj.ColorListBroken)
+                        remove = true;
                 }
-                catch
+                catch (Exception)
                 {
                     try
                     {
-                        AssemblyNode restored = AssemblyNodeVM.RestoreAssembly(projectpath);
+                        AssemblyNode restored = await AssemblyNodeVM.RestoreAssembly(projectpath);
                         node = new AssemblyNodeVM(restored, OpenItem, RemoveNodeFromTabs, GetTab);
                     }
                     catch (FileNotFoundException)
@@ -388,7 +563,7 @@ namespace DominoPlanner.Usage
                     }
                     catch
                     {
-                        Errorhandler.RaiseMessage($"The main project file of project {projectpath} was damaged. An attempt to restore the file has been unsuccessful. \nThe project will be removed from the list of opened projects.", "Damaged File", Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage(String.Format(_("The main project file of project {0} was damaged. An attempt to restore the file has been unsuccessful. \nThe project will be removed from the list of opened projects."), projectpath), _("Damaged File"), Errorhandler.MessageType.Error);
                         remove = true;
                     }
                 }
@@ -399,127 +574,124 @@ namespace DominoPlanner.Usage
             }
             if (remove)
             {
-                Errorhandler.RaiseMessage($"Unable to load project {newProject.name}. It might have been moved or damaged. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects.", "Error!", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(string.Format(_("Unable to load project {0}. It might have been moved or damaged. \nPlease re-add it at its current location.\n\nThe project has been removed from the list of opened projects."), newProject.name), _("Error"), Errorhandler.MessageType.Error);
                 OpenProjectSerializer.RemoveOpenProject(newProject.id);
             }
         }
-        private List<ProjectElement> getProjects(DominoAssembly dominoAssembly)
+        public async Task<bool> CheckIfParentProjectMissing()
         {
-            List<ProjectElement> returnList = new List<ProjectElement>();
-
-            if (dominoAssembly != null)
+            if (SelectedAssembly == null)
             {
-                ProjectElement color = new ProjectElement(dominoAssembly.colorPath, @".\Icons\colorLine.ico", null);
-                returnList.Add(color);
+                await Errorhandler.RaiseMessage(_("Objects require a parent project, which contains the color list to be used. Please choose a parent project in the project panel."), _("Select parent project"), Errorhandler.MessageType.Error);
+                return true;
             }
-
-            foreach (DocumentNode dominoWrapper in dominoAssembly.children.OfType<DocumentNode>().ToList())
-            {
-                try
-                {
-                    string relativePath = dominoWrapper.relativePath;
-                    string filepath = Workspace.AbsolutePathFromReference(ref relativePath, dominoWrapper.parent);
-                    dominoWrapper.relativePath = relativePath;
-                    string picturepath = ImageHelper.GetImageOfFile(filepath);
-                    ProjectElement project = new ProjectElement(filepath,
-                        picturepath, dominoWrapper);
-                    returnList.Add(project);
-                    
-
-                }
-                catch (FileNotFoundException)
-                {
-                    // Remove file from Project
-                    dominoAssembly.children.Remove(dominoWrapper);
-                    Errorhandler.RaiseMessage($"The file {dominoWrapper.relativePath} doesn't exist at the current location. \nIt has been removed from the project.", "Missing file", Errorhandler.MessageType.Error);
-                    dominoAssembly.Save();
-                }
-            }
-            dominoAssembly.Save();
-            return returnList;
+            return false;
         }
 
         /// <summary>
         /// Neues Unterprojekt starten
         /// </summary>
-        private void NewFieldStructure()
+        private async void NewFieldStructure()
         {
-            if (SelectedProject == null)
-            {
-                Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
-                return;
-            }
-            SelectedProject.NewFieldStructure();
+            if (!await CheckIfParentProjectMissing())
+                SelectedAssembly.NewFieldStructure();
         }
-
-        private void AddProject_Exists()
+        AssemblyNodeVM SelectedAssembly
         {
-            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog.Filter = $"project files (*{Properties.Resources.ProjectExtension})|*{Properties.Resources.ProjectExtension}";
-            openFileDialog.RestoreDirectory = true;
-            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                if (File.Exists(openFileDialog.FileName))
+            get {
+                if (SelectedProject == null)
                 {
-                    OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(openFileDialog.FileName), Path.GetDirectoryName(openFileDialog.FileName));
-                    loadProject(openProject);
+                    return null;
+                }
+                if (SelectedProject is AssemblyNodeVM ass)
+                    return ass;
+                else
+                {
+                    var cur = SelectedProject.Parent;
+                    while (!(cur is AssemblyNodeVM))
+                    {
+                        cur = cur.Parent;
+                    }
+                    return cur;
                 }
             }
         }
 
-        private void AddItem_Exists()
+        private async void AddProject_Exists()
         {
-            if (SelectedProject == null)
+            OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Errorhandler.RaiseMessage("Please choose a project folder.", "Please choose", Errorhandler.MessageType.Error);
-                return;
+                Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension } },
+                Directory = UserSettings.Instance.StandardProjectPath
+            };
+            //openFileDialog.RestoreDirectory = true;
+            var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
+            if (result != null && result.Length == 1 && File.Exists(result[0]))
+            {
+                {
+                    OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(result[0]), Path.GetDirectoryName(result[0]));
+                    LoadProject(openProject);
+                }
             }
-            SelectedProject.AddExistingItem();
         }
-        private void CreateNewProject()
+
+        private async void AddItem_Exists()
+        {
+            if (!await CheckIfParentProjectMissing())
+                SelectedAssembly.AddExistingItem();
+        }
+        private async void CreateNewProject()
         {
             NewProjectVM curNPVM = new NewProjectVM();
-            new NewProject(curNPVM).ShowDialog();
+            await new NewProject(curNPVM).ShowDialogWithParent<MainWindow>();
             if (curNPVM.Close == true)
             {
-                OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}\{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
+                OpenProject newProj = OpenProjectSerializer.AddOpenProject(curNPVM.ProjectName, string.Format(@"{0}/{1}", curNPVM.SelectedPath, curNPVM.ProjectName));
                 if (newProj == null)
                 {
-                    Errorhandler.RaiseMessage("Could not create new Project!", "Error!", Errorhandler.MessageType.Error);
+                    await Errorhandler.RaiseMessage(_("Could not create new Project!"), _("Error!"), Errorhandler.MessageType.Error);
                     return;
                 }
-                loadProject(newProj);
+                LoadProject(newProj);
             }
         }
 
         /// <summary>
         /// Save all open projects
         /// </summary>
-        private void SaveAllOpen()
+        private async void SaveAllOpen()
         {
-            foreach (TabItem curTI in Tabs)
+            foreach (UserControls.ViewModel.TabItem curTI in Tabs)
             {
                 if (curTI.Content.UnsavedChanges)
                 {
                     if (!curTI.Content.Save())
                     {
-                        Errorhandler.RaiseMessage("Error Saving files!", string.Format("Stop saving, because could not save {0}", curTI.Header), Errorhandler.MessageType.Error);
+                        await Errorhandler.RaiseMessage(_("Error saving files!"), string.Format(_("Save aborted, unable to save file {0}"), curTI.Header), Errorhandler.MessageType.Error);
                         return;
                     }
                 }
             }
-            Errorhandler.RaiseMessage("Save all files", "Saves all files!", Errorhandler.MessageType.Info);
+            await Errorhandler.RaiseMessage(_("All files saved"), _("Success"), Errorhandler.MessageType.Info);
         }
         /// <summary>
         /// Save current project
         /// </summary>
-        private void SaveCurrentOpenProject()
+        private async Task<bool> SaveCurrentOpenProject()
         {
-            if (SelectedTab.Content.Save())
-                Errorhandler.RaiseMessage("Save all changes!", "Save all changes", Errorhandler.MessageType.Info);
+            var result = SelectedTab.Content.Save();
+            if (result)
+                await Errorhandler.RaiseMessage(_("All changes saved"), _("Success"), Errorhandler.MessageType.Info);
             else
-                Errorhandler.RaiseMessage("Error!", "Error saving changes!", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Error saving changes"), _("Error"), Errorhandler.MessageType.Error);
+            return result;
+        }
+        public async void OpenAboutDialog()
+        {
+            var aw = new AboutWindow();
+            await aw.ShowDialogWithParent<MainWindow>();
         }
         #endregion
     }
+    
 }

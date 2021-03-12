@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Emgu.CV;
-using Emgu.CV.Structure;
 using ProtoBuf;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -36,8 +36,8 @@ namespace DominoPlanner.Core
         private double rotate_angle = 0;
         [ProtoMember(5)]
         public double RotateAngle { get => rotate_angle; set => SetField(ref rotate_angle, value); }
-        private Image<Bgra, byte> _to_blend;
-        internal Image<Bgra, byte> to_blend
+        private SKBitmap _to_blend;
+        internal SKBitmap To_blend
         {
             get
             {
@@ -50,19 +50,24 @@ namespace DominoPlanner.Core
                 
             }
         }
-        public override void Apply(Image<Bgra, byte> input)
+        public override void Apply(SKBitmap input)
         {
             if (!mat_valid) UpdateMat();
-            var image = to_blend.Clone();
-            if (scale_x != 1 && scale_y != 1)
-                image = image.Resize((int)(image.Width * scale_x), (int)(image.Height * scale_y), Emgu.CV.CvEnum.Inter.Lanczos4);
-            if (rotate_angle != 0)
-                image = image.Rotate(rotate_angle, new Bgra(0, 0, 0, 0), false);
-            input.OverlayImage(image, (int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d));
+            SKBitmap image = new SKBitmap();
+            To_blend.CopyTo(image);
+            if (scale_x != 1 || scale_y != 1)
+            {
+                SKImageInfo info = new SKImageInfo((int)(image.Width * scale_x), (int)(image.Height * scale_y));
+                image = image.Resize(info, SKFilterQuality.High);
+            }
+            //if (rotate_angle != 0)
+            //    image = image.Rotate(rotate_angle, new Bgra(0, 0, 0, 0), false);
+            using SKCanvas canvas = new SKCanvas(input);
+            canvas.DrawBitmap(image, new SKPoint((int)(center_x - image.Width / 2d), (int)(center_y - image.Height / 2d)));
         }
         public Size GetSizeOfMat()
         {
-            return to_blend.Size;
+            return new Size(To_blend.Width, To_blend.Height);
         }
         public bool mat_valid;
         public abstract void UpdateMat();
@@ -88,14 +93,15 @@ namespace DominoPlanner.Core
         public FontStyle FontStyle { get => _fontStyle; set { if (SetField(ref _fontStyle, value)) mat_valid = false; } }
 
         [ProtoMember(5)]
-        private string before_surrogate { get { return ColorTranslator.ToHtml(_color); } set { _color = ColorTranslator.FromHtml(value); } }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _color")]
+        private string Before_surrogate { get { return ColorTranslator.ToHtml(_color); } set { _color = ColorTranslator.FromHtml(value); } }
         private Color _color;
         public Color Color { get => _color; set { SetField(ref _color, value); mat_valid = false; } }
         [ProtoAfterDeserialization]
         public override void UpdateMat()
         {
 
-            var font = new Font(new FontFamily(FontFamily), FontSize, FontStyle);
+            /*var font = new Font(new FontFamily(FontFamily), FontSize, FontStyle);
             // dummy image zum ausmessen des Texts
             var bmp = new System.Drawing.Bitmap(5, 10);
             var graphics = Graphics.FromImage(bmp);
@@ -106,7 +112,7 @@ namespace DominoPlanner.Core
             graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             graphics.Clear(Color.Transparent);
             graphics.DrawString(Text, font, new SolidBrush(Color), new PointF(0, 0));
-            to_blend = new Image<Bgra, byte>(bmp);
+            to_blend = bmp.toimage<bgra, byte>();*/
             mat_valid = true;
         }
     }
@@ -119,11 +125,19 @@ namespace DominoPlanner.Core
         public string FilePath
         {
             get => _filepath;
-            set { if (SetField(ref _filepath, value)) { mat_valid = false; } }
+            set
+            {
+                if (value.Contains("\\")) value = value.Replace("\\", "/");
+
+                if (SetField(ref _filepath, value))
+                {
+                    mat_valid = false;
+                }
+            }
         }
         public override void UpdateMat()
         {
-            to_blend = new Image<Bgra, byte>(Workspace.AbsolutePathFromReference(ref _filepath, parent));
+            To_blend = SKBitmap.Decode(Workspace.AbsolutePathFromReference(ref _filepath, parent));
         }
         public BlendFileFilter()
         {
@@ -139,16 +153,15 @@ namespace DominoPlanner.Core
         private double _b;
         [ProtoMember(2)]
         public double Beta { get => _b; set => SetField(ref _b, value); }
-        public override void Apply(Image<Bgra, byte> input)
+        public override void Apply(SKBitmap input)
         {
             Parallel.For(0, input.Height, (y) =>
             {
                 for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    for (int c = 2; c >= 0; c--)
-                    {
-                        input.Data[y, x, c] = Saturate(input.Data[y, x, c] * Alpha + Beta);
-                    }
+                    SKColor color = input.GetPixel(x, y);
+                    SKColor result = new SKColor(Saturate(color.Red * Alpha + Beta), Saturate(color.Green * Alpha + Beta), Saturate(color.Blue * Alpha + Beta), color.Alpha);
+                    input.SetPixel(x, y, result);
                 }
             });
         }
@@ -160,25 +173,23 @@ namespace DominoPlanner.Core
     {
         private double _gamma;
         [ProtoMember(1)]
-        public double Gamma { get => _gamma; set { SetField(ref _gamma, value); updateLUT(); } }
+        public double Gamma { get => _gamma; set { SetField(ref _gamma, value); UpdateLUT(); } }
 
         private byte[] LUT;
-        public override void Apply(Image<Bgra, byte> input)
+        public override void Apply(SKBitmap input)
         {
             Parallel.For(0, input.Height, (y) =>
             {
                 for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    for (int c = 2; c >= 0; c--)
-                    {
-                        input.Data[y, x, c] = LUT[input.Data[y, x, c]];
-
-                    }
+                    SKColor color = input.GetPixel(x, y);
+                    SKColor result = new SKColor(LUT[color.Red], LUT[color.Green], LUT[color.Blue], color.Alpha);
+                    input.SetPixel(x, y, result);
                 }
             });
 
         }
-        public void updateLUT()
+        public void UpdateLUT()
         {
             LUT = new byte[256];
             for (int i = 0; i < LUT.Length; i++)
@@ -198,10 +209,10 @@ namespace DominoPlanner.Core
         [ProtoMember(2)]
         public double StandardDeviation { get => std_dev; set {  SetField(ref std_dev, value); } }
 
-        public override void Apply(Image<Bgra, byte> input)
+        public override void Apply(SKBitmap input)
         {
             //var result = input.Clone();
-            CvInvoke.GaussianBlur(input, input, new Size(KernelSize, KernelSize), StandardDeviation);
+            //CvInvoke.GaussianBlur(input, input, new Size(KernelSize, KernelSize), StandardDeviation);
             //input = result;
         }
     }
@@ -211,43 +222,43 @@ namespace DominoPlanner.Core
         private double weight = 1;
         [ProtoMember(1)]
         public double SharpenWeight { get => weight; set { SetField(ref weight, value); } }
-        public override void Apply(Image<Bgra, byte>  input)
+        public override void Apply(SKBitmap  input)
         {
-            var blurred = new Mat();
-            CvInvoke.GaussianBlur(input, blurred, new Size(KernelSize, KernelSize), StandardDeviation);
-            CvInvoke.AddWeighted(input, (1.0 + weight), blurred, -weight, 0, input, Emgu.CV.CvEnum.DepthType.Cv8U);
-            
+            //var blurred = new Mat();
+            //CvInvoke.GaussianBlur(input, blurred, new Size(KernelSize, KernelSize), StandardDeviation);
+            //CvInvoke.AddWeighted(input, (1.0 + weight), blurred, -weight, 0, input, Emgu.CV.CvEnum.DepthType.Cv8U);
         }
     }
     [ProtoContract]
     public class ReplaceColorFilter : ImageFilter
     {
         [ProtoMember(2)]
-        private string before_surrogate { get { return ColorTranslator.ToHtml(_before); } set { _before = ColorTranslator.FromHtml(value); } }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _before")]
+        private string Before_surrogate { get { return ColorTranslator.ToHtml(_before); } set { _before = ColorTranslator.FromHtml(value); } }
         private Color _before;
         public Color BeforeColor { get => _before; set { SetField(ref _before, value); } }
         [ProtoMember(3)]
-        private string after_surrogate { get { return ColorTranslator.ToHtml(_after); } set { _after = ColorTranslator.FromHtml(value); } }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _after")]
+        private string After_surrogate { get { return ColorTranslator.ToHtml(_after); } set { _after = ColorTranslator.FromHtml(value); } }
         private Color _after;
         public Color AfterColor { get => _after; set { SetField(ref _after, value); } }
         private int _tol;
         [ProtoMember(1)]
         public int Tolerance { get => _tol; set { SetField(ref _tol, value); } }
 
-        public override void Apply(Image<Bgra, byte> input)
+        public override void Apply(SKBitmap input)
         {
             Parallel.For(0, input.Height, (y) =>
             {
                 for (int x = input.Width - 1; x >= 0; x--)
                 {
-                    if (Math.Abs(input.Data[y, x, 0] - BeforeColor.B) < Tolerance &&
-                    Math.Abs(input.Data[y, x, 1] - BeforeColor.G) < Tolerance &&
-                    Math.Abs(input.Data[y, x, 2] - BeforeColor.R) < Tolerance)
+                    var px = input.GetPixel(x, y);
+                    if (Math.Abs(px.Blue - BeforeColor.B) < Tolerance &&
+                    Math.Abs(px.Green - BeforeColor.G) < Tolerance &&
+                    Math.Abs(px.Red - BeforeColor.R) < Tolerance)
                     {
-                        input.Data[y, x, 0] = AfterColor.B;
-                        input.Data[y, x, 1] = AfterColor.G;
-                        input.Data[y, x, 2] = AfterColor.R;
-                        input.Data[y, x, 3] = AfterColor.A;
+                        input.SetPixel(x, y, new SKColor(AfterColor.R, AfterColor.G, AfterColor.B, AfterColor.A));
                     }
                 }
             });
@@ -255,10 +266,10 @@ namespace DominoPlanner.Core
     }
     public static class ImageExtensions
     {
-        public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
+        /*public static void OverlayImage(this Image<Bgra, byte> background, Image<Bgra, byte> overlay, int start_x = 0, int start_y = 0)
         {
-            Bitmap source = background.Bitmap;
-            Bitmap over = overlay.Bitmap;
+            Bitmap source = background.ToBitmap();
+            Bitmap over = overlay.AsBitmap();
             unsafe
             {
                 BitmapData backgroundData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), 
@@ -302,21 +313,7 @@ namespace DominoPlanner.Core
                 });
                 source.UnlockBits(backgroundData);
             }
-            background = new Image<Bgra, byte>(source);
-        }
-        public static void OpacityReduction(this Image<Bgra, byte> input, double opacity)
-        {
-            int height = input.Height;
-            int width = input.Width;
-            Parallel.For(0, height, (y) =>
-            {
-                for (int x = width - 1; x >= 0; x--)
-                {
-
-                    var new_opacity = input.Data[y, x, 3] * opacity;
-                    input.Data[y, x, 3] = (byte) (new_opacity > 255 ? 255 : new_opacity);
-                }
-            });
-        }
+            background = source.ToImage<Bgra, byte>();
+*/
     }
 }

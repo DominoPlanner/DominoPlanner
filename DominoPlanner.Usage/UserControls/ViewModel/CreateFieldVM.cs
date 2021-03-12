@@ -1,17 +1,11 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
-using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
     class CreateFieldVM : DominoProviderVM
     {
         #region CTOR
@@ -19,22 +13,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             // Regeneration kurz sperren, dann wieder auf Ursprungswert setzen
             AllowRegeneration = false;
-            field_templates = new List<StandardSize>();
-            field_templates.Add(new StandardSize("8mm", new Sizes(8, 8, 24, 8)));
-            field_templates.Add(new StandardSize("Tortoise", new Sizes(0, 48, 24, 0)));
-            field_templates.Add(new StandardSize("User Size", new Sizes(10, 10, 10, 10)));
-            Click_Binding = new RelayCommand((x) => BindSize = !BindSize);  
+            Field_templates = new List<StandardSize>
+            {
+                new StandardSize(_("8mm"), new Sizes(8, 8, 24, 8)),
+                new StandardSize(_("Tortoise"), new Sizes(0, 48, 24, 0)),
+                new StandardSize(GetParticularString("User defined field dimensions (keep string short)", "User Size"), new Sizes(10, 10, 10, 10))
+            };
             ReloadSizes();
             AllowRegeneration = AllowRegenerate;
             Refresh();
             if (fieldParameters.Counts != null) RefreshColorAmount();
             UnsavedChanges = false;
-            TargetSizeAffectedProperties = new string[] {"Length", "Height" };
+            TargetSizeAffectedProperties = new string[] {nameof(Length), nameof(Height) };
         }
         #endregion
 
         #region fields
-        Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+        private readonly Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         FieldParameters fieldParameters
         {
             get { return CurrentProject as FieldParameters; }
@@ -180,7 +175,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         private List<StandardSize> _field_templates;
-        public List<StandardSize> field_templates
+        public List<StandardSize> Field_templates
         {
             get { return _field_templates; }
             set
@@ -217,7 +212,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_SelectedItem != value)
                 {
                     var tempSelItem = _SelectedItem;
-                    if (_SelectedItem?.Name=="User Size")
+                    if (_SelectedItem?.Name==GetParticularString("User defined field dimensions (keep string short)", "User Size"))
                     {
                         _SelectedItem.Sizes.a = HorizontalDistance;
                         _SelectedItem.Sizes.b = HorizontalSize;
@@ -231,7 +226,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             PostUndoAction: () => { UpdateSizes(); Refresh(); }, ChangesSize: true);
                     }
                     _SelectedItem = value;
-                    if (SelectedItem.Name.Equals("User Size"))
+                    if (SelectedItem == null)
+                        return;
+                    if (SelectedItem.Name.Equals(GetParticularString("User defined field dimensions (keep string short)", "User Size")))
                         CanChange = true;
                     else
                         CanChange = false;
@@ -287,16 +284,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         protected override void PostCalculationUpdate()
         {
-            TabPropertyChanged("Length", ProducesUnsavedChanges: false);
-            TabPropertyChanged("Height", ProducesUnsavedChanges: false);
-            TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(Length), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(Height), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(DominoCount), ProducesUnsavedChanges: false);
         }
         private void UpdateSizes()
         {
-            HorizontalDistance = SelectedItem.Sizes.a;
-            HorizontalSize = SelectedItem.Sizes.b;
-            VerticalSize = SelectedItem.Sizes.c;
-            VerticalDistance = SelectedItem.Sizes.d;
+            if (SelectedItem != null)
+            {
+                HorizontalDistance = SelectedItem.Sizes.a;
+                HorizontalSize = SelectedItem.Sizes.b;
+                VerticalSize = SelectedItem.Sizes.c;
+                VerticalDistance = SelectedItem.Sizes.d;
+            }
 
         }
 
@@ -304,7 +304,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             Sizes currentSize = new Sizes(HorizontalDistance, HorizontalSize, VerticalSize, VerticalDistance);
             bool found = false;
-            foreach (StandardSize sSize in field_templates)
+            foreach (StandardSize sSize in Field_templates)
             {
                 if (sSize.Sizes.a == currentSize.a && sSize.Sizes.b == currentSize.b && sSize.Sizes.c == currentSize.c && sSize.Sizes.d == currentSize.d)
                 {
@@ -315,15 +315,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
             if (!found)
             {
-                field_templates.Last<StandardSize>().Sizes = currentSize;
-                SelectedItem = field_templates.Last<StandardSize>();
+                Field_templates.Last<StandardSize>().Sizes = currentSize;
+                SelectedItem = Field_templates.Last<StandardSize>();
             }
             UnsavedChanges = true;
         }
         #endregion
 
-        private ICommand _Click_Binding;
-        public ICommand Click_Binding { get { return _Click_Binding; } set { if (value != _Click_Binding) { _Click_Binding = value; } } }
         
         
     }

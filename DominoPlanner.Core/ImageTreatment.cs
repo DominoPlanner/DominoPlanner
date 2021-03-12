@@ -1,7 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +7,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Avalonia.Media;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -19,8 +17,8 @@ namespace DominoPlanner.Core
     [ProtoInclude(101, typeof(FieldReadout))]
     public abstract class ImageTreatment
     {
-        private Mat source;
-        public Mat imageFiltered;
+        private SKBitmap source;
+        public SKBitmap imageFiltered;
         [ProtoMember(1)]
         private int _width;
         public int Width
@@ -40,13 +38,14 @@ namespace DominoPlanner.Core
         }
         private Color _background;
         [ProtoMember(3)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _background")]
         private string BackgroundSurrogate
         {
             get
             {
                 return _background.ToString();
             }
-            set { Background = (Color)ColorConverter.ConvertFromString(value); }
+            set { Background = Color.Parse(value); }
         }
         public Color Background
         {
@@ -107,20 +106,25 @@ namespace DominoPlanner.Core
         }
         protected void UpdateSource()
         {
-            this.source = new Image<Emgu.CV.Structure.Bgra, byte>(Width, Height,
-                new Emgu.CV.Structure.Bgra(Background.B, Background.G, Background.R, Background.A)).Mat;
+            source = new SKBitmap(Width, Height);
+            using (SKCanvas canvas = new SKCanvas(source))
+            {
+                var bg = new SKColor(Background.R, Background.G, Background.B, Background.A);
+                canvas.Clear(bg);
+            }
             imageValid = false;
         }
         protected void ApplyImageFilters()
         {
-            var imageFiltered = source.ToImage<Emgu.CV.Structure.Bgra, byte>();
+            var imageFiltered = source;
             foreach (ImageFilter filter in ImageFilters)
             {
                 filter.parent = parent;
                 filter.Apply(imageFiltered);
             }
-            this.imageFiltered = imageFiltered.Mat;
+            this.imageFiltered = imageFiltered;
             imageValid = true;
+            colorsValid = false;
         }
         protected ImageTreatment()
         {
@@ -149,15 +153,11 @@ namespace DominoPlanner.Core
             UpdateSource();
         }
 
-        public System.Drawing.Bitmap FilteredImage
+        public SKBitmap FilteredImage
         {
             get
             {
-                if(imageFiltered != null)
-                {
-                    return imageFiltered.Bitmap;
-                }
-                return null;
+                return imageFiltered;
             }
         }
     }
@@ -217,72 +217,82 @@ namespace DominoPlanner.Core
         #region overrides
         public override void ReadoutColors(DominoTransfer shapes)
         {
-            using (Image<Bgra, byte> img = imageFiltered.ToImage<Bgra, byte>())
+            if (shapes.Length == 0)
+                return;
+            var img = FilteredImage;
+            double scalingX = (double)(Width - 1) / shapes.PhysicalLength;
+            double scalingY = (double)(Height - 1) / shapes.PhysicalHeight;
+            if (!AllowStretch)
             {
-                double scalingX = (double)(Width - 1) / shapes.physicalLength;
-                double scalingY = (double)(Height - 1) / shapes.physicalHeight;
-                if (!AllowStretch)
+                if (scalingX > scalingY) scalingX = scalingY;
+                else scalingY = scalingX;
+            }
+            // tatsächlich genutzte Farben auslesen
+            Parallel.For(0, shapes.Length, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i) =>
+            {
+                SKColor result = new SKColor();
+                if (Average == AverageMode.Corner)
                 {
-                    if (scalingX > scalingY) scalingX = scalingY;
-                    else scalingY = scalingX;
+                    DominoRectangle container = shapes[i].GetContainer(scalingX, scalingY);
+
+                    result = img.GetPixel(container.x1, container.y1);
                 }
-                // tatsächlich genutzte Farben auslesen
-                Parallel.For(0, shapes.length, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, (i) =>
+                else if (Average == AverageMode.Average)
                 {
-                    Bgra result = new Bgra();
-                    if (Average == AverageMode.Corner)
-                    {
-                        DominoRectangle container = shapes[i].GetContainer(scalingX, scalingY);
+                    DominoRectangle container = shapes[i].GetContainer(scalingX, scalingY);
+                    double R = 0, G = 0, B = 0, A = 0;
+                    int counter = 0;
 
-                        result = new Bgra(img.Data[container.y1, container.x1, 0], img.Data[container.y1, container.x1, 1],
-                            img.Data[container.y1, container.x1, 2], img.Data[container.y1, container.x1, 3]);
-                    }
-                    else if (Average == AverageMode.Average)
+                    // for each container
+                    for (int x_iterator = container.x1; x_iterator <= container.x2; x_iterator++)
                     {
-                        DominoRectangle container = shapes[i].GetContainer(scalingX, scalingY);
-                        double R = 0, G = 0, B = 0, A = 0;
-                        int counter = 0;
-
-                        // for each container
-                        for (int x_iterator = container.x1; x_iterator <= container.x2; x_iterator++)
+                        for (int y_iterator = container.y1; y_iterator <= container.y2; y_iterator++)
                         {
-                            for (int y_iterator = container.y1; y_iterator <= container.y2; y_iterator++)
+                            if (shapes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY))
                             {
-                                if (shapes[i].IsInside(new Point(x_iterator, y_iterator), scalingX, scalingY))
-                                {
-                                    R += img.Data[y_iterator, x_iterator, 2];
-                                    G += img.Data[y_iterator, x_iterator, 1];
-                                    B += img.Data[y_iterator, x_iterator, 0];
-                                    A += img.Data[y_iterator, x_iterator, 3];
-                                    counter++;
-                                }
+                                var r = img.GetPixel(x_iterator, y_iterator);
+                                R += r.Red;
+                                G += r.Green;
+                                B += r.Blue;
+                                A += r.Alpha;
+                                counter++;
                             }
                         }
-                        if (counter != 0)
-                        {
-                            result = new Bgra((byte)(B / counter), (byte)(G / counter), (byte)(R / counter), (byte)(A / counter));
-                        }
-                        else // rectangle too small
-                        {
-                            result = new Bgra(img.Data[container.y1, container.x1, 0], img.Data[container.y1, container.x1, 1],
-                            img.Data[container.y1, container.x1, 2], img.Data[container.y1, container.x1, 3]);
-                        }
                     }
-                    if (StateReference == StateReference.Before)
+                    if (counter != 0)
                     {
-                        shapes[i].PrimaryOriginalColor = result;
+                        result = new SKColor((byte)(R / counter), (byte)(G / counter), (byte)(B / counter),   (byte)(A / counter));
                     }
-                    else
+                    else // rectangle too small
                     {
-                        throw new NotImplementedException();
+                        result = img.GetPixel(container.y1, container.x1);
                     }
-                });
-            }
+                }
+                if (StateReference == StateReference.Before)
+                {
+                    shapes[i].PrimaryOriginalColor = result;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            });
+            
             colorsValid = true;
         }
         #endregion
         
 
+    }
+    public enum Inter
+    {
+        Nearest = 0,
+        Linear = 1,
+        LinearExact = 1,
+        Cubic = 2,
+        Area = 3,
+        Lanczos4 = 3,
+        Unset=5
     }
     [ProtoContract(SkipConstructor =true)]
     public class FieldReadout : ImageTreatment
@@ -294,29 +304,46 @@ namespace DominoPlanner.Core
         /// Bicubic eignet sich für Fotos, NearestNeighbor für Logos
         /// </summary>
         [ProtoMember(1)]
-        public Inter ResizeMode
+        private Inter ResizeMode
         {
             get => _resizeMode;
             set
             {
-                if (_resizeMode != value)
+                _resizeMode = value;
+                if (value == Inter.Nearest )
+                    ResizeQuality = SKFilterQuality.Low;
+                else if (value == Inter.Linear || value == Inter.LinearExact || value == Inter.Cubic)
+                    ResizeQuality = SKFilterQuality.Medium;
+                else
+                    ResizeQuality = SKFilterQuality.High;
+                _resizeMode = Inter.Unset;
+            }
+        }
+        private SKFilterQuality _resizeQuality;
+        [ProtoMember(2)]
+        public SKFilterQuality ResizeQuality
+        {
+            get => _resizeQuality;
+            set
+            {
+                if (_resizeQuality != value)
                 {
-                    _resizeMode = value;
+                    _resizeQuality = value;
                     colorsValid = false;
                 }
             }
         }
         #endregion
-        private Mat resizedImage;
+        private SKBitmap resizedImage;
 
         #region constructors
-        public FieldReadout(FieldParameters parent, string relativeImagePath, Inter resizeMode) : base(relativeImagePath, parent)
+        public FieldReadout(FieldParameters parent, string relativeImagePath, SKFilterQuality resizeQuality) : base(relativeImagePath, parent)
         {
-            ResizeMode = resizeMode;
+            ResizeQuality = resizeQuality;
         }
-        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, Inter resizeMode) : base(imageWidth, imageHeight, parent)
+        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, SKFilterQuality resizeQuality) : base(imageWidth, imageHeight, parent)
         {
-            ResizeMode = resizeMode;
+            ResizeQuality = resizeQuality;
         }
         #endregion
         #region overrides
@@ -324,10 +351,8 @@ namespace DominoPlanner.Core
         {
             int length = shapes.FieldPlanLength;
             int height = shapes.FieldPlanHeight;
-            resizedImage = new Mat();
-            CvInvoke.Resize(imageFiltered, resizedImage,
-                new System.Drawing.Size() { Height = height, Width = length}, interpolation: ResizeMode);
-            using (var image = resizedImage.ToImage<Bgra, byte>())
+            resizedImage = imageFiltered.Resize(new SKImageInfo(length, height), ResizeQuality);
+            using (var image = resizedImage)
             {
                 Parallel.For(0, length, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (xi) =>
                 {
@@ -335,7 +360,7 @@ namespace DominoPlanner.Core
                     {
                         if (StateReference == StateReference.Before)
                         {
-                            shapes[length * yi + xi].PrimaryOriginalColor = image[yi, xi];
+                            shapes[length * yi + xi].PrimaryOriginalColor = image.GetPixel(xi, yi);
                         }
                         else
                         {

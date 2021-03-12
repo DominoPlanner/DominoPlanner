@@ -1,19 +1,27 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Emgu.CV.Structure;
 
 namespace DominoPlanner.Core
 {
+    public struct Lab
+    {
+        public double X, Y, Z;
+        public Lab(double X, double Y, double Z)
+        {
+            this.X = X; this.Y = Y; this.Z = Z;
+        }
+    }
     static class ColorExtension
     {
-        private static Lab ToLab(this Bgr color)
+        public static Lab SKToLab(this SKColor color)
         {
-            double r = color.Red / 255,
-                g = color.Green / 255,
-                b = color.Blue / 255,
+            double r = color.Red / 255d,
+                g = color.Green / 255d,
+                b = color.Blue / 255d,
                 x, y, z;
 
             r = (r > 0.04045) ? Math.Pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
@@ -31,24 +39,20 @@ namespace DominoPlanner.Core
 
             return new Lab((116 * y) - 16, (500 * (x - y)), 200 * (y - z));
         }
-        public static Lab ToLab(this System.Windows.Media.Color color)
+        public static Lab ToLab(this Avalonia.Media.Color color)
         {
-            return new Bgr(color.B, color.G, color.R).ToLab();
-        }
-        public static Lab ToLab(this Bgra color)
-        {
-            return new Bgr(color.Blue, color.Green, color.Red).ToLab();
+            return new SKColor(color.R, color.G, color.B).SKToLab();
         }
     }
     public interface IColorComparison
     {
         double Distance(Lab lab1, Lab lab2);
 
-        ColorComparisonMode colorComparisonMode { get; }
+        ColorComparisonMode ColorComparisonMode { get; }
     }
     public class CieDe2000Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -175,7 +179,7 @@ namespace DominoPlanner.Core
     }
     public class CmcComparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -185,7 +189,7 @@ namespace DominoPlanner.Core
 
         private readonly double _lightness = 2;
         private readonly double _chroma = 1;
-        public double Distance(Emgu.CV.Structure.Lab lab1, Emgu.CV.Structure.Lab lab2)
+        public double Distance(Lab lab1, Lab lab2)
         {
             var deltaL = lab1.X - lab2.X;
             var h = Math.Atan2(lab1.Z, lab1.Y);
@@ -224,7 +228,7 @@ namespace DominoPlanner.Core
     }
     public class Cie94Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode
+        ColorComparisonMode IColorComparison.ColorComparisonMode
         {
             get
             {
@@ -232,9 +236,9 @@ namespace DominoPlanner.Core
             }
         }
 
-        double Kl = 1.0;
-        double K1 = .045;
-        double K2 = .015;
+        readonly double Kl = 1.0;
+        readonly double K1 = .045;
+        readonly double K2 = .015;
         public double Distance(Lab lab1, Lab lab2)
         {
 
@@ -265,7 +269,7 @@ namespace DominoPlanner.Core
     }
     public class Cie1976Comparison : IColorComparison
     {
-        ColorComparisonMode IColorComparison.colorComparisonMode {
+        ColorComparisonMode IColorComparison.ColorComparisonMode {
             get
             {
                 return ColorComparisonMode.Cie76;

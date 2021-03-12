@@ -1,77 +1,210 @@
-﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DominoPlanner.Usage"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.LiveBuildHelperV"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-        mc:Ignorable="d" Title="FieldBlockViewer" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="Icons/DominoCalculator.ico">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="MouseDown">
-            <i:InvokeCommandAction Command="{Binding MouseDown}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-    <Grid>
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        
+        mc:Ignorable="d"
+        x:Class="DominoPlanner.Usage.LiveBuildHelperV"
+        Title="{local:Gettext FieldBlockViewer}"
+        Height="600" Width="900"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" Icon="/Icons/DominoCalculator.ico">
+    <Window.Resources>
+        <local:StoneWidthConverter x:Key="StoneWidthConverter"/>
+        <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
+        <local:IsSnapshottedConverter x:Key="IsSnapshottedConverter"/>
+        <local:DateTimeDifferenceConverter x:Key="DateTimeDifferenceConverter"/>
+    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <ia:EventTriggerBehavior EventName="PointerPressed">
+            <ia:InvokeCommandAction Command="{Binding MouseDown}"/>
+        </ia:EventTriggerBehavior>
+    </i:Interaction.Behaviors>
+    <Grid x:Name="MG">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Row:" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <xctk:IntegerUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False" PreviewKeyDown="IntegerUpDown_PreviewKeyDown"/>
-                <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <Label Grid.Column="3" Content="{Binding CountRow}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+        <Grid Grid.Row="0" ColumnDefinitions="300, 5, 300, *">
+            <Grid Grid.Column="0" ColumnDefinitions="3*, 3*, 2*, 3*">
+                <TextBlock Grid.Column="0" Text="{local:Gettext Row:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Minimum="1" Maximum="{Binding CountRow}" Grid.Column="1" Value="{Binding SelectedRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" Focusable="False"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="3" Text="{Binding CountRow}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+            </Grid>
+            <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
+                <TextBlock Grid.Column="0" Text="{local:Gettext Block:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+                <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
+                <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
+                <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
+            </Grid>
+            <TextBlock Grid.Column="3" Text="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+            
+            <StackPanel Grid.Column="4" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                <ToggleButton Width="30" Height="30" Command="{Binding MakePositionSnapshot}" CommandParameter="{Binding IsChecked,RelativeSource={RelativeSource Self}}" ToolTip.Tip="Pin this location to remember it later on">
+                    <ToggleButton.IsChecked>
+                        <MultiBinding Converter="{StaticResource IsSnapshottedConverter}">
+                            <Binding Path="PositionSnapshots" Mode="TwoWay"/>
+                            <Binding Path="SelectedRow"/>
+                            <Binding Path="SelectedBlock"/>
+                        </MultiBinding>
+                    </ToggleButton.IsChecked>
+                    <ToggleButton.Content>
+                        <Image Source="{StaticResource pinDrawingImage}"/>
+                    </ToggleButton.Content>
+                </ToggleButton>
+                <StackPanel Orientation="Horizontal">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding PositionSnapshots.Count}" Value="0">
+                            <ia:ChangePropertyAction PropertyName="IsVisible" Value="False"/>
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior ComparisonCondition="NotEqual" Binding="{Binding PositionSnapshots.Count}" Value="0">
+                            <ia:ChangePropertyAction PropertyName="IsVisible" Value="True"/>
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <Button Content="{local:Gettext Go To Last Pin}" Margin="5, 0, 0, 0" Command="{Binding GoToPositionSnapshot}" CommandParameter="{Binding PositionSnapshots[0]}">
+                        <ToolTip.Tip>
+                            <MultiBinding StringFormat="{local:Gettext 'Go to Row {0}, Block {1}'}">
+                                <Binding Path="PositionSnapshots[0].Row"/>
+                                <Binding Path="PositionSnapshots[0].Column"/>
+                            </MultiBinding>
+                        </ToolTip.Tip>
+                    </Button>
+                    <StackPanel Orientation="Vertical">
+                        <ToggleButton Name="PinDropButton" Height="30">
+                            <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                                                          HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"
+                                                          Data="M 2 0 L 6 4 L 10 0 Z"/>
 
-            </Grid>
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Block:" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <xctk:IntegerUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" PreviewKeyDown="IntegerUpDown_PreviewKeyDown"/>
-                <Label Grid.Column="2" Content="of" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <Label Grid.Column="3" Content="{Binding CountBlock}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-            </Grid>
-            <Label Grid.Column="3" Content="{Binding BatState}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="25"/>
+                        </ToggleButton>
+                        <Popup IsOpen="{Binding #PinDropButton.IsChecked, Mode=TwoWay}" StaysOpen="False">
+                            <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Vertical" Margin="2">
+                                    <ListBox Items="{Binding PositionSnapshots}" Width="200" BorderThickness="0" Padding="0">
+                                        <ListBox.Resources>
+                                            <local:Ticker x:Key="ticker"/>
+                                        </ListBox.Resources>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type local:PositionSnapshot}">
+                                                <DockPanel LastChildFill="False" Background="Transparent">
+                                                    <i:Interaction.Behaviors>
+                                                        <ia:EventTriggerBehavior EventName="PointerReleased">
+                                                            <ia:InvokeCommandAction CommandParameter="{Binding .}" Command="{Binding #PinDropButton.DataContext.GoToPositionSnapshot}"/>
+                                                            <ia:ChangePropertyAction TargetObject="{Binding #PinDropButton}" PropertyName="IsChecked" Value="False"/>
+                                                        </ia:EventTriggerBehavior>
+                                                    </i:Interaction.Behaviors>
+                                                    <TextBlock DockPanel.Dock="Left" FontWeight="Bold">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{local:Gettext 'Row {0}, Block {1}'}">
+                                                                <Binding Path="Row"/>
+                                                                <Binding Path="Column"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <TextBlock DockPanel.Dock="Right" FontStyle="Italic" Foreground="Gray" ToolTip.Tip="{Binding CreationTime, StringFormat={local:Gettext 'Creation Time: {0}'}}">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource DateTimeDifferenceConverter}">
+                                                                <Binding Source="{StaticResource ticker}" Path="Now" Mode="OneWay"/>
+                                                                <Binding Path="CreationTime"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock Text="{local:Gettext Click Pin to activate}" Margin="0, 5"/>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
-                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5">Show History</CheckBox>
+                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
-                        <TextBlock>Show remaining colors</TextBlock>
-                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False">
-                            <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}">
-
-                            </local:ColorControl>
+                        <TextBlock Text="{local:Gettext Show remaining colors}"/>
+                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False" Width="400">
+                            <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
                         </Popup>
                     </StackPanel>
                 </Button>
             </StackPanel>
         </Grid>
-        <ContentControl x:Name="CC" Grid.Row="1" Content="{Binding currentBlock}" MouseDown="ContentControl_MouseDown">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SizeChanged">
-                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="Loaded">
-                    <i:InvokeCommandAction Command="{Binding SizeChanged}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ContentControl>
+        <Grid Grid.Row="1">
+            <Grid.Styles>
+                <Style Selector="ListBox">
+                    <Setter Property="ItemsPanel">
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </Setter>
+                </Style>
+                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+            </Grid.Styles>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MaxHeight="150"/>
+                <RowDefinition Height="*" MaxHeight="50"/>
+                <RowDefinition Height="*" MaxHeight="250"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                                    <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource StoneWidthConverter}">
+                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Height="80" VerticalAlignment="Top">
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource BorderWidthConverter}">
+                                    <Binding Path="Amount"/>
+                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="{Binding #TitleBox.DataContext.FontSize}" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Bottom" Margin="5">
+                <TextBlock Text="{local:Gettext Font size:}" VerticalAlignment="Center"/>
+                <NumericUpDown Value="{Binding FontSize}" Margin="5, 0" Width="60" Minimum="5"></NumericUpDown>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

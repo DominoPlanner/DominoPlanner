@@ -1,21 +1,35 @@
-﻿using System;
+﻿using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using System;
+using System.Configuration;
 using System.Text;
-using System.Windows;
+using Avalonia;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public class MainWindow : Window
     {
         NamedPipeManager PipeManager;
-        
-
         public MainWindow()
         {
+            // Find out current locale if started for the first time. Needs to be done after app is started, but before first window is shown
+            var vm =  new MainWindowViewModel();
+            if (vm.FirstStartup)
+            {
+                var currentLocale = System.Globalization.CultureInfo.CurrentCulture;
+                var selectedLang = Localizer.GetAllLocales().Contains(currentLocale) ? currentLocale.Name : "en-US";
+                Localizer.Language = selectedLang;
+                Localizer.LocalizerInstance.LoadLanguage(selectedLang);
+            }
             InitializeComponent();
-            DataContext = new MainWindowViewModel();
+
+            DataContext = vm;
+            KeyDown += (o, e) => KeyPressedHandler(o, e);
+            Opened += (o, e) => MainWindow_Initialized();
             PipeManager = new NamedPipeManager("DominoPlanner");
             PipeManager.StartServer();
             PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
@@ -31,21 +45,43 @@ namespace DominoPlanner.Usage
                 filesToOpen = sb.ToString();
             }
             PipeManager.Write(filesToOpen);
+#if DEBUG
+            this.AttachDevTools();
+#endif
         }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        // ugly hacky workaround for the fact that events don't wait if they are canceled asynchronously
+        private bool should_really_close = false;
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(DataContext is MainWindowViewModel mwvm)
+            if (!should_really_close)
             {
-                if (!mwvm.CloseAllTabs())
+                e.Cancel = true;
+            }
+            if (DataContext is MainWindowViewModel mwvm)
+            {
+                if (await mwvm.CloseAllTabs())
                 {
-                    e.Cancel = true;
+                    mwvm.SaveSettings();
+                    if (!should_really_close)
+                    {
+                        should_really_close = true;
+                        this.Close();
+                    }
                 }
             }
-            PipeManager.StopServer();
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                PipeManager.StopServer();
+        }
+        private void KeyPressedHandler(object sender, KeyEventArgs args)
+        {
+            if (DataContext is MainWindowViewModel mwvm)
+            {
+                mwvm.KeyPressed(sender, args);
+            }
         }
         public void HandleNamedPipe_OpenRequest(string filesToOpen)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
                 ((MainWindowViewModel)DataContext).OpenFile(filesToOpen);
 
@@ -54,8 +90,19 @@ namespace DominoPlanner.Usage
 
                 this.Topmost = true;
                 this.Activate();
-                Dispatcher.BeginInvoke(new Action(() => { this.Topmost = false; }));
+                Dispatcher.UIThread.InvokeAsync(new Action(() => { this.Topmost = false; }));
             });
+        }
+        protected void MainWindow_Initialized()
+        {
+            if (DataContext is MainWindowViewModel mwvm)
+            {
+                mwvm.AfterStartupChecks();
+            }
+        }
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

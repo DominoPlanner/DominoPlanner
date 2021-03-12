@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Input;
+using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +22,76 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region Methods
         internal virtual void ResetContent() { }
-        public abstract void Undo();
-        public abstract void Redo();
         public abstract bool Save();
+
+        protected bool undostate { get; set; }
+
+        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
+        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
+
+        public virtual void PropertyValueChanged(object sender, object value_new,
+           [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, Action PostUndoAction = null)
+        {
+            if (!undostate)
+            {
+                try
+                {
+                    undostate = true;
+                    if (producesUnsavedChanges)
+                        UnsavedChanges = true;
+                    var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction);
+                    if (undoStack.Count != 0)
+                    {
+                        var lastOnStack = undoStack.Peek();
+                        if (lastOnStack is PropertyChangedOperation op)
+                        {
+                            if (op.sender == sender && op.membername == membername)
+                            {
+                                // property has been changed multiple times in a row
+                                if (!op.value_old.Equals(value_new))
+                                {
+                                    op.value_new = value_new;
+                                    undoStack.Pop();
+                                    filter = op;
+                                }
+                            }
+                        }
+                    }
+                    undoStack.Push(filter);
+                    filter.Apply();
+                    redoStack = new Stack<PostFilter>();
+                }
+                finally
+                {
+                    undostate = false;
+                }
+            }
+        }
+        public virtual void Undo()
+        {
+            undostate = true;
+            if (undoStack.Count != 0)
+            {
+                PostFilter undoFilter = undoStack.Pop();
+                redoStack.Push(undoFilter);
+                undoFilter.Undo();
+                if (undoStack.Count == 0) UnsavedChanges = false;
+            }
+            undostate = false;
+        }
+
+        public virtual void Redo()
+        {
+            undostate = true;
+            if (redoStack.Count != 0)
+            {
+                PostFilter redoFilter = redoStack.Pop();
+                undoStack.Push(redoFilter);
+                redoFilter.Apply();
+            }
+            undostate = false;
+        }
+
         #endregion
 
         #region prope
@@ -97,6 +165,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         
 	    private ICommand _RedoComm;
         public ICommand RedoComm { get { return _RedoComm; } set { if (value != _RedoComm) { _RedoComm = value; } } }
+
+        internal virtual void KeyPressed(object sender, KeyEventArgs args) { }
         #endregion
     }
 

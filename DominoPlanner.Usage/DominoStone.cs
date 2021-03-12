@@ -11,7 +11,7 @@ namespace DominoPlanner.Usage
     public class DominoStone : ModelBase
     {
         #region CTOR
-        public DominoStone(string name, int count, System.Windows.Media.Color rgb, int ID)
+        public DominoStone(string name, int count, Avalonia.Media.Color rgb, int ID)
         {
             this.Name = name;
             this.Count = count;
@@ -73,11 +73,11 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private System.Windows.Media.Color _RGB;
+        private Avalonia.Media.Color _RGB;
         [Category("Stone")]
         [DisplayName("Color")]
         [Browsable(true)]
-        public System.Windows.Media.Color RGB
+        public Avalonia.Media.Color RGB
         {
             get { return _RGB; }
             set

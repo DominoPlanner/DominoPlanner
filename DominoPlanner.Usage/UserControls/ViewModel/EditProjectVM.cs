@@ -1,15 +1,13 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using Avalonia.Input;
+using Avalonia.Collections;
+using Avalonia.Controls;
+using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -18,18 +16,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #region CTOR
         public EditProjectVM(IDominoProvider dominoProvider) : base()
         {
-            HaveBuildtools = dominoProvider.HasProtocolDefinition ? Visibility.Visible : Visibility.Hidden;
+            HaveBuildtools = dominoProvider.HasProtocolDefinition;
 
             UICursor = null;
-            selectedDominoes = new List<int>();
+            Dominoes = new AvaloniaList<EditingDominoVM>();
+            PossiblePastePositions = new List<int>();
+            selectedDominoes = new AvaloniaList<int>();
             UnsavedChanges = false;
             CurrentProject = dominoProvider;
-            
+
             _DominoList = new ObservableCollection<ColorListEntry>();
 
             _DominoList.Clear();
             CurrentProject.colors.Anzeigeindizes.CollectionChanged += Anzeigeindizes_CollectionChanged;
-            refreshList();
+            RefreshList();
             selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
             RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
@@ -38,7 +38,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
             ClearSelection = new RelayCommand(o => { ClearFullSelection(true); });
             CopyCom = new RelayCommand(o => { Copy(); });
-            PasteCom = new RelayCommand(o => { Paste(); });
 
             AddRowAbove = new RelayCommand(o => { AddRow(false); });
             AddRowBelow = new RelayCommand(o => { AddRow(true); });
@@ -48,37 +47,65 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RemoveColumns = new RelayCommand(o => { RemoveSelColumns(); });
             FlipHorizontallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
             FlipVerticallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
-            MouseInPicture = new RelayCommand(o => { UICursor = Cursors.Hand; });
+            MouseInPicture = new RelayCommand(o => { UICursor = new Cursor(StandardCursorType.Hand); });
             MouseOutPicture = new RelayCommand(o => { UICursor = null; });
             SelectAllCom = new RelayCommand(o => { SelectAll(); });
+            ChangeColorCom = new RelayCommand(o => { if (o is IDominoColor dc) ChangeColor(dc); });
             UnsavedChanges = false;
             SelectionTool = new SelectionToolVM(this);
             DisplaySettingsTool = new DisplaySettingsToolVM(this);
             ZoomTool = new ZoomToolVM(this);
+            RulerTool = new RulerToolVM(this);
             EditingTools = new ObservableCollection<EditingToolVM>() {
                 SelectionTool,
-                new EditingToolVM() {Image = "ruler2DrawingImage", Name = "Measure distance"},
-                new EditingToolVM() {Image = "add_delete_rowDrawingImage", Name="Add or delete rows and columns" },
-                new EditingToolVM() { Image = "textDrawingImage", Name="Write text"},
-                new EditingToolVM() {Image = "fill_bucketDrawingImage", Name="Fill area" },
+                RulerTool,
+                new EditingToolVM(this) { Image = "textDrawingImage", Name="Write text"},
                 ZoomTool,
                 DisplaySettingsTool
             };
+            if (this.CurrentProject is IRowColumnAddableDeletable)
+            {
+                RowColumnTool = new RowColumnInsertionVM(this);
+                EditingTools.Insert(2, RowColumnTool);
+            }
             SelectedTool = SelectionTool;
             UpdateUIElements();
-
         }
         #endregion
 
         #region fields
-        internal List<int> selectedDominoes;
+
+
+        internal DominoTransfer dominoTransfer => CurrentProject.Last;
+
+        internal AvaloniaList<int> selectedDominoes;
+        public AvaloniaList<int> SelectedDominoes
+        {
+            get { return selectedDominoes; }
+            set { selectedDominoes = value; RaisePropertyChanged(); }
+        }
         private int[] selectedColors;
         private int startindex;
-        internal DominoTransfer dominoTransfer;
 
-        private SelectionToolVM SelectionTool;
+        private AvaloniaList<EditingDominoVM> dominoes;
+
+        public AvaloniaList<EditingDominoVM> Dominoes
+        {
+            get { return dominoes; }
+            set { dominoes = value; RaisePropertyChanged(); }
+        }
+        private AvaloniaList<CanvasDrawable> additionalDrawables;
+        public AvaloniaList<CanvasDrawable> AdditionalDrawables
+        {
+            get { return additionalDrawables; }
+            set { additionalDrawables = value; RaisePropertyChanged(); }
+        }
+
+        public SelectionToolVM SelectionTool { get; set; }
         public DisplaySettingsToolVM DisplaySettingsTool { get; set; }
-        public ZoomToolVM ZoomTool;
+        public ZoomToolVM ZoomTool { get; set; }
+        public RulerToolVM RulerTool;
+        public RowColumnInsertionVM RowColumnTool;
         #endregion
 
         #region events
@@ -101,16 +128,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             get { return selectedTool; }
             set
             {
-                if (value != null)
+                if (value != null && value != selectedTool)
+                {
+                    selectedTool?.LeaveTool();
                     selectedTool = value;
+                    selectedTool.EnterTool();
+                }
                 TabPropertyChanged(ProducesUnsavedChanges: false);
 
             }
         }
-
-
-        private Visibility _HaveBuildtools;
-        public Visibility HaveBuildtools
+        private bool _HaveBuildtools;
+        public bool HaveBuildtools
         {
             get { return _HaveBuildtools; }
             set
@@ -228,9 +257,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        private ColumnConfig _colorColumnConfig;
+        private AvaloniaList<ColorControl.Column> _colorColumnConfig;
 
-        public ColumnConfig ColorColumnConfig
+        public AvaloniaList<ColorControl.Column> ColorColumnConfig
         {
             get { return _colorColumnConfig; }
             set { _colorColumnConfig = value; }
@@ -250,27 +279,27 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         internal void ClearCanvas(bool ClearSelection = true)
         {
-            DisplaySettingsTool.ClearPastePositions();
+            ClearPastePositions();
             if (ClearSelection) ClearFullSelection(true);
-            if (DisplaySettingsTool.DominoProject != null)
-                DisplaySettingsTool.RemoveStones();
+            /*if (DisplaySettingsTool.DominoProject != null)
+                DisplaySettingsTool.RemoveStones();*/
         }
 
         private void Anzeigeindizes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    _DominoList.Where(x => x.DominoColor is DominoColor).ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
-                    break;
+                var filtered = _DominoList.Where(x => x.DominoColor is DominoColor);
+                if (e.NewStartingIndex < filtered.Count())
+                    filtered.ElementAt(e.NewStartingIndex).SortIndex = (int)e.NewItems[0];
             }
             UnsavedChanges = false;
-            RaisePropertyChanged("DominoList");
+            RaisePropertyChanged(nameof(DominoList));
         }
         public void UpdateUIElements()
         {
             RefreshColorAmount();
-            DisplaySettingsTool.Redraw();
+            Redraw();
             RefreshSizeLabels();
         }
         private void RefreshColorAmount()
@@ -298,19 +327,18 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private void refreshList()
+        private void RefreshList()
         {
             // Setup Columns
-            ColorColumnConfig = new ColumnConfig();
+            ColorColumnConfig = new AvaloniaList<ColorControl.Column>
+            {
+                new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
+                new ColorControl.Column() { DataField = "DominoColor.name", Header = _("Name"), Width = new GridLength(100), CanResize = true },
+                new ColorControl.Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(70), CanResize=true },
+                new ColorControl.Column() { DataField = "ProjectCount[0]", Header = GetParticularString("Number of stones used in current field", "Used"), HighlightDataField = "DominoColor.count" },
+                new ColorControl.Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Number of stones currently selected", "Selected") }
+            };
 
-            var columns = new ObservableCollection<Column>();
-            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
-            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
-            columns.Add(new Column() { DataField = "ProjectCount[0]", Header = "Used", HighlightDataField= "DominoColor.count" });
-            columns.Add(new Column() { DataField = "ProjectCount[1]", Header = "Selected" });
-            ColorColumnConfig.Columns = columns;
-            
             _DominoList.Clear();
             int counter = 0;
 
@@ -327,52 +355,121 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
         private void SelectAll()
         {
-            SelectionTool.Select(Enumerable.Range(0, dominoTransfer.length).ToList(), true);
+            SelectionTool.Select(Enumerable.Range(0, dominoTransfer.Length).ToList(), true);
+            UpdateUIElements();
         }
         List<int> toCopy = new List<int>();
-        private void Copy()
+
+        bool iscopying = false;
+        private async void Copy()
         {
-            if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not copy in this project.", "Copy", Errorhandler.MessageType.Warning);
-            DisplaySettingsTool.ClearPastePositions();
-            if (selectedDominoes.Count < 0)
+            if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage(_("Copy/Paste is not supported in this project."), "Copy", Errorhandler.MessageType.Warning);
+            ClearPastePositions();
+            if (selectedDominoes.Count <= 0)
             {
-                Errorhandler.RaiseMessage("Nothing to copy!", "No selection", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(_("Nothing to copy!"), _("No selection"), Errorhandler.MessageType.Error);
                 return;
             }
+            iscopying = true;
             toCopy = new List<int>(selectedDominoes);
             startindex = selectedDominoes.Min();
             ClearFullSelection(true);
             try
             {
                 int[] validPositions = ((ICopyPasteable)this.CurrentProject).GetValidPastePositions(startindex);
-                DisplaySettingsTool.HighlightPastePositions(validPositions);
+                HighlightPastePositions(validPositions);
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
+                FinalizePaste(true);
             }
             UpdateUIElements();
         }
 
-        private void Paste()
+        private async void Paste(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
+            bool pasteFailed = true;
             try
             {
-                if (!(CurrentProject is ICopyPasteable)) Errorhandler.RaiseMessage("Could not paste in this project.", "Paste", Errorhandler.MessageType.Warning);
-                if (selectedDominoes.Count == 0) return;
-                int pasteindex = selectedDominoes.First();
-                RemoveFromSelectedDominoes(pasteindex);
-                ClearFullSelection(true);
-                PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), pasteindex);
-                paste.Apply();
-                undoStack.Push(paste);
-                DisplaySettingsTool.ClearPastePositions();
-                UpdateUIElements();
+                if (!(CurrentProject is ICopyPasteable)) await Errorhandler.RaiseMessage(_("Copy/Paste is not supported in this project."), _("Paste"), Errorhandler.MessageType.Warning);
+                // find closest domino
+                int domino = FindDominoAtPosition(dominoPoint, int.MaxValue).idx;
+                if (PossiblePastePositions.Contains(domino))
+                {
+                    PasteFilter paste = new PasteFilter(CurrentProject as ICopyPasteable, startindex, toCopy.ToArray(), domino);
+                    paste.Apply();
+                    undoStack.Push(paste);
+                    pasteFailed = false;
+                    if (e.KeyModifiers != KeyModifiers.Control)
+                    {
+                        SelectionTool.Select(paste.paste_target, true);
+                    }
+                    
+                }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
+            finally
+            {
+                FinalizePaste(e.KeyModifiers != KeyModifiers.Control && !pasteFailed);
+            }
+        }
+        private void FinalizePaste(bool clearall)
+        {
+            if (clearall)
+            {
+                iscopying = false;
+                ClearPastePositions();
+            }
+            // refresh the preview in case we copied to the source domain
+            AdditionalDrawables.RemoveAll(PasteOverlays);
+            PasteOverlays = new List<CanvasDrawable>();
+            UpdateUIElements();
+        }
+        List<CanvasDrawable> PasteOverlays = new List<CanvasDrawable>();
+        Avalonia.Point lastreference;
+
+        private void DrawPasteOverlay(Avalonia.Point dominoPoint, PointerEventArgs e)
+        {
+            // display the dominoes to paste as a half-transparent overlay.
+            // reference point:
+            var reference_point = Dominoes[toCopy.Min()].CenterPoint - dominoPoint;
+            if (PasteOverlays.Count == 0)
+            {
+                // create the overlays
+                foreach (int i in toCopy)
+                {
+                    var p = new SkiaSharp.SKPath();
+                    var points = Dominoes[i].CanvasPoints;
+                    if (points.Length > 1)
+                    {
+                        p.MoveTo(new SkiaSharp.SKPoint((float)points[0].X - (float)reference_point.X, (float)points[0].Y - (float)reference_point.Y));
+                        foreach (var point in points.Skip(1))
+                        {
+                            p.LineTo(new SkiaSharp.SKPoint((float)point.X - (float)reference_point.X, (float)point.Y - (float)reference_point.Y));
+                        }
+                    }
+                    var color = Dominoes[i].StoneColor.ToSKColor().WithAlpha(128);
+                    PasteOverlays.Add(new CanvasDrawable() { BeforeBorders = false, Paint = new SkiaSharp.SKPaint() { Color = color }, Path = p });
+                    }
+                AdditionalDrawables.AddRange(PasteOverlays);
+            }
+            else
+            {
+                // find out difference between current and last reference point
+                var shift = lastreference - reference_point;
+                var transform = SkiaSharp.SKMatrix.CreateTranslation((float)shift.X, (float)shift.Y);
+                System.Diagnostics.Debug.WriteLine(shift);
+                foreach (var stone in PasteOverlays)
+                {
+                    stone.Path.Transform(transform);
+                }
+            }
+            lastreference = reference_point;
+            Redraw();
         }
         public void ExecuteOperation(PostFilter pf)
         {
@@ -399,14 +496,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(undoFilter is EditingActivatedOperation || undoFilter is SelectionOperation || undoFilter is SetColorOperation) )
             {
                 ClearCanvas(false);
-                DisplaySettingsTool.ResetCanvas();
+                RecreateCanvasViewModel();
+                UpdateUIElements();
+                DisplaySettingsTool.SliceImage();
                 if (undoStack.Count == 0) UnsavedChanges = false;
             }
             else
             {
                 UpdateUIElements();
             }
-            
+            SelectedTool.OnUndo();
         }
             
         public override void Redo()
@@ -427,138 +526,173 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             if (!(redoFilter is EditingDeactivatedOperation || redoFilter is SelectionOperation || redoFilter is SetColorOperation))
             {
                 ClearCanvas(false);
-                DisplaySettingsTool.ResetCanvas();
+                RecreateCanvasViewModel();
+                UpdateUIElements();
+                DisplaySettingsTool.SliceImage();
             }
             else
             {
                 UpdateUIElements();
             }
+            SelectedTool.OnRedo();
         }
-        internal void PressedKey(Key key)
+        internal override void KeyPressed(object sender, KeyEventArgs args)
         {
-            SelectedTool.KeyPressed(key);
+            if (iscopying && args.Key == Key.Escape)
+            {
+                FinalizePaste(true);
+                args.Handled = true;
+            }
+            if (!args.Handled)
+                SelectedTool.KeyPressed(args);
         }
         internal override void ResetContent()
         {
             base.ResetContent();
             RefreshSize?.Invoke(this, EventArgs.Empty);
         }
-        private void ChangeColor()
+        private void ChangeColor(IDominoColor color = null)
         {
-            
-            SetColorOperation sco = new SetColorOperation(CurrentProject, selectedDominoes.ToArray(), CurrentProject.colors.RepresentionForCalculation.ToList().IndexOf(SelectedColor.DominoColor));
+            if (color == null)
+            {
+                color = SelectedColor.DominoColor;
+            }
+            SetColorOperation sco = new SetColorOperation(CurrentProject, selectedDominoes.ToArray(), CurrentProject.colors.RepresentionForCalculation.ToList().IndexOf(color));
             ClearFullSelection(true);
             ExecuteOperation(sco);
             UnsavedChanges = true;
             UpdateUIElements();
         }
 
-        private void AddRow(bool addBelow)
+        public async void AddRow(bool addBelow, int index = -1, IDominoShape colorReference = null)
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (selectedDominoes.Count > 0 || index != -1)
                 {
-                    int selDomino = selectedDominoes.First();
+                    int selDomino = selectedDominoes.Count > 0 ? selectedDominoes.First() : index;
+                    int color = (colorReference ?? dominoTransfer[selDomino]).Color;
                     if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, dominoTransfer[selDomino].color, addBelow);
+                        AddRows addRows = new AddRows((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, color, addBelow);
                         ClearCanvas();
                         ExecuteOperation(addRows);
                         
-                        DisplaySettingsTool.ResetCanvas();
+                        RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
+                        DisplaySettingsTool.SliceImage();
                     }
                     else
                     {
-                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage(_("Adding rows is not supported in this project."), _("Add Row"), Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
-        private void AddColumn(bool addRight)
+        public async void AddColumn(bool addRight, int index = -1, IDominoShape colorReference  =null)
         {
             try
             {
-                if (selectedDominoes.Count > 0)
+                if (selectedDominoes.Count > 0 || index != -1)
                 {
-                    int selDomino = selectedDominoes.First();
+                    int selDomino = selectedDominoes.Count > 0 ? selectedDominoes.First() : index;
+                    int color = (colorReference ?? dominoTransfer[selDomino]).Color;
                     if (CurrentProject is IRowColumnAddableDeletable)
                     {
-                        AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, dominoTransfer[selDomino].color, addRight);
+                        AddColumns addRows = new AddColumns((CurrentProject as IRowColumnAddableDeletable), selDomino, 1, color, addRight);
                         ClearCanvas();
                         ExecuteOperation(addRows);
                        
-                        DisplaySettingsTool.ResetCanvas();
+                        RecreateCanvasViewModel();
                         SelectionTool.Select(addRows.added_indizes, true);
                         UpdateUIElements();
+                        DisplaySettingsTool.SliceImage();
                     }
                     else
                     {
-                        Errorhandler.RaiseMessage("Could not add a row in this project.", "Add Row", Errorhandler.MessageType.Warning);
+                        await Errorhandler.RaiseMessage(_("Adding columns is not supported in this project."), _("Add Row"), Errorhandler.MessageType.Warning);
                     }
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
-        private void RemoveSelRows()
+        public async void RemoveSelRows(int index = -1)
         {
             try
             {
                 if (CurrentProject is IRowColumnAddableDeletable)
                 {
+                    int[] deletionIndices = null;
+                    if (index != -1)
+                    {
+                        deletionIndices = new int[] { index };
+                    }
                     if (selectedDominoes.Count > 0)
                     {
-                        DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
+                        deletionIndices = selectedDominoes.ToArray();
+                    }
+                    if (deletionIndices != null)
+                    {
+                        DeleteRows deleteRows = new DeleteRows((CurrentProject as IRowColumnAddableDeletable), deletionIndices);
                         ClearCanvas();
                         ExecuteOperation(deleteRows);
-                        
-                        DisplaySettingsTool.ResetCanvas();
+                        RecreateCanvasViewModel();
+                        DisplaySettingsTool.SliceImage();
                     }
                 }
                 else
                 {
-                    Errorhandler.RaiseMessage("Could not remove a row in this project.", "Remove Row", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage(_("Removing rows is not supported in this project."), _("Remove Row"), Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
 
-        private void RemoveSelColumns()
+        public async void RemoveSelColumns(int index = -1)
         {
             try
             {
                 if (CurrentProject is IRowColumnAddableDeletable)
                 {
+                    int[] deletionIndices = null;
+                    if (index != -1)
+                    {
+                        deletionIndices = new int[] { index };
+                    }
                     if (selectedDominoes.Count > 0)
                     {
-                        DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), selectedDominoes.ToArray());
+                        deletionIndices = selectedDominoes.ToArray();
+                    }
+                    if (deletionIndices != null)
+                    {
+                        DeleteColumns deleteColumns = new DeleteColumns((CurrentProject as IRowColumnAddableDeletable), deletionIndices);
                         ClearCanvas();
                         ExecuteOperation(deleteColumns);
-                        DisplaySettingsTool.ResetCanvas();
+                        RecreateCanvasViewModel();
+                        DisplaySettingsTool.SliceImage();
                     }
                 }
                 else
                 {
-                    Errorhandler.RaiseMessage("Could not remove a column in this project.", "Remove Column", Errorhandler.MessageType.Warning);
+                    await Errorhandler.RaiseMessage(_("Removing columns is not supported in this project."), _("Remove Column"), Errorhandler.MessageType.Warning);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                Errorhandler.RaiseMessage(ex.Message, "Error", Errorhandler.MessageType.Error);
+                await Errorhandler.RaiseMessage(ex.Message, _("Error"), Errorhandler.MessageType.Error);
             }
         }
         internal void ClearFullSelection(bool undoable = false)
@@ -580,7 +714,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
             selectedColors = new int[CurrentProject.colors.Length];
-            DisplaySettingsTool.Redraw();
+            UpdateUIElements();
             SelectionTool.CurrentSelectionDomain.ResetSelectionArea();
             RefreshColorAmount();
         }
@@ -592,25 +726,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 ProjectHeight = dominoTransfer.FieldPlanHeight.ToString();
                 ProjectWidth = dominoTransfer.FieldPlanLength.ToString();
                 ProjectAmount = dominoTransfer.shapes.Count().ToString();
-                PhysicalLength = dominoTransfer.physicalLength;
-                PhysicalHeight = dominoTransfer.physicalHeight;
-            }
-        }
-
-        private void Dic_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            DominoInCanvas dic = (DominoInCanvas)sender;
-
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (IsSelected(dic.idx))
-                {
-                    SelectionTool.Select(new int[] { dic.idx }, true);
-                }
-            }
-            else if (e.RightButton == MouseButtonState.Pressed)
-            {
-                SelectionTool.Select(new int[] { dic.idx }, false);
+                PhysicalLength = dominoTransfer.PhysicalLength;
+                PhysicalHeight = dominoTransfer.PhysicalHeight;
             }
         }
         private void SelectAllStonesWithColor()
@@ -620,9 +737,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             IEnumerable<int> oldSelection = selectedDominoes.ToArray();
             if (oldSelection.Count() == 0)
             {
-                oldSelection = Enumerable.Range(0, dominoTransfer.length);
+                oldSelection = Enumerable.Range(0, dominoTransfer.Length);
             }
-            IEnumerable<int> newSelection = oldSelection.Where(x => dominoTransfer[x].color == selectedIndex);
+            IEnumerable<int> newSelection = oldSelection.Where(x => dominoTransfer[x].Color == selectedIndex);
             if (selectedDominoes.Count == 0)
             {
                 SelectionTool.Select(newSelection.ToList(), true);
@@ -634,40 +751,139 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             UpdateUIElements();
         }
 
-        internal void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseDown(Avalonia.Point dominoPoint, PointerPressedEventArgs e)
         {
-            SelectedTool?.MouseDown(sender, e);
+            SelectedTool?.MouseDown(dominoPoint, e);
         }
 
-        internal void Canvas_MouseMove(object sender, MouseEventArgs e)
+        internal void Canvas_MouseMove(Avalonia.Point dominoPoint, PointerEventArgs e)
         {
-            SelectedTool?.MouseMove(sender, e);
+            if (iscopying)
+            { 
+                DrawPasteOverlay(dominoPoint, e);
+            }
+            else
+            {
+                SelectedTool?.MouseMove(dominoPoint, e);
+            }
         }
+        
 
-        internal void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        internal void Canvas_MouseUp(Avalonia.Point dominoPoint, PointerReleasedEventArgs e)
         {
-            SelectedTool?.MouseUp(sender, e);
-            UpdateUIElements();
+            if (iscopying)
+            {
+                Paste(dominoPoint, e);
+                if (e.InitialPressMouseButton == MouseButton.Right)
+                {
+                    FinalizePaste(true);
+                }
+            }
+            else
+            {
+                SelectedTool?.MouseUp(dominoPoint, e);
+                UpdateUIElements();
+            }
+        }
+        internal void Canvas_MouseWheel(Avalonia.Point dominoPoint, PointerWheelEventArgs e)
+        {
+            SelectedTool?.MouseWheel(dominoPoint, e);
+            
         }
         public void AddToSelectedDominoes(int i)
         {
-            if (DisplaySettingsTool.SelectDominoVisual(i))
+            if (SelectDominoVisual(i))
             { 
                 selectedDominoes.Add(i);
-                selectedColors[dominoTransfer[i].color]++;
+                selectedColors[dominoTransfer[i].Color]++;
             }
         }
         public void RemoveFromSelectedDominoes(int i)
         {
-            if (DisplaySettingsTool.DeSelectDominoVisual(i))
+            selectedDominoes.Remove(i);
+            if (DeSelectDominoVisual(i))
             {
-                selectedDominoes.Remove(i);
-                selectedColors[dominoTransfer[i].color]--;
+                selectedColors[dominoTransfer[i].Color]--;
             }
         }
         public bool IsSelected(int i)
         {
-            return DisplaySettingsTool.IsSelected(i);
+            return Dominoes[i].State.HasFlag(EditingDominoStates.Selected);
+        }
+        internal void RecreateCanvasViewModel()
+        {
+            if (CurrentProject.Last == null)
+            {
+                return;
+            }
+            Dominoes.Clear();
+            for (int i = 0; i < CurrentProject.Last.shapes.Count(); i++)
+            {
+                EditingDominoVM dic = new EditingDominoVM(i, CurrentProject.Last[i], CurrentProject.colors, DisplaySettingsTool.Expanded);
+                Dominoes.Add(dic);
+            }
+        }
+        internal void Redraw()
+        {
+            DisplaySettingsTool.ForceRedraw = true;
+        }
+        private List<int> PossiblePastePositions;
+        public void HighlightPastePositions(int[] validPositions)
+        {
+            PossiblePastePositions = new List<int>();
+            foreach (int i in validPositions)
+            {
+                var dic = Dominoes[i];
+                dic.State |= EditingDominoStates.PasteHighlight;
+                PossiblePastePositions.Add(i);
+            }
+            Redraw();
+        }
+        public void ClearPastePositions()
+        {
+            foreach (int i in PossiblePastePositions)
+            {
+                Dominoes[i].State &= ~EditingDominoStates.PasteHighlight;
+            }
+            PossiblePastePositions.Clear();
+            Redraw();
+        }
+        public bool SelectDominoVisual(int position)
+        {
+            var dic = Dominoes[position];
+            if (!dic.State.HasFlag(EditingDominoStates.Selected))
+            {
+                dic.State |= EditingDominoStates.Selected;
+                return true;
+            }
+            return false;
+        }
+        public bool DeSelectDominoVisual(int position)
+        {
+            var dic = Dominoes[position];
+            if (dic.State.HasFlag(EditingDominoStates.Selected))
+            {
+                dic.State &= ~EditingDominoStates.Selected;
+                return true;
+            }
+            return false;
+        }
+        public EditingDominoVM FindDominoAtPosition(Avalonia.Point pos, int tolerance = 0)
+        {
+            double min_dist = int.MaxValue;
+            EditingDominoVM result = null;
+            foreach (var shape in Dominoes)
+            {
+                if (shape.domino.IsInside(new Core.Point(pos.X, pos.Y), expanded: DisplaySettingsTool.Expanded)) return shape;
+                var rect = shape.domino.GetContainer();
+                double dist = Math.Pow((rect.x + rect.width / 2) - pos.X, 2) + Math.Pow(rect.y + rect.height / 2 - pos.Y, 2);
+                if (min_dist > dist && dist < tolerance)
+                {
+                    min_dist = dist;
+                    result = shape;
+                }
+            }
+            return result;
         }
         #endregion
 
@@ -728,7 +944,17 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public ICommand MouseOutPicture { get { return _MouseOutPicture; } set { if (value != _MouseOutPicture) { _MouseOutPicture = value; } } }
 
         private ICommand _SelectAllCom;
+
         public ICommand SelectAllCom { get { return _SelectAllCom; } set { if (value != _SelectAllCom) { _SelectAllCom = value; } } }
+
+        private ICommand _ChangeColorCom;
+
+        public ICommand ChangeColorCom
+        {
+            get { return _ChangeColorCom; }
+            set { _ChangeColorCom = value; RaisePropertyChanged(); }
+        }
+
 
         #endregion
     }

@@ -1,12 +1,12 @@
-﻿using Emgu.CV;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 { 
@@ -54,7 +54,7 @@ namespace DominoPlanner.Core
             OnPropertyChanged(propertyName);
             return true;
         }
-        public abstract void Apply(Image<Emgu.CV.Structure.Bgra, byte> input);
+        public abstract void Apply(SKBitmap input);
         public void OnPropertyChanged(string propertyname)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
@@ -90,10 +90,11 @@ namespace DominoPlanner.Core
         private Color _color;
         public Color Color { get => _color; set { SetField(ref _color, value); } }
         [ProtoMember(2)]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "needed for serialization")]
         private String ColorSerialized
         {
             get { return Color.ToString(); }
-            set { Color = (Color)ColorConverter.ConvertFromString(value); }
+            set { Color = Color.Parse(value); }
         }
         public override void Apply(ColorRepository input)
         {

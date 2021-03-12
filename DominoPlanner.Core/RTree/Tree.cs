@@ -1,6 +1,4 @@
-﻿using Emgu.CV;
-using Emgu.CV.Structure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,12 +27,12 @@ namespace DominoPlanner.Core.RTree
         }
     }*/
 
-    public class RTree<T> : Geometry where T: Geometry
+    public class RTree<T> : IGeometry where T: IGeometry
     {
         public SplitNodeAlgorithm<T> algo;
         public Node<T> root;
         public DominoRectangle boundary;
-        private int maxitems;
+        private readonly int maxitems;
         public RTree(int maxItems, SplitNodeAlgorithm<T> algo)
         {
             root = new Leaf<T>(maxItems);
@@ -43,7 +41,7 @@ namespace DominoPlanner.Core.RTree
            
         }
 
-        public DominoRectangle getBoundingRectangle()
+        public DominoRectangle GetBoundingRectangle()
         {
             return boundary;
         }
@@ -61,7 +59,7 @@ namespace DominoPlanner.Core.RTree
                 root = new NonLeaf<T>(maxitems);
                 root.AddInternal(r.n1);
                 root.AddInternal(r.n2);
-                boundary = r.n1.getBoundingRectangle().CommonBoundingRectangle(r.n2.getBoundingRectangle());
+                boundary = r.n1.GetBoundingRectangle().CommonBoundingRectangle(r.n2.GetBoundingRectangle());
 
             }
             
@@ -76,12 +74,12 @@ namespace DominoPlanner.Core.RTree
         {
             throw new NotImplementedException();
         }
-        public Image<Rgba, byte> Draw()
+        /*public Image<Rgba, byte> Draw()
         {
             var result = new Image<Rgba, byte>(1100, 1100, new Rgba(255, 255, 255, 0));
             root.Draw(result, 0, 0, 0);
             return result;
-        }
+        }*/
         /*private Node<T> BuildTree(List<T> data)
         {
             var treeHeight = GetDepth(data.Count);
@@ -127,9 +125,9 @@ namespace DominoPlanner.Core.RTree
             return new Node(children, height);
         }*/
     }
-    public abstract class SplitNodeAlgorithm<T> where T : Geometry
+    public abstract class SplitNodeAlgorithm<T> where T : IGeometry
     {
-        public abstract void Split<A>(List<A> elements, SplitResult<T> result) where A : Geometry;
+        public abstract void Split<A>(List<A> elements, SplitResult<T> result) where A : IGeometry;
     }
     public struct CommonSplitResult
     {
@@ -138,7 +136,7 @@ namespace DominoPlanner.Core.RTree
         public DominoRectangle bounding1;
         public DominoRectangle bounding2;
     }
-    public class GuttmannQuadraticSplit<T> : SplitNodeAlgorithm<T> where T : Geometry
+    public class GuttmannQuadraticSplit<T> : SplitNodeAlgorithm<T> where T : IGeometry
     {
         public override void Split<A>(List<A> elements, SplitResult<T> result)
         {
@@ -149,7 +147,7 @@ namespace DominoPlanner.Core.RTree
             elements.RemoveAt(seeds.Item2);
             while (elements.Count != 0)
             {
-                var picked = PickNext(elements, result.n1.getBoundingRectangle(), result.n2.getBoundingRectangle());
+                var picked = PickNext(elements, result.n1.GetBoundingRectangle(), result.n2.GetBoundingRectangle());
                 if (picked.Item2)
                 {
                     result.n1.AddInternal(elements[picked.Item1]);
@@ -158,7 +156,7 @@ namespace DominoPlanner.Core.RTree
                 elements.RemoveAt(picked.Item1);
             }
         }
-        private Tuple<int, int> PickSeeds<A>(List<A> list) where A : Geometry
+        private Tuple<int, int> PickSeeds<A>(List<A> list) where A : IGeometry
         {
             double max_waste = 0;
             int entry1 = 0;
@@ -167,8 +165,8 @@ namespace DominoPlanner.Core.RTree
             {
                 for (int j = 0; j < i; j++)
                 {
-                    double size = list[i].getBoundingRectangle().SizeOfCommonBoundingRectangle(list[j].getBoundingRectangle()) 
-                        - list[i].getBoundingRectangle().Size - list[j].getBoundingRectangle().Size;
+                    double size = list[i].GetBoundingRectangle().SizeOfCommonBoundingRectangle(list[j].GetBoundingRectangle()) 
+                        - list[i].GetBoundingRectangle().Size - list[j].GetBoundingRectangle().Size;
                     if (size > max_waste)
                     {
                         entry1 = i;
@@ -180,15 +178,15 @@ namespace DominoPlanner.Core.RTree
             return new Tuple<int, int>(entry1, entry2);
         }
         // erster Wert: Index, zweiter Wert gibt an, zu welcher Gruppe er gehören soll (false = Gruppe2, true=Gruppe1)
-        private Tuple<int, bool> PickNext<A>(List<A> list, DominoRectangle bounding1, DominoRectangle bounding2) where A : Geometry
+        private Tuple<int, bool> PickNext<A>(List<A> list, DominoRectangle bounding1, DominoRectangle bounding2) where A : IGeometry
         {
             double preference = 0;
             int preferred = 0;
             bool l = false;
             for (int i = 0; i < list.Count; i++)
             {
-                var result1 = bounding1.SizeOfCommonBoundingRectangle(list[i].getBoundingRectangle()) - bounding1.Size;
-                var result2 = bounding2.SizeOfCommonBoundingRectangle(list[i].getBoundingRectangle()) - bounding2.Size;
+                var result1 = bounding1.SizeOfCommonBoundingRectangle(list[i].GetBoundingRectangle()) - bounding1.Size;
+                var result2 = bounding2.SizeOfCommonBoundingRectangle(list[i].GetBoundingRectangle()) - bounding2.Size;
                 var pref = result2 - result1;
                 if (Math.Abs(pref) > preference)
                 {
@@ -200,7 +198,7 @@ namespace DominoPlanner.Core.RTree
             return new Tuple<int, bool>(preferred, l);
         }
     }
-    public abstract class Node<T> : Geometry where T : Geometry
+    public abstract class Node<T> : IGeometry where T : IGeometry
     {
         public DominoRectangle boundingbox;
         public abstract List<T> Search(DominoRectangle region, List<T> result);
@@ -211,16 +209,16 @@ namespace DominoPlanner.Core.RTree
         {
             return boundingbox.Intersects(rect);
         }
-        public DominoRectangle getBoundingRectangle()
+        public DominoRectangle GetBoundingRectangle()
         {
             return boundingbox;
         }
-        public abstract void AddInternal(Geometry g);
-        internal abstract void Draw(Image<Rgba, byte> result, int x, int y, int ebene);
+        public abstract void AddInternal(IGeometry g);
+        //internal abstract void Draw(Image<Rgba, byte> result, int x, int y, int ebene);
 
         
     }
-    public class Leaf<T> : Node<T> where T : Geometry
+    public class Leaf<T> : Node<T> where T : IGeometry
     {
         public T[] data;
         public List<T> data2;
@@ -235,12 +233,12 @@ namespace DominoPlanner.Core.RTree
             data = new T[maxEntries];
         }
 
-        public override void AddInternal(Geometry g)
+        public override void AddInternal(IGeometry g)
         {
             data[dataLength] = (T) g;
             dataLength++;
-            if (boundingbox == null) boundingbox = g.getBoundingRectangle();
-            else boundingbox = boundingbox.CommonBoundingRectangle(g.getBoundingRectangle());
+            if (boundingbox == null) boundingbox = g.GetBoundingRectangle();
+            else boundingbox = boundingbox.CommonBoundingRectangle(g.GetBoundingRectangle());
         }
 
         public override InsertResult Insert(T geometry, SplitNodeAlgorithm<T> algo)
@@ -251,7 +249,7 @@ namespace DominoPlanner.Core.RTree
                 dataLength++;
             }
             else return SplitNode(geometry,algo);
-            boundingbox = geometry.getBoundingRectangle().ExtendRectangle(boundingbox);
+            boundingbox = geometry.GetBoundingRectangle().ExtendRectangle(boundingbox);
             return new NormalInsertResult() { bounding_rectangle = boundingbox};
         }
 
@@ -265,16 +263,18 @@ namespace DominoPlanner.Core.RTree
         }
         public SplitResult<T> SplitNode(T overflowed, SplitNodeAlgorithm<T> algo)
         {
-            SplitResult<T> res = new SplitResult<T>();
-            res.n1 = new Leaf<T>(this.data.Length);
-            res.n2 = new Leaf<T>(this.data.Length);
-            List<Geometry> list = new List<Geometry>();
+            SplitResult<T> res = new SplitResult<T>
+            {
+                n1 = new Leaf<T>(this.data.Length),
+                n2 = new Leaf<T>(this.data.Length)
+            };
+            List<IGeometry> list = new List<IGeometry>();
             foreach (var e in data) list.Add(e);
             list.Add(overflowed);
             algo.Split(list, res);
             return res;
         }
-        internal override void Draw(Image<Rgba, byte> result, int x, int y, int ebene)
+        /*internal override void Draw(Image<Rgba, byte> result, int x, int y, int ebene)
         {
             if (ebene > 5) ebene = 5;
             Rgba color = new Rgba(255 * (5 - ebene) / 5.0, 0, 255 * ebene / 5.0, 255);
@@ -296,10 +296,10 @@ namespace DominoPlanner.Core.RTree
                     (int)data[i].getBoundingRectangle().y - y,
                 (int)data[i].getBoundingRectangle().width, (int)data[i].getBoundingRectangle().height), color, 1) ;
             }
-        }
+        }*/
         
     }
-    public class NonLeaf<T> : Node<T> where T : Geometry
+    public class NonLeaf<T> : Node<T> where T : IGeometry
     {
         public Node<T>[] children;
         public NonLeaf(int maxEntries, List<Node<T>> nodes)
@@ -334,11 +334,11 @@ namespace DominoPlanner.Core.RTree
 
         public override InsertResult Insert(T geometry, SplitNodeAlgorithm<T> algo)
         {
-            var child = ChooseLeaf(geometry.getBoundingRectangle());
+            var child = ChooseLeaf(geometry.GetBoundingRectangle());
             var result = children[child].Insert(geometry, algo);
             if (result is NormalInsertResult)
             {
-                ExtendBoundingRectangle(geometry.getBoundingRectangle());
+                ExtendBoundingRectangle(geometry.GetBoundingRectangle());
                 return result;
             }
             else
@@ -349,7 +349,7 @@ namespace DominoPlanner.Core.RTree
                 {
                     children[dataLength] = res.n2;
                     dataLength++;
-                    ExtendBoundingRectangle(geometry.getBoundingRectangle());
+                    ExtendBoundingRectangle(geometry.GetBoundingRectangle());
                     return new NormalInsertResult
                     { bounding_rectangle = boundingbox};
                 }
@@ -361,10 +361,12 @@ namespace DominoPlanner.Core.RTree
         }
         public SplitResult<T> SplitNode(Node<T> overflowed, SplitNodeAlgorithm<T> algo)
         {
-            SplitResult<T> res = new SplitResult<T>();
-            res.n1 = new NonLeaf<T>(this.children.Length);
-            res.n2 = new NonLeaf<T>(this.children.Length);
-            List<Geometry> list = new List<Geometry>();
+            SplitResult<T> res = new SplitResult<T>
+            {
+                n1 = new NonLeaf<T>(this.children.Length),
+                n2 = new NonLeaf<T>(this.children.Length)
+            };
+            List<IGeometry> list = new List<IGeometry>();
             foreach (var e in children) list.Add(e);
             list.Add(overflowed);
             algo.Split(list, res);
@@ -383,14 +385,14 @@ namespace DominoPlanner.Core.RTree
             return result;
         }
 
-        public override void AddInternal(Geometry g)
+        public override void AddInternal(IGeometry g)
         {
             children[dataLength] = (Node<T>) g;
             dataLength++;
-            if (boundingbox == null) boundingbox = g.getBoundingRectangle();
-            else boundingbox = boundingbox.CommonBoundingRectangle(g.getBoundingRectangle());
+            if (boundingbox == null) boundingbox = g.GetBoundingRectangle();
+            else boundingbox = boundingbox.CommonBoundingRectangle(g.GetBoundingRectangle());
         }
-        internal override void Draw(Image<Rgba, byte> result, int x, int y, int ebene)
+        /*internal override void Draw(Image<Rgba, byte> result, int x, int y, int ebene)
         {
             if (ebene > 5) ebene = 5;
             Rgba color = new Rgba(255 * (5 - ebene) / 5.0, 0, 255 * ebene / 5.0, 255);
@@ -407,19 +409,19 @@ namespace DominoPlanner.Core.RTree
             result.FillConvexPoly(points, color);
             for(int i = 0; i < dataLength; i++)
                 children[i].Draw(result, x, y, ebene + 1);
-        }
+        }*/
     }
-    public interface Geometry
+    public interface IGeometry
     {
         bool Intersects(DominoRectangle rect);
 
-        DominoRectangle getBoundingRectangle();
+        DominoRectangle GetBoundingRectangle();
     }
     public abstract class InsertResult
     {
 
     }
-    public class SplitResult<T> : InsertResult where T: Geometry
+    public class SplitResult<T> : InsertResult where T: IGeometry
     {
         public Node<T> n1;
         public Node<T> n2;

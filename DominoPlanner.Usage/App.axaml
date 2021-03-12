@@ -1,0 +1,219 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:uc="clr-namespace:DominoPlanner.Usage.UserControls"
+             xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
+             x:Class="DominoPlanner.Usage.App">
+    <Application.Resources>
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+    </Application.Resources>
+    <Application.Styles>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+        <StyleInclude Source="avares://ThemeEditor.Controls.ColorPicker/ColorPicker.xaml"/>
+        <Style Selector="HeaderedContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Grid ColumnDefinitions="6, Auto, *, 6" RowDefinitions="Auto, Auto, *, 6">
+                            <!-- Border for the background with the same CornerRadius as the Border with the Header
+                                 Using this because if the background is set in the Border with the Header the opacity
+                                   mask will be applied to the background as well. -->
+                            <Border CornerRadius="4"
+                                    Grid.Row="1"
+                                    Grid.RowSpan="3"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="4"
+                                    BorderThickness="1"
+                                    BorderBrush="Transparent"/>
+
+                            <Border CornerRadius="4"
+                                    Grid.Row="1"
+                                    Grid.RowSpan="3"
+                                    Grid.ColumnSpan="4"
+                                    BorderThickness="2"
+                                    BorderBrush="White">
+                                <Border BorderThickness="1"
+                                        BorderBrush="{DynamicResource ThemeBorderLowBrush}"
+                                        CornerRadius="3">
+                                </Border>
+                            </Border>
+
+                            <!-- ContentPresenter for the header -->
+                            <Border x:Name="Header"
+                                    Background="{DynamicResource ThemeBackgroundBrush}"
+                                    Padding="3,1,3,0"
+                                    Grid.Row="0"
+                                    Grid.RowSpan="2"
+                                    Grid.Column="1">
+                                <ContentPresenter Content="{TemplateBinding Header}" />
+                            </Border>
+                            <!-- Primary content for GroupBox -->
+                            <ContentPresenter Grid.Row="2"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}"/>
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="Expander /template/ ToggleButton">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Margin" Value="5, 0">
+            </Setter>
+        </Style>
+        <!-- styling tool buttons-->
+        <Style Selector="ListBox.ToolButton > ListBoxItem">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBox.ToolButton > ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+        </Style>
+        <Style Selector="ListBox.ToolButton > ListBoxItem:selected:focus /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+        </Style>
+        <Style Selector="ListBox.ToolButton > ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+        </Style>
+        <Style Selector="ListBox.ToolButton > ListBoxItem:pressed  /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+        </Style>
+        <Style Selector="ListBox.ToolButton > ListBoxItem:disabled">
+            <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}"/>
+        </Style>
+        <!--styling radiobuttons acting as tool buttons-->
+        <Style Selector="RadioButton.ToolButton">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ThemeForegroundBrush}"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.ToolButton:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+        </Style>
+        <Style Selector="RadioButton.ToolButton:pointerover /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+        </Style>
+
+        <Style Selector="RadioButton.ToolButton:pressed  /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ThemeControlHighBrush}"/>
+        </Style>
+        <Style Selector="RadioButton.ToolButton:disabled">
+            <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}"/>
+        </Style>
+        <Style Selector="Image.ToolImage">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+        </Style>
+        <Style Selector="local|PopupColorPicker">
+            <Style.Resources>
+                <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+            </Style.Resources>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <ToggleButton Name="PopupButton" Background="Transparent" Width="100" Height="24" DockPanel.Dock="Right" Margin="0, 0, 5, 0">
+                            <Grid>
+                                <Rectangle Width="200" Height="{Binding #PopupButton.Bounds.Height}">
+                                    <Rectangle.Fill>
+                                        <VisualBrush TileMode="Tile" SourceRect="0, 0, 16, 16" DestinationRect="0, 0, 16, 16">
+                                            <VisualBrush.Visual>
+                                                <Path Data="M 0,0 L 0,8 L 8,8 L 8,0 Z M 8,8 L 8,16 L 16,16 L 16,8 Z" Fill="Gray"></Path>
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Rectangle Fill="{TemplateBinding Color, Converter={StaticResource ColorToBrushConverter}}" Width="200" Height="200"></Rectangle>
+                            </Grid>
+                            <ToggleButton.Styles >
+                                <Style Selector="ToggleButton:checked /template/ ContentPresenter, ToggleButton:pressed /template/ ContentPresenter">
+                                    <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+                                </Style>
+                                <Style Selector="ToggleButton:checked /template/ ContentPresenter">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+                                </Style>
+                            </ToggleButton.Styles>
+                        </ToggleButton>
+                        <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" StaysOpen="False">
+                            <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="5" CornerRadius="3" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
+                                <cp:ColorPicker Name="ColorPicker" Width="300" Color="{TemplateBinding Color, Mode=TwoWay}"/>
+                            </Border>
+                        </Popup>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="local|ImageButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Button Height="30" Margin="5" Command="{TemplateBinding Command}">
+                        <StackPanel Orientation="Horizontal" Margin="10, 0">
+                        <StackPanel.Resources>
+                            <local:IsNotEmptyStringConverter x:Key="IsNotEmptyStringConverter"/>
+                        </StackPanel.Resources>
+                            <Image Source="{TemplateBinding Image}" Height="20" VerticalAlignment="Center"/>
+                            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" IsVisible="{TemplateBinding Content, Converter={StaticResource IsNotEmptyStringConverter}}"  Margin="5, 0,0, 0"/>                        </StackPanel>
+                    </Button>
+                </ControlTemplate>
+            </Setter>
+
+        </Style>
+    </Application.Styles>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/Icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

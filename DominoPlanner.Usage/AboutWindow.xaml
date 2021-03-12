@@ -1,27 +1,41 @@
-﻿<Window x:Class="DominoPlanner.Usage.AboutWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
-        mc:Ignorable="d"
-        Title="About DominoPlanner" Height="350" Width="390" RenderOptions.BitmapScalingMode="HighQuality" ResizeMode="NoResize">
-    <Grid>
-        <Image Source="Icons/DominoCalculator.png" Margin="206,0,10,224"  RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"/>
-        <Label Margin="0,0,10,10">
-            <TextBlock Width="364" Height="311">DominoPlanner 1.0.8<LineBreak/>TDT-Internal Release<LineBreak/><LineBreak/><Run Text="DominoPlanner is developed by"/><LineBreak/><Run Text="Jonathan Hofinger (jaytar42) and"/><LineBreak/><Run Text="Johannes Linnenbrink (DominoJOJO)"/><Run Text="."/><LineBreak/><Run/><LineBreak/><Run Text="This software might contain bugs. We are not responsible for any"/><LineBreak/>damage to your system.<LineBreak/><LineBreak/>
-            If you encountered a bug or have an idea for an amazing feature, <LineBreak/>write us an
-            <Hyperlink NavigateUri="mailto:dominorechner@gmx.de?subject=DominoPlanner Request" RequestNavigate="OnNavigate">
-        email
-    </Hyperlink>.<LineBreak/><LineBreak/>
-        The software is licensed under the GNU General Public License V3.0.<LineBreak/>It is therefore free to use and free to share.
+        mc:Ignorable="d" CanResize="False" Height="350" Width="350"
+        xmlns:local="using:DominoPlanner.Usage"
+        x:Class="DominoPlanner.Usage.AboutWindow"
+        Title="About DominoPlanner">
+    <Window.Styles>
+        <Style Selector="TextBox /template/ TextPresenter">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Styles>
+    <StackPanel Orientation="Vertical" Margin="5" >
+        <Image Source="/Icons/DominoCalculator.png" Width="160" Margin="40, 20" HorizontalAlignment="Left"></Image>
+        <Button Margin="0, 5" HorizontalAlignment="Left" Command="{Binding CopyVersionToClipboard}" ToolTip.Tip="{local:Gettext Click to copy version to clipboard}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{local:Gettext DominoPlanner}"/>
+                <TextBlock Text="{Binding Version}" Margin="5, 0, 0, 0"/>
+            </StackPanel>
+        </Button>
+        <TextBlock Margin="0, 5, 0, 0" Text="{local:Gettext 'Developed by:'}"/>
+        <TextBlock Text="{Binding Authors}"></TextBlock>
+        <TextBlock Text="{local:Gettext 'DominoPlanner ist free software, licensed under GNU GPL 3.0.'}"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0, 5, 0, 0" Text=""/>
+        <Button Margin="0, 5"  HorizontalAlignment="Left" Command="{Binding ReportBug}" ToolTip.Tip="{Binding IssueTracker}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{local:Gettext 'For feature requests and bug reports, click here.'}"/>
+            </StackPanel>
+        </Button>
+        <StackPanel Margin="0, 5" Orientation="Horizontal">
+        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0, 0, 5, 0" Text="{local:Gettext 'You can buy us a coffee here:'}"/>
+        <Button  VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding OpenPayPal}" ToolTip.Tip="{Binding DonateLink}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{local:Gettext Donate}"/>
+            </StackPanel>
+        </Button>
+        </StackPanel>
 
-    <LineBreak/> <LineBreak/>
-                We used multiple open source libraries, i.e. <LineBreak/> EPPlus, CalcBinding and ImageProcessor.NET.
-                
-               <LineBreak/> Some icons used in this project are by Oxygen Icons. (GNU License)
-            </TextBlock>
-
-        </Label>
-    </Grid>
+    </StackPanel>
 </Window>

@@ -1,4 +1,7 @@
-﻿using DominoPlanner.Usage;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data.Converters;
+using DominoPlanner.Usage;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,12 +11,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     public class PropertiesVM : ModelBase
     {
         public object Model { get; set; }
@@ -34,7 +36,7 @@ namespace DominoPlanner.Usage
     }
     public abstract class PropertyEntryVM : ModelBase
     {
-        
+
         private ICommand command;
 
         public ICommand OpenChildren
@@ -51,12 +53,52 @@ namespace DominoPlanner.Usage
         }
         public object Value { get; set; }
         public bool CanWrite { get; set; }
-        public string Type { get; set; }
+        private string type;
+
+        public string Type
+        {
+            get { return type; }
+            set { type = value; RaisePropertyChanged(); }
+        }
+
+        private string fullType;
+
+        public string FullType
+        {
+            get { return fullType; }
+            set { fullType = value; RaisePropertyChanged(); }
+        }
+
+
         public string Name { get; set; }
+        private bool hasChildren;
+
+        public bool HasChildren
+        {
+            get { return hasChildren; }
+            set { hasChildren = value; RaisePropertyChanged();  }
+        }
+
+        private bool isExpanded;
+
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            set
+            {
+                if (!isExpanded && value)
+                {
+                    LoadChildren(Value, true);
+                }
+                isExpanded = value; 
+                RaisePropertyChanged();
+            }
+        }
+
 
         public PropertyEntryVM()
         {
-            OpenChildren = new RelayCommand(o => LoadChildren(Value, (bool) o));
+            OpenChildren = new RelayCommand(o => LoadChildren(Value, (bool)o));
         }
 
         public static List<PropertyEntryVM> LoadChildren(IEnumerable<MemberInfo> ChildPI, object parent, string name)
@@ -82,16 +124,20 @@ namespace DominoPlanner.Usage
         }
         public void PrepareTree()
         {
-            if (!(Value is Exception || Value is System.Collections.IList || 
-                Value == null || 
+            if (!(Value is Exception || Value is System.Collections.IList ||
+                Value == null ||
                 Value.GetType().IsSimpleType()))
             {
                 GetSubMembers();
             }
             if (ChildPI?.Count() > 0 || (Value is System.Collections.IList list && list.Count > 0))
             {
-                // add dummy child
-                Children = new List<PropertyEntryVM>() { new DummyPropertyItem() };
+                HasChildren = true;
+                if (Value is System.Collections.IList list2)
+                {
+                    
+                    FullType = FullType.Replace("[]", "") + "[" + list2.Count + "]";
+                }
             }
 
         }
@@ -104,21 +150,21 @@ namespace DominoPlanner.Usage
                 var childPropInfo = Value.GetType().GetProperties().Where(x => x.CanRead);
                 var childFieldInfo = Value.GetType().GetFields();
                 ChildPI = childPropInfo.Concat<MemberInfo>(childFieldInfo)
-                    .Where(x => x.IsPublic() && !x.IsSubtypeOf(typeof(MulticastDelegate)) 
-                                             && !x.IsSubtypeOf(typeof(EventHandler)) 
+                    .Where(x => x.IsPublic() && !x.IsSubtypeOf(typeof(MulticastDelegate))
+                                             && !x.IsSubtypeOf(typeof(EventHandler))
                                              && !x.IsSubtypeOf(typeof(ICommand)))
                     .OrderBy(x => x.Name);
             }
         }
         public void LoadChildren(object parent, bool check = true)
         {
-            if (check && Children?.OfType<DummyPropertyItem>().Count() == 1)
+            if (check && HasChildren && Children == null)
             {
                 Children = LoadChildren(ChildPI, parent, Name);
             }
         }
     }
-    
+
     public class PropertyItemVM : PropertyEntryVM
     {
         MemberInfo pi;
@@ -134,22 +180,31 @@ namespace DominoPlanner.Usage
                 CanWrite = p.CanWrite;
             }
             Value = Eval(parent);
+            if (!(Value is Exception) && Value != null)
+            {
+                FullType = Value.GetType().Name;
+            }
             PrepareTree();
         }
-        
-        
-        
+
+
+
         public object Eval(object parent)
         {
             try
             {
                 if (pi is PropertyInfo p && p.CanRead)
                 {
+                    // in case evaluation leads to an exception, store the property type first
+                    FullType = p.PropertyType.Name;
+
                     return p.GetValue(parent);
                     
+
                 }
                 else if (pi is FieldInfo f)
                 {
+                    FullType = f.FieldType.Name;
                     return f.GetValue(parent);
                 }
             }
@@ -168,9 +223,10 @@ namespace DominoPlanner.Usage
         {
             this.index = index;
             Value = Eval(parent);
+            FullType = Value.GetType().FullName;
             CanWrite = true;
             Type = "Item";
-            Name = parentname + "[" + index + "]";
+            Name = "[" + index + "]";
             PrepareTree();
         }
 
@@ -192,55 +248,6 @@ namespace DominoPlanner.Usage
         {
 
         }
-    }
-    public class TreeListView : TreeView
-    {
-        protected override DependencyObject
-                           GetContainerForItemOverride()
-        {
-            return new TreeListViewItem();
-        }
-
-        protected override bool
-                           IsItemItsOwnContainerOverride(object item)
-        {
-            return item is TreeListViewItem;
-        }
-    }
-
-    public class TreeListViewItem : TreeViewItem
-    {
-        /// <summary>
-        /// Item's hierarchy in the tree
-        /// </summary>
-        public int Level
-        {
-            get
-            {
-                if (_level == -1)
-                {
-                    TreeListViewItem parent =
-                        ItemsControl.ItemsControlFromItemContainer(this)
-                            as TreeListViewItem;
-                    _level = (parent != null) ? parent.Level + 1 : 0;
-                }
-                return _level;
-            }
-        }
-
-
-        protected override DependencyObject
-                           GetContainerForItemOverride()
-        {
-            return new TreeListViewItem();
-        }
-
-        protected override bool IsItemItsOwnContainerOverride(object item)
-        {
-            return item is TreeListViewItem;
-        }
-
-        private int _level = -1;
     }
     public class LevelToIndentConverter : IValueConverter
     {
@@ -267,13 +274,13 @@ namespace DominoPlanner.Usage
             switch (value)
             {
                 case Exception ex:
-                    return "Exception of type " + ex.GetType();
+                    return string.Format(_("Exception of type {0}"), ex.GetType()) + ":\n" + ex.StackTrace;
                 case System.Collections.IList ie:
                     var type = ie.GetType();
                     var membertype = (type.GenericTypeArguments.Count() > 0 ? type.GenericTypeArguments[0] : null) ?? type.GetElementType();
                     return membertype?.ToString() + "[" + ie.Count + "]";
                 default:
-                    return value;
+                    return value.ToString();
             }
         }
 
@@ -284,7 +291,7 @@ namespace DominoPlanner.Usage
     }
     public class BooleanAndConverter : IMultiValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(IList<object> values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             return values.OfType<IConvertible>().All(System.Convert.ToBoolean);
         }
@@ -341,8 +348,5 @@ namespace DominoPlanner.Usage
             }
             return false;
         }
-    }
-    public class ControlTemplateSelector : DataTemplateSelector
-    {
     }
 }

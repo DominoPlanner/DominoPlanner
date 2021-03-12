@@ -1,37 +1,48 @@
-﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
+﻿using Avalonia.Controls;
+using DominoPlanner.Core;
 using DominoPlanner.Usage.UserControls.ViewModel;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DominoPlanner.Usage
 {
+    using static Localizer;
     class SetStandardVM : ModelBase
     {
         public SetStandardVM()
         {
+            var StandardColorPath = UserSettings.Instance.StandardColorArray;
             SetStandardColor = new RelayCommand(o => { SetColorPath(); });
             SetStandardPath = new RelayCommand(o => { SetStandardPathOpen(); });
-            SaveStandardPath = new RelayCommand(o => { SaveStandard(); });
             ClearList = new RelayCommand(o => { ClearListMet(); });
-            standardpath = Properties.Settings.Default.StandardProjectPath;
+            standardpath = UserSettings.Instance.StandardProjectPath;
 
-            if (!File.Exists(Properties.Settings.Default.StandardColorArray))
+            if (!File.Exists(StandardColorPath))
             {
                 try
                 {
-                    File.Copy(@".\Resources\lamping.DColor", Properties.Settings.Default.StandardColorArray);
+                    var share_path = MainWindowViewModel.ShareDirectory;
+                    File.Copy(Path.Combine(share_path, "Resources", "lamping.DColor"), StandardColorPath);
                 }
                 catch { }
             }
 
-            ColorVM = new ColorListControlVM(Properties.Settings.Default.StandardColorArray);
+            ColorVM = new ColorListControlVM(StandardColorPath);
+
+            Languages = Localizer.GetAllLocales().OrderBy(x => x.DisplayName).ToList();
+            var Selected = Languages.Where(x => x.Name == Localizer.Language);
+            if (Selected.Count() != 0)
+            {
+                CurrentLanguage = Selected.First();
+            }
+            else
+            {
+                CurrentLanguage = new CultureInfo("en-US");
+            }
         }
 
         #region prop
@@ -49,6 +60,21 @@ namespace DominoPlanner.Usage
             }
         }
 
+        public List<CultureInfo> Languages { get; set; }
+
+        private CultureInfo culture;
+
+        public CultureInfo CurrentLanguage
+        {
+            get { return culture; }
+            set { culture = value;
+                Localizer.Language = value.Name;
+                Properties.Settings.Default.Save();
+                RaisePropertyChanged();
+            }
+        }
+
+
         private string _standardpath;
         public string standardpath
         {
@@ -58,6 +84,7 @@ namespace DominoPlanner.Usage
                 if (_standardpath != value)
                 {
                     _standardpath = value;
+                    UserSettings.Instance.StandardProjectPath = value;
                     RaisePropertyChanged();
                 }
             }
@@ -66,45 +93,49 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region Method
-        private void SaveStandard()
-        {
-            Properties.Settings.Default.StandardProjectPath = standardpath;
-            Properties.Settings.Default.Save();
-        }
 
-        private void SetStandardPathOpen()
+        private async void SetStandardPathOpen()
         {
-            var fbd = new System.Windows.Forms.FolderBrowserDialog();
-            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFolderDialog ofd = new OpenFolderDialog { Directory = standardpath };
+            var result = await ofd.ShowAsyncWithParent<SetStandardV>();
+            if (result != null && !string.IsNullOrEmpty(result))
             {
-                standardpath = fbd.SelectedPath;
+                standardpath = result;
             }
         }
 
-        private void SetColorPath()
+        private async void SetColorPath()
         {
+            var StandardColorPath = UserSettings.Instance.StandardColorArray;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.InitialDirectory = ColorVM.FilePath;
-                openFileDialog.Filter = $"All color files |*{Properties.Resources.ColorExtension};*.clr;*.farbe|" +
-                    $"DominoPlanner 3.x color files (*{Properties.Resources.ColorExtension})|*{Properties.Resources.ColorExtension}|" +
-                    "DominoPlanner 2.x color files (*.clr)|*.clr|" +
-                    "Dominorechner color files (*.farbe)|*.farbe|" +
-                    "All files (*.*)|*.*";
-                openFileDialog.InitialDirectory = Path.Combine(Environment.CurrentDirectory, "Resources");
+                openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
+                {
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = _("All color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension }, Name = _("DominoPlanner 3.x color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = _("DominoPlanner 2.x color files")},
+                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = _("Dominorechner color files")},
+                };
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
+                else
+                    // otherwise, the dialog is opened in the parent directory (see https://github.com/AvaloniaUI/Avalonia/issues/4141)
+                    // TODO: check macos
+                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
             }
             catch (Exception) { }
-            
-            if (openFileDialog.ShowDialog() == true)
+            var result = await openFileDialog.ShowAsyncWithParent<SetStandardV>();
+            if (result != null && result.Length != 0)
             {
-                if (File.Exists(openFileDialog.FileName))
+                var filename = result[0];
+                if (File.Exists(filename))
                 {
                     ColorRepository colorList;
-                    int colorListVersion = 0;
+                    int colorListVersion;
                     try
                     {
-                         colorList = Workspace.Load<ColorRepository>(openFileDialog.FileName);
+                        colorList = Workspace.Load<ColorRepository>(filename);
                         colorListVersion = 3;
                     }
                     catch
@@ -112,28 +143,28 @@ namespace DominoPlanner.Usage
                         // Colorlist version 1 or 2
                         try
                         {
-                            colorList = new ColorRepository(openFileDialog.FileName);
+                            colorList = new ColorRepository(filename);
                             colorListVersion = 1;
                         }
                         catch
                         {
                             // file not readable
-                            Errorhandler.RaiseMessage("Color repository file is invalid", "Error", Errorhandler.MessageType.Error);
+                            await Errorhandler.RaiseMessage(GetParticularString("When importing color list fails", "Color repository file is invalid"), _("Error"), Errorhandler.MessageType.Error);
                             return;
                         }
                     }
-                    File.Delete(Properties.Settings.Default.StandardColorArray);
+                    File.Delete(StandardColorPath);
                     if (colorListVersion == 3)
                     {
-                        File.Copy(openFileDialog.FileName, Properties.Settings.Default.StandardColorArray);
+                        File.Copy(filename, StandardColorPath);
                     }
                     else if (colorListVersion != 0)
                     {
-                        colorList.Save(Properties.Settings.Default.StandardColorArray);
+                        colorList.Save(StandardColorPath);
                     }
                 }
-                Workspace.CloseFile(Properties.Settings.Default.StandardColorArray);
-                ColorVM.Reload(Properties.Settings.Default.StandardColorArray);
+                Workspace.CloseFile(StandardColorPath);
+                ColorVM.Reload(StandardColorPath);
             }
         }
 
@@ -150,10 +181,8 @@ namespace DominoPlanner.Usage
         private ICommand _SetStandardPath;
         public ICommand SetStandardPath { get { return _SetStandardPath; } set { if (value != _SetStandardPath) { _SetStandardPath = value; } } }
 
-        private ICommand _SaveStandardPath;
-        public ICommand SaveStandardPath { get { return _SaveStandardPath; } set { if (value != _SaveStandardPath) { _SaveStandardPath = value; } } }
-
         private ICommand _ClearList;
+
         public ICommand ClearList { get { return _ClearList; } set { if (value != _ClearList) { _ClearList = value; } } }
 
         #endregion

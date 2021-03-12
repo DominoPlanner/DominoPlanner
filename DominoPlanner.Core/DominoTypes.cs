@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
+using Avalonia.Media;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Core
@@ -25,41 +25,66 @@ namespace DominoPlanner.Core
         
         private double _width;
         [ProtoMember(3)]
-        public double width
+        public double Width
         {
             get => _width; set
             {
                 _width = value;
-                expanded_width = value;
             }
         }
         private double _height;
         [ProtoMember(4)]
-        public double height
+        public double Height
         {
             get => _height; set
             {
                 _height = value;
-                expanded_height = value;
             }
         }
         [ProtoMember(5)]
-        public double expanded_width;
+        private double expanded_width;
+        public double ExpandedWidth
+        {
+            get
+            {
+                if (expanded_width == 0) return Width;
+                else return expanded_width;
+            }
+            set
+            {
+                expanded_width = value;
+            }
+        }
         [ProtoMember(6)]
-        public double expanded_height;
+        private double expanded_height;
+        public double ExpandedHeight
+        {
+            get
+            {
+                if (expanded_height == 0) return Height;
+                else return expanded_height;
+            }
+            set
+            {
+                expanded_height = value;
+            }
+        }
         public override DominoRectangle GetContainer(double scaling_x, double scaling_y, bool expanded = false)
         {
             return new DominoRectangle()
             {
-                width = (expanded ? expanded_width : this.width) * scaling_x,
-                height = (expanded ? expanded_height : this.height) * scaling_y,
+                width = (expanded ? ExpandedWidth : this.Width) * scaling_x,
+                height = (expanded ? ExpandedHeight : this.Height) * scaling_y,
                 x = this.x * scaling_x,
                 y = this.y * scaling_y
             };
         }
 
-        public override DominoPath GetPath(double scaling_x, double scaling_y)
+        public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
+            var width = (expanded ? ExpandedWidth : this.Width);
+            
+            var height = (expanded ? ExpandedHeight : this.Height);
             return new DominoPath()
             {
                 points = new Point[] {
@@ -71,8 +96,11 @@ namespace DominoPlanner.Core
 
         }
 
-        public override bool IsInside(Point point, double scaling_x, double scaling_y)
+        public override bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false)
         {
+            var width = (expanded ? ExpandedWidth : this.Width);
+
+            var height = (expanded ? ExpandedHeight : this.Height);
             if (point.X < x * scaling_x) return false;
             if (point.X > (x + width) * scaling_x) return false;
             if (point.Y < y * scaling_y) return false;
@@ -85,7 +113,7 @@ namespace DominoPlanner.Core
             if (other is RectangleDomino)
             {
                 RectangleDomino o = other as RectangleDomino;
-                if (o.x == this.x && o.y == this.y && o.height == this.height && o.width == this.width) return true;
+                if (o.x == this.x && o.y == this.y && o.Height == this.Height && o.Width == this.Width) return true;
             }
             return false;
         }
@@ -94,8 +122,8 @@ namespace DominoPlanner.Core
         {
             x = double.Parse(domino.Attribute("x").Value, CultureInfo.InvariantCulture);
             y = double.Parse(domino.Attribute("y").Value, CultureInfo.InvariantCulture);
-            width = double.Parse(domino.Attribute("Width").Value, CultureInfo.InvariantCulture);
-            height = double.Parse(domino.Attribute("Height").Value, CultureInfo.InvariantCulture);
+            Width = double.Parse(domino.Attribute("Width").Value, CultureInfo.InvariantCulture);
+            Height = double.Parse(domino.Attribute("Height").Value, CultureInfo.InvariantCulture);
         }
 
         public override IDominoShape TransformDomino(double moveX, double moveY, int i, int j, int width, int height)
@@ -104,8 +132,8 @@ namespace DominoPlanner.Core
             {
                 x = this.x + moveX,
                 y = this.y + moveY,
-                width = this.width,
-                height = this.height,
+                Width = this.Width,
+                Height = this.Height,
                 position = TransformProtocol(i, j, width, height)
             };
         }
@@ -145,7 +173,7 @@ namespace DominoPlanner.Core
             return new DominoRectangle() { x = xmin * scaling_x, y = ymin * scaling_y, width = (xmax - xmin) * scaling_x, height = (ymax - ymin) * scaling_y };
         }
 
-        public override DominoPath GetPath(double scaling_x, double scaling_y)
+        public override DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false)
         {
             return new DominoPath()
             {
@@ -153,7 +181,7 @@ namespace DominoPlanner.Core
             };
         }
 
-        public override bool IsInside(Point point, double scaling_x, double scaling_y)
+        public override bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false)
         {
             int i, j;
             bool c = false;
@@ -199,9 +227,9 @@ namespace DominoPlanner.Core
         }
         private Point() { }
 
-        public static implicit operator System.Windows.Point(Point v)
+        public static implicit operator Avalonia.Point(Point v)
         {
-            throw new NotImplementedException();
+            return new Avalonia.Point(v.X, v.Y);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using DominoPlanner.Core.RTree;
-using Emgu.CV.Structure;
 using ProtoBuf;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,24 +18,24 @@ namespace DominoPlanner.Core
     [ProtoContract(SkipConstructor =true)]
     [ProtoInclude(10, typeof(RectangleDomino))]
     [ProtoInclude(11, typeof(PathDomino))]
-    public abstract class IDominoShape : IEquatable<IDominoShape>, Geometry
+    public abstract class IDominoShape : IEquatable<IDominoShape>, IGeometry
     {
         /// <summary>
         /// Gibt an, ob der Stein eine Protokolldefinition enthält
         /// </summary>
         
-        public bool hasTransformableProtocolDefinition
+        public bool HasTransformableProtocolDefinition
         {
             get
             {
                 return (position != null && position.xParams != null && position.yParams != null);
             }
         }
-        public string midpoint
+        public string Midpoint
         {
             get
             {
-                var rect = getBoundingRectangle();
+                var rect = GetBoundingRectangle();
                 return "x: " + (rect.x + rect.width / 2) + ", y: " + (rect.y + rect.height/2);
             }
         }
@@ -50,13 +50,13 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract DominoPath GetPath(double scaling_x, double scaling_y);
+        public abstract DominoPath GetPath(double scaling_x, double scaling_y, bool expanded = false);
         /// <summary>
         /// Gibt die Grenze eines Steins als Punktliste zurück, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public DominoPath GetPath(double scaling = 1) { return GetPath(scaling, scaling); }
+        public DominoPath GetPath(double scaling = 1, bool expanded = false) { return GetPath(scaling, scaling, expanded); }
         /// <summary>
         /// 
         /// </summary>
@@ -78,14 +78,14 @@ namespace DominoPlanner.Core
         /// <param name="scaling_x">Multiplikator in x-Richtung</param>
         /// <param name="scaling_y">Multiplikator in y-Richtung</param>
         /// <returns></returns>
-        public abstract bool IsInside(Point point, double scaling_x, double scaling_y);
+        public abstract bool IsInside(Point point, double scaling_x, double scaling_y, bool expanded = false);
         /// <summary>
         /// Überprüft, ob ein Punkt innerhalb des Steins liegt, mit seitenverhältniserhaltender Skalierung.
         /// </summary>
         /// <param name="point">Punkt, der geprüft werden soll</param>
         /// <param name="scaling">Skalierungsfaktor</param>
         /// <returns></returns>
-        public bool IsInside(Point point, double scaling = 1) { return IsInside(point, scaling, scaling); }
+        public bool IsInside(Point point, double scaling = 1, bool expanded = false) { return IsInside(point, scaling, scaling, expanded); }
         /// <summary>
         /// Überprüft, ob zwei Dominosteine gleich sind. 
         /// Berücksichtigt keine Unterschiede in der Protokolldefinition
@@ -95,7 +95,7 @@ namespace DominoPlanner.Core
         public bool Equals(IDominoShape other)
         {
             bool shapeEquals = ShapeEquals(other);
-            bool primaryColorEquals = color == other.color;
+            bool primaryColorEquals = Color == other.Color;
             bool secondaryColorEquals = SecondaryDomino.Equals(other.SecondaryDomino);
             return shapeEquals && primaryColorEquals && secondaryColorEquals;
         }
@@ -129,7 +129,7 @@ namespace DominoPlanner.Core
         /// <returns></returns>
         internal ProtocolDefinition TransformProtocol(int i, int j, int width, int height)
         {
-            if (hasTransformableProtocolDefinition)
+            if (HasTransformableProtocolDefinition)
             {
                 return position.FinalizeProtocol(i, j, width, height);
             }
@@ -161,22 +161,22 @@ namespace DominoPlanner.Core
             return GetContainer().Intersects(rect);
         }
 
-        public DominoRectangle getBoundingRectangle()
+        public DominoRectangle GetBoundingRectangle()
         {
             return GetContainer();
         }
-        Bgra _originalColor;
-        public Bgra PrimaryOriginalColor
+        SKColor _originalColor;
+        public SKColor PrimaryOriginalColor
         {
             get { return _originalColor; }
             set { _originalColor = value;  PrimaryDitherColor = PrimaryOriginalColor; }
         }
-        public Bgra PrimaryDitherColor;
+        public SKColor PrimaryDitherColor;
 
         private int _color;
         public event EventHandler ColorChanged;
         [ProtoMember(2)]
-        public int color
+        public int Color
         {
             get { return _color; }
             set
@@ -193,6 +193,10 @@ namespace DominoPlanner.Core
 
         public void CalculateColor(IDominoColor[] colors, IColorComparison comp, byte TransparencyThreshold, double[] weights)
         {
+            if (weights == null)
+            {
+                return;
+            }
             double minimum = int.MaxValue;
             for (int color = 0; color < colors.Length; color++)
             {
