@@ -265,7 +265,7 @@ namespace DominoPlanner.Core
                     }
                     else // rectangle too small
                     {
-                        result = img.GetPixel(container.y1, container.x1);
+                        result = img.GetPixel(container.x1, container.y1);
                     }
                 }
                 if (StateReference == StateReference.Before)

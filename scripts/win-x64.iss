@@ -75,4 +75,4 @@ Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes
 Filename: "{app}\PreviewHandler\ServerRegistrationManager.exe"; Description: "Register preview handler"; Flags: postinstall runascurrentuser; Parameters: "install ""{app}\PreviewHandler\DominoPlanner.PreviewHandler.dll"" -codebase"
 
 [UninstallRun]
-Filename: "{app}\PreviewHandler\ServerRegistrationManager.exe"; Parameters: "uninstall ""{app}\PreviewHandler\DominoPlanner.PreviewHandler.dll"""
+Filename: "{app}\PreviewHandler\ServerRegistrationManager.exe"; Parameters: "uninstall ""{app}\PreviewHandler\DominoPlanner.PreviewHandler.dll"""; RunOnceId: 5E51A584-CEFC-4D3B-B72C-6E16DD5BA31F

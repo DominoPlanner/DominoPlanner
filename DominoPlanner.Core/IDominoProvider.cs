@@ -300,7 +300,10 @@ namespace DominoPlanner.Core
         /// <param name="reverse">Gibt an, ob das Objekt von der anderen Seite gebaut werden soll. Macht eigentlich nur bei Felder Sinn (optional)</param>
         /// <returns></returns>
         public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
+        
         {
+            if (templateLength == 0)
+                templateLength = int.MaxValue;
             int[,] dominoes = GetBaseField(o, MirrorX, MirrorY);
 
             ProtocolTransfer d = new ProtocolTransfer
