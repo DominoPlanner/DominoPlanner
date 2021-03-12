@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    /// <summary>
-    /// Interaktionslogik für Properties.xaml
-    /// </summary>
-    public partial class PropertiesWindow : Window
+    public class PropertiesWindow : Window
     {
-        public PropertiesWindow(object context)
+        public PropertiesWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
+
+        }
+        public PropertiesWindow(object context) : this()
+        {
             this.DataContext = new PropertiesVM(context);
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

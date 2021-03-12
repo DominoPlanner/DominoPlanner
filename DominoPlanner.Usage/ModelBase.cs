@@ -1,15 +1,13 @@
-﻿using DominoPlanner.Usage.UserControls.ViewModel;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace DominoPlanner.Usage
 {
@@ -21,6 +19,17 @@ namespace DominoPlanner.Usage
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            var propertyInfo = this.GetType().GetProperty(propertyName);
+            if (propertyInfo != null)
+            {
+                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true);
+                if (attributes.Any())
+                {
+                    var attribute = (SettingsAttribute)attributes[0];
+                    WriteSetting<object>(attribute.ClassName, attribute.PropertyName, propertyInfo.GetValue(this));
+                }
+            }
+           
         }
 
         public ModelBase Self
@@ -28,7 +37,7 @@ namespace DominoPlanner.Usage
             get { return this; }
         }
 
-        public BitmapImage ToBitmapSource(Bitmap source)
+        /*public BitmapImage ToBitmapSource(Bitmap source)
         {
             using (MemoryStream memory = new MemoryStream())
             {
@@ -42,8 +51,53 @@ namespace DominoPlanner.Usage
 
                 return bitmapimage;
             }
+        }*/
+        public ModelBase()
+        {
+            var propertyInfos = this.GetType().GetProperties();
+            foreach (var propertyInfo in propertyInfos)
+            {
+                var attributes = propertyInfo.GetCustomAttributes(typeof(SettingsAttribute), true).FirstOrDefault();
+                if (attributes is SettingsAttribute settingsAttribute)
+                {
+                    object value = ReadSetting(settingsAttribute.ClassName, settingsAttribute.PropertyName);
+                    if (value != null)
+                    {
+                        propertyInfo.SetValue(this, value);
+                    }
+                    else
+                    {
+                        if (settingsAttribute.DefaultValue.GetType() == propertyInfo.PropertyType)
+                        {
+                            propertyInfo.SetValue(this, settingsAttribute.DefaultValue);
+                        }
+                    }
+                }
+            }
+        }
+        public object ReadSetting(string vmname, string propertyname)
+        {
+            return UserSettingsSerializer.Instance.GetPropertyValue(vmname, propertyname);
+        }
+        public void WriteSetting<T>(string vmname, string propertyname, T value)
+        {
+            UserSettingsSerializer.Instance.AddPropertyValue(vmname, propertyname, value);
         }
 
+
+    }
+    public class SettingsAttribute : Attribute
+    {
+        public string ClassName{ get; set; }
+        public string PropertyName { get; set; }
+        public object DefaultValue { get; set; }
+
+        public SettingsAttribute(string className, object defaultValue, [CallerMemberName] string propertyName = null)
+        {
+            ClassName = className;
+            PropertyName = propertyName;
+            DefaultValue = defaultValue;
+        }
     }
 
     public class RelayCommand : ICommand
@@ -70,12 +124,13 @@ namespace DominoPlanner.Usage
         {
             return CanExecuteAction(parameter);
         }
+        public event EventHandler CanExecuteChanged;
 
-        public event EventHandler CanExecuteChanged
+        /*public event EventHandler CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
-        }
+        }*/
 
         public void Execute(object parameter)
         {
@@ -84,11 +139,12 @@ namespace DominoPlanner.Usage
 
         #endregion
     }
-    public class ContextMenuEntry : MenuItem
+    
+    public class ContextMenuEntry
     {
-
-        public ContextMenuEntry(ContextMenuAttribute attr, MethodInfo mi, object reference)
+        public static MenuItem GenerateMenuItem(ContextMenuAttribute attr, MethodInfo mi, object reference)
         {
+            MenuItem MI = new MenuItem();
             bool Activated = true;
             bool isMethod = !bool.TryParse(attr.Activated, out Activated);
             if (isMethod)
@@ -104,13 +160,19 @@ namespace DominoPlanner.Usage
                     Activated = false;
                 }
             }
-            Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
-            Header = attr.Header;
+            MI.Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
+            MI.Header = attr.Header;
             if (!string.IsNullOrEmpty(attr.ImageSource))
-                Icon = new System.Windows.Controls.Image {
-                Source = new BitmapImage(new Uri(attr.ImageSource, UriKind.Relative)) };
-            Visibility = attr.Visibility;
-            IsEnabled = Activated;
+            {
+                var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                MI.Icon = new Image
+                {
+                    Source = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage/" + attr.ImageSource, UriKind.Absolute)))
+            };
+            }
+            MI.IsVisible = attr.IsVisible;
+            MI.IsEnabled = Activated;
+            return MI;
         }
     }
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
@@ -118,7 +180,7 @@ namespace DominoPlanner.Usage
     {
         public string Activated { get; set; }
 
-        public Visibility Visibility { get; set; }
+        public bool IsVisible { get; set; }
 
         public string ImageSource { get; set; }
 
@@ -128,21 +190,21 @@ namespace DominoPlanner.Usage
 
         //public ICommand Command { get; set; }
         public ContextMenuAttribute(string header, string imageSource, 
-            string activated, Visibility visibility = Visibility.Visible, int index = 0)
+            string activated, bool isVisible = true, int index = 0)
         {
-            Header = header;
+            Header = Localizer._(header);
             ImageSource = imageSource;
             Activated = activated;
-            Visibility = visibility;
+            IsVisible = isVisible;
             Index = index;
         }
         public ContextMenuAttribute(string header, string imageSource,
-            bool activated = true, Visibility visibility = Visibility.Visible, int index = 0)
+            bool activated = true, bool isVisible = true, int index = 0)
         {
-            Header = header;
+            Header = Localizer._(header);
             ImageSource = imageSource;
             Activated = activated.ToString();
-            Visibility = visibility;
+            IsVisible = isVisible;
             Index = index;
         }
 

@@ -1,103 +1,90 @@
-﻿<UserControl
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-    xmlns:parent="clr-namespace:DominoPlanner.Usage"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="DominoPlanner.Usage.UserControls.View.FieldSize"
-             xmlns:intr="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-             mc:Ignorable="d" d:DesignWidth="300" Height="205">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="250"
+             x:Class="DominoPlanner.Usage.UserControls.View.FieldSize">
     <UserControl.Resources>
-        <parent:LockedToImageConverter x:Key="LockedToImageConverter"/>
-        <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <local:LockedToImageConverter x:Key="LockedToImageConverter"/>
+        <local:BoolInverterConverter x:Key="BoolInverterConverter"/>
     </UserControl.Resources>
     <Grid>
         <DockPanel>
-            <GroupBox DockPanel.Dock="Top">
-                <GroupBox.Header>
+            <HeaderedContentControl DockPanel.Dock="Top">
+                <HeaderedContentControl.Header>
                     <TextBlock>
                         <TextBlock.Text>
-                            <MultiBinding StringFormat="{}Field Dimensions: {0}mm x {1}mm">
+                            <MultiBinding StringFormat="{local:Gettext 'Field Dimensions: {0}mm x {1}mm'}">
                                 <Binding Path="PhysicalLength"></Binding>
                                 <Binding Path="PhysicalHeight"></Binding>
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                </GroupBox.Header>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="1"/>
-                        <RowDefinition Height="20"/>
-                    </Grid.RowDefinitions>
-                    <DockPanel Grid.Row="0" Height="26" VerticalAlignment="Top">
-                        <Label Content="Field Size [Dominoes]: " VerticalAlignment="Center"/>
-                        <xctk:IntegerUpDown Value="{Binding DominoCount, Delay=400}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
+                </HeaderedContentControl.Header>
+                <DockPanel>
+
+                    <DockPanel DockPanel.Dock="Top"  VerticalAlignment="Top">
+                        <TextBlock Text="{local:Gettext Field Size (Dominoes):}" VerticalAlignment="Center"/>
+                        <NumericUpDown Value="{Binding DominoCount, Mode=OneWay}" Minimum="0" Width="80" HorizontalAlignment="Left" Name="SizeUpDown">
+                            <NumericUpDown.Styles>
+                                <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
+                                    <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}"/>
+                                    <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}"/>
+                                </Style>
+                            </NumericUpDown.Styles>
+                        </NumericUpDown>
                     </DockPanel>
 
-                    <Grid Grid.Row="2" Height="26" VerticalAlignment="Top" HorizontalAlignment="Left" Width="268">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50" />
-                            <ColumnDefinition Width="70" />
-                            <ColumnDefinition Width="30" />
-                            <ColumnDefinition Width="48" />
-                            <ColumnDefinition Width="70" />
-                        </Grid.ColumnDefinitions>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="0, 5, 0, 0">
                         <!--Length and Height Setters-->
-                        <Label Content="Length:" Grid.Column="0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="50"/>
-                        <xctk:IntegerUpDown Value="{Binding Length, Delay=200}" IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="1" HorizontalAlignment="Stretch"/>
-                        <Image Source="{Binding BindSize, Converter={StaticResource LockedToImageConverter}}"  IsEnabled="{Binding EditState}" Margin="2" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <intr:Interaction.Triggers>
-                                <intr:EventTrigger EventName="MouseUp">
-                                    <intr:InvokeCommandAction Command="{Binding Click_Binding}"/>
-                                </intr:EventTrigger>
-                            </intr:Interaction.Triggers>
-                        </Image>
-                        <Label Content="Height:" Grid.Column="3" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
-                        <xctk:IntegerUpDown Value="{Binding Height, Delay=200}"  IsEnabled="{Binding EditState}" Minimum="0" Grid.Column="4" HorizontalAlignment="Stretch"/>
-                    </Grid>
-                    <DockPanel Grid.Row="4">
-                        <Label Content="Falldown direction: "  HorizontalAlignment="Left" VerticalAlignment="Center" Height="27"/>
-                        <RadioButton Content="Horizontal" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Horizontal}"/>
-                        <RadioButton Content="Vertical" GroupName="HorVert" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5, 0, 0, 0" IsChecked="{Binding Horizontal, Converter={StaticResource BoolInverterConverter}}"/>
+                        <TextBlock Text="{local:Gettext Horizontal Field dimension|Length:}"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <NumericUpDown Margin="5, 0, 0, 0" Value="{Binding Length}" IsEnabled="{Binding EditState}" Minimum="0" HorizontalAlignment="Stretch"/>
+                        <ToggleButton Background="Transparent" BorderBrush="Transparent" IsChecked="{Binding BindSize}" IsEnabled="{Binding EditState}" Margin="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Image Height="20" Width="20" Source="{Binding BindSize, Converter={StaticResource LockedToImageConverter}}"/>
+                        </ToggleButton>
+                        <TextBlock Text="{local:Gettext Height:}" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <NumericUpDown Value="{Binding Height}" Margin="5, 0, 0, 0" IsEnabled="{Binding EditState}" Minimum="0" HorizontalAlignment="Stretch"/>
                     </DockPanel>
-                </Grid>
-            </GroupBox>
-            <GroupBox DockPanel.Dock="Bottom" Grid.Row="1" Header="Domino dimensions" Margin="0,0,-0.286,0">
-                <Grid>
-                    <DockPanel Margin="0,5,0,0" Height="22" VerticalAlignment="Top">
-                        <TextBlock Text="Choose Standard:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5, 0, 5, 0"/>
-                        <ComboBox SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding field_templates}" Margin="0, 0, 5, 0"/>
+                    <DockPanel Margin="0, 5, 0, 0">
+                        <DockPanel.Styles>
+                            <Style Selector="ToggleSwitch /template/ Border#OuterBorder">
+                                <Setter Property="BorderBrush" Value="{DynamicResource ToggleSwitchStrokeOffPressed}"/>
+                            </Style>
+                            <Style Selector="ToggleSwitch /template/ Ellipse#SwitchKnobOff">
+                                <Setter Property="Fill" Value="{DynamicResource ThemeBorderHighColor}"/>
+                            </Style>
+                        </DockPanel.Styles>
+                        
+                        <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Falldown direction:}" Margin="0, 0, 5, 0"  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Field falldown direction|Horizontal}" Margin="0, 0, 5, 0"  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ToggleSwitch OffContent="{local:Gettext Field falldown direction|Vertical}" OnContent="{local:Gettext Field falldown direction|Vertical}" IsChecked="{Binding !Horizontal}"/>
+                    </DockPanel>
+                </DockPanel>
+            </HeaderedContentControl>
+            <HeaderedContentControl  DockPanel.Dock="Bottom" Grid.Row="1" Header="{local:Gettext Domino dimensions}" Margin="0,5,0,0">
+                <DockPanel DockPanel.Dock="Top">
+                    <DockPanel Margin="0,5,0,0" VerticalAlignment="Top" DockPanel.Dock="Top">
+                        <TextBlock Text="{local:Gettext Choose Standard:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ComboBox SelectedItem="{Binding SelectedItem}" Items="{Binding Field_templates}" Margin="5, 0, 5, 0"/>
                     </DockPanel>
 
-                    <Grid Margin="0,30,5,0" VerticalAlignment="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="5*" />
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="5*" />
-                            <ColumnDefinition Width="3*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="26" />
-                            <RowDefinition Height="2" />
-                            <RowDefinition Height="26" />
-                        </Grid.RowDefinitions>
-
+                    <Grid VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0, 5, 5, 0" ColumnDefinitions="5*, 4*, 5*, 4*" RowDefinitions="*, 2, *">
                         <!--Field Distances and Dimensions-->
-                        <Label Content="Dist. inside line:" Grid.Row="2" HorizontalAlignment="Right"/>
-                        <xctk:IntegerUpDown Minimum="0" Value="{Binding HorizontalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" />
-                        <Label Content="Domino width:" Grid.Row="0" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="1" Value="{Binding HorizontalSize}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" />
-                        <Label Content="Domino depth:" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="1" Value="{Binding VerticalSize}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="0,0,0,0" />
-                        <Label Content="Dist. btw. lines:" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" />
-                        <xctk:IntegerUpDown Minimum="0" Value="{Binding VerticalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="0,0,0,0" />
+                        <TextBlock Text="{local:Gettext Distance\\ninside line:}" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <NumericUpDown Minimum="0" Value="{Binding HorizontalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="2" Increment="1"  Margin="5,0,0,0" />
+                        <TextBlock Text="{local:Gettext Domino\\nwidth:}" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <NumericUpDown Minimum="1" Value="{Binding HorizontalSize}" IsEnabled="{Binding CanChange}" Grid.Column="1" Grid.Row="0" Increment="1"  Margin="5,0,0,0" />
+                        <TextBlock Text="{local:Gettext Domino\\ndepth:}" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <NumericUpDown Minimum="1" Value="{Binding VerticalSize}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="0" Margin="5,0,0,0" Increment="1" />
+                        <TextBlock Text="{local:Gettext 'Distance\\nbtw. lines:'}" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <NumericUpDown Minimum="0" Value="{Binding VerticalDistance}" IsEnabled="{Binding CanChange}" Grid.Column="3" Grid.Row="2" Margin="5,0,0,0" Increment="1" />
                     </Grid>
-                </Grid>
-            </GroupBox>
+                </DockPanel>
+            </HeaderedContentControl>
         </DockPanel>
     </Grid>
 </UserControl>

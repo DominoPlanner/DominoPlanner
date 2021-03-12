@@ -1,29 +1,26 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.RenderOptions"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             mc:Ignorable="d" 
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             d:DesignHeight="120" d:DesignWidth="200">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="350"
+             x:Class="DominoPlanner.Usage.UserControls.View.RenderOptions">
     <Grid Margin="5" x:Name="LayoutRoot">
-        <DockPanel>
-            <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" Visibility="{Binding ShowImageSize}" Grid.Row="0">
-                <TextBlock VerticalAlignment="Center" >Image size (larger side):</TextBlock>
-                <xctk:IntegerUpDown Width="100" HorizontalAlignment="Right" Minimum="200" Maximum="{Binding MaxSize}" Value="{Binding ImageSize, UpdateSourceTrigger=PropertyChanged}"/>
+        <StackPanel>
+            <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" IsVisible="{Binding ShowImageSize}" Grid.Row="0">
+                <TextBlock VerticalAlignment="Center"  Text="{local:Gettext Image size (larger side):}"/>
+                <NumericUpDown Width="100" HorizontalAlignment="Right" Minimum="200" Maximum="{Binding MaxSize}" Value="{Binding ImageSize}"/>
             </DockPanel>
             <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="1">
-                <TextBlock VerticalAlignment="Center">Background color:</TextBlock>
-                <xctk:ColorPicker HorizontalAlignment="Right" Width="100" SelectedColor="{Binding BackgroundColor}"/>
+                <TextBlock VerticalAlignment="Center" Text="{local:Gettext Background color:}"/>
+                <local:PopupColorPicker Color="{Binding BackgroundColor, Mode=TwoWay}"></local:PopupColorPicker>
             </DockPanel>
             <DockPanel Margin="0, 5, 0, 0" Height="26" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="2">
-                <CheckBox VerticalAlignment="Center" IsChecked="{Binding DrawBorders}" Grid.Row="2" Content="Draw Domino Borders"></CheckBox>
-
+                <CheckBox VerticalAlignment="Center" IsChecked="{Binding DrawBorders}" Grid.Row="2" Content="{local:Gettext Draw Domino Borders}"></CheckBox>
             </DockPanel>
 
-            <CheckBox  Height="26" VerticalContentAlignment="Center" Margin="0, 5, 0, 0" Visibility="{Binding Collapsible}" VerticalAlignment="Center" IsChecked="{Binding Collapse}" Grid.Row="3">Remove spaces between dominoes</CheckBox>
-        </DockPanel>
+            <CheckBox  Height="26" VerticalContentAlignment="Center" Margin="0, 5, 0, 0" IsVisible="{Binding Collapsible}" VerticalAlignment="Center" IsChecked="{Binding Collapse}" Grid.Row="3" Content="{local:Gettext Remove spaces between dominoes}"/>
+        </StackPanel>
 
     </Grid>
 </UserControl>

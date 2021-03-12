@@ -1,30 +1,37 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.RectangularSize"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="260">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:DominoPlanner.Usage"
+             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
+             x:Class="DominoPlanner.Usage.UserControls.View.RectangularSize">
     <Grid>
-        <GroupBox>
-            <GroupBox.Header>
+        <HeaderedContentControl>
+            <HeaderedContentControl.Header>
                 <TextBlock>
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{}Structure Dimensions: {0}mm x {1}mm">
+                        <MultiBinding StringFormat="{local:Gettext 'Structure Dimensions: {0}mm x {1}mm'}">
                             <Binding Path="PhysicalLength"></Binding>
                             <Binding Path="PhysicalHeight"></Binding>
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>
-            </GroupBox.Header>
+            </HeaderedContentControl.Header>
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
-                    <Label DockPanel.Dock="Left" Content="Structure Size:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <xctk:IntegerUpDown Minimum="1" Value="{Binding DominoCount, Delay=400}" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="120"/>
-                    <Label DockPanel.Dock="Left" Content="Dominoes" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Structure Size:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <NumericUpDown Value="{Binding DominoCount, Mode=OneWay}" Minimum="0" Width="120" HorizontalAlignment="Left" Name="SizeUpDown">
+                            <NumericUpDown.Styles>
+                                <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
+                                    <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}"/>
+                                    <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}"/>
+                                </Style>
+                            </NumericUpDown.Styles>
+                        </NumericUpDown>
+                    <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Amount Structure|Dominoes}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </DockPanel>
-                <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding list}" SelectedIndex="{Binding structure_index}" Height="25" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
+                <ComboBox DockPanel.Dock="Top" Items="{Binding list}" SelectedIndex="{Binding structure_index}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
                 <Grid Margin="0, 5, 0, 0" Grid.IsSharedSizeScope="True">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -76,10 +83,10 @@
                                    Margin="1" Source="{Binding Path=description_imgs[8]}"/>
                     </Border>
 
-                    <xctk:IntegerUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength, Delay=200}" Visibility="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Height="26" Margin="0, 5, 0, 0" Width="55"/>
-                    <xctk:IntegerUpDown Minimum="0" Value="{Binding sHeight, Delay=200}" Visibility="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4" Height="26" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
+                    <NumericUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength}" IsVisible="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Margin="0, 5, 0, 0" Width="55"/>
+                    <NumericUpDown Minimum="0" Value="{Binding sHeight}" IsVisible="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
                 </Grid>
             </DockPanel>
-        </GroupBox>
+        </HeaderedContentControl>
     </Grid>
 </UserControl>

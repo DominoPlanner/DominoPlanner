@@ -1,7 +1,6 @@
-﻿using Emgu.CV.CvEnum;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {
@@ -128,7 +127,7 @@ namespace DominoPlanner.Core
                 if (value > 0 && value != _length)
                 {
                     _length = value;
-                    current_width = value;
+                    ResetColumnHistory(value);
                     shapesValid = false;
                 }
             }
@@ -149,6 +148,7 @@ namespace DominoPlanner.Core
                 if (value > 0 && value != _height)
                 {
                     _height = value;
+                    ResetRowHistory(value);
                     shapesValid = false;
                 }
             }
@@ -156,7 +156,7 @@ namespace DominoPlanner.Core
         #endregion properties
         #region constructors
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int width, int height,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
         {
             ColorPath = colors;
             HorizontalDistance = horizontalDistance;
@@ -165,18 +165,18 @@ namespace DominoPlanner.Core
             VerticalDistance = verticalDistance;
             Length = width;
             Height = height;
-            PrimaryImageTreatment = new FieldReadout(this, imagePath, scalingMode);
+            PrimaryImageTreatment = new FieldReadout(this, imagePath, scalingQuality);
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
         }
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
-            : this(filepath, imagePath, colors, horizontalDistance, horizontalSize, verticalSize, verticalDistance, 1, 1, scalingMode, colorMode, ditherMode, iterationInformation)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+            : this(filepath, imagePath, colors, horizontalDistance, horizontalSize, verticalSize, verticalDistance, 1, 1, scalingQuality, colorMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
         public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            Inter scalingMode, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
         {
 
             ColorPath = colors;
@@ -184,8 +184,10 @@ namespace DominoPlanner.Core
             HorizontalSize = horizontalSize;
             VerticalSize = verticalSize;
             VerticalDistance = verticalDistance;
-            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingMode);
-            PrimaryImageTreatment.Background = background;
+            PrimaryImageTreatment = new FieldReadout(this, imageWidth, imageHeight, scalingQuality)
+            {
+                Background = background
+            };
             TargetCount = targetSize;
             PrimaryCalculation = new FieldCalculation(colorMode, ditherMode, iterationInformation);
             HasProtocolDefinition = true;
@@ -195,20 +197,23 @@ namespace DominoPlanner.Core
         #region overrides
         public override void RegenerateShapes()
         {
-            last = new DominoTransfer(getNewShapes(Length, Height), colors);
+            Last = new DominoTransfer(getNewShapes(Length, Height), colors);
             shapesValid = true;
         }
         public override int[,] GetBaseField(Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
-            if (!lastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
-            current_width = last.FieldPlanLength;
-            current_height = last.FieldPlanHeight;
+            if (!LastValid) throw new InvalidOperationException("There are unreflected changes in this field.");
+            if (current_width != Last.FieldPlanLength)
+            {
+                //Likely, something went wrong during row/column operations. Discard history
+                ResetSize(Last.FieldPlanLength);
+            }
             int[,] result = new int[current_width, current_height];
             for (int i = 0; i < current_width; i++)
             {
                 for (int j = 0; j < current_height; j++)
                 {
-                    result[i, j] = last.shapes[j * current_width + i].color;
+                    result[i, j] = Last.shapes[j * current_width + i].Color;
                 }
             }
             if (o == Orientation.Vertical) result = TransposeArray(result);

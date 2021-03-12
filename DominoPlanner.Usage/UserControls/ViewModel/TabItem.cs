@@ -1,4 +1,5 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Input;
+using DominoPlanner.Core;
 using DominoPlanner.Usage.Serializer;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Windows.Input;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
     public sealed class TabItem : ModelBase
     {
         #region CTOR
@@ -23,7 +25,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public TabItem(string Header, string picturePath, string path) : this(path, "")
         {
             this.Header = Header;
-            this.picture = picturePath;
+            this.Picture = picturePath;
         }
 
         public TabItem(string Header, string picturePath, string path, TabBaseVM content) : this(Header, picturePath, path)
@@ -33,32 +35,32 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public TabItem(string path) : this(path, "")
         {
             this.Header = System.IO.Path.GetFileNameWithoutExtension(path);
-            this.picture = ImageHelper.GetImageOfFile(path);
+            this.Picture = ImageHelper.GetImageOfFile(path);
             var ext = System.IO.Path.GetExtension(path).ToLower();
-            if (ext == Properties.Resources.ColorExtension.ToLower())
+            if (ext == "." + Declares.ColorExtension.ToLower())
             {
                 Content = new ColorListControlVM(path);
                 ResetContent();
             }
-            else if (ext == Properties.Resources.ObjectExtension.ToLower())
+            else if (ext == "."+  Declares.ObjectExtension.ToLower())
             {
                 Content = ViewModelGenerator(Workspace.Load<IDominoProvider>(path), (path));
                 ResetContent();
             }
             else
             {
-                throw new InvalidOperationException("Incorrect file extension");
+                throw new InvalidOperationException(_("Incorrect file extension"));
             }
         }
 
         public TabItem(DocumentNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         {
-            Content = ViewModelGenerator(project.DocumentModel.obj, project.AbsolutePath);
+            Content = ViewModelGenerator(project.DocumentModel.Obj, project.AbsolutePath);
             ResetContent();
         }
         public TabItem(ColorNodeVM project) : this(project.Name, ImageHelper.GetImageOfFile(project.AbsolutePath), project.AbsolutePath)
         { 
-            Content = new ColorListControlVM(project.parent.AssemblyModel.obj);
+            Content = new ColorListControlVM(project.Parent.AssemblyModel);
             ResetContent();
         }
         public static TabItem TabItemGenerator(NodeVM project)
@@ -111,6 +113,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return Content;
         }
 
+        internal void KeyPressed(object sender, KeyEventArgs args)
+        {
+            if (!args.Handled)
+            {
+                Content?.KeyPressed(sender, args);
+            }
+        }
+
         internal void ResetContent()
         {
 
@@ -125,14 +135,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region EventHandler
-        public delegate bool CloseDelegate(TabItem TI);
+        public delegate Task<bool> CloseDelegate(TabItem TI);
 
         public CloseDelegate CloseIt;
         #endregion
 
         #region prope
 
-        public string picture { get; set; }
+        public string Picture { get; set; }
 
         private int _ProjectID;
         public int ProjectID
@@ -194,9 +204,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region METHODS
-        private void CloseThis()
+        private async void CloseThis()
         {
-            if (CloseIt?.Invoke(this) == true)
+            if (await CloseIt?.Invoke(this) == true)
             {
                 Content?.Close();
             }
@@ -215,8 +225,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public string name { get; set; }
         public string assemblyname { get; set; }
 
-        public Stack<PostFilter> undoStack = new Stack<PostFilter>();
-        public Stack<PostFilter> redoStack = new Stack<PostFilter>();
         #endregion
         #region properties
         private IDominoProvider _CurrentProject;
@@ -228,20 +236,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 if (_CurrentProject != value)
                 {
                     _CurrentProject = value;
-                    TabPropertyChanged("VisibleFieldplan", ProducesUnsavedChanges: false);
-                    TabPropertyChanged("Collapsible", ProducesUnsavedChanges: false);
+                    TabPropertyChanged(nameof(VisibleFieldplan), ProducesUnsavedChanges: false);
+                    TabPropertyChanged(nameof(Collapsible), ProducesUnsavedChanges: false);
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
 
-        public Visibility VisibleFieldplan
+        public bool VisibleFieldplan
         {
             get
             {
                 if (CurrentProject?.HasProtocolDefinition == true)
-                    return Visibility.Visible;
-                else return Visibility.Collapsed;
+                    return true;
+                else return false;
             }
         }
 
@@ -275,25 +283,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        public virtual Visibility Collapsible
+        public virtual bool Collapsible
         {
             get
             {
                 if (CurrentProject != null && CurrentProject is FieldParameters)
                 {
-                    return Visibility.Visible;
+                    return true;
                 }
-                else return Visibility.Collapsed;
+                else return false;
             }
         }
 
-        private bool _undostate;
-
-        public bool undostate
-        {
-            get { return _undostate; }
-            set { _undostate = value; }
-        }
+        
         public Func<DominoProviderTabItem, DominoProviderTabItem> GetNewViewModel;
         public Action<DominoProviderTabItem, DominoProviderTabItem> RegisterNewViewModel;
         public bool Editing
@@ -318,35 +320,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #endregion
         #region methods
-        public override void Undo()
-        {
-            undostate = true;
-            if (undoStack.Count != 0)
-            {
-                PostFilter undoFilter = undoStack.Pop();
-                redoStack.Push(undoFilter);
-                undoFilter.Undo();
-                if (undoStack.Count == 0) UnsavedChanges = false;
-            }
-            undostate = false;
-        }
-
-        public override void Redo()
-        {
-            undostate = true;
-            if (redoStack.Count != 0)
-            {
-                PostFilter redoFilter = redoStack.Pop();
-                undoStack.Push(redoFilter);
-                redoFilter.Apply();
-            }
-            undostate = false;
-        }
+        
         private void OpenBuildTools()
         {
             ProtocolV protocolV = new ProtocolV();
             protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.ShowDialog();
+            protocolV.Show();
         }
         public override bool Save()
         {

@@ -1,28 +1,29 @@
-﻿<UserControl x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="200">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:DominoPlanner.Usage"
+             mc:Ignorable="d" d:DesignHeight="50" d:DesignWidth="200"
+             x:Class="DominoPlanner.Usage.UserControls.View.FieldReadoutV"
+             >
     <UserControl.Resources>
-        <parent:DiffusionModeToIntConverter x:Key="EnumToIntConverter"/>
-        <parent:InterToStringConverter x:Key="InterToStringConverter"/>
+        <local:FilterQualityToIntConverter x:Key="EnumToIntConverter"/>
+        <local:FilterQualityToStringConverter x:Key="InterToStringConverter"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox Header="{Binding ResizeMode, Converter={StaticResource InterToStringConverter}}" HeaderStringFormat="Resize Mode: {0}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Pixel" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
-                <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="5" IsSnapToTickEnabled="True" Value="{Binding ResizeMode, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
-                <Label Grid.Column="2" Content="Smooth" HorizontalAlignment="Right" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+        <HeaderedContentControl Header="{Binding ResizeQuality, Converter={StaticResource InterToStringConverter}, StringFormat={local:Gettext 'Resize Quality: {0}'}}">
+        <DockPanel>
+            <Grid ColumnDefinitions="1*, 3*, 1.5*" DockPanel.Dock="Top">
+                <TextBlock Grid.Column="0" Text="{local:Gettext Rough interpolation|Pixel}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <Slider Margin="0, 5, 0, 0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="2" 
+                        IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" TickFrequency="1" Value="{Binding ResizeQuality, Converter={StaticResource EnumToIntConverter}}" TickPlacement="BottomRight"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext Fine interpolation|Smooth}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
-        </GroupBox>
+                <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="1">
+                    <TextBlock VerticalAlignment="Center" Text="{local:Gettext Image background:}" ToolTip.Tip="{local:Gettext 'For transparent images, set background color here. In order to use transparency threshold, background must be transparent'}"/>
+                    <local:PopupColorPicker Color="{Binding Background, Mode=TwoWay}"></local:PopupColorPicker>
+                </DockPanel>
+            </DockPanel>
+        </HeaderedContentControl>
     </Grid>
 </UserControl>

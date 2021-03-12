@@ -120,13 +120,13 @@ namespace DominoPlanner.Usage
         public override void Apply()
         {
             base.Apply();
-            ((EditProjectVM)NewViewModel).DisplaySettingsTool.ResetCanvas();
+            ((EditProjectVM)NewViewModel).RecreateCanvasViewModel();
         }
         public override void Undo()
         {
 
             //((DominoProviderVM)OldViewModel).CurrentProject.shapesValid = false;
-            ((EditProjectVM)NewViewModel).DisplaySettingsTool.cleanEvents();
+            //((EditProjectVM)NewViewModel).cleanEvents();
             base.Undo();
 
             //((DominoProviderVM)OldViewModel).Refresh();
@@ -135,9 +135,9 @@ namespace DominoPlanner.Usage
     public class EditingDeactivatedOperation : EditingChangedOperation
     {
         public override bool NewEditingValue => false;
-        public EditProjectVM cmodel { get => (EditProjectVM)OldViewModel; }
-        private int current_width;
-        private int current_height;
+        public EditProjectVM Cmodel { get => (EditProjectVM)OldViewModel; }
+        private List<RowColumnHistoryDefinition> ColumnHistoryDefinitions;
+        private List<RowColumnHistoryDefinition> RowHistoryDefinitions;
         private DominoTransfer last;
         public EditingDeactivatedOperation(EditProjectVM editProjectVM) : base(editProjectVM)
         {
@@ -146,28 +146,26 @@ namespace DominoPlanner.Usage
         public override void Apply()
         {
 
-            last = (DominoTransfer)cmodel.CurrentProject.last.Clone();
-            if (cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
+            last = (DominoTransfer)Cmodel.CurrentProject.Last.Clone();
+            if (Cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
-                current_width = rowc.current_width;
-                current_height = rowc.current_height;
+                ColumnHistoryDefinitions = rowc.ColumnHistory;
+                RowHistoryDefinitions = rowc.RowHistory;
             }
-            ((EditProjectVM)OldViewModel).DisplaySettingsTool.cleanEvents();
             base.Apply();
-            //((DominoProviderVM)OldViewModel).Refresh();
 
         }
 
         public override void Undo()
         {
-            cmodel.CurrentProject.last = last;
-            if (cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
+            Cmodel.CurrentProject.Last = last;
+            if (Cmodel.CurrentProject is IRowColumnAddableDeletable rowc)
             {
-                rowc.current_width = current_width;
-                rowc.current_height = current_height;
+                rowc.ColumnHistory = ColumnHistoryDefinitions;
+                rowc.RowHistory = RowHistoryDefinitions;
             }
             base.Undo();
-            cmodel.DisplaySettingsTool.ResetCanvas();
+            Cmodel.RecreateCanvasViewModel();
 
         }
     }

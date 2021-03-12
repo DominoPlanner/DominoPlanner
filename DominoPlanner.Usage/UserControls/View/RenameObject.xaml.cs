@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 
-namespace DominoPlanner.Usage
+namespace DominoPlanner.Usage.UserControls
 {
-    /// <summary>
-    /// Interaktionslogik für RenameObject.xaml
-    /// </summary>
-    public partial class RenameObject : Window
+    public class RenameObject : Window
     {
+        public RenameObject()
+        {
+            this.InitializeComponent();
+#if DEBUG
+            //this.AttachDevTools();
+#endif
+        }
         public RenameObject(string filename)
         {
             InitializeComponent();
@@ -31,9 +25,14 @@ namespace DominoPlanner.Usage
         {
             if (e.PropertyName.Equals("Close"))
             {
-                DialogResult = ((RenameObjectVM)DataContext).result;
-                Close();
+                var result = ((RenameObjectVM)DataContext).result;
+                Close(result);
             }
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
         }
     }
 }

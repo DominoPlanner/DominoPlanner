@@ -89,7 +89,7 @@ namespace DominoPlanner.Core
             int[] counts = new int[palette.Length];
             for (int j = field.Length - 1; j >= 0; j--)
             {
-                counts[field[j].color]++;
+                counts[field[j].Color]++;
             }
             this.colorRestrictionsFulfilled = true;
             for (int j = 0; j < counts.Length; j++)

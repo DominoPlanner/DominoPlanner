@@ -1,20 +1,22 @@
 ﻿using DominoPlanner.Core;
-using DominoPlanner.Usage.HelperClass;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
+using Avalonia.Input;
+using Avalonia.Collections;
+using static DominoPlanner.Usage.ColorControl;
+using Avalonia.Controls;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
+    using static Localizer;
+
     public class DominoProviderVM : DominoProviderTabItem
     {
         #region CTOR
@@ -28,17 +30,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             BuildtoolsClick = new RelayCommand(o => { OpenBuildTools(); });
 
-            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>();  Editing = false; });
-            OpenPopup = new RelayCommand(x => PopupOpen = true);
-            ColorColumnConfig = new ColumnConfig();
+            SetDominoCount = new RelayCommand(o =>
+            {
+                if (CurrentProject is ICountTargetable)
+                    DominoCount = (int)Math.Floor((double)o);
+            }
+            );
 
-            var columns = new ObservableCollection<Column>();
-            columns.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "" });
-            columns.Add(new Column() { DataField = "DominoColor.name", Header = "Name" });
-            columns.Add(new Column() { DataField = "DominoColor.count", Header = "Total" });
-            columns.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
-            columns.Add(new Column() { DataField = "Weight", Header = "Weight" });
-            ColorColumnConfig.Columns = columns;
+            EditClick = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
+            OpenPopup = new RelayCommand(x => PopupOpen = true);
+
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = _("Name"), Width = new GridLength(100), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(70), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = GetParticularString("Number of stones used in current project", "Used"), HighlightDataField = "DominoColor.count" });
+            ColorColumnConfig.Add(new Column() { DataField = "Weight", Header = GetParticularString("Emphasis during calculation", "Weight") });
 
             AllowRegeneration = AllowRegenerate;
         }
@@ -46,7 +52,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         #region fields
         public string[] TargetSizeAffectedProperties;
-        public ColumnConfig ColorColumnConfig { get; set; } = new ColumnConfig();
+        public AvaloniaList<Column> ColorColumnConfig { get; set; } = new AvaloniaList<Column>();
         private ICommand _OpenPopup;
         public ICommand OpenPopup
         {
@@ -54,7 +60,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set { if (value != _OpenPopup) { _OpenPopup = value; } }
         }
         int refrshCounter = 0;
-        Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
+        readonly Progress<String> progress = new Progress<string>(pr => Console.WriteLine(pr));
         private DominoTransfer _dominoTransfer;
 
         public bool? AllowRegeneration { get; set; } = false;
@@ -89,23 +95,23 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
-        public DominoTransfer dominoTransfer
+        public DominoTransfer DominoTransfer
         {
             get { return _dominoTransfer; }
             set
             {
                 _dominoTransfer = value;
-                refreshPlanPic();
+                RefreshPlanPic();
 
-                PhysicalLength = dominoTransfer.physicalLength;
-                PhysicalHeight = dominoTransfer.physicalHeight;
+                PhysicalLength = DominoTransfer.PhysicalLength;
+                PhysicalHeight = DominoTransfer.PhysicalHeight;
             }
         }
         #endregion
 
         #region prope
         private Cursor _cursorState;
-        public Cursor cursor
+        public Cursor Cursor
         {
             get { return _cursorState; }
             set
@@ -125,8 +131,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return TabItemType.CreateField;
             }
         }
-        private WriteableBitmap _CurrentPlan;
-        public WriteableBitmap CurrentPlan
+        private Bitmap _CurrentPlan;
+        public Bitmap CurrentPlan
         {
             get { return _CurrentPlan; }
             set
@@ -139,7 +145,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         protected bool _draw_borders;
-        public bool draw_borders
+        public bool Draw_borders
         {
             get { return _draw_borders; }
             set
@@ -167,8 +173,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private System.Windows.Media.Color _backgroundColor = System.Windows.Media.Color.FromArgb(0, 255, 255, 255);
-        public System.Windows.Media.Color backgroundColor
+        private Avalonia.Media.Color _backgroundColor = Avalonia.Media.Color.FromArgb(0, 255, 255, 255);
+        public Avalonia.Media.Color BackgroundColor
         {
             get { return _backgroundColor; }
             set
@@ -192,12 +198,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (__dominoCount != value)
                 {
-                    __dominoCount = value;
-                    TabPropertyChanged("DominoCount", ProducesUnsavedChanges: false);
+                    if (!isTargetCountUpdating)
+                    {
+                        __dominoCount = value;
+                        TabPropertyChanged(nameof(DominoCount), ProducesUnsavedChanges: false);
+                    }
                 }
             }
         }
 
+        private bool isTargetCountUpdating = false;
         // entspricht Targetcount, daran wird gebunden
         public int DominoCount
         {
@@ -208,16 +218,25 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     if (CurrentProject is ICountTargetable t)
                     {
+                        isTargetCountUpdating = true;
                         PropertyValueChanged(this, value, producesUnsavedChanges: false, ChangesSize: true);
                         t.TargetCount = value;
+                        isTargetCountUpdating = false;
                     }
                     __dominoCount = value;
                     TabPropertyChanged(ProducesUnsavedChanges: false);
                 }
             }
         }
-
         public ObservableCollection<ColorListEntry> UsedColors { get; set; }
+        public ObservableCollection<ColorListEntry> SortedColors
+        {
+            get
+            {
+                return new ObservableCollection<ColorListEntry>(UsedColors.OrderBy(x => x.SortIndex));
+            }
+        }
+
         private bool _ColorRestrictionFulfilled;
 
         public bool ColorRestrictionFulfilled
@@ -238,41 +257,38 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 _popupOpen = value; RaisePropertyChanged();
             }
         }
-        public System.Windows.Threading.Dispatcher dispatcher;
-        protected void refreshPlanPic()
+        public Avalonia.Threading.Dispatcher dispatcher;
+        protected void RefreshPlanPic()
         {
+            void regenerate()
+            {
+                try
+                {
+                    var new_img = DominoTransfer.GenerateImage(BackgroundColor, 2000, Draw_borders, Collapsed).Snapshot();
+                    CurrentPlan = Bitmap.DecodeToWidth(new_img.Encode().AsStream(), new_img.Width);
+                    Cursor = null;
+                    _dominoCount = DominoTransfer.Length;
+                    PostCalculationUpdate();
+                    RefreshColorAmount();
+                }
+                catch { }
+            };
             if (AllowRegeneration == true)
             {
                 System.Diagnostics.Debug.WriteLine(progress.ToString());
                 if (dispatcher == null)
                 {
-                    CurrentPlan = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                    cursor = null;
-                    _dominoCount = dominoTransfer.length;
-                    PostCalculationUpdate();
-                    RefreshColorAmount();
+                    regenerate();
                 }
                 else
                 {
-                    dispatcher.BeginInvoke((Action)(() =>
-                    {
-                        try
-                        {
-                            WriteableBitmap newBitmap = ImageConvert.ToWriteableBitmap(dominoTransfer.GenerateImage(backgroundColor, 2000, draw_borders, Collapsed).Bitmap);
-                            CurrentPlan = newBitmap;
-                            _dominoCount = dominoTransfer.length;
-                            PostCalculationUpdate();
-                            RefreshColorAmount();
-                            cursor = null;
-                        }
-                        catch { }
-                    }));
+                    dispatcher.InvokeAsync(regenerate);
                 }
             }
             else if (AllowRegeneration == null)
             {
-                cursor = null;
-                _dominoCount = dominoTransfer.length;
+                Cursor = null;
+                _dominoCount = DominoTransfer.Length;
                 PostCalculationUpdate();
             }
         }
@@ -287,7 +303,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 cs?.Cancel();
                 cs = new CancellationTokenSource();
-                cursor = Cursors.Wait;
+                Cursor = new Cursor(StandardCursorType.Wait);
                 refrshCounter++;
                 if (AllowRegeneration == true)
                 {
@@ -298,13 +314,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                         {
                             return CurrentProject.Generate(cs.Token, progress);
                         }
-                        catch { return CurrentProject.last; }
+                        catch { return CurrentProject.Last; }
                     });
                     DominoTransfer dt = await Task.Factory.StartNew<DominoTransfer>(function);
                     refrshCounter--;
                     if (refrshCounter == 0)
                     {
-                        dominoTransfer = dt;
+                        DominoTransfer = dt;
                     }
                 }
                 else if (AllowRegeneration == null)
@@ -317,13 +333,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                             CurrentProject.RegenerateShapes();
                         }
                         catch { }
-                        return CurrentProject.last;
+                        return CurrentProject.Last;
                     });
                     DominoTransfer dt = await Task.Factory.StartNew(function);
                     refrshCounter--;
                     if (refrshCounter == 0)
                     {
-                        dominoTransfer = dt;
+                        DominoTransfer = dt;
                     }
                 }
             }
@@ -331,9 +347,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         #endregion
 
         #region Methods
-        
 
-        
+
+
         protected void FillColorList()
         {
             UsedColors = new ObservableCollection<ColorListEntry>();
@@ -371,75 +387,62 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     UsedColors[i].ProjectCount.Add(CurrentProject.Counts[0]);
                 }
             }
+            TabPropertyChanged(nameof(SortedColors), false);
             ColorRestrictionFulfilled = fulfilled;
         }
         protected void OpenBuildTools()
         {
-            ProtocolV protocolV = new ProtocolV();
-            protocolV.DataContext = new ProtocolVM(CurrentProject, name, assemblyname);
-            protocolV.ShowDialog();
+            ProtocolV protocolV = new ProtocolV
+            {
+                DataContext = new ProtocolVM(CurrentProject, name, assemblyname)
+            };
+            protocolV.ShowWithParent<MainWindow>();
         }
         public void RefreshTargetSize()
         {
             bool oldUndoState = undostate;
             undostate = true;
             if (DominoCount > 0)
-                DominoCount = DominoCount + 1;
-            undostate= oldUndoState;
+                DominoCount += 1;
+            undostate = oldUndoState;
         }
-
-        public void PropertyValueChanged(object sender, object value_new,
-            [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
+        public void PropertyValueChanged(object sender, object value_new, [CallerMemberName] string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, bool ChangesSize = false, Action PostUndoAction = null)
         {
-            if (!undostate)
+            if (ChangesSize)
             {
-                try
+                if (!undostate)
                 {
                     undostate = true;
                     if (producesUnsavedChanges)
                         UnsavedChanges = true;
-                    if (ChangesSize)
+                    try
                     {
                         var filter = new TargetSizeChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()), PostUndoAction ?? PostAction ?? (() => Refresh()), TargetSizeAffectedProperties);
                         undoStack.Push(filter);
                         filter.Apply();
+                        redoStack = new Stack<PostFilter>();
                     }
-                    else
+                    finally
                     {
-                        var filter = new PropertyChangedOperation(sender, value_new, membername, PostAction ?? (() => Refresh()));
-                        if (undoStack.Count != 0)
-                        {
-                            var lastOnStack = undoStack.Peek();
-                            if (lastOnStack is PropertyChangedOperation op)
-                            {
-                                if (op.sender == sender && op.membername == membername)
-                                {
-                                    // property has been changed multiple times in a row
-                                    if (!op.value_old.Equals(value_new))
-                                    {
-                                        op.value_new = value_new;
-                                        undoStack.Pop();
-                                        filter = op;
-                                    }
-                                }
-                            }
-                        }
-                        undoStack.Push(filter);
-                        filter.Apply();
+                        undostate = false;
                     }
-                    redoStack = new Stack<PostFilter>();
-                }
-                finally
-                {
-                    undostate = false;
                 }
             }
-        }
+            else
+            {
+                base.PropertyValueChanged(sender, value_new, membername, producesUnsavedChanges, PostAction ?? (() => Refresh()), PostUndoAction);
+            }
+        } 
+
+
         #endregion
 
         #region Commands
         private ICommand _EditClick;
         public ICommand EditClick { get { return _EditClick; } set { if (value != _EditClick) { _EditClick = value; } } }
+
+        private ICommand _SetDominoCount;
+        public ICommand SetDominoCount { get { return _SetDominoCount; } set { if (value != _SetDominoCount) { _SetDominoCount = value; } } }
 
     #endregion
 

@@ -1,10 +1,13 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Collections;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using DominoPlanner.Core;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
@@ -30,7 +33,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 structure_index = 0;
             }
             UnsavedChanges = false;
-            TargetSizeAffectedProperties = new string[] { "sLength", "sHeight" };
+            TargetSizeAffectedProperties = new string[] { nameof(sLength), nameof(sHeight) };
         }
         #endregion
 
@@ -101,6 +104,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     _structure_index = value;
                     SelectedStructureElement = structures.ElementAt(_structure_index);
+                    TabPropertyChanged(nameof(VisibleFieldplan), ProducesUnsavedChanges: false);
                     RaisePropertyChanged();
                     RefreshDescriptionImages();
                     if (temp_struct_index != -1)
@@ -111,17 +115,14 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 }
             }
         }
-        private BitmapSource[] _description_imgs;
-        public BitmapSource[] description_imgs
+        private AvaloniaList<IImage> _description_imgs;
+        public AvaloniaList<IImage> description_imgs
         {
             get { return _description_imgs; }
             set
             {
-                if (_description_imgs != value)
-                {
-                    _description_imgs = value;
-                    RaisePropertyChanged();
-                }
+                _description_imgs = value;
+                RaisePropertyChanged();
             }
         }
         protected XElement _selectedStructureElement;
@@ -135,7 +136,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 _selectedStructureElement = value;
-                currentStructure.structureDefinitionXML = value;
+                currentStructure.StructureDefinitionXML = value;
             }
         }
         #endregion
@@ -144,8 +145,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         protected override void PostCalculationUpdate()
         {
-            TabPropertyChanged("sHeight", ProducesUnsavedChanges: false);
-            TabPropertyChanged("sLength", ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(sHeight), ProducesUnsavedChanges: false);
+            TabPropertyChanged(nameof(sLength), ProducesUnsavedChanges: false);
         }
         public static Tuple<List<XElement>, List<string>> StuctureTypes()
         {
@@ -153,7 +154,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             var names = new List<string>();
             try
             {
-                XElement xElement = XElement.Parse(Properties.Resources.Structures);
+                string structurepath = Path.Combine(MainWindowViewModel.ShareDirectory, UserSettings.Instance.StructureTemplates);
+                if (!File.Exists(structurepath))
+                {
+                    Debug.WriteLine("Structure file not found");
+                }
+                StreamReader fr = new StreamReader(structurepath);
+                XElement xElement = XElement.Parse(fr.ReadToEnd());
                 structures = xElement.Elements().ToList();
 
                 foreach (var structure in structures)
@@ -171,16 +178,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public void RefreshDescriptionImages()
         {
-            WriteableBitmap[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
-            description_imgs = new BitmapSource[9];
+            SKSurface[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
+            description_imgs = new AvaloniaList<IImage>();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    description_imgs[i + j * 3] = previews[i, j];
+                    var bit = previews[j, i].Snapshot();
+                    description_imgs.Add(Bitmap.DecodeToWidth(bit.Encode(SKEncodedImageFormat.Png, 100).AsStream(), bit.Width));
                 }
             }
-            RaisePropertyChanged("description_imgs");
         }
         #endregion
     }

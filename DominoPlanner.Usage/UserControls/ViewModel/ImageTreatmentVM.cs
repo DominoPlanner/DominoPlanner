@@ -1,5 +1,4 @@
 ﻿using DominoPlanner.Core;
-using Emgu.CV.CvEnum;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
+using Avalonia.Media;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -132,15 +131,15 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             get => CurrentModel as FieldReadout;
         }
-        public Inter ResizeMode
+        public SkiaSharp.SKFilterQuality ResizeQuality
         {
-            get => FRModel.ResizeMode;
+            get => FRModel.ResizeQuality;
             set
             {
-                if (FRModel.ResizeMode != value)
+                if (FRModel.ResizeQuality != value)
                 {
                     PropertyValueChanged(this, value);
-                    FRModel.ResizeMode = value;
+                    FRModel.ResizeQuality = value;
                     RaisePropertyChanged();
                 }
             }

@@ -1,18 +1,28 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia.Media;
+using DominoPlanner.Core;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace DominoPlanner.Usage
 {
+    // Viewmodel for DominoColor
     public class ColorListEntry : ModelBase
     {
+        public Action<object, object, string, bool, Action, Action> ValueChanged;
+        protected void PropertyValueChanged(object sender, object value_new, [CallerMemberName]
+        string membername = "", bool producesUnsavedChanges = true, Action PostAction = null, Action PostUndoAction = null)
+        {
+            ValueChanged?.Invoke(sender, value_new, membername, producesUnsavedChanges, PostAction, PostUndoAction);
+        }
         public ColorListEntry()
         {
             ProjectCount = new ObservableCollection<int>();
             SumAll = 0;
         }
 
-        private void _ProjectCount_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ProjectCount_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             SumAll = ProjectCount.Sum();
         }
@@ -31,6 +41,26 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public string Name
+        {
+            get { return DominoColor.name; }
+            set { PropertyValueChanged(this, value); DominoColor.name = value; RaisePropertyChanged(); }
+        }
+
+
+        public int Count
+        {
+            get { return DominoColor.count; }
+            set { PropertyValueChanged(this, value); DominoColor.count = value; RaisePropertyChanged(); }
+        }
+
+        public Color Color
+        {
+            get { return DominoColor.mediaColor; }
+            set { PropertyValueChanged(this, value); DominoColor.mediaColor = value; RaisePropertyChanged(); }
+        }
+
 
         private int _SortIndex;
         public int SortIndex
@@ -72,6 +102,13 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        public bool Deleted
+        {
+            get { return DominoColor.Deleted; }
+            set { DominoColor.Deleted = value; RaisePropertyChanged(); }
+        }
+
         private ObservableCollection<int> _ProjectCount;
         public ObservableCollection<int> ProjectCount
         {
@@ -81,14 +118,34 @@ namespace DominoPlanner.Usage
                 if (_ProjectCount != value)
                 {
                     if (_ProjectCount != null)
-                        _ProjectCount.CollectionChanged -= _ProjectCount_CollectionChanged; 
+                        _ProjectCount.CollectionChanged -= ProjectCount_CollectionChanged;
                     _ProjectCount = value;
-                    if(_ProjectCount != null)
-                        _ProjectCount.CollectionChanged += _ProjectCount_CollectionChanged;
+                    if (_ProjectCount != null)
+                        _ProjectCount.CollectionChanged += ProjectCount_CollectionChanged;
                     RaisePropertyChanged();
                 }
             }
         }
+        public DominoColorState GetColorState()
+        {
+            return GetColorState(Deleted, ProjectCount);
+        }
+
+        public static DominoColorState GetColorState(bool deleted, ObservableCollection<int> counts)
+        {
+            if (!deleted)
+                return DominoColorState.Active;
+            foreach (int count in counts)
+                if (count > 0)
+                    return DominoColorState.Inactive;
+            return DominoColorState.Deleted;
+        }
         #endregion
+    }
+    public enum DominoColorState
+    {
+        Active,
+        Inactive,
+        Deleted
     }
 }

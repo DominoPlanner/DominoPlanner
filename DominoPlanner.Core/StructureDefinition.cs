@@ -5,8 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
 using System.Xml.Linq;
+using SkiaSharp;
 
 namespace DominoPlanner.Core
 {
@@ -49,11 +50,13 @@ namespace DominoPlanner.Core
             //int a = g.dominoes.Max(s => s.GetContainer().x2);
             //return g;
         }
-        public WriteableBitmap DrawPreview(int col, int row, int targetDimension)
+        public SKSurface DrawPreview(int col, int row, int targetDimension)
         {
             CellDefinition cell = cells[col, row];
             double scalingFactor = PreviewScaleFactor(targetDimension); // scale everything to the same size
-            WriteableBitmap b = BitmapFactory.New((int)(cell.width * scalingFactor + 2), (int)(cell.height * scalingFactor + 2));
+            SKImageInfo info = new SKImageInfo((int)(cell.width * scalingFactor + 2), (int)(cell.height * scalingFactor + 2));
+            var bitmap = SKSurface.Create(info);
+            SKCanvas canvas = bitmap.Canvas;
             for (int colc = (col == 2) ? 1 : 0; colc <= ((col == 0) ? 1 : 2); colc++)
             {
                 for (int rowc = (row == 2) ? 1 : 0; rowc <= ((row == 0) ? 1 : 2); rowc++) // only use the cells next to the specified (so top left uses 4 top center, center left and center center).
@@ -68,18 +71,19 @@ namespace DominoPlanner.Core
                             yOffsetMultiplier * ((yOffsetMultiplier > 0) ? cell.height : current.height), 0, 0, 0, 0); // move the dominoes
                         DominoRectangle container = transformed.GetContainer(); // get containing rectangle
                         if (container.x >= cells[col, row].width || container.x + container.width <= 0 || container.y >= cells[col, row].height || container.y + container.height <= 0) continue; // check if rectangle is out of drawing area
-                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle((int)Math.Ceiling(scalingFactor)).getWBXPath(), System.Windows.Media.Colors.Black); // outline
-                        b.FillPolygon(transformed.GetPath(scalingFactor).getOffsetRectangle(-(int)Math.Ceiling(scalingFactor)).getWBXPath(), System.Windows.Media.Colors.LightGray); // inner line
+
+                        canvas.DrawPath(transformed.GetPath(scalingFactor).GetSKPath(), new SKPaint() { Color = SKColors.Black, IsStroke=true, StrokeWidth = 1 }); // outline
+                        canvas.DrawPath(transformed.GetPath(scalingFactor).GetSKPath(), new SKPaint() { Color = new SKColor(0, 0, 255, 128) }); // inner line
                     }
                 }
             }
-            return b;
+            return bitmap;
         }
-        public static WriteableBitmap[,] getPreviews(int targetDimension, XElement structure)
+        public static SKSurface[,] getPreviews(int targetDimension, XElement structure)
         {
-            WriteableBitmap[,] array = new WriteableBitmap[3, 3];
+            SKSurface[,] array = new SKSurface[3, 3];
             StructureParameters sp = new StructureParameters();
-            sp.structureDefinitionXML = structure;
+            sp.StructureDefinitionXML = structure;
             for (int col = 0; col < 3; col++)
             {
                 for (int row = 0; row < 3; row++)
@@ -88,6 +92,23 @@ namespace DominoPlanner.Core
                 }
             }
             return array;
+        }
+    }
+    public static class PathExtensions
+    {
+        public static SKPath GetSKPath(this DominoPath path)
+        {
+            var p = new SKPath();
+            if (path.points.Length > 0)
+            {
+                p.MoveTo((float)path.points[0].X, (float)path.points[0].Y);
+                foreach (var point in path.points.Skip(1))
+                {
+                    p.LineTo((float)point.X, (float)point.Y);
+                }
+                p.Close();
+            }
+            return p;
         }
     }
     [ProtoContract]
