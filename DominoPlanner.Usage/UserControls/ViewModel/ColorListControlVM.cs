@@ -345,7 +345,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
                     new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
                 },
-                Directory = Path.GetDirectoryName(DialogExtensions.GetCurrentProjectPath())
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             var result = await dlg.ShowAsyncWithParent<MainWindow>();
             if (!string.IsNullOrEmpty(result))

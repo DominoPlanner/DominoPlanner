@@ -7,6 +7,7 @@ using MessageBox.Avalonia.Enums;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace DominoPlanner.Usage
@@ -35,7 +36,7 @@ namespace DominoPlanner.Usage
             if (project is AssemblyNodeVM vm2)
             {
                 var path = vm2.AbsolutePath;
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
                     path = Path.GetDirectoryName(path);
                 }

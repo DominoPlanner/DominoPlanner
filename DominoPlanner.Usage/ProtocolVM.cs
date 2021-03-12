@@ -507,7 +507,7 @@ namespace DominoPlanner.Usage
             {
                 DefaultExtension = ".xlsx",
                 InitialFileName = Titel,
-                Directory = Path.GetDirectoryName(DialogExtensions.GetCurrentProjectPath())
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
 
@@ -532,7 +532,7 @@ namespace DominoPlanner.Usage
             {
                 DefaultExtension = ".html",
                 InitialFileName = Titel,
-                Directory = Path.GetDirectoryName(DialogExtensions.GetCurrentProjectPath())
+                Directory = DialogExtensions.GetCurrentProjectPath()
             };
             dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
             string filename = await dlg.ShowAsyncWithParent<ProtocolV>();
