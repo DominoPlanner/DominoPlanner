@@ -25,8 +25,8 @@ namespace DominoPlanner.Usage
             {
                 try
                 {
-                    var share_path = MainWindowViewModel.ShareDirectory;
-                    File.Copy(Path.Combine(share_path, "Resources", "lamping.DColor"), StandardColorPath);
+                    string newPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
+                    File.Copy(newPath, StandardColorPath);
                 }
                 catch { }
             }
