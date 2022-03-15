@@ -36,8 +36,13 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     PropertyValueChanged(this, value);
                     CircularStructure.DominoLength = value;
                     RaisePropertyChanged();
+                    NormalWidthChanged();
                 }
             }
+        }
+        protected virtual void NormalWidthChanged()
+        {
+
         }
         public int TangentialDistance
         {
@@ -85,6 +90,44 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     PropertyValueChanged(this, value);
                     CircleParameters.Circles = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        public int InnerDiameter
+        {
+            get => CircleParameters.StartDiameter;
+            set
+            {
+                if(CircleParameters.StartDiameter != value)
+                {
+                    PropertyValueChanged(this, value);
+                    CircleParameters.StartDiameter = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+        protected override void NormalWidthChanged()
+        {
+            RaisePropertyChanged("MinInnerDiameter");
+            if(InnerDiameter < MinInnerDiameter)
+            {
+                InnerDiameter = MinInnerDiameter;
+            }
+        }
+        public int MinInnerDiameter
+        {
+            get => CircleParameters.DominoLength * 2 + 1;
+        }
+        public bool TryUsePerfectInnerCircle
+        {
+            get => CircleParameters.TryUsePerfectInnerCircle;
+            set
+            {
+                if(CircleParameters.TryUsePerfectInnerCircle != value)
+                {
+                    PropertyValueChanged(this, value);
+                    CircleParameters.TryUsePerfectInnerCircle = value;
                     RaisePropertyChanged();
                 }
             }
