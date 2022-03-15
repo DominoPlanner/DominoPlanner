@@ -37,6 +37,11 @@
                         <TextBlock Text="{local:Gettext Divisor:}" VerticalAlignment="Center"/>
                         <NumericUpDown  Value="{Binding ForceDivisibility}" Minimum="1"/>
                     </DockPanel>
+                    <DockPanel LastChildFill="True" Margin="2"  VerticalAlignment="Top">
+                        <TextBlock Text="{local:Gettext Inner Diameter:}" VerticalAlignment="Center"/>
+                        <NumericUpDown  Value="{Binding InnerDiameter}" Minimum="{Binding MinInnerDiameter}"/>
+                    </DockPanel>
+                    <CheckBox IsChecked="{Binding TryUsePerfectInnerCircle}" Content="Try create perfect inner circles"/>
                     <DockPanel Margin="2">
                         <RadioButton IsChecked="{Binding RandomShiftFactor}" VerticalAlignment="Center" Content="{local:Gettext circle start shift|Random Shift}"/>
                         <RadioButton IsChecked="{Binding RandomShiftFactor, Converter={StaticResource BoolInverterConverter}}" Margin="5, 0, 0, 0" VerticalAlignment="Center" Content="{local:Gettext circle start shift|Fixed shift:}"/>
