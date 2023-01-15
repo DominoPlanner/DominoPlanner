@@ -13,6 +13,7 @@ using DominoPlanner.Usage.Serializer;
 using Avalonia.Media;
 using System.Diagnostics;
 using static DominoPlanner.Usage.Localizer;
+using MessageBox.Avalonia.Enums;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -709,26 +710,78 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _("Custom Image Export");
             ExportImage(true);
         }
+        [ContextMenu("Export Floor Print", "Icons/image.ico", isVisible: nameof(CanExportFloorPrint), index: 6)]
+        public void ExportFloorPrint()
+        {
+            _("Export Floor Print");
+            _ExportFloorPrint();
+        }
+        
+        public bool CanExportFloorPrint()
+        {
+            return DocumentModel is CircleNode || DocumentModel is SpiralNode;
+        }
+
+        private async void _ExportFloorPrint()
+        {
+            try
+            {
+                if (DocumentModel?.Obj?.Last != null && DocumentModel.Obj.Last.PhysicalExpandedHeight > 1700)
+                {
+                    var box = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("To large", "The project ist to large.", ButtonEnum.Ok, Icon.Error);
+                    await box.ShowDialogWithParent<MainWindow>();
+                    return;
+                }
+                ExportFloorPlan();
+            }
+            catch (Exception ex) { await Errorhandler.RaiseMessage(_("Export failed: ") + ex, _("Error"), Errorhandler.MessageType.Error); }
+        }
 
         public async void ExportImage(string exportPath, bool collapsed, bool drawBorders, Color background, int width = 0)
         {
-            if (string.IsNullOrWhiteSpace(exportPath))
+            string finalExportPath = await ExportImage_PrepairPath(exportPath);
+            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(finalExportPath);
+        }
+
+        private async Task<string> ExportImage_PrepairPath()
+        {
+            return await ExportImage_PrepairPath(string.Empty);
+        }
+
+        private async Task<string> ExportImage_PrepairPath(string checkPath)
+        {
+            Task<string> createPath = Task.Run(async () =>
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog()
+                string exportPath = checkPath;
+                if (string.IsNullOrEmpty(exportPath))
                 {
-                    Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
-                    Directory = this.GetInitialDirectory()
-                };
-                exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
-            }
-            if (!string.IsNullOrWhiteSpace(exportPath))
-            {
-                if (File.Exists(exportPath))
-                {
-                    File.Delete(exportPath);
+                    SaveFileDialog saveFileDialog = new SaveFileDialog()
+                    {
+                        Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
+                        Directory = this.GetInitialDirectory(),
+                        InitialFileName = $"{Name}.png",
+                    };
+                    exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
                 }
-                DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(exportPath);
-            }
+
+                if (!string.IsNullOrWhiteSpace(exportPath))
+                {
+                    if (File.Exists(exportPath))
+                    {
+                        File.Delete(exportPath);
+                    }
+                }
+                return exportPath;
+            });
+
+            await createPath;
+            return createPath.Result;
+        }
+
+        public async void ExportFloorPlan()
+        {
+            string exportPath = await ExportImage_PrepairPath();
+            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateFloorPlan().Save(exportPath, 300);
         }
 
         public async void ExportImage(bool userDefinedExport)
