@@ -145,21 +145,6 @@ namespace DominoPlanner.Usage
         public static MenuItem GenerateMenuItem(ContextMenuAttribute attr, MethodInfo mi, object reference)
         {
             MenuItem MI = new MenuItem();
-            bool Activated = true;
-            bool isMethod = !bool.TryParse(attr.Activated, out Activated);
-            if (isMethod)
-            {
-                try
-                {
-                    var mipred = reference.GetType().GetRuntimeMethod(attr.Activated, new Type[] { });
-                    var micoll = reference.GetType().GetRuntimeMethods();
-                    Activated = (bool)mipred.Invoke(reference, new object[] { });
-                }
-                catch
-                {
-                    Activated = false;
-                }
-            }
             MI.Command = new RelayCommand(o => mi.Invoke(reference, new object[] { }));
             MI.Header = attr.Header;
             if (!string.IsNullOrEmpty(attr.ImageSource))
@@ -170,9 +155,28 @@ namespace DominoPlanner.Usage
                     Source = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage/" + attr.ImageSource, UriKind.Absolute)))
             };
             }
-            MI.IsVisible = attr.IsVisible;
-            MI.IsEnabled = Activated;
+            MI.IsVisible = ConvertStringToBool(attr.IsVisible, reference);
+            MI.IsEnabled = ConvertStringToBool(attr.Activated, reference);
             return MI;
+        }
+
+        private static bool ConvertStringToBool(string attrValue, object reference)
+        {
+            if (bool.TryParse(attrValue, out bool activated))
+            {
+                return activated;
+            }
+
+            try
+            {
+                var mipred = reference.GetType().GetRuntimeMethod(attrValue, new Type[] { });
+                var micoll = reference.GetType().GetRuntimeMethods();
+                return (bool)mipred.Invoke(reference, new object[] { });
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
@@ -180,7 +184,7 @@ namespace DominoPlanner.Usage
     {
         public string Activated { get; set; }
 
-        public bool IsVisible { get; set; }
+        public string IsVisible { get; set; }
 
         public string ImageSource { get; set; }
 
@@ -188,9 +192,7 @@ namespace DominoPlanner.Usage
 
         public int Index { get; set; }
 
-        //public ICommand Command { get; set; }
-        public ContextMenuAttribute(string header, string imageSource, 
-            string activated, bool isVisible = true, int index = 0)
+        public ContextMenuAttribute(string header, string imageSource, string activated = "true", string isVisible = "true", int index = 0)
         {
             Header = Localizer._(header);
             ImageSource = imageSource;
@@ -198,15 +200,10 @@ namespace DominoPlanner.Usage
             IsVisible = isVisible;
             Index = index;
         }
-        public ContextMenuAttribute(string header, string imageSource,
-            bool activated = true, bool isVisible = true, int index = 0)
-        {
-            Header = Localizer._(header);
-            ImageSource = imageSource;
-            Activated = activated.ToString();
-            IsVisible = isVisible;
-            Index = index;
-        }
 
+        public ContextMenuAttribute(string header, string imageSource, string activated, bool isVisible, int index = 0)
+            : this(header, imageSource, activated, isVisible.ToString(), index) { }
+        public ContextMenuAttribute(string header, string imageSource, bool activated, bool isVisible, int index = 0)
+            : this(header, imageSource, activated.ToString(), isVisible.ToString(), index) { }
     }
 }
