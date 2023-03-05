@@ -23,7 +23,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public DominoProviderVM(IDominoProvider dominoProvider, bool? AllowRegenerate) : base()
         {
             CurrentProject = dominoProvider;
-            CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation);
+            CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation, CurrentProject.colors);
             ImageTreatmentVM = ImageTreatmentVM.ImageTreatmentVMFactory(CurrentProject.PrimaryImageTreatment);
 
             FillColorList();
