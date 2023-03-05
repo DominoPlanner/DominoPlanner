@@ -145,6 +145,21 @@
                         Text="255" />
                 </Grid>
             </HeaderedContentControl>
+            <HeaderedContentControl Header="Use Colors">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Current Selected Color</TextBlock>
+                        <CheckBox IsChecked="{Binding IsColorUsed}"/>
+                        <TextBlock>Forcen:</TextBlock>
+                        <CheckBox IsChecked="{Binding ShouldUseForceMode}"/>
+                        <CheckBox IsChecked="{Binding ForcedValue}"/>
+                    </StackPanel>
+                    <local:ColorControl Grid.Row="2" SelectedColor="{Binding SelectedColor}"
+                                        ColumnConfig="{Binding ColorColumnConfig}" 
+                                        Colors="{Binding DataContext.SortedColors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}}" >
+                    </local:ColorControl>
+                </StackPanel>
+            </HeaderedContentControl>
             <HeaderedContentControl>
                 <HeaderedContentControl.Header>
                     <StackPanel Orientation="Horizontal">

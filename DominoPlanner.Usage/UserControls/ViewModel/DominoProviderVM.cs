@@ -23,7 +23,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public DominoProviderVM(IDominoProvider dominoProvider, bool? AllowRegenerate) : base()
         {
             CurrentProject = dominoProvider;
-            CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation);
+            CalculationVM = CalculationVM.CalculationVMFactory(CurrentProject.PrimaryCalculation, CurrentProject.colors);
             ImageTreatmentVM = ImageTreatmentVM.ImageTreatmentVMFactory(CurrentProject.PrimaryImageTreatment);
 
             FillColorList();
@@ -104,7 +104,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 _dominoTransfer = value;
-                RefreshPlanPic();
+                try
+                {
+                    if(CalculationVM is NonEmptyCalculationVM nonEmptyCalculationVM)
+                    {
+                        nonEmptyCalculationVM.updatingImage = true;
+                    }
+                    RefreshPlanPic();
+                }
+                finally
+                {
+                    if (CalculationVM is NonEmptyCalculationVM nonEmptyCalculationVM)
+                    {
+                        nonEmptyCalculationVM.updatingImage = false;
+                    }
+                }
 
                 PhysicalLength = DominoTransfer.PhysicalLength;
                 PhysicalHeight = DominoTransfer.PhysicalHeight;

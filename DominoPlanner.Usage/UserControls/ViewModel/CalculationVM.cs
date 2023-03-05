@@ -10,6 +10,10 @@ using System.Windows;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Templates;
 using System.Windows.Input;
+using Avalonia.Collections;
+using static DominoPlanner.Usage.ColorControl;
+using static OfficeOpenXml.ExcelErrorValue;
+using System.Diagnostics;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -23,35 +27,41 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         }
 
         internal Calculation currentModel;
-        public CalculationVM(Calculation model)
+        internal ColorRepository colorRepository;
+        public CalculationVM(Calculation model, ColorRepository colorRepository)
         {
             currentModel = model;
+            this.colorRepository = colorRepository;
             
         }
-        public static CalculationVM CalculationVMFactory(Calculation model)
+        public static CalculationVM CalculationVMFactory(Calculation model, ColorRepository colorRepository)
         {
             if (model is FieldCalculation f)
             {
-                return new FieldCalculationVM(f);
+                return new FieldCalculationVM(f, colorRepository);
             }
             else if (model is UncoupledCalculation u)
             {
-                return new UncoupledCalculationVM(u);
+                return new UncoupledCalculationVM(u, colorRepository);
             }
             return null;
         }
     }
     public class EmptyCalculationVM : CalculationVM
     {
-        public EmptyCalculationVM(EmptyCalculation model) : base(model)
+        public EmptyCalculationVM(EmptyCalculation model, ColorRepository colorRepository) : base(model, colorRepository)
         {
             
         }
     }
     public class NonEmptyCalculationVM : CalculationVM
     {
-        public NonEmptyCalculationVM(NonEmptyCalculation model) : base(model)
+        public NonEmptyCalculationVM(NonEmptyCalculation model, ColorRepository colorRepository) : base(model, colorRepository)
         {
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" });
+            ColorColumnConfig.Add(new Column() { DataField = "DominoColor.name", Header = "Name", Width = new GridLength(100), CanResize = true });
+            ColorColumnConfig.Add(new Column() { DataField = "SumAll", Header = "Used", HighlightDataField = "DominoColor.count" });
+            
             IterationInformationVM = IterationInformationVM.IterationInformationVMFactory(model.IterationInformation);
             IterationInformationVM.ValueChanged = PropertyValueChanged;
             IterationInformationChanged = new RelayCommand( (o) => {if (o is bool b) ChangeIterationInformation(b); });
@@ -68,6 +78,152 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 IterationInformation = new NoColorRestriction();
             }
         }
+
+        public bool updatingImage = false;
+
+        private ColorListEntry _SelectedColor;
+        public ColorListEntry SelectedColor
+        {
+            get
+            {
+                return _SelectedColor;
+            }
+            set
+            {
+                if (_SelectedColor != value)
+                {
+                    _SelectedColor = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged("IsColorUsed");
+
+                    if(SelectedColor != null)
+                    {
+                        if(ShouldUseForceMode && !updatingImage)
+                        {
+                            ChangeColorFilter(ForcedValue);
+                            PropertyValueChanged(this, value);
+                        }
+
+                        if(ColorFilters == null)
+                        {
+                            IsColorUsed = true;
+                        }
+                        else
+                        {
+                            if (ColorFilters.OfType<ChangeCountColorFilter>().Any(x => x.Index == CalcIndex(SelectedColor.DominoColor as DominoColor)))
+                            {
+                                IsColorUsed = false;
+                            }
+                            else
+                            {
+                                IsColorUsed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public AvaloniaList<Column> ColorColumnConfig { get; set; } = new AvaloniaList<Column>();
+
+        private bool _ShouldUseForceMode;
+        public bool ShouldUseForceMode
+        {
+            get
+            {
+                return _ShouldUseForceMode;
+            }
+            set
+            {
+                if(_ShouldUseForceMode != value)
+                {
+                    _ShouldUseForceMode = value;
+                    RaisePropertyChanged("ShouldUseForceMode");
+                }
+            }
+        }
+
+        private bool _ForcedValue;
+        public bool ForcedValue
+        {
+            get
+            {
+                return _ForcedValue;
+            }
+            set
+            {
+                if(_ForcedValue != value)
+                {
+                    _ForcedValue = value;
+                    RaisePropertyChanged("ForcedValue");
+                }
+            }
+        }
+
+        private bool _IsColorUsed;
+
+        public bool IsColorUsed
+        {
+            get
+            {
+                return _IsColorUsed;
+            }
+            set
+            {
+                if (_IsColorUsed != value)
+                {
+                    _IsColorUsed = value;
+                    RaisePropertyChanged("IsColorUsed");
+
+                    
+
+                    ChangeColorFilter(IsColorUsed);
+
+                    PropertyValueChanged(this, value);
+                }
+            }
+        }
+
+        private void ChangeColorFilter(bool activate)
+        {
+            if (SelectedColor != null)
+            {
+                if (ColorFilters == null)
+                {
+                    ColorFilters = new ObservableCollection<ColorFilter>();
+                }
+
+                ChangeCountColorFilter foundFilter = ColorFilters.OfType<ChangeCountColorFilter>().FirstOrDefault(x => x.Index == CalcIndex(SelectedColor.DominoColor as DominoColor));
+                if (activate)
+                {
+                    if (foundFilter != null)
+                    {
+                        ColorFilters.Remove(foundFilter);
+                    }
+                }
+                else if (foundFilter == null && SelectedColor.DominoColor is DominoColor dColor && colorRepository.colors.Contains(dColor))
+                {
+                    ChangeCountColorFilter changeCountColorFilter = new ChangeCountColorFilter();
+                    changeCountColorFilter.NewCount = 0;
+                    changeCountColorFilter.Index = CalcIndex(dColor);
+                    ColorFilters.Add(changeCountColorFilter);
+                }
+            }
+        }
+
+        private int CalcIndex(DominoColor dominoColor)
+        {
+            if(dominoColor != null)
+            {
+                if(colorRepository?.colors != null && colorRepository.colors.Contains(dominoColor))
+                {
+                    return colorRepository.colors.IndexOf(dominoColor) + 1;
+                }
+            }
+            return -1;
+        }
+
+
         private NonEmptyCalculation NEModel
         {
             get => currentModel as NonEmptyCalculation;
@@ -167,21 +323,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
     }
     public class CoupledCalculationVM : NonEmptyCalculationVM
     {
-        public CoupledCalculationVM(CoupledCalculation model) : base(model)
+        public CoupledCalculationVM(CoupledCalculation model, ColorRepository colorRepository) : base(model, colorRepository)
         {
 
         }
     }
     public class UncoupledCalculationVM : NonEmptyCalculationVM
     {
-        public UncoupledCalculationVM(UncoupledCalculation model) : base(model)
+        public UncoupledCalculationVM(UncoupledCalculation model, ColorRepository colorRepository) : base(model, colorRepository)
         {
 
         }
     }
     public class FieldCalculationVM : NonEmptyCalculationVM
     {
-        public FieldCalculationVM(FieldCalculation model) : base(model)
+        public FieldCalculationVM(FieldCalculation model, ColorRepository colorRepository) : base(model, colorRepository)
         {
 
         }
