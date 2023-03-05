@@ -121,14 +121,36 @@ namespace DominoPlanner.Core
                 LastValid = false; _TransparencySetting = value;
             }
         }
+        private ObservableCollection<ColorFilter> _ColorFilters;
         [ProtoMember(5)]
-        public ObservableCollection<ColorFilter> ColorFilters { get; set; }
+        public ObservableCollection<ColorFilter> ColorFilters
+        {
+            get
+            {
+                return _ColorFilters;
+            }
+            set
+            {
+                if(value != _ColorFilters)
+                {
+                    if(_ColorFilters != null)
+                    {
+                        ColorFilters.CollectionChanged -= ColorFiltersChanged;
+                    }
+                    _ColorFilters = value;
+                    if(_ColorFilters != null)
+                    {
+                        ColorFilters.CollectionChanged += ColorFiltersChanged;
+                    }
+                }
+            }
+        }
+        
         #endregion
         #region constructors
         public NonEmptyCalculation()
         {
             ColorFilters = new ObservableCollection<ColorFilter>();
-            ColorFilters.CollectionChanged += ColorFiltersChanged;
         }
         public NonEmptyCalculation(IColorComparison colorMode, Dithering dithering, IterationInformation iterationInformation) : this()
         {
@@ -147,6 +169,11 @@ namespace DominoPlanner.Core
                 {
                     ((ColorFilter)item).PropertyChanged += new PropertyChangedEventHandler((s, param) => LastValid = false);
                 }
+                LastValid = false;
+            }
+            else if(e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                LastValid = false;
             }
         }
         internal ColorRepository ApplyColorFilters(ColorRepository repo)
