@@ -60,6 +60,15 @@
                     <TextBlock Grid.Column="2" Text="255" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 </Grid>
             </HeaderedContentControl>
+            <HeaderedContentControl Header="Use Colors">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding IsColorUsed}"/>
+                    <local:ColorControl Grid.Row="2" SelectedColor="{Binding SelectedColor}"
+                                        ColumnConfig="{Binding ColorColumnConfig}" 
+                                        Colors="{Binding DataContext.SortedColors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}}" >
+                    </local:ColorControl>
+                </StackPanel>
+            </HeaderedContentControl>
             <HeaderedContentControl >
                 <HeaderedContentControl.Header>
                     <StackPanel Orientation="Horizontal">
