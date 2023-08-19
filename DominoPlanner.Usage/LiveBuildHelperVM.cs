@@ -70,6 +70,8 @@ namespace DominoPlanner.Usage
             ColorNames = new ObservableCollection<ColorAmount>();
 
             RefreshCanvas();
+
+            updateSubBlocks();
         }
         #endregion
 
@@ -244,6 +246,38 @@ namespace DominoPlanner.Usage
                 if (_CurrentStones != value)
                 {
                     _CurrentStones = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _ShowSubBlocks;
+        [SettingsAttribute("LiveBuildHelperVM", false)]
+        public bool ShowSubBlocks
+        {
+            get { return _ShowSubBlocks; }
+            set
+            {
+                if(_ShowSubBlocks != value)
+                {
+                    _ShowSubBlocks = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<SubBlockInformation> _SubBlocks;
+        public ObservableCollection<SubBlockInformation> SubBlocks
+        {
+            get
+            {
+                return _SubBlocks;
+            }
+            set
+            {
+                if(_SubBlocks != value)
+                {
+                    _SubBlocks = value;
                     RaisePropertyChanged();
                 }
             }
@@ -452,6 +486,23 @@ namespace DominoPlanner.Usage
                     break;
             }
         }
+
+        private void updateSubBlocks()
+        {
+            SubBlocks = new ObservableCollection<SubBlockInformation>();
+            double blockAmount = Math.Ceiling(BlockSize / 10d);
+            for (int i = 0; i < blockAmount; i++)
+            {
+                int currentSubBlockSize = 10;
+                int amount = (i + 1) * currentSubBlockSize;
+                if (amount > BlockSize)
+                {
+                    currentSubBlockSize = BlockSize % currentSubBlockSize;
+                }
+
+                SubBlocks.Add(new SubBlockInformation(currentSubBlockSize, i % 2 == 0));
+            }
+        }
         #endregion
 
         private ICommand _MouseDown;
@@ -606,6 +657,49 @@ namespace DominoPlanner.Usage
         public override string ToString()
         {
             return $"{Amount} {ColorName}";
+        }
+    }
+
+    public class SubBlockInformation : ModelBase
+    {
+        public SubBlockInformation(int blockSize, bool visibleBlock)
+        {
+            BlockSize = blockSize;
+            VisibleBlock = visibleBlock;
+        }
+
+        private int _BlockSize;
+        public int BlockSize
+        {
+            get
+            {
+                return _BlockSize;
+            }
+            set
+            {
+                if(_BlockSize != value)
+                {
+                    _BlockSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private bool _VisibleBlock;
+        public bool VisibleBlock
+        {
+            get
+            {
+                return _VisibleBlock;
+            }
+            set
+            {
+                if(_VisibleBlock != value)
+                {
+                    _VisibleBlock = value;
+                    RaisePropertyChanged();
+                }
+            }
         }
     }
 }
