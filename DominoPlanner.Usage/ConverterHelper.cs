@@ -610,4 +610,19 @@ namespace DominoPlanner.Usage
             return 20;
         }
     }
+
+    public class BlockConverter : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Count == 3)
+            {
+                if (values[0] is int amount && values[1] is double width && values[2] is int blockSize)
+                {
+                    return (Math.Floor((width - 6) / amount)) * blockSize - 4;
+                }
+            }
+            return 20;
+        }
+    }
 }

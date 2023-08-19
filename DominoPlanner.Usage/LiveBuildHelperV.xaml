@@ -16,6 +16,7 @@
         <local:BorderWidthConverter x:Key="BorderWidthConverter"/>
         <local:IsSnapshottedConverter x:Key="IsSnapshottedConverter"/>
         <local:DateTimeDifferenceConverter x:Key="DateTimeDifferenceConverter"/>
+        <local:BlockConverter x:Key="BlockConverter"/>
     </Window.Resources>
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="PointerPressed">
@@ -124,6 +125,7 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
+                <CheckBox IsChecked="{Binding ShowSubBlocks}" Margin="0,0,0,5" Content="{local:Gettext Show Subblocks}"/>
                 <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
@@ -153,7 +155,7 @@
             </Grid.Styles>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" MaxHeight="150"/>
-                <RowDefinition Height="*" MaxHeight="50"/>
+                <RowDefinition Height="20"/>
                 <RowDefinition Height="*" MaxHeight="250"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -165,6 +167,29 @@
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
                                     <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
                                     <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
+                                </MultiBinding>
+                            </Border.Width>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox BorderThickness="0" Height="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="1" Items="{Binding SubBlocks}" x:Name="StoneBoxCopy" IsVisible="{Binding ShowSubBlocks}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="0">
+                            <i:Interaction.Behaviors>
+                                <ia:DataTriggerBehavior Binding="{Binding VisibleBlock}" ComparisonCondition="Equal" Value="true">
+                                    <ia:ChangePropertyAction PropertyName="Background" Value="gray" />
+                                </ia:DataTriggerBehavior>
+                                <ia:DataTriggerBehavior Binding="{Binding VisibleBlock}" ComparisonCondition="Equal" Value="false">
+                                    <ia:ChangePropertyAction PropertyName="Background" Value="transparent" />
+                                </ia:DataTriggerBehavior>
+                            </i:Interaction.Behaviors>
+                            <Border.Width>
+                                <MultiBinding Converter="{StaticResource BlockConverter}">
+                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                    <Binding Path="BlockSize"/>
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
