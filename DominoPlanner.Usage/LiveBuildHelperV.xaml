@@ -17,6 +17,7 @@
         <local:IsSnapshottedConverter x:Key="IsSnapshottedConverter"/>
         <local:DateTimeDifferenceConverter x:Key="DateTimeDifferenceConverter"/>
         <local:BlockConverter x:Key="BlockConverter"/>
+        <local:ShowBlockWarning x:Key="ShowBlockWarning"/>
     </Window.Resources>
     <i:Interaction.Behaviors>
         <ia:EventTriggerBehavior EventName="PointerPressed">
@@ -37,7 +38,14 @@
             </Grid>
             <Grid Grid.Column="2" ColumnDefinitions="3*, 3*, 2*, 3*">
                 <TextBlock Grid.Column="0" Text="{local:Gettext Block:}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
-                <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" />
+                <NumericUpDown Focusable="False" Minimum="1" Maximum="{Binding CountBlock}" Grid.Column="1" Value="{Binding SelectedBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25" >
+                    <NumericUpDown.Background>
+                        <MultiBinding Converter="{StaticResource ShowBlockWarning}">
+                            <Binding Path="SelectedBlock"/>
+                            <Binding Path="BlockSizes"/>
+                        </MultiBinding>
+                    </NumericUpDown.Background>
+                </NumericUpDown>
                 <TextBlock Grid.Column="2" Text="{local:Gettext of}" VerticalAlignment="Center"  HorizontalAlignment="Stretch" FontSize="25"/>
                 <TextBlock Grid.Column="3" Text="{Binding CountBlock}" VerticalAlignment="Center" HorizontalAlignment="Stretch" FontSize="25"/>
             </Grid>
@@ -165,7 +173,7 @@
                         <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding Path="DataContext.BlockSize" ElementName="HistoryBox"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="HistoryBox"/>
                                     <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
                                 </MultiBinding>
                             </Border.Width>
@@ -187,7 +195,7 @@
                             </i:Interaction.Behaviors>
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource BlockConverter}">
-                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
                                     <Binding Path="Bounds.Width" ElementName="StoneBox"/>
                                     <Binding Path="BlockSize"/>
                                 </MultiBinding>
@@ -202,7 +210,7 @@
                         <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
                                     <Binding Path="Bounds.Width" ElementName="StoneBox"/>
                                 </MultiBinding>
                             </Border.Width>
@@ -217,7 +225,7 @@
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource BorderWidthConverter}">
                                     <Binding Path="Amount"/>
-                                    <Binding Path="DataContext.BlockSize" ElementName="StoneBox"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
                                     <Binding Path="Bounds.Width" ElementName="StoneBox"/>
                                 </MultiBinding>
                             </Border.Width>

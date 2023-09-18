@@ -35,15 +35,29 @@ namespace DominoPlanner.Usage
         }
 
         #region CTOR
-        public LiveBuildHelperVM(IDominoProvider pFParameters, int pBlockSize, Core.Orientation orientation, bool MirrorX, bool MirrorY)
+        public LiveBuildHelperVM(IDominoProvider pFParameters, List<BlockData> blockSizes, Core.Orientation orientation, bool MirrorX, bool MirrorY)
         {
-            BlockSize = pBlockSize;
             fParameters = pFParameters;
             intField = fParameters.GetBaseField(orientation, MirrorX, MirrorY);
             NextN = 500;
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
-            CountBlock = Convert.ToInt32(Math.Ceiling(((double)stonesPerLine / BlockSize)));
+            BlockSizes = new List<BlockData>();
+            int sum = 0;
+            int blockIndex = 0;
+            while (sum < stonesPerLine)
+            {
+                if (blockIndex == blockSizes.Count)
+                {
+                    blockIndex = 0;
+                }
+
+                sum += blockSizes[blockIndex].BlockSize;
+                BlockSizes.Add(blockSizes[blockIndex].Clone());
+                blockIndex++;
+            }
+
+            CountBlock = BlockSizes.Count;
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { CurrentBlock.Focus(); });
             PositionSnapshots = new ObservableCollection<PositionSnapshot>();
@@ -84,20 +98,22 @@ namespace DominoPlanner.Usage
         #endregion
 
         #region prope
-        private int _BlockSize;
-        public int BlockSize
+        private List<BlockData> _BlockSizes;
+        public List<BlockData> BlockSizes
         {
-            get { return _BlockSize; }
+            get
+            {
+                return _BlockSizes;
+            }
             set
             {
-                if (_BlockSize != value)
+                if(value != _BlockSizes)
                 {
-                    _BlockSize = value;
+                    _BlockSizes = value;
                     RaisePropertyChanged();
                 }
             }
         }
-
 
         private string _BatState;
         public string BatState
@@ -336,12 +352,12 @@ namespace DominoPlanner.Usage
             HistStones.Clear();
             ColorNames.Clear();
             CurrentBlock.Children.RemoveRange(0, CurrentBlock.Children.Count);
-            
-            stoneWidth = (((int)CurrentBlock.Bounds.Width) - (2 * 2 * space) - ((BlockSize - 1) * space)) / BlockSize;
-            
-            int firstBlockStone = BlockSize * (SelectedBlock - 1);
 
-            for (int i = 0; i < BlockSize; i++)
+            stoneWidth = (((int)CurrentBlock.Bounds.Width) - (2 * 2 * space) - ((CurrentBlockSize - 1) * space)) / CurrentBlockSize;
+            
+            int firstBlockStone = FirstBlockStone;
+
+            for (int i = 0; i < CurrentBlockSize; i++)
             {
                 if (firstBlockStone + i < stonesPerLine)
                 {
@@ -366,6 +382,34 @@ namespace DominoPlanner.Usage
                     }
                 }
             }
+
+            updateSubBlocks();
+        }
+
+        private int FirstBlockStone
+        {
+            get
+            {
+                int firstBlockStone = 0;
+                for (int i = 0; i < SelectedBlock - 1; i++)
+                {
+                    firstBlockStone += BlockSizes[i].BlockSize;
+                }
+                return firstBlockStone;
+            }
+        }
+
+        private int CurrentBlockSize
+        {
+            get
+            {
+                int selBlockIndex = SelectedBlock - 1;
+                if(selBlockIndex >= 0 && BlockSizes != null && selBlockIndex < BlockSizes.Count)
+                {
+                    return BlockSizes[selBlockIndex].BlockSize;
+                }
+                return 1;
+            }
         }
 
         private void FillColorList()
@@ -388,7 +432,7 @@ namespace DominoPlanner.Usage
         }
         private void RefreshColorAmount()
         {
-            int firstBlockStone = BlockSize * (SelectedBlock - 1);
+            int firstBlockStone = FirstBlockStone;
             int firstRow = SelectedRow - 1;
             int[] RemainingCount = new int[Colors.Count];
             int[] NextNCount = new int[Colors.Count];
@@ -427,23 +471,38 @@ namespace DominoPlanner.Usage
             Colors = new ObservableCollection<ColorListEntry>(Colors.Where(x => x.ProjectCount[0] > 0).OrderBy(x => x.SortIndex));
         }
 
+        private void SpaceJump()
+        {
+            for (int i = SelectedBlock; i < BlockSizes.Count; i++)
+            {
+                if(BlockSizes[i].UseBlock)
+                {
+                    SelectedBlock = i + 1;
+                    return;
+                }
+            }
+
+            if(SelectedRow < CountRow)
+            {
+                SelectedRow++;
+            }
+
+            for (int i = 0; i < BlockSizes.Count; i++)
+            {
+                if (BlockSizes[i].UseBlock)
+                {
+                    SelectedBlock = i + 1;
+                    return;
+                }
+            }
+        }
+
         internal void PressedKey(Key pressedKey)
         {
             switch (pressedKey)
             {
                 case Key.Space:
-                    if (SelectedBlock == CountBlock)
-                    {
-                        if (SelectedRow < CountRow)
-                        {
-                            SelectedBlock = 1;
-                            SelectedRow++;
-                        }
-                    }
-                    else
-                    {
-                        SelectedBlock++;
-                    }
+                    SpaceJump();
                     break;
                 case Key.Left:
                     if (SelectedBlock == 1)
@@ -490,14 +549,14 @@ namespace DominoPlanner.Usage
         private void updateSubBlocks()
         {
             SubBlocks = new ObservableCollection<SubBlockInformation>();
-            double blockAmount = Math.Ceiling(BlockSize / 10d);
+            double blockAmount = Math.Ceiling(CurrentBlockSize / 10d);
             for (int i = 0; i < blockAmount; i++)
             {
                 int currentSubBlockSize = 10;
                 int amount = (i + 1) * currentSubBlockSize;
-                if (amount > BlockSize)
+                if (amount > CurrentBlockSize)
                 {
-                    currentSubBlockSize = BlockSize % currentSubBlockSize;
+                    currentSubBlockSize = CurrentBlockSize % currentSubBlockSize;
                 }
 
                 SubBlocks.Add(new SubBlockInformation(currentSubBlockSize, i % 2 == 0));

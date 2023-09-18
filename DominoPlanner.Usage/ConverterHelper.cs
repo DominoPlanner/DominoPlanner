@@ -625,4 +625,16 @@ namespace DominoPlanner.Usage
             return 20;
         }
     }
+
+    public class ShowBlockWarning : IMultiValueConverter
+    {
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(values != null && values.Count == 2 && values[0] is int index && values[1] is List<BlockData> blockData && blockData.Count > (index - 1) && (index - 1) >= 0 && !blockData[index - 1].UseBlock)
+            {
+                return Brushes.Red;
+            }
+            return Brushes.Transparent;
+        }
+    }
 }
