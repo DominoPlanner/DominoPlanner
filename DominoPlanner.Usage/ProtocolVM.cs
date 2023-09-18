@@ -496,7 +496,7 @@ namespace DominoPlanner.Usage
         {
             LiveBuildHelperV lbhv = new LiveBuildHelperV
             {
-                DataContext = new LiveBuildHelperVM(DominoProvider, StonesPerBlock, currentOPP.orientation, MirrorX, MirrorY)
+                DataContext = new LiveBuildHelperVM(DominoProvider, new List<BlockData>() { new BlockData(StonesPerBlock, true) }, currentOPP.orientation, MirrorX, MirrorY)
             };
             lbhv.Show();
         }
