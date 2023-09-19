@@ -269,7 +269,7 @@ namespace DominoPlanner.Core
         /// <returns>Ein String, der das HTML des Protokoll enthält.</returns>
         public string GetHTMLProcotol(ObjectProtocolParameters parameters)
         {
-            return parameters.GetHTMLProcotol(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical));
+            return parameters.GetHTMLProcotol(GenerateProtocol(parameters.Templates, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical));
         }
         /// <summary>
         /// Speichert das Excel-Protokoll eines Objekts am angegebenen Ort.
@@ -283,14 +283,14 @@ namespace DominoPlanner.Core
             FileInfo file = new FileInfo(path);
             if (file.Exists) file.Delete();
             ExcelPackage pack = new ExcelPackage(file);
-            pack = parameters.GenerateExcelFieldplan(GenerateProtocol(parameters.templateLength, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical), pack);
+            pack = parameters.GenerateExcelFieldplan(GenerateProtocol(parameters.Templates, parameters.orientation, parameters.mirrorHorizontal, parameters.mirrorVertical), pack);
             pack.Save();
             pack.Dispose();
             GC.Collect();
         }
-        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, bool MirrorX = false, bool MirrorY = false)
+        public ProtocolTransfer GenerateProtocol(List<int> templates = null, bool MirrorX = false, bool MirrorY = false)
         {
-            return GenerateProtocol(templateLength, FieldPlanDirection, MirrorX, MirrorY);
+            return GenerateProtocol(templates, FieldPlanDirection, MirrorX, MirrorY);
         }
         /// <summary>
         /// Generiert das Protokoll eines Objekts.
@@ -299,11 +299,8 @@ namespace DominoPlanner.Core
         /// <param name="o">Die Orientierung des Protokolls (optional)</param>
         /// <param name="reverse">Gibt an, ob das Objekt von der anderen Seite gebaut werden soll. Macht eigentlich nur bei Felder Sinn (optional)</param>
         /// <returns></returns>
-        public ProtocolTransfer GenerateProtocol(int templateLength = int.MaxValue, Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
-        
+        public ProtocolTransfer GenerateProtocol(List<int> templates = null, Orientation o = Orientation.Horizontal, bool MirrorX = false, bool MirrorY = false)
         {
-            if (templateLength == 0)
-                templateLength = int.MaxValue;
             int[,] dominoes = GetBaseField(o, MirrorX, MirrorY);
 
             ProtocolTransfer d = new ProtocolTransfer
@@ -315,6 +312,7 @@ namespace DominoPlanner.Core
             for (int i = 0; i < dominoes.GetLength(1); i++) // foreach line
             {
                 int posX = 0;
+                int templateIndex = 0;
                 d.dominoes[i] = new List<List<Tuple<int, int>>>();
                 for (int j = 0; posX < dominoes.GetLength(0); j++) // foreach block in this line
                 {
@@ -322,6 +320,15 @@ namespace DominoPlanner.Core
                     int currentColor = -2;
                     int blockCounter = 0;
                     List<Tuple<int, int>> currentColors = new List<Tuple<int, int>>();
+                    int templateLength = int.MaxValue;
+                    if(templates != null)
+                    {
+                        if(templateIndex == templates.Count)
+                        {
+                            templateIndex = 0;
+                        }
+                        templateLength = templates[templateIndex];
+                    }
                     while (blockCounter < templateLength && posX < dominoes.GetLength(0))
                     {
                         if (dominoes[posX, i] == currentColor)
@@ -340,6 +347,7 @@ namespace DominoPlanner.Core
                     }
                     if (currentColor != -2) currentColors.Add(new Tuple<int, int>(currentColor, currentcount));
                     d.dominoes[i].Add(currentColors);
+                    templateIndex++;
                 }
             }
             d.counts = Counts;

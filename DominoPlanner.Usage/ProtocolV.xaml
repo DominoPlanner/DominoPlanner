@@ -237,12 +237,29 @@
                     </DockPanel>
                     <CheckBox Margin="2" DockPanel.Dock="Top" x:Name="chkUseTemplate" Content="{local:Gettext Display blocks (for template)}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
                               ToolTip.Tip="{local:Gettext 'When activating this option\, DominoPlanner will show blocks in the specified length.\\nThis should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes (e.g. you left out one domino).'}"/>
-                    <DockPanel DockPanel.Dock="Top" Margin="2">
+                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="{local:Gettext Hide color names}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <DockPanel DockPanel.Dock="Top" Margin="2" IsVisible="{Binding !UseDynamicBlock}">
                         <NumericUpDown DockPanel.Dock="Right" Focusable="False" IsEnabled="{Binding UseBlocks}" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" />
                         <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Stones/Block}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </DockPanel>
-                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="{local:Gettext Hide color names}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-
+					<CheckBox Margin="2" IsChecked="{Binding UseDynamicBlock}" DockPanel.Dock="Top">Create Dynamic Blocks</CheckBox>
+				    <ItemsControl Margin="10,0,0,0" IsVisible="{Binding UseDynamicBlock}" Items="{Binding CreatedBlocks}" DockPanel.Dock="Top">
+						<ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderThickness="0"
+										Padding="5">
+									<StackPanel Orientation="Horizontal">
+										<TextBlock Text="Show: " VerticalAlignment="Center"/>
+										<CheckBox IsChecked="{Binding UseBlock}" />	
+									    <TextBlock Margin="5,0,0,0" Text="Blocksize: " VerticalAlignment="Center"/>
+									    <NumericUpDown Height="34" Value="{Binding BlockSize}" Minimum="1" Maximum="500"/>
+									</StackPanel>
+								</Border>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+					<local:ImageButton IsVisible="{Binding UseDynamicBlock}" DockPanel.Dock="Top" Image="/Icons/add.ico" Command="{Binding AddBlock}" Content="Add Block" />
+					<local:ImageButton IsVisible="{Binding UseDynamicBlock}" DockPanel.Dock="Top" Image="/Icons/remove.ico" Command="{Binding RemoveBlock}" Content="Remove Block" />
                 </DockPanel>
             </HeaderedContentControl>
             <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Summary Settings}" ToolTip.Tip="{local:Gettext Additional information shown at the end of the document}" VerticalAlignment="Top">
