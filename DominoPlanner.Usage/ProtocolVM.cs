@@ -6,6 +6,7 @@ using Avalonia.Media.Imaging;
 using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -235,7 +236,7 @@ namespace DominoPlanner.Usage
 
 
         private bool _HasNoProperties;
-        [SettingsAttribute("ProtocolVM", false)]
+        [Settings("ProtocolVM", false)]
         public bool HasNoProperties
         {
             get { return _HasNoProperties; }
@@ -252,7 +253,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasShortProperties;
-        [SettingsAttribute("ProtocolVM", true)]
+        [Settings("ProtocolVM", true)]
         public bool HasShortProperties
         {
             get { return _HasShortProperties; }
@@ -269,7 +270,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _HasExtendedProperties;
-        [SettingsAttribute("ProtocolVM", false)]
+        [Settings("ProtocolVM", false)]
         public bool HasExtendedProperties
         {
             get { return _HasExtendedProperties; }
@@ -320,7 +321,7 @@ namespace DominoPlanner.Usage
         }
 
         private bool _UseBlocks;
-        [SettingsAttribute("ProtocolVM", true)]
+        [Settings("ProtocolVM", true)]
         public bool UseBlocks
         {
             get { return _UseBlocks; }
@@ -329,13 +330,12 @@ namespace DominoPlanner.Usage
                 if (_UseBlocks != value)
                 {
                     _UseBlocks = value;
-                    currentOPP.templateLength = _UseBlocks ? StonesPerBlock : int.MaxValue;
                     RaisePropertyChanged();
                 }
             }
         }
         private int _StonesPerBlock;
-        [SettingsAttribute("ProtocolVM", 50)]
+        [Settings("ProtocolVM", 50)]
         public int StonesPerBlock
         {
             get 
@@ -347,7 +347,6 @@ namespace DominoPlanner.Usage
                 if (_StonesPerBlock != value)
                 {
                     _StonesPerBlock = value;
-                    currentOPP.templateLength = value;
                     RaisePropertyChanged();
                 }
             }
@@ -378,19 +377,6 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private string _CurrentProtocol;
-        public string CurrentProtocol
-        {
-            get { return _CurrentProtocol; }
-            set
-            {
-                if (_CurrentProtocol != value)
-                {
-                    _CurrentProtocol = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
         public bool Orientation
         {
             get
@@ -421,19 +407,53 @@ namespace DominoPlanner.Usage
             }
         }
 
+        private bool _UseDynamicBlock;
+        public bool UseDynamicBlock
+        {
+            get
+            {
+                return _UseDynamicBlock;
+            }
+            set
+            {
+                if(_UseDynamicBlock != value)
+                {
+                    _UseDynamicBlock = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private ObservableCollection<BlockData> _CreatedBlocks;
+        public ObservableCollection<BlockData> CreatedBlocks
+        {
+            get
+            {
+                return _CreatedBlocks;
+            }
+            set
+            {
+                if(_CreatedBlocks != value)
+                {
+                    _CreatedBlocks = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
 
         #region Methods
         private void Init()
         {
+            CreatedBlocks = new ObservableCollection<BlockData>();
+            CreatedBlocks.Add(new BlockData(50, true));
             TextFormat = "<font face=\"Verdana\">";
             DefaultBackColor = true;
             IntelligentTextColor = true;
             HideText = true;
             currentOPP.orientation = DominoProvider.FieldPlanDirection;
             currentOPP.mirrorHorizontal = DominoProvider.FieldPlanDirection == Core.Orientation.Vertical;
-            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
-
+            
             NaturalOrientation = GetNaturalOrientation();
 
             SkiaSharp.SKImage new_img = DominoProvider.Last.GenerateImage(1000, false).Snapshot();
@@ -442,8 +462,6 @@ namespace DominoPlanner.Usage
             ShowLiveBuildHelper = new RelayCommand(o => { ShowLiveHelper(); });
             SaveHTML = new RelayCommand(o => { SaveHTMLFile(); });
             SaveExcel = new RelayCommand(o => { SaveExcelFile(); });
-
-            this.PropertyChanged += ProtocolVM_PropertyChanged;
 
             ClickTopLeft = new RelayCommand(o => SetOrientation(false, false));
             ClipTopRight = new RelayCommand(o => SetOrientation(true, false));
@@ -488,21 +506,25 @@ namespace DominoPlanner.Usage
             //    orientation.orientation = !orientation.orientation;
             return orientation;
         }
-        private void ProtocolVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            CurrentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
-        }
+        
         private void ShowLiveHelper()
         {
+            List<BlockData> blockData = CreatedBlocks.ToList();
+            if(!UseDynamicBlock)
+            {
+                blockData = new List<BlockData>() { new BlockData(StonesPerBlock, true) };
+            }
+
             LiveBuildHelperV lbhv = new LiveBuildHelperV
             {
-                DataContext = new LiveBuildHelperVM(DominoProvider, new List<BlockData>() { new BlockData(StonesPerBlock, true) }, currentOPP.orientation, MirrorX, MirrorY)
+                DataContext = new LiveBuildHelperVM(DominoProvider, blockData, currentOPP.orientation, MirrorX, MirrorY)
             };
             lbhv.Show();
         }
 
         public async void SaveExcelFile()
         {
+            _UpdateTemplatesInProtocolParams();
             SaveFileDialog dlg = new SaveFileDialog
             {
                 DefaultExtension = ".xlsx",
@@ -528,6 +550,7 @@ namespace DominoPlanner.Usage
         
         public async void SaveHTMLFile()
         {
+            _UpdateTemplatesInProtocolParams();
             SaveFileDialog dlg = new SaveFileDialog
             {
                 DefaultExtension = ".html",
@@ -541,9 +564,11 @@ namespace DominoPlanner.Usage
 
                 try
                 {
+                    string currentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
+
                     FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
                     StreamWriter sw = new StreamWriter(fs);
-                    sw.Write(CurrentProtocol);
+                    sw.Write(currentProtocol);
                     sw.Close();
                     var process = new Process();
                     process.StartInfo = new ProcessStartInfo(filename) { UseShellExecute = true };
@@ -552,9 +577,50 @@ namespace DominoPlanner.Usage
                 catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
         }
-#endregion
 
-#region commands
+        private void _UpdateTemplatesInProtocolParams()
+        {
+            if (currentOPP == null) return;
+
+            if(UseBlocks)
+            {
+                if(UseDynamicBlock)
+                {
+                    currentOPP.Templates = CreatedBlocks.Select(x => x.BlockSize).ToList();
+                    return;
+                }
+
+                currentOPP.Templates = new List<int>() { StonesPerBlock };
+                return;
+            }
+
+            currentOPP.Templates = null;
+        }
+
+        public void AddBlock()
+        {
+            int blockSize = 50;
+            bool useBlock = true;
+            if(CreatedBlocks?.LastOrDefault() is BlockData blockData)
+            {
+                blockSize = blockData.BlockSize;
+                useBlock = blockData.UseBlock;
+            }
+
+            CreatedBlocks.Add(new BlockData(blockSize, useBlock));
+        }
+
+        public void RemoveBlock()
+        {
+            BlockData lastBlock = CreatedBlocks?.LastOrDefault();
+            if(lastBlock != null)
+            {
+                CreatedBlocks.Remove(lastBlock);
+            }
+        }
+        #endregion
+
+        #region commands
         private ICommand _ShowliveBuildHelper;
         public ICommand ShowLiveBuildHelper { get { return _ShowliveBuildHelper; } set { if (value != _ShowliveBuildHelper) { _ShowliveBuildHelper = value; } } }
 

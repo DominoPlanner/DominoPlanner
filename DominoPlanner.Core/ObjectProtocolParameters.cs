@@ -15,7 +15,7 @@ namespace DominoPlanner.Core
     {
         public string title {
             get; set; }
-        public int templateLength { get; set; }
+        public List<int> Templates { get; set; }
         public SummaryMode summaryMode { get; set; }
         public string textFormat { get; set; }
         public string textRegex { get; set; }
