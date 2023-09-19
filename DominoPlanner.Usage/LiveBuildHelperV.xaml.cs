@@ -18,6 +18,15 @@ namespace DominoPlanner.Usage
             this.KeyDown += LiveBuildHelperV_KeyDown;
         }
 
+        private void ListBox_GotFocus(object sender, GotFocusEventArgs e)
+        {
+            try
+            {
+                var mainGrid = this.Get<Grid>("MG");
+                mainGrid?.Focus();
+            }catch(Exception ex) { }
+        }
+
         private void LiveBuildHelperV_LayoutUpdated(object sender, System.EventArgs e)
         {
             if(sender is TextBlock textBox)
