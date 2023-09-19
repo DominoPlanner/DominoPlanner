@@ -133,8 +133,8 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="4" HorizontalAlignment="Right">
-                <CheckBox IsChecked="{Binding ShowSubBlocks}" Margin="0,0,0,5" Content="{local:Gettext Show Subblocks}"/>
-                <CheckBox IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
+                <CheckBox GotFocus="ListBox_GotFocus" IsChecked="{Binding ShowSubBlocks}" Margin="0,0,0,5" Content="{local:Gettext Show Subblocks}"/>
+                <CheckBox GotFocus="ListBox_GotFocus" IsChecked="{Binding ShowHistory}" Margin="0,0,0,5" Content="{local:Gettext Show History}"/>
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
                         <TextBlock Text="{local:Gettext Show remaining colors}"/>
@@ -167,7 +167,7 @@
                 <RowDefinition Height="*" MaxHeight="250"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
+            <ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
@@ -181,7 +181,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox BorderThickness="0" Height="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="1" Items="{Binding SubBlocks}" x:Name="StoneBoxCopy" IsVisible="{Binding ShowSubBlocks}">
+			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" Height="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="1" Items="{Binding SubBlocks}" x:Name="StoneBoxCopy" IsVisible="{Binding ShowSubBlocks}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border BorderThickness="0">
@@ -204,7 +204,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
+			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
@@ -218,7 +218,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
+			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Height="80" VerticalAlignment="Top">
