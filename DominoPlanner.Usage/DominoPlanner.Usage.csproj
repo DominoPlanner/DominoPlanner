@@ -13,13 +13,13 @@
     <CFBundleName>DominoPlanner</CFBundleName> 
     <CFBundleDisplayName>DominoPlanner</CFBundleDisplayName>
     <CFBundleIdentifier>com.DominoPlanner</CFBundleIdentifier>
-    <CFBundleVersion>1.0.0</CFBundleVersion>
+    <CFBundleVersion>1.0.1</CFBundleVersion>
     <CFBundlePackageType>AAPL</CFBundlePackageType>
     <CFBundleExecutable>DominoPlanner.Usage</CFBundleExecutable>
     <CFBundleIconFile>DominoCalculator</CFBundleIconFile> <!-- Will be copied from output directory -->
     <NSPrincipalClass>DominoPlanner.Usage.MainWindow</NSPrincipalClass>
     <NSHighResolutionCapable>true</NSHighResolutionCapable>
-    <CFBundleShortVersionString>1.0.0</CFBundleShortVersionString>
+    <CFBundleShortVersionString>1.0.1</CFBundleShortVersionString>
   </PropertyGroup>
   <!--<Target Name="BeforeBuild">
       <Exec Command="C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NonInteractive -executionpolicy Unrestricted -command &quot;&amp; { .\CompileTranslations.ps1 } &quot;" LogStandardErrorAsError="True" ContinueOnError="False" WorkingDirectory="$(MSBuildProjectDirectory)" />
