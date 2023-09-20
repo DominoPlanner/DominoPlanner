@@ -4,7 +4,7 @@
 #define MyAppName "DominoPlanner"
 #define MyAppVersion GetVersionNumbersString("..\DominoPlanner.Usage\bin\Release\netcoreapp3.1\win-x64\DominoPlanner.Usage.exe")
 #define MyAppPublisher "DominoPlanner Team"
-#define MyAppURL "https://github.com/jhofinger/DominoPlanner"
+#define MyAppURL "https://github.com/DominoPlanner/DominoPlanner"
 #define MyAppExeName  "DominoPlanner.Usage.exe"
    
 #expr Exec('dotnet','clean -c Release', "..\DominoPlanner.Usage") 

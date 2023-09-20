@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using DominoPlanner.Core;
-using DynamicData.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
