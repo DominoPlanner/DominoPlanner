@@ -39,7 +39,7 @@ namespace DominoPlanner.Usage
         {
             fParameters = pFParameters;
             intField = fParameters.GetBaseField(orientation, MirrorX, MirrorY);
-            NextN = 500;
+            NextN = 1480;
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
             BlockSizes = new List<BlockData>();

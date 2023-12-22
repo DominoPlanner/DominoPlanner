@@ -708,7 +708,24 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void ExportImageCustom()
         {
             _("Custom Image Export");
-            ExportImage(true);
+            //ExportImage(true);
+
+            List<string> svgData = new List<string>();
+            System.Globalization.CultureInfo usCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
+            svgData.Add($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{(DocumentModel.Obj.Last.PhysicalExpandedLength / (double)20).ToString(usCulture)}mm\" height=\"{((DocumentModel.Obj.Last.PhysicalExpandedHeight) / (double)20).ToString(usCulture)}mm\">");
+
+            foreach (RectangleDomino rectangleDomino in DocumentModel.Obj.Last.shapes.Where(x => x.Color != 0))
+            {
+                Color currentColor = DocumentModel.Obj.Last.colors[rectangleDomino.Color].mediaColor;
+                svgData.Add($"<rect x=\"{(rectangleDomino.x / 20).ToString(usCulture)}mm\" y=\"{(rectangleDomino.y / 20).ToString(usCulture)}mm\" width=\"{(rectangleDomino.ExpandedWidth / 20).ToString(usCulture)}mm\" height=\"{(rectangleDomino.ExpandedHeight / 20).ToString(usCulture)}mm\" fill=\"rgb({currentColor.R},{currentColor.G},{currentColor.B})\" stroke-width=\"0.01mm\" stroke=\"rgb(0,0,0)\" />");
+            }
+
+            svgData.Add("</svg>");
+
+            string filePath = @"C:\Users\johan\Downloads\test.svg";
+            File.Create(filePath).Dispose();
+            File.WriteAllLines(filePath, svgData.ToArray());
+                
         }
         [ContextMenu("Export Floor Print", "Icons/image.ico", isVisible: nameof(CanExportFloorPrint), index: 6)]
         public void ExportFloorPrint()

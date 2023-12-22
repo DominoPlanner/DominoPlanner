@@ -265,7 +265,7 @@
   </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)/version.txt&quot;" />
-        <Exec 
+        <Exec
       Command="git describe --long --always --dirty --exclude=* --abbrev=8"
       ConsoleToMSBuild="True"
       IgnoreExitCode="False"
