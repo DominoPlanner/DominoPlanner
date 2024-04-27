@@ -716,7 +716,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _("Export Floor Print");
             _ExportFloorPrint();
         }
-        
+
         public bool CanExportFloorPrint()
         {
             return DocumentModel is CircleNode || DocumentModel is SpiralNode;
@@ -740,7 +740,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public async void ExportImage(string exportPath, bool collapsed, bool drawBorders, Color background, int width = 0)
         {
             string finalExportPath = await ExportImage_PrepairPath(exportPath);
-            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed).Save(finalExportPath);
+
+#if MasterplanExport
+            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, true, true, 0, 0).Save(finalExportPath, 254f);
+#else
+            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed, 0, 0).Save(finalExportPath, 24);
+#endif
         }
 
         private async Task<string> ExportImage_PrepairPath()
