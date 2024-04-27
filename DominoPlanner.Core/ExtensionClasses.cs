@@ -70,12 +70,12 @@ namespace DominoPlanner.Core
             }
         }
 
-        public static void Save(this SkiaSharp.SKSurface surf, string filename, int dpi)
+        public static void Save(this SkiaSharp.SKSurface surf, string filename, float dpi)
         {
             Save(surf, filename, dpi, dpi);
         }
 
-        public static void Save(this SkiaSharp.SKSurface surf, string filename, int dpiX, int dpiY)
+        public static void Save(this SkiaSharp.SKSurface surf, string filename, float dpiX, float dpiY)
         {
             using (var image = surf.Snapshot().Encode())
             {
@@ -83,8 +83,8 @@ namespace DominoPlanner.Core
                 {
                     using (Bitmap bitmap = new Bitmap(ms))
                     {
-                        bitmap.SetResolution(dpiX, dpiY);
-                        bitmap.Save(filename, ImageFormat.Png);
+						bitmap.SetResolution(dpiX, dpiY);
+						bitmap.Save(filename, ImageFormat.Png);
                     }
                 }
             }

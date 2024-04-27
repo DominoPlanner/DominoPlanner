@@ -132,7 +132,7 @@ namespace DominoPlanner.Core
                     if (borders)
                     {
                         canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height,
-                            new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = true, IsStroke=true, StrokeWidth=1});
+                            new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = false, IsStroke=true, StrokeWidth=1});
                     }
                 }
                 else
