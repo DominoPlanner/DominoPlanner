@@ -12,6 +12,8 @@ using Avalonia.Markup.Xaml.Templates;
 using System.Windows.Input;
 using Avalonia.Collections;
 using static DominoPlanner.Usage.ColorControl;
+using static OfficeOpenXml.ExcelErrorValue;
+using System.Diagnostics;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -77,6 +79,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
 
+        public bool updatingImage = false;
+
         private ColorListEntry _SelectedColor;
         public ColorListEntry SelectedColor
         {
@@ -94,6 +98,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                     if(SelectedColor != null)
                     {
+                        if(ShouldUseForceMode && !updatingImage)
+                        {
+                            ChangeColorFilter(ForcedValue);
+                            PropertyValueChanged(this, value);
+                        }
+
                         if(ColorFilters == null)
                         {
                             IsColorUsed = true;
@@ -116,6 +126,40 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         public AvaloniaList<Column> ColorColumnConfig { get; set; } = new AvaloniaList<Column>();
 
+        private bool _ShouldUseForceMode;
+        public bool ShouldUseForceMode
+        {
+            get
+            {
+                return _ShouldUseForceMode;
+            }
+            set
+            {
+                if(_ShouldUseForceMode != value)
+                {
+                    _ShouldUseForceMode = value;
+                    RaisePropertyChanged("ShouldUseForceMode");
+                }
+            }
+        }
+
+        private bool _ForcedValue;
+        public bool ForcedValue
+        {
+            get
+            {
+                return _ForcedValue;
+            }
+            set
+            {
+                if(_ForcedValue != value)
+                {
+                    _ForcedValue = value;
+                    RaisePropertyChanged("ForcedValue");
+                }
+            }
+        }
+
         private bool _IsColorUsed;
 
         public bool IsColorUsed
@@ -131,31 +175,38 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     _IsColorUsed = value;
                     RaisePropertyChanged("IsColorUsed");
 
-                    if (ColorFilters == null)
-                    {
-                        ColorFilters = new ObservableCollection<ColorFilter>();
-                    }
+                    
 
-                    if (SelectedColor != null)
-                    {
-                        ChangeCountColorFilter foundFilter = ColorFilters.OfType<ChangeCountColorFilter>().FirstOrDefault(x => x.Index == CalcIndex(SelectedColor.DominoColor as DominoColor));
-                        if (IsColorUsed)
-                        {
-                            if (foundFilter != null)
-                            {
-                                ColorFilters.Remove(foundFilter);
-                            }
-                        }
-                        else if(foundFilter == null && SelectedColor.DominoColor is DominoColor dColor && colorRepository.colors.Contains(dColor))
-                        {
-                            ChangeCountColorFilter changeCountColorFilter = new ChangeCountColorFilter();
-                            changeCountColorFilter.NewCount = 0;
-                            changeCountColorFilter.Index = CalcIndex(dColor);
-                            ColorFilters.Add(changeCountColorFilter);
-                        }
-                    }
+                    ChangeColorFilter(IsColorUsed);
 
                     PropertyValueChanged(this, value);
+                }
+            }
+        }
+
+        private void ChangeColorFilter(bool activate)
+        {
+            if (SelectedColor != null)
+            {
+                if (ColorFilters == null)
+                {
+                    ColorFilters = new ObservableCollection<ColorFilter>();
+                }
+
+                ChangeCountColorFilter foundFilter = ColorFilters.OfType<ChangeCountColorFilter>().FirstOrDefault(x => x.Index == CalcIndex(SelectedColor.DominoColor as DominoColor));
+                if (activate)
+                {
+                    if (foundFilter != null)
+                    {
+                        ColorFilters.Remove(foundFilter);
+                    }
+                }
+                else if (foundFilter == null && SelectedColor.DominoColor is DominoColor dColor && colorRepository.colors.Contains(dColor))
+                {
+                    ChangeCountColorFilter changeCountColorFilter = new ChangeCountColorFilter();
+                    changeCountColorFilter.NewCount = 0;
+                    changeCountColorFilter.Index = CalcIndex(dColor);
+                    ColorFilters.Add(changeCountColorFilter);
                 }
             }
         }
