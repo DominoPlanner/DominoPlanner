@@ -62,7 +62,13 @@
             </HeaderedContentControl>
             <HeaderedContentControl Header="Use Colors">
                 <StackPanel>
-                    <CheckBox IsChecked="{Binding IsColorUsed}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Current Selected Color</TextBlock>
+                        <CheckBox IsChecked="{Binding IsColorUsed}"/>
+                        <TextBlock>Forcen:</TextBlock>
+                        <CheckBox IsChecked="{Binding ShouldUseForceMode}"/>
+                        <CheckBox IsChecked="{Binding ForcedValue}"/>
+                    </StackPanel>
                     <local:ColorControl Grid.Row="2" SelectedColor="{Binding SelectedColor}"
                                         ColumnConfig="{Binding ColorColumnConfig}" 
                                         Colors="{Binding DataContext.SortedColors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}}" >
