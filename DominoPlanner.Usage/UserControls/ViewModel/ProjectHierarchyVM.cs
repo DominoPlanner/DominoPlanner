@@ -712,12 +712,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             List<string> svgData = new List<string>();
             System.Globalization.CultureInfo usCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
-            svgData.Add($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{(DocumentModel.Obj.Last.PhysicalExpandedLength / (double)20).ToString(usCulture)}mm\" height=\"{((DocumentModel.Obj.Last.PhysicalExpandedHeight) / (double)20).ToString(usCulture)}mm\">");
+            svgData.Add($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{(DocumentModel.Obj.Last.PhysicalExpandedLength).ToString(usCulture)}mm\" height=\"{((DocumentModel.Obj.Last.PhysicalExpandedHeight)).ToString(usCulture)}mm\">");
 
             foreach (RectangleDomino rectangleDomino in DocumentModel.Obj.Last.shapes.Where(x => x.Color != 0))
             {
                 Color currentColor = DocumentModel.Obj.Last.colors[rectangleDomino.Color].mediaColor;
-                svgData.Add($"<rect x=\"{(rectangleDomino.x / 20).ToString(usCulture)}mm\" y=\"{(rectangleDomino.y / 20).ToString(usCulture)}mm\" width=\"{(rectangleDomino.ExpandedWidth / 20).ToString(usCulture)}mm\" height=\"{(rectangleDomino.ExpandedHeight / 20).ToString(usCulture)}mm\" fill=\"rgb({currentColor.R},{currentColor.G},{currentColor.B})\" stroke-width=\"0.01mm\" stroke=\"rgb(0,0,0)\" />");
+                svgData.Add($"<rect x=\"{(rectangleDomino.x).ToString(usCulture)}mm\" y=\"{(rectangleDomino.y).ToString(usCulture)}mm\" width=\"{(rectangleDomino.ExpandedWidth).ToString(usCulture)}mm\" height=\"{(rectangleDomino.ExpandedHeight).ToString(usCulture)}mm\" fill=\"rgb({currentColor.R},{currentColor.G},{currentColor.B})\" stroke-width=\"0.01mm\" stroke=\"rgb(0,0,0)\" />");
             }
 
             svgData.Add("</svg>");
