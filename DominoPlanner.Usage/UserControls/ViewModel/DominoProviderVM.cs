@@ -101,7 +101,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             set
             {
                 _dominoTransfer = value;
-                RefreshPlanPic();
+                try
+                {
+                    if(CalculationVM is NonEmptyCalculationVM nonEmptyCalculationVM)
+                    {
+                        nonEmptyCalculationVM.updatingImage = true;
+                    }
+                    RefreshPlanPic();
+                }
+                finally
+                {
+                    if (CalculationVM is NonEmptyCalculationVM nonEmptyCalculationVM)
+                    {
+                        nonEmptyCalculationVM.updatingImage = false;
+                    }
+                }
 
                 PhysicalLength = DominoTransfer.PhysicalLength;
                 PhysicalHeight = DominoTransfer.PhysicalHeight;
