@@ -509,18 +509,27 @@ namespace DominoPlanner.Usage
         
         private void ShowLiveHelper()
         {
-            List<BlockData> blockData = CreatedBlocks.ToList();
-            if(!UseDynamicBlock)
-            {
-                blockData = new List<BlockData>() { new BlockData(StonesPerBlock, true) };
-            }
-
             LiveBuildHelperV lbhv = new LiveBuildHelperV
             {
-                DataContext = new LiveBuildHelperVM(DominoProvider, blockData, currentOPP.orientation, MirrorX, MirrorY)
+                DataContext = new LiveBuildHelperVM(DominoProvider, CreateSelectedBlockData(), currentOPP.orientation, MirrorX, MirrorY)
             };
             lbhv.Show();
         }
+
+        private List<BlockData> CreateSelectedBlockData()
+        {
+			if (UseBlocks)
+			{
+				if (UseDynamicBlock)
+				{
+					return CreatedBlocks.ToList();
+				}
+                
+                return new List<BlockData>() { new BlockData(StonesPerBlock, true) };
+			}
+
+            return null;
+		}
 
         public async void SaveExcelFile()
         {
