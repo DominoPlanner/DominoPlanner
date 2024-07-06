@@ -482,10 +482,12 @@ namespace DominoPlanner.Usage
                 }
             }
 
-            if(SelectedRow < CountRow)
+            if (SelectedRow >= CountRow)
             {
-                SelectedRow++;
+                return;
             }
+
+            SelectedRow++;
 
             for (int i = 0; i < BlockSizes.Count; i++)
             {
