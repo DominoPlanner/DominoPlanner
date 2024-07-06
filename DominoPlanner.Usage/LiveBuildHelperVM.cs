@@ -63,7 +63,7 @@ namespace DominoPlanner.Usage
                 new Column() { DataField = "DominoColor.name", Header = _("Name") },
                 new Column() { DataField = "ProjectCount[0]", Header = GetParticularString("Number of stones available", "Total") },
                 new Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Remaining number of stones", "Remaining"), Class="Count" },
-                new Column() { DataField = "ProjectCount[2]", Header = string.Format(GetParticularString("Dominoes of the given color within the next {0}", "Next {0}"), NextN) }
+                new Column() { DataField = "ProjectCount[2]", Header = GetParticularString("Dominoes of the given color within the next 'N'", "Next 'N'") }
             };
 
             OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
@@ -240,7 +240,12 @@ namespace DominoPlanner.Usage
         public int NextN
         {
             get { return _nextN; }
-            set { _nextN = value; }
+            set
+            {
+                _nextN = value;
+                FillColorList();
+                RaisePropertyChanged();
+            }
         }
 
         private ObservableCollection<SolidColorBrush> _CurrentStones;
@@ -422,6 +427,8 @@ namespace DominoPlanner.Usage
         }
         private void RefreshColorAmount()
         {
+            if (Colors == null) return;
+
             int firstBlockStone = FirstBlockStone;
             int firstRow = SelectedRow - 1;
             int[] RemainingCount = new int[Colors.Count];

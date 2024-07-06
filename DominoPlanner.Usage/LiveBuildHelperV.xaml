@@ -138,8 +138,16 @@
                 <Button Height="25" Padding="5, 0, 5, 0" Command="{Binding OpenPopup}">
                     <StackPanel>
                         <TextBlock Text="{local:Gettext Show remaining colors}"/>
-                        <Popup MaxHeight="500" IsOpen="{Binding PopupOpen}" StaysOpen="False" Width="400">
-                            <local:ColorControl Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
+                        <Popup IsOpen="{Binding PopupOpen}" StaysOpen="False" Width="400">
+							<Border CornerRadius="2" BorderBrush="Gray" Background="Transparent" BorderThickness="1">
+								<StackPanel Margin="2">
+								    <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
+								        <TextBlock Text="{local:Gettext show next needed dominoes (N):}" VerticalAlignment="Center"/>
+								        <NumericUpDown Value="{Binding NextN}" Margin="5, 0" Width="80" Minimum="5"></NumericUpDown>
+								    </StackPanel>
+									<local:ColorControl MaxHeight="480" Colors="{Binding Colors}" ColumnConfig="{Binding ColumnConfig}"/>
+							    </StackPanel>
+							</Border>
                         </Popup>
                     </StackPanel>
                 </Button>
