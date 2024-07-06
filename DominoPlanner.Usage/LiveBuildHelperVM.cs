@@ -42,26 +42,15 @@ namespace DominoPlanner.Usage
             NextN = 500;
             CountRow = intField.GetLength(1);
             stonesPerLine = intField.GetLength(0);
-            BlockSizes = new List<BlockData>();
-            int sum = 0;
-            int blockIndex = 0;
-            while (sum < stonesPerLine)
-            {
-                if (blockIndex == blockSizes.Count)
-                {
-                    blockIndex = 0;
-                }
-
-                sum += blockSizes[blockIndex].BlockSize;
-                BlockSizes.Add(blockSizes[blockIndex].Clone());
-                blockIndex++;
-            }
+            
+            InitLocalBlockSizes(blockSizes);
 
             CountBlock = BlockSizes.Count;
             SizeChanged = new RelayCommand(o => { RefreshCanvas(); });
             MouseDown = new RelayCommand(o => { CurrentBlock.Focus(); });
             PositionSnapshots = new ObservableCollection<PositionSnapshot>();
-            MakePositionSnapshot = new RelayCommand(o => {
+            MakePositionSnapshot = new RelayCommand(o =>
+            {
                 PositionSnapshots.RemoveAll(x => x.Column == SelectedBlock && x.Row == SelectedRow);
                 if ((bool)o == true)
                     PositionSnapshots.Insert(0, new PositionSnapshot() { Column = SelectedBlock, Row = SelectedRow });
@@ -572,6 +561,31 @@ namespace DominoPlanner.Usage
             if (firstUsedBlock != null)
             {
                 SelectedBlock = BlockSizes.IndexOf(firstUsedBlock) + 1;
+            }
+        }
+
+        private void InitLocalBlockSizes(List<BlockData> blockSizes)
+        {
+            BlockSizes = new List<BlockData>();
+
+            if (blockSizes == null)
+            {
+                BlockSizes.Add(new BlockData(stonesPerLine, true));
+                return;
+            }
+
+            int sum = 0;
+            int blockIndex = 0;
+            while (sum < stonesPerLine)
+            {
+                if (blockIndex == blockSizes.Count)
+                {
+                    blockIndex = 0;
+                }
+
+                sum += blockSizes[blockIndex].BlockSize;
+                BlockSizes.Add(blockSizes[blockIndex].Clone());
+                blockIndex++;
             }
         }
         #endregion
