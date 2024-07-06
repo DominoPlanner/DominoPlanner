@@ -1092,9 +1092,9 @@ msgstr "Neues Objekt"
 
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperVM.cs:77
 #, csharp-format
-msgctxt "Dominoes of the given color within the next {0}"
-msgid "Next {0}"
-msgstr "In nächsten {0}"
+msgctxt "Dominoes of the given color within the next 'N'"
+msgid "Next 'N'"
+msgstr "In nächsten 'N'"
 
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:198
 msgid "No Dithering"
@@ -1563,6 +1563,10 @@ msgstr "Vorherige Reihe darüber anzeigen"
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:136
 msgid "Show Subblocks"
 msgstr "Subblöcke anzeigen"
+
+#: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\LiveBuildHelperV.xaml:140
+msgid "show next needed dominoes (N):"
+msgstr "zeig die nächsten benötigten Steine (N)"
 
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\View\EditProject.xaml:160
 msgid "Show entire field"
