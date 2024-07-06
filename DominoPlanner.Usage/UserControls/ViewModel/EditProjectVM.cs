@@ -337,11 +337,11 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             // Setup Columns
             ColorColumnConfig = new AvaloniaList<ColorControl.Column>
             {
-                new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color" },
+                new ColorControl.Column() { DataField = "DominoColor.mediaColor", Header = "", Class = "Color", Width = new GridLength(40) },
                 new ColorControl.Column() { DataField = "DominoColor.name", Header = _("Name"), Width = new GridLength(100), CanResize = true },
-                new ColorControl.Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(70), CanResize=true },
-                new ColorControl.Column() { DataField = "ProjectCount[0]", Header = GetParticularString("Number of stones used in current field", "Used"), HighlightDataField = "DominoColor.count" },
-                new ColorControl.Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Number of stones currently selected", "Selected") }
+                new ColorControl.Column() { DataField = "DominoColor.count", Header = GetParticularString("Number of stones available", "Total"), Class="Count", Width = new GridLength(50), CanResize=true },
+                new ColorControl.Column() { DataField = "ProjectCount[0]", Header = GetParticularString("Number of stones used in current field", "Used"), HighlightDataField = "DominoColor.count", CanResize=true, Width = new GridLength(50) },
+                new ColorControl.Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Number of stones currently selected", "Selected"), Width = new GridLength(60), CanResize=true }
             };
 
             _DominoList.Clear();
