@@ -83,6 +83,7 @@ namespace DominoPlanner.Usage
             HistStones = new ObservableCollection<SolidColorBrush>();
             ColorNames = new ObservableCollection<ColorAmount>();
 
+            UpdateStartSelection();
             RefreshCanvas();
 
             updateSubBlocks();
@@ -562,6 +563,15 @@ namespace DominoPlanner.Usage
                 }
 
                 SubBlocks.Add(new SubBlockInformation(currentSubBlockSize, i % 2 == 0));
+            }
+        }
+
+        private void UpdateStartSelection()
+        {
+            BlockData firstUsedBlock = BlockSizes?.FirstOrDefault(x => x.UseBlock);
+            if (firstUsedBlock != null)
+            {
+                SelectedBlock = BlockSizes.IndexOf(firstUsedBlock) + 1;
             }
         }
         #endregion
