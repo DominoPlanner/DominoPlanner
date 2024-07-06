@@ -228,7 +228,9 @@ namespace DominoPlanner.Usage
             get { return _columnConfig; }
             set { _columnConfig = value; RaisePropertyChanged(); }
         }
-        private ObservableCollection<ColorListEntry> _colors;
+
+		private ObservableCollection<ColorListEntry> fullColors = new ObservableCollection<ColorListEntry>();
+		private ObservableCollection<ColorListEntry> _colors;
 
         public ObservableCollection<ColorListEntry> Colors
         {
@@ -243,7 +245,7 @@ namespace DominoPlanner.Usage
             set
             {
                 _nextN = value;
-                FillColorList();
+				RefreshColorAmount();
                 RaisePropertyChanged();
             }
         }
@@ -410,29 +412,36 @@ namespace DominoPlanner.Usage
         private void FillColorList()
         {
             Colors = new ObservableCollection<ColorListEntry>();
+            fullColors = new ObservableCollection<ColorListEntry>();
 
             int counter = 0;
 
             if (fParameters.colors.RepresentionForCalculation.OfType<EmptyDomino>().Count() == 1)
-            {
-                Colors.Add(new ColorListEntry() { DominoColor = fParameters.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
-            }
+			{
+                ColorListEntry cle = new ColorListEntry() { DominoColor = fParameters.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 };
+				Colors.Add(cle);
+				fullColors.Add(cle);
+			}
             foreach (DominoColor domino in fParameters.colors.RepresentionForCalculation.OfType<DominoColor>())
-            {
-                Colors.Add(new ColorListEntry() { DominoColor = domino, SortIndex = fParameters.colors.Anzeigeindizes[counter] });
-                counter++;
+			{
+                ColorListEntry cle = new ColorListEntry() { DominoColor = domino, SortIndex = fParameters.colors.Anzeigeindizes[counter] };
+				Colors.Add(cle);
+				fullColors.Add(cle);
+				counter++;
             }
 
             RefreshColorAmount();
-        }
+
+			Colors = new ObservableCollection<ColorListEntry>(Colors.Where(x => x.ProjectCount[0] > 0).OrderBy(x => x.SortIndex));
+		}
         private void RefreshColorAmount()
         {
             if (Colors == null) return;
 
             int firstBlockStone = FirstBlockStone;
             int firstRow = SelectedRow - 1;
-            int[] RemainingCount = new int[Colors.Count];
-            int[] NextNCount = new int[Colors.Count];
+            int[] RemainingCount = new int[fullColors.Count];
+            int[] NextNCount = new int[fullColors.Count];
             int counter = 0;
             for (int i = firstRow; i < intField.GetLength(1); i++)
             {
@@ -445,14 +454,15 @@ namespace DominoPlanner.Usage
                         counter++;
                     }
                     if(intField[j, i] >= 0 && intField[j, i] < RemainingCount.Count()) RemainingCount[intField[j, i]]++;
-                    
+
                 }
             }
-            for (int i = 0; i < Colors.Count; i++)
+
+            for (int i = 0; i < fullColors.Count; i++)
             {
                 if (fParameters.Counts.Length > i)
                 {
-                    Colors[i].ProjectCount = new ObservableCollection<int>
+                    fullColors[i].ProjectCount = new ObservableCollection<int>
                     {
                         fParameters.Counts[i],
                         RemainingCount[i],
@@ -462,10 +472,9 @@ namespace DominoPlanner.Usage
                 }
                 else
                 {
-                    Colors[i].ProjectCount.Add(fParameters.Counts[0]);
+                    fullColors[i].ProjectCount.Add(fParameters.Counts[0]);
                 }
             }
-            Colors = new ObservableCollection<ColorListEntry>(Colors.Where(x => x.ProjectCount[0] > 0).OrderBy(x => x.SortIndex));
         }
 
         private void SpaceJump()
