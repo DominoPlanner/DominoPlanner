@@ -242,7 +242,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
             ColumnConfig = new AvaloniaList<Column>
             {
-                new Column() { DataField = "Color", Header = "", Class = "Color", CanResize = false },
+                new Column() { DataField = "Color", Header = "", Class = "Color", CanResize = false, Width = new GridLength(40) },
                 new Column() { DataField = "Name", Header = _("Name"), Class = "Name",  CanResize = true, Width = new GridLength(100) },
                 new Column() { DataField = "Color", Header = _("RGB"), Class = "RGB",   CanResize = true, Width= new GridLength(70)   },
                 new Column() { DataField = "Count", Header = GetParticularString("Total domino color count", "Count"), Class="Count", CanResize = true, Width = new GridLength(70) }
