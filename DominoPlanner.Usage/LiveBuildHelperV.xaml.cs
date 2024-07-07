@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Platform;
+using Avalonia.VisualTree;
 using System;
 
 namespace DominoPlanner.Usage
@@ -16,6 +18,25 @@ namespace DominoPlanner.Usage
             //this.AttachDevTools();
 #endif
             this.KeyDown += LiveBuildHelperV_KeyDown;
+        }
+
+        public static readonly StyledProperty<double> ActivePixelDensityProperty = AvaloniaProperty.Register<LiveBuildHelperV, double>(nameof(ActivePixelDensity), defaultValue: 1);
+
+        public double ActivePixelDensity
+        {
+            get => GetValue(ActivePixelDensityProperty);
+            private set
+            {
+                SetValue(ActivePixelDensityProperty, value);
+            }
+        }
+
+        private void ListBox_EffectiveViewportChanged(object? sender, Avalonia.Layout.EffectiveViewportChangedEventArgs e)
+        {
+            if (Screens?.ScreenFromVisual(sender as IVisual) is Screen currentScreen)
+            {
+                ActivePixelDensity = currentScreen.PixelDensity;
+            }
         }
 
         private void ListBox_GotFocus(object sender, GotFocusEventArgs e)
@@ -40,7 +61,7 @@ namespace DominoPlanner.Usage
                     TranslateTransform translate = new TranslateTransform
                     {
                         Y = 0,
-                        X = (textBox.TextLayout.Size.Width / 2) + (textBox.TextLayout.Size.Height / 2)
+                        X = (textBox.TextLayout.Size.Width / 2) + (textBox.TextLayout.Size.Height / 2) + 4
                     };
 
                     TransformGroup transformGroup = new TransformGroup();
