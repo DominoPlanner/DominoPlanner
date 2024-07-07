@@ -587,11 +587,14 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 3)
+            if (values.Count == 4)
             {
-                if (values[0] is int colorAmount && values[1] is int amount && values[2] is double width)
+                if (values[0] is int colorAmount && values[1] is int amount && values[2] is double width && values[3] is double pixelDensity && pixelDensity > 0)
                 {
-                    return Math.Floor((width - 6) / amount) * colorAmount - 4;
+					double realWidth = Math.Ceiling(width * pixelDensity);
+					double realStoneWidth = Math.Floor(realWidth / amount);
+					double realBlockSize = realStoneWidth * colorAmount;
+					return realBlockSize / pixelDensity;
                 }
             }
             return 20;
@@ -602,11 +605,14 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 2)
+            if (values.Count == 3)
             {
-                if (values[0] is int amount && values[1] is double width)
+                if (values[0] is double pixelDensity && pixelDensity > 0 && values[1] is int amount && values[2] is double width)
                 {
-                    return Math.Floor((width - 6) / amount) - 4;
+                    double realWidth = Math.Ceiling(width * pixelDensity);
+                    double realStoneWidth = Math.Floor(realWidth / amount);
+                    realStoneWidth -= Math.Floor(4 * pixelDensity);
+                    return realStoneWidth / pixelDensity;
                 }
             }
             return 20;
@@ -617,14 +623,21 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 3)
+            if (values.Count == 4)
             {
-                if (values[0] is int amount && values[1] is double width && values[2] is int blockSize)
+                if (values[0] is int amount && values[1] is double width && values[2] is int blockSize && values[3] is double pixelDensity && pixelDensity > 0)
                 {
-                    return (Math.Floor((width - 6) / amount)) * blockSize - 4;
+					double realWidth = Math.Ceiling(width * pixelDensity);
+					double realStoneWidth = Math.Floor(realWidth / amount);
+
+                    double realBlockSize = realStoneWidth * blockSize;
+
+                    realBlockSize -= Math.Floor(4 * pixelDensity);
+
+                    return realBlockSize / pixelDensity;
                 }
             }
-            return 20;
+			return 20;
         }
     }
 

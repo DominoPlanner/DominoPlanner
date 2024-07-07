@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:DominoPlanner.Usage"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        
+        x:Name="LiveBuildHelper"
         mc:Ignorable="d"
         x:Class="DominoPlanner.Usage.LiveBuildHelperV"
         Title="{local:Gettext FieldBlockViewer}"
@@ -175,24 +175,35 @@
                 <RowDefinition Height="*" MaxHeight="250"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
-                <ListBox.ItemTemplate>
+            <ListBox Margin="0" Padding="0" HorizontalAlignment="Left" GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" Grid.Row="0" Items="{Binding HistStones}" x:Name="HistoryBox" IsVisible="{Binding ShowHistory}">
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="0" />
+					</Style>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                        <Border Margin="2" Padding="0" Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="HistoryBox"/>
-                                    <Binding Path="Bounds.Width" ElementName="HistoryBox"/>
+									<Binding Path="ActivePixelDensity" ElementName="LiveBuildHelper"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="LiveBuildHelper"/>
+                                    <Binding Path="Bounds.Width" ElementName="LiveBuildHelper"/>
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" Height="20" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="1" Items="{Binding SubBlocks}" x:Name="StoneBoxCopy" IsVisible="{Binding ShowSubBlocks}">
-                <ListBox.ItemTemplate>
+			<ListBox Margin="0" Padding="0" GotFocus="ListBox_GotFocus" BorderThickness="0" Height="20" HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="1" Items="{Binding SubBlocks}" x:Name="StoneBoxCopy" IsVisible="{Binding ShowSubBlocks}">
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="0 0" />
+					</Style>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="0">
+                        <Border BorderThickness="0" Margin="2 0 2 0" Padding="0" >
                             <i:Interaction.Behaviors>
                                 <ia:DataTriggerBehavior Binding="{Binding VisibleBlock}" ComparisonCondition="Equal" Value="true">
                                     <ia:ChangePropertyAction PropertyName="Background" Value="gray" />
@@ -206,35 +217,48 @@
                                     <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
                                     <Binding Path="Bounds.Width" ElementName="StoneBox"/>
                                     <Binding Path="BlockSize"/>
+									<Binding Path="ActivePixelDensity" ElementName="LiveBuildHelper"/>
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
-                <ListBox.ItemTemplate>
+			<ListBox EffectiveViewportChanged="ListBox_EffectiveViewportChanged" Margin="0" Padding="0" HorizontalAlignment="Left" GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="2" Items="{Binding CurrentStones}" x:Name="StoneBox">
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="0" />
+					</Style>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
+                        <Border Margin="2" Padding="0" Background="{Binding}" BorderThickness="1" BorderBrush="DarkSlateGray">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
-                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+									<Binding Path="ActivePixelDensity" ElementName="LiveBuildHelper"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="LiveBuildHelper"/>
+                                    <Binding Path="Bounds.Width" ElementName="LiveBuildHelper"/>
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-			<ListBox GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
-                <ListBox.ItemTemplate>
+			<ListBox Background="Plum" Margin="0 0 0 0" Padding="0" HorizontalAlignment="Left" GotFocus="ListBox_GotFocus" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PointerPressed="ContentControl_MouseDown" ScrollViewer.VerticalScrollBarVisibility="Disabled" Grid.Row="3" Items="{Binding ColorNames}" x:Name="TitleBox">
+				<ListBox.Styles>
+					<Style Selector="ListBoxItem">
+						<Setter Property="Padding" Value="0" />
+					</Style>
+				</ListBox.Styles>
+				<ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Height="80" VerticalAlignment="Top">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource BorderWidthConverter}">
                                     <Binding Path="Amount"/>
-                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="StoneBox"/>
-                                    <Binding Path="Bounds.Width" ElementName="StoneBox"/>
+                                    <Binding Path="DataContext.CurrentBlockSize" ElementName="LiveBuildHelper"/>
+                                    <Binding Path="Bounds.Width" ElementName="LiveBuildHelper"/>
+									<Binding Path="ActivePixelDensity" ElementName="LiveBuildHelper"/>
                                 </MultiBinding>
                             </Border.Width>
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="{Binding}" FontSize="{Binding #TitleBox.DataContext.FontSize}" LayoutUpdated="LiveBuildHelperV_LayoutUpdated"/>
@@ -242,6 +266,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+			
             <StackPanel Orientation="Horizontal" Grid.Row="3" VerticalAlignment="Bottom" Margin="5">
                 <TextBlock Text="{local:Gettext Font size:}" VerticalAlignment="Center"/>
                 <NumericUpDown Value="{Binding FontSize}" Margin="5, 0" Width="60" Minimum="5"></NumericUpDown>
