@@ -177,6 +177,59 @@
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Bottom" Width="80" Height="0"/>
 		<PartDefinition HorizontalPosition="Right" VerticalPosition="Bottom" Width="48" Height="0"/>
 	</StructureDefinition>
+	<StructureDefinition Name="Wall - slow" HasProtocolDefinition="true">
+		<PartDefinition HorizontalPosition="Left" VerticalPosition="Top" Width="80" Height="0"/>
+		<PartDefinition HorizontalPosition="Center" VerticalPosition="Top" Width="80" Height="0"/>
+		<PartDefinition HorizontalPosition="Right" VerticalPosition="Top" Width="48" Height="0"/>
+		<PartDefinition HorizontalPosition="Left" VerticalPosition="Center" Width="80" Height="48">
+			<RectangleDomino x="0" y="0" Width="8" Height="24">
+				<ProtocolDefinition xConstant="0" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="0" y="0" Width="48" Height="24">
+				<ProtocolDefinition xConstant="1" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="48" y="0" Width="32" Height="24">
+				<ProtocolDefinition xConstant="2" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="0" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="0" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="40" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="1" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+		</PartDefinition>
+		<PartDefinition HorizontalPosition="Center" VerticalPosition="Center" Width="80" Height="48">
+			<RectangleDomino x="0" y="0" Width="48" Height="24">
+				<ProtocolDefinition xConstant="3" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="48" y="0" Width="32" Height="24">
+				<ProtocolDefinition xConstant="4" yConstant="-1" xPositionMultiplier="2" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="0" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="2" yConstant="-2" xPositionMultiplier="2" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="40" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="2" yPositionMultiplier="-2" WidthMultiplier="0" HeightMultiplier="2"/>
+			</RectangleDomino>
+		</PartDefinition>
+		<PartDefinition HorizontalPosition="Right" VerticalPosition="Center" Width="48" Height="48">
+			<RectangleDomino x="40" y="0" Width="8" Height="24">
+				<ProtocolDefinition xConstant="4" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="2" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="0" y="0" Width="48" Height="24">
+				<ProtocolDefinition xConstant="3" yConstant="-1" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="2" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="0" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="2" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="2" HeightMultiplier="2"/>
+			</RectangleDomino>
+			<RectangleDomino x="40" y="24" Width="8" Height="24">
+				<ProtocolDefinition xConstant="3" yConstant="-2" xPositionMultiplier="0" yPositionMultiplier="-2" WidthMultiplier="2" HeightMultiplier="2"/>
+			</RectangleDomino>
+		</PartDefinition>
+		<PartDefinition HorizontalPosition="Left" VerticalPosition="Bottom" Width="80" Height="0"/>
+		<PartDefinition HorizontalPosition="Center" VerticalPosition="Bottom" Width="80" Height="0"/>
+		<PartDefinition HorizontalPosition="Right" VerticalPosition="Bottom" Width="48" Height="0"/>
+	</StructureDefinition>
 	<StructureDefinition Name="T-Wall" HasProtocolDefinition="false">
 		<PartDefinition HorizontalPosition="Left" VerticalPosition="Top" Width="0" Height="56"/>
 		<PartDefinition HorizontalPosition="Center" VerticalPosition="Top" Width="96" Height="56">
