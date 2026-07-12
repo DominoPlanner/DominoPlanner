@@ -30,7 +30,7 @@
                             Header="{local:Gettext New Project}" />
                         <NativeMenuItem
                             Command="{Binding NewFieldStruct}"
-                            Gesture="Ctrl+N"
+                            Gesture="Meta+N"
                             Header="{local:Gettext New Field/Structure}" />
                     </NativeMenu>
                 </NativeMenuItem.Menu>
@@ -50,11 +50,11 @@
                     <NativeMenu>
                         <NativeMenuItem
                             Command="{Binding SaveCurrentOpen}"
-                            Gesture="Ctrl+S"
+                            Gesture="Meta+S"
                             Header="{local:Gettext Save}" />
                         <NativeMenuItem
                             Command="{Binding SaveAll}"
-                            Gesture="Ctrl+Alt+S"
+                            Gesture="Meta+Alt+S"
                             Header="{local:Gettext Save all}" />
                     </NativeMenu>
                 </NativeMenuItem.Menu>
@@ -65,11 +65,11 @@
                     <NativeMenu>
                         <NativeMenuItem
                             Command="{Binding SelectedTab.Content.UndoComm}"
-                            Gesture="Ctrl+Z"
+                            Gesture="Meta+Z"
                             Header="{local:Gettext Undo}" />
                         <NativeMenuItem
                             Command="{Binding SelectedTab.Content.RedoComm}"
-                            Gesture="Ctrl+Shift+Z"
+                            Gesture="Meta+Shift+Z"
                             Header="{local:Gettext Redo}" />
                     </NativeMenu>
                 </NativeMenuItem.Menu>
@@ -79,7 +79,7 @@
                 <NativeMenu>
                     <NativeMenuItem
                         Command="{Binding MenuSetStandard}"
-                        Gesture="Ctrl+R"
+                        Gesture="Meta+R"
                         Header="{local:Gettext Set Defaults}" />
                 </NativeMenu>
             </NativeMenuItem.Menu>
@@ -90,11 +90,11 @@
                 <NativeMenu x:CompileBindings="False">
                     <NativeMenuItem
                         Command="{Binding SelectedTab.Content.CopyCom}"
-                        Gesture="Ctrl+C"
+                        Gesture="Meta+C"
                         Header="{local:Gettext Copy}" />
                     <NativeMenuItem
                         Command="{Binding SelectedTab.Content.PasteCom}"
-                        Gesture="Ctrl+V"
+                        Gesture="Meta+V"
                         Header="{local:Gettext Paste}" />
 
                     <NativeMenuItem Header="{local:Gettext Add}">
