@@ -679,6 +679,7 @@ namespace DominoPlanner.Usage
         /// </summary>
         private async Task<bool> SaveCurrentOpenProject()
         {
+            if (SelectedTab?.Content == null) return false;
             var result = SelectedTab.Content.Save();
             if (result)
                 await Errorhandler.RaiseMessage(_("All changes saved"), _("Success"), Errorhandler.MessageType.Info);
