@@ -19,7 +19,7 @@
                 <NativeMenuItem.Menu>
                     <NativeMenu>
                         <NativeMenuItem Header="{local:Gettext New Project}" Command="{Binding NewProject}" Gesture="Alt+N"/>
-                        <NativeMenuItem Header="{local:Gettext New Field/Structure}" Command="{Binding NewFieldStruct}" Gesture="Ctrl+N"/>
+                        <NativeMenuItem Header="{local:Gettext New Field/Structure}" Command="{Binding NewFieldStruct}" Gesture="Meta+N"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -36,8 +36,8 @@
             <NativeMenuItem Header="{local:Gettext Save}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="{local:Gettext Save}" Command="{Binding SaveCurrentOpen}" Gesture="Ctrl+S"/>
-                        <NativeMenuItem Header="{local:Gettext Save all}" Command="{Binding SaveAll}" Gesture="Ctrl+Alt+S"/>
+                        <NativeMenuItem Header="{local:Gettext Save}" Command="{Binding SaveCurrentOpen}" Gesture="Meta+S"/>
+                        <NativeMenuItem Header="{local:Gettext Save all}" Command="{Binding SaveAll}" Gesture="Meta+Alt+S"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -45,8 +45,8 @@
             <NativeMenuItem Header="{local:Gettext Undo Redo}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="{local:Gettext Undo}" Command="{Binding SelectedTab.Content.UndoComm}" Gesture="Ctrl+Z"/>
-                        <NativeMenuItem Header="{local:Gettext Redo}" Command="{Binding SelectedTab.Content.RedoComm}" Gesture="Ctrl+Shift+Z"/>
+                        <NativeMenuItem Header="{local:Gettext Undo}" Command="{Binding SelectedTab.Content.UndoComm}" Gesture="Meta+Z"/>
+                        <NativeMenuItem Header="{local:Gettext Redo}" Command="{Binding SelectedTab.Content.RedoComm}" Gesture="Meta+Shift+Z"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -55,7 +55,7 @@
         <NativeMenuItem Header="{local:Gettext Settings}">
             <NativeMenuItem.Menu>
                 <NativeMenu>
-                    <NativeMenuItem Header="{local:Gettext Set Defaults}" Command="{Binding MenuSetStandard}" Gesture="Ctrl+R"/>
+                    <NativeMenuItem Header="{local:Gettext Set Defaults}" Command="{Binding MenuSetStandard}" Gesture="Meta+R"/>
                 </NativeMenu>
             </NativeMenuItem.Menu>
         </NativeMenuItem>
@@ -63,8 +63,8 @@
         <NativeMenuItem Header="{local:Gettext Editing}">
             <NativeMenuItem.Menu>
                 <NativeMenu x:CompileBindings="False">
-                    <NativeMenuItem Header="{local:Gettext Copy}" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Ctrl+C"/>
-                    <NativeMenuItem Header="{local:Gettext Paste}" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Ctrl+V"/>
+                    <NativeMenuItem Header="{local:Gettext Copy}" Command="{Binding SelectedTab.Content.CopyCom}" Gesture="Meta+C"/>
+                    <NativeMenuItem Header="{local:Gettext Paste}" Command="{Binding SelectedTab.Content.PasteCom}" Gesture="Meta+V"/>
 
                     <NativeMenuItem Header="{local:Gettext Add}">
                         <NativeMenuItem.Menu>

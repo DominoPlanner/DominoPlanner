@@ -95,7 +95,7 @@
                                 <Popup Name="myPopup" IsOpen="{Binding PopupOpen, Mode=TwoWay}" StaysOpen="False">
                                     <Popup.DataTemplates>
                                         <DataTemplate DataType="{x:Type system:Double}">
-                                            <TextBlock Text="{Binding, StringFormat={}{0:0.###}}"/>
+                                            <TextBlock Text="{Binding StringFormat={}{0:0.###}}"/>
                                         </DataTemplate>
                                     </Popup.DataTemplates>
                                     <local:ColorControl Grid.Row="2" MaxHeight="250" Width="400"

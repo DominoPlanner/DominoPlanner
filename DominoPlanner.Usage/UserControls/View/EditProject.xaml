@@ -179,8 +179,7 @@
                         </Image.RenderTransform>
                     </Image>
                 </RadioButton>
-                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding !Direction}"
-                             Content="Column">
+                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding !Direction}">
                     <Image Source="{StaticResource add_delete_rowDrawingImage}"/>
                 </RadioButton>
                 <RadioButton Classes="ToolButton" GroupName="AddDelete" IsChecked="{Binding InsertionMode}" Content="+" Margin="10, 0, 0, 0"/>
