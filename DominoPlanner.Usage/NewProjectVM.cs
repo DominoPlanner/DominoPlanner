@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using DominoPlanner.Core;
+﻿using DominoPlanner.Core;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using static DominoPlanner.Usage.Localizer;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 
 namespace DominoPlanner.Usage
 {
@@ -29,12 +30,27 @@ namespace DominoPlanner.Usage
         #region Methods
         private async void SelectProjectFolder()
         {
-            OpenFolderDialog ofd = new OpenFolderDialog();
-            var result = await ofd.ShowAsyncWithParent<NewProject>();
-            if (result != null && result != "")
+            try
             {
-                SelectedPath = result;
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                    {
+                        Title = _("Select Project Folder"),
+                        AllowMultiple = false
+                    });
+
+                    if (folders.Count > 0)
+                    {
+                        SelectedPath = folders[0].Path.LocalPath;
+                    }
+                }
             }
+            catch (Exception) { }
         }
 
         private async void CreateNewProject()
@@ -76,20 +92,32 @@ namespace DominoPlanner.Usage
 
         private async void SelectColorArray()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.Directory = sPath;
-                openFileDialog.AllowMultiple = false;
-                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { Declares.ColorExtension }, Name = _("Color files") });
-                openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                    {
+                        Title = _("Select Color File"),
+                        AllowMultiple = false,
+                        FileTypeFilter = new[]
+                        {
+                            new FilePickerFileType(_("Color files")) { Patterns = new[] { $"*.{Declares.ColorExtension}" } },
+                            new FilePickerFileType(_("All files")) { Patterns = new[] { "*" } }
+                        }
+                    });
+
+                    if (files.Count > 0)
+                    {
+                        sPath = files[0].Path.LocalPath;
+                    }
+                }
             }
             catch (Exception) { }
-            var result = await openFileDialog.ShowAsyncWithParent<NewProject>();
-            if (result != null && result.Length == 1 && result[0] != "")
-            {
-                sPath = result[0];
-            }
         }
         #endregion
 

@@ -1,79 +1,122 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Width="800" Height="450"
-        x:Class="DominoPlanner.Usage.ReferenceManager"
-        Title="{local:Gettext Window title|Manage references}">
+﻿<Window
+    x:Class="DominoPlanner.Usage.ReferenceManager"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="{local:Gettext Window title|Manage references}"
+    Width="800"
+    Height="450"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="local:ReferenceManagerViewModel"
+    mc:Ignorable="d">
     <Window.Resources>
-        <local:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <local:BoolInverterConverter x:Key="BoolInverterConverter" />
     </Window.Resources>
-    <Border Margin="2" BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1" Grid.IsSharedSizeScope="True">
+    <Border
+        Margin="2"
+        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+        BorderThickness="1"
+        Grid.IsSharedSizeScope="True">
         <DockPanel>
             <Grid DockPanel.Dock="Top">
                 <Grid.Styles>
                     <Style Selector="TextBlock">
-                        <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="Margin" Value="5 2"/>
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Margin" Value="5 2" />
                     </Style>
                 </Grid.Styles>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="30" SharedSizeGroup="A"/>
-                    <ColumnDefinition Width="Auto" MaxWidth="200" SharedSizeGroup="B"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
-                    <ColumnDefinition Width="Auto" MaxWidth="300"  SharedSizeGroup="D"/>
+                    <ColumnDefinition Width="30" SharedSizeGroup="A" />
+                    <ColumnDefinition
+                        Width="Auto"
+                        MaxWidth="200"
+                        SharedSizeGroup="B" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
+                    <ColumnDefinition
+                        Width="Auto"
+                        MaxWidth="300"
+                        SharedSizeGroup="D" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{local:Gettext Parent path}" Grid.Column="1"/>
-                <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Right" ResizeDirection="Columns"/>
+                <TextBlock Grid.Column="1" Text="{local:Gettext Parent path}" />
+                <GridSplitter
+                    Grid.Column="1"
+                    Width="2"
+                    HorizontalAlignment="Right"
+                    ResizeDirection="Columns" />
 
-                <TextBlock Text="{local:Gettext Relative path}" Grid.Column="2"/>
-                <GridSplitter Grid.Column="2" Width="2" HorizontalAlignment="Right" ResizeDirection="Columns"/>
-                <TextBlock Text="{local:Gettext Resolved absolute path}" Grid.Column="3"/>
-                <GridSplitter Grid.Column="3" Width="2" HorizontalAlignment="Right" ResizeDirection="Columns"/>
+                <TextBlock Grid.Column="2" Text="{local:Gettext Relative path}" />
+                <GridSplitter
+                    Grid.Column="2"
+                    Width="2"
+                    HorizontalAlignment="Right"
+                    ResizeDirection="Columns" />
+                <TextBlock Grid.Column="3" Text="{local:Gettext Resolved absolute path}" />
+                <GridSplitter
+                    Grid.Column="3"
+                    Width="2"
+                    HorizontalAlignment="Right"
+                    ResizeDirection="Columns" />
             </Grid>
-            <ListBox Items="{Binding VMs}">
+            <ListBox ItemsSource="{Binding VMs}">
                 <ListBox.DataTemplates>
                     <DataTemplate DataType="{x:Type local:PathResolutionVM}">
                         <Grid DockPanel.Dock="Top">
-                            <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                    <ia:InvokeCommandAction Command="{Binding ReplacePathCommand}"/>
-                                </ia:EventTriggerBehavior>
-                                <ia:DataTriggerBehavior Binding="{Binding IsResolved}" Value="false">
-                                    <ia:ChangePropertyAction PropertyName="ContextMenu">
-                                        <ia:ChangePropertyAction.Value>
+                            <Interaction.Behaviors>
+                                <EventTriggerBehavior EventName="DoubleTapped">
+                                    <InvokeCommandAction Command="{Binding ReplacePathCommand}" />
+                                </EventTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding IsResolved}" Value="false">
+                                    <ChangePropertyAction PropertyName="ContextMenu">
+                                        <ChangePropertyAction.Value>
                                             <ContextMenu>
-                                                <MenuItem Header="{local:Gettext Replace path}" Command="{Binding ReplacePathCommand}"></MenuItem>
+                                                <MenuItem Command="{Binding ReplacePathCommand}" Header="{local:Gettext Replace path}" />
                                             </ContextMenu>
-                                        </ia:ChangePropertyAction.Value>
-                                    </ia:ChangePropertyAction>
-                                </ia:DataTriggerBehavior>
-                            </i:Interaction.Behaviors>
+                                        </ChangePropertyAction.Value>
+                                    </ChangePropertyAction>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
                             <Grid.Styles>
                                 <Style Selector="TextBlock">
-                                    <Setter Property="Margin" Value="5 2"/>
+                                    <Setter Property="Margin" Value="5 2" />
                                 </Style>
                             </Grid.Styles>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="30" SharedSizeGroup="A"/>
-                                <ColumnDefinition Width="Auto" MaxWidth="200" SharedSizeGroup="B"/>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
-                                <ColumnDefinition Width="Auto"  MaxWidth="300" SharedSizeGroup="D"/>
+                                <ColumnDefinition Width="30" SharedSizeGroup="A" />
+                                <ColumnDefinition
+                                    Width="Auto"
+                                    MaxWidth="200"
+                                    SharedSizeGroup="B" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
+                                <ColumnDefinition
+                                    Width="Auto"
+                                    MaxWidth="300"
+                                    SharedSizeGroup="D" />
                             </Grid.ColumnDefinitions>
-                            <Image Source="/Icons/ok.ico" Width="20" Height="20" IsVisible="{Binding IsResolved}"/>
-                            <Image Source="/Icons/closewindow.ico"  Width="20" Height="20" IsVisible="{Binding IsResolved, Converter={StaticResource BoolInverterConverter}}">
-                                <i:Interaction.Behaviors>
-                                    <ia:EventTriggerBehavior EventName="PointerPressed">
-                                        <ia:InvokeCommandAction Command="{Binding ReplacePathCommand}"/>
-                                    </ia:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
+                            <Image
+                                Width="20"
+                                Height="20"
+                                IsVisible="{Binding IsResolved}"
+                                Source="/Icons/ok.ico" />
+                            <Image
+                                Width="20"
+                                Height="20"
+                                IsVisible="{Binding IsResolved, Converter={StaticResource BoolInverterConverter}}"
+                                Source="/Icons/closewindow.ico">
+                                <Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="PointerPressed">
+                                        <InvokeCommandAction Command="{Binding ReplacePathCommand}" />
+                                    </EventTriggerBehavior>
+                                </Interaction.Behaviors>
                             </Image>
-                            <TextBlock Text="{Binding ParentPath}" TextTrimming="CharacterEllipsis" Grid.Column="1"/>
-                            <TextBlock Text="{Binding RelativePath}" Grid.Column="2"/>
-                            <TextBlock Text="{Binding AbsolutePath}" Grid.Column="3"/>
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{Binding ParentPath}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="2" Text="{Binding RelativePath}" />
+                            <TextBlock Grid.Column="3" Text="{Binding AbsolutePath}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.DataTemplates>

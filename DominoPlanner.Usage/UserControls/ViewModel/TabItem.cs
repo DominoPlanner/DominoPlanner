@@ -225,6 +225,12 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public string name { get; set; }
         public string assemblyname { get; set; }
 
+        public string Name
+        {
+            get { return name; }
+            set { name = value; RaisePropertyChanged(); }
+        }
+
         #endregion
         #region properties
         private IDominoProvider _CurrentProject;

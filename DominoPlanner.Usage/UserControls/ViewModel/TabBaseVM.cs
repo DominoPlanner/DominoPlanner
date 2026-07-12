@@ -168,6 +168,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         internal virtual void KeyPressed(object sender, KeyEventArgs args) { }
         #endregion
+
+        // Commands container to hold common tab commands (keeps TabBaseVM surface minimal)
+        public TabCommands Commands { get; } = new TabCommands();
     }
 
     public enum TabItemType

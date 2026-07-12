@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class RectangularSize : UserControl
+    public partial class RectangularSize : UserControl
     {
         public RectangularSize()
         {

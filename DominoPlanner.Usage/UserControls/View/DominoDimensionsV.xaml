@@ -1,32 +1,82 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="using:DominoPlanner.Usage"
-             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="90"
-             x:Class="DominoPlanner.Usage.UserControls.View.DominoDimensionsV">
+﻿<UserControl
+    x:Class="DominoPlanner.Usage.UserControls.View.DominoDimensionsV"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ucView="using:DominoPlanner.Usage.UserControls.View"
+    xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    d:DesignHeight="90"
+    d:DesignWidth="300"
+    x:DataType="ucView:DominoDimensionsV"
+    mc:Ignorable="d">
     <Grid x:Name="LayoutRoot">
-        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="7*"/>
-                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="8*" />
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="8*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
-                <RowDefinition Height="2*"/>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="3*" />
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="3*" />
             </Grid.RowDefinitions>
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0" Text="{local:Gettext Width:}"/>
-            <NumericUpDown Minimum="0" Value="{Binding TangentialWidth}" Grid.Row="0" Grid.Column="1" Width="70" />
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Grid.Row="0" Grid.Column="2" Text="{local:Gettext Length:}"/>
-            <NumericUpDown Minimum="0" Value="{Binding NormalWidth}" Grid.Column="3" Grid.Row="0" Width="70" />
-            <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{local:Gettext Distances:}"/>
-            <TextBlock Grid.Row="2" HorizontalAlignment="Right" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding TangentialDistanceText}"/>
-            <NumericUpDown Minimum="0" Value="{Binding TangentialDistance}" Grid.Row="2" Grid.Column="1" Width="70" />
-            <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Right" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding NormalDistanceText}"/>
-            <NumericUpDown Minimum="0" Value="{Binding NormalDistance}" Grid.Column="3" Grid.Row="2" Width="70" />
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Text="{local:Gettext Width:}" />
+            <NumericUpDown
+                Grid.Row="0"
+                Grid.Column="1"
+                Width="70"
+                Minimum="0"
+                Value="{Binding TangentialWidth}" />
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Text="{local:Gettext Length:}" />
+            <NumericUpDown
+                Grid.Row="0"
+                Grid.Column="3"
+                Width="70"
+                Minimum="0"
+                Value="{Binding NormalWidth}" />
+            <TextBlock
+                Grid.Row="1"
+                VerticalAlignment="Center"
+                Text="{local:Gettext Distances:}" />
+            <TextBlock
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Text="{Binding TangentialDistanceText}"
+                TextAlignment="Center" />
+            <NumericUpDown
+                Grid.Row="2"
+                Grid.Column="1"
+                Width="70"
+                Minimum="0"
+                Value="{Binding TangentialDistance}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Text="{Binding NormalDistanceText}"
+                TextAlignment="Center" />
+            <NumericUpDown
+                Grid.Row="2"
+                Grid.Column="3"
+                Width="70"
+                Minimum="0"
+                Value="{Binding NormalDistance}" />
         </Grid>
     </Grid>
 </UserControl>

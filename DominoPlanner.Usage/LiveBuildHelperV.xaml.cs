@@ -9,7 +9,7 @@ using System;
 
 namespace DominoPlanner.Usage
 {
-    public class LiveBuildHelperV : Window
+    public partial class LiveBuildHelperV : Window
     {
         public LiveBuildHelperV()
         {
@@ -33,13 +33,18 @@ namespace DominoPlanner.Usage
 
         private void ListBox_EffectiveViewportChanged(object? sender, Avalonia.Layout.EffectiveViewportChangedEventArgs e)
         {
-            if (Screens?.ScreenFromVisual(sender as IVisual) is Screen currentScreen)
-            {
-                ActivePixelDensity = currentScreen.PixelDensity;
-            }
-        }
+			if (sender is Visual visual)
+			{
+				var topLevel = TopLevel.GetTopLevel(visual);
 
-        private void ListBox_GotFocus(object sender, GotFocusEventArgs e)
+				if (topLevel != null)
+				{
+					ActivePixelDensity = topLevel.RenderScaling;
+				}
+			}
+		}
+
+        private void ListBox_GotFocus(object sender, FocusChangedEventArgs e)
         {
             try
             {
@@ -48,34 +53,37 @@ namespace DominoPlanner.Usage
             }catch(Exception ex) { }
         }
 
-        private void LiveBuildHelperV_LayoutUpdated(object sender, System.EventArgs e)
-        {
-            if(sender is TextBlock textBox)
-            {
-                if(textBox.DesiredSize.Width < Math.Floor(textBox.TextLayout.Size.Width))
-                {
-                    textBox.RenderTransformOrigin = new RelativePoint(new Point(0, 0), RelativeUnit.Relative);
+		private void LiveBuildHelperV_LayoutUpdated(object sender, System.EventArgs e)
+		{
+			if (sender is TextBlock textBox)
+			{
+				// Width liegt jetzt direkt auf TextLayout
+				if (textBox.DesiredSize.Width < Math.Floor(textBox.TextLayout.Width))
+				{
+					textBox.RenderTransformOrigin = new RelativePoint(new Point(0, 0), RelativeUnit.Relative);
 
-                    RotateTransform rotate = new RotateTransform(90);
+					RotateTransform rotate = new RotateTransform(90);
 
-                    TranslateTransform translate = new TranslateTransform
-                    {
-                        Y = 0,
-                        X = (textBox.TextLayout.Size.Width / 2) + (textBox.TextLayout.Size.Height / 2) + 4
-                    };
+					// Direkt .Width und .Height verwenden
+					TranslateTransform translate = new TranslateTransform
+					{
+						Y = 0,
+						X = (textBox.TextLayout.Width / 2) + (textBox.TextLayout.Height / 2) + 4
+					};
 
-                    TransformGroup transformGroup = new TransformGroup();
-                    transformGroup.Children.Add(rotate);
-                    transformGroup.Children.Add(translate);
+					TransformGroup transformGroup = new TransformGroup();
+					transformGroup.Children.Add(rotate);
+					transformGroup.Children.Add(translate);
 
-                    textBox.RenderTransform = transformGroup;
+					textBox.RenderTransform = transformGroup;
 
-                    textBox.Width = textBox.TextLayout.Size.Width + 5;
-                }
-            }
-        }
+					// Direkt .Width verwenden
+					textBox.Width = textBox.TextLayout.Width + 5;
+				}
+			}
+		}
 
-        private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
+		private void LiveBuildHelperV_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space || e.Key == Key.P)
             {

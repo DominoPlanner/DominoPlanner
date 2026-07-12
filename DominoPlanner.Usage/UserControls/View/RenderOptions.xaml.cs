@@ -8,7 +8,7 @@ namespace DominoPlanner.Usage.UserControls.View
     /// <summary>
     /// Interaktionslogik für RenderOptions.xaml
     /// </summary>
-    public class RenderOptions : UserControl
+    public partial class RenderOptions : UserControl
     {
         public RenderOptions()
         {
@@ -26,7 +26,7 @@ namespace DominoPlanner.Usage.UserControls.View
             set { SetValue(ShowImageSizeProperty, value); }
         }
 
-        public static readonly AvaloniaProperty ShowImageSizeProperty =
+        public static readonly StyledProperty<bool> ShowImageSizeProperty =
             AvaloniaProperty.Register<RenderOptions, bool>("ShowImageSize", true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public int ImageSize
@@ -36,7 +36,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for imageSize.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty ImageSizeProperty =
+        public static readonly StyledProperty<int> ImageSizeProperty =
             AvaloniaProperty.Register<RenderOptions, int>("ImageSize", 0, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -48,7 +48,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for MaxSize.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty MaxSizeProperty =
+        public static readonly StyledProperty<int> MaxSizeProperty =
             AvaloniaProperty.Register<RenderOptions, int>("MaxSize", 2000, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -60,7 +60,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for Collapse.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty CollapseProperty =
+        public static readonly StyledProperty<bool> CollapseProperty =
             AvaloniaProperty.Register<RenderOptions, bool>("Collapse", false, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public bool Collapsible
@@ -70,7 +70,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for Collapsible.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty CollapsibleProperty =
+        public static readonly StyledProperty<bool> CollapsibleProperty =
             AvaloniaProperty.Register<RenderOptions, bool>("Collapsible", false, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
         public Color BackgroundColor
@@ -80,7 +80,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for BackgroundColor.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty BackgroundColorProperty =
+        public static readonly StyledProperty<Color> BackgroundColorProperty =
             AvaloniaProperty.Register<RenderOptions, Color>("BackgroundColor", Colors.Transparent, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -92,7 +92,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a AvaloniaProperty as the backing store for DrawBorders.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty DrawBordersProperty =
+        public static readonly StyledProperty<bool> DrawBordersProperty =
             AvaloniaProperty.Register<RenderOptions, bool>("DrawBorders",  false, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 

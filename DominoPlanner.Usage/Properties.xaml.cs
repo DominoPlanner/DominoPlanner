@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    public class PropertiesWindow : Window
+    public partial class PropertiesWindow : Window
     {
         public PropertiesWindow()
         {

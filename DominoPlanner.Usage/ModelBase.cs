@@ -149,12 +149,11 @@ namespace DominoPlanner.Usage
             MI.Header = attr.Header;
             if (!string.IsNullOrEmpty(attr.ImageSource))
             {
-                var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-                MI.Icon = new Image
-                {
-                    Source = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage/" + attr.ImageSource, UriKind.Absolute)))
-            };
-            }
+                 MI.Icon = new Image
+                 {
+                     Source = new Bitmap(AssetLoader.Open(new Uri("avares://DominoPlanner.Usage/" + attr.ImageSource, UriKind.Absolute)))
+                 };
+             }
             MI.IsVisible = ConvertStringToBool(attr.IsVisible, reference);
             MI.IsEnabled = ConvertStringToBool(attr.Activated, reference);
             return MI;

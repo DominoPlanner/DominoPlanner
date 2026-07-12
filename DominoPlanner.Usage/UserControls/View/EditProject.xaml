@@ -1,147 +1,288 @@
 ﻿
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
-             xmlns:parent="clr-namespace:DominoPlanner.Usage"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             
-             xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
-             mc:Ignorable="d"
-             x:Class="DominoPlanner.Usage.UserControls.View.EditProject"
-             d:DesignHeight="600" d:DesignWidth="1000" Cursor="{Binding UICursor}"
-             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-             ScrollViewer.VerticalScrollBarVisibility="Disabled">
+<UserControl
+    x:Name="Root"
+    x:Class="DominoPlanner.Usage.UserControls.View.EditProject"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage.UserControls.View"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:parent="clr-namespace:DominoPlanner.Usage"
+    xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    d:DesignHeight="600"
+    d:DesignWidth="1000"
+    x:DataType="vm:EditProjectVM"
+    Cursor="{Binding UICursor}"
+    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <parent:ColorToBrushConverter x:Key="ColorToBrushConverter" />
-        <parent:AmountToColorConverter x:Key="AmountToColorConverter"/>
-        <parent:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
-        <parent:BoolInverterConverter x:Key="BoolInverterConverter"/>
-        <local:ImageConverter x:Key="ImageConverter"/>
-        <vm:SelectionModeColorConverter x:Key="SelectionModeColorConverter"/>
+        <parent:AmountToColorConverter x:Key="AmountToColorConverter" />
+        <parent:EnumBooleanConverter x:Key="EnumBooleanConverter" />
+        <parent:BoolInverterConverter x:Key="BoolInverterConverter" />
+        <local:ImageConverter x:Key="ImageConverter" />
+        <vm:SelectionModeColorConverter x:Key="SelectionModeColorConverter" />
     </UserControl.Resources>
     <UserControl.DataTemplates>
 
         <DataTemplate DataType="{x:Type vm:SelectionToolVM}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Selection Mode:}"/>
-                <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Add to selection (+)}"
-                             IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
-                    Converter={StaticResource EnumBooleanConverter}, 
-                    ConverterParameter={x:Static vm:SelectionMode.Add} }">
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Selection Mode:}" />
+                <RadioButton
+                    Margin="0,0"
+                    Classes="ToolButton"
+                    GroupName="SelectMode"
+                    IsChecked="{Binding CurrentSelectionDomain.SelectionMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static vm:SelectionMode.Add}}"
+                    ToolTip.Tip="{parent:Gettext Add to selection (+)}">
                     +
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Left mouse button: add\, right mouse button: remove (.)}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
-                    Converter={StaticResource EnumBooleanConverter}, 
-                    ConverterParameter={x:Static vm:SelectionMode.Neutral} }">
+                <RadioButton
+                    Margin="1,0"
+                    Classes="ToolButton"
+                    GroupName="SelectMode"
+                    IsChecked="{Binding CurrentSelectionDomain.SelectionMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static vm:SelectionMode.Neutral}}"
+                    ToolTip.Tip="{parent:Gettext Left mouse button: add\, right mouse button: remove (.)}">
                     ±
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="SelectMode" ToolTip.Tip="{parent:Gettext Remove from selection (-)}" IsChecked="{Binding CurrentSelectionDomain.SelectionMode, 
-                    Converter={StaticResource EnumBooleanConverter}, 
-                    ConverterParameter={x:Static vm:SelectionMode.Remove} }">
+                <RadioButton
+                    Margin="1,0"
+                    Classes="ToolButton"
+                    GroupName="SelectMode"
+                    IsChecked="{Binding CurrentSelectionDomain.SelectionMode, Converter={StaticResource EnumBooleanConverter}, ConverterParameter={x:Static vm:SelectionMode.Remove}}"
+                    ToolTip.Tip="{parent:Gettext Remove from selection (-)}">
                     -
                 </RadioButton>
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Selection Shape:}"/>
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Selection Shape:}" />
 
-                <ListBox Background="Transparent" Margin="0, -2, 0, 0"
-                     BorderBrush="Transparent" Padding="0"
-                     BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                     VerticalAlignment="Stretch" SelectedItem="{Binding CurrentSelectionDomain, Mode=TwoWay}"
-                         Items="{Binding SelectionTools}" Classes="ToolButton">
+                <ListBox
+                    Margin="0,-2,0,0"
+                    Padding="0"
+                    VerticalAlignment="Stretch"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
+                    Classes="ToolButton"
+                    ItemsSource="{Binding SelectionTools}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    SelectedItem="{Binding CurrentSelectionDomain, Mode=TwoWay}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal"/>
+                            <StackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
 
                     <ListBox.ItemTemplate>
-                        <DataTemplate >
+                        <DataTemplate>
                             <Image Classes="ToolImage" Source="{Binding Img}">
                                 <ToolTip.Tip>
                                     <MultiBinding StringFormat="{}{0} ({1})">
-                                        <Binding Path="Name"/>
-                                        <Binding Path="Shortcut"/>
+                                        <Binding Path="Name" />
+                                        <Binding Path="Shortcut" />
                                     </MultiBinding>
                                 </ToolTip.Tip>
                             </Image>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <ContentControl Content="{Binding CurrentSelectionDomain}" Width="180" Margin="5, 0"></ContentControl>
+                <ContentControl
+                    Width="180"
+                    Margin="5,0"
+                    Content="{Binding CurrentSelectionDomain}" />
 
-                <Button Margin="30, 0, 1, 0" ToolTip.Tip="{parent:Gettext Undo last selection operation}" Command="{Binding UndoSelectionOperation}">
-                    <Image Source="{StaticResource undoDrawingImage}" Classes="ToolImage"/>
+                <Button
+                    Margin="30,0,1,0"
+                    Command="{Binding UndoSelectionOperation}"
+                    ToolTip.Tip="{parent:Gettext Undo last selection operation}">
+                    <Image Classes="ToolImage" Source="{StaticResource undoDrawingImage}" />
                 </Button>
-                <Button Margin="1, 0" ToolTip.Tip="{parent:Gettext Redo selection operation}" Command="{Binding RedoSelectionOperation}">
-                    <Image Source="{StaticResource redoDrawingImage}" Classes="ToolImage"/>
+                <Button
+                    Margin="1,0"
+                    Command="{Binding RedoSelectionOperation}"
+                    ToolTip.Tip="{parent:Gettext Redo selection operation}">
+                    <Image Classes="ToolImage" Source="{StaticResource redoDrawingImage}" />
                 </Button>
-                <Button Margin="30, 0, 1, 0" ToolTip.Tip="{parent:Gettext Invert selection}" Command="{Binding InvertSelection}">
-                    <Image Source="{StaticResource invert_selectionDrawingImage}" Classes="ToolImage"/>
+                <Button
+                    Margin="30,0,1,0"
+                    Command="{Binding InvertSelection}"
+                    ToolTip.Tip="{parent:Gettext Invert selection}">
+                    <Image Classes="ToolImage" Source="{StaticResource invert_selectionDrawingImage}" />
                 </Button>
-                <Button Margin="30, 0, 1, 0" ToolTip.Tip="{parent:Gettext Clear selection}" Command="{Binding DataContext.ClearSelection, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}">
-                    <Image Source="{StaticResource closeDrawingImage}" Classes="ToolImage"/>
+                <Button
+                    Margin="30,0,1,0"
+                    Command="{Binding DataContext.ClearSelection, ElementName=Root}"
+                    ToolTip.Tip="{parent:Gettext Clear selection}">
+                    <Image Classes="ToolImage" Source="{StaticResource closeDrawingImage}" />
                 </Button>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:FillBucketDomain}">
-            <CheckBox VerticalAlignment="Center" IsChecked="{Binding IncludeDiagonals}" Content="{parent:Gettext Include diagonals}"/>
+            <CheckBox
+                VerticalAlignment="Center"
+                Content="{parent:Gettext Include diagonals}"
+                IsChecked="{Binding IncludeDiagonals}" />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:SelectionDomain}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Boundary treatment:}"/>
-                <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="Boundary" ToolTip.Tip="{parent:Gettext Include dominoes on selection boundary}" IsChecked="{Binding IncludeBoundary}">
-                    <Image Source="{StaticResource include_borderDrawingImage}" Classes="ToolImage"/>
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Boundary treatment:}" />
+                <RadioButton
+                    Margin="0,0"
+                    Classes="ToolButton"
+                    GroupName="Boundary"
+                    IsChecked="{Binding IncludeBoundary}"
+                    ToolTip.Tip="{parent:Gettext Include dominoes on selection boundary}">
+                    <Image Classes="ToolImage" Source="{StaticResource include_borderDrawingImage}" />
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="Boundary" ToolTip.Tip="{parent:Gettext Exclude dominoes on selection boundary}" IsChecked="{Binding IncludeBoundary, Converter={StaticResource BoolInverterConverter }}">
-                    <Image Source="{StaticResource exclude_borderDrawingImage}" Classes="ToolImage"/>
+                <RadioButton
+                    Margin="1,0"
+                    Classes="ToolButton"
+                    GroupName="Boundary"
+                    IsChecked="{Binding IncludeBoundary, Converter={StaticResource BoolInverterConverter}}"
+                    ToolTip.Tip="{parent:Gettext Exclude dominoes on selection boundary}">
+                    <Image Classes="ToolImage" Source="{StaticResource exclude_borderDrawingImage}" />
                 </RadioButton>
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:DisplaySettingsToolVM}">
             <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Margin="10, 0, 2, 0" Text="{parent:Gettext Background Color:}"/>
-                <parent:PopupColorPicker Width="50" VerticalAlignment="Center" Margin="0, 0, 5, 0" Color="{Binding BackgroundColor , Mode=TwoWay}"/>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+                <TextBlock
+                    Margin="10,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Background Color:}" />
+                <parent:PopupColorPicker
+                    Width="50"
+                    Margin="0,0,5,0"
+                    VerticalAlignment="Center"
+                    Color="{Binding BackgroundColor, Mode=TwoWay}" />
+                <Border
+                    Margin="0"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0" />
 
-                <CheckBox Content="Hide spaces" Margin="5, 0, 5, 0" VerticalAlignment="Center" IsVisible="{Binding Expandable}" IsChecked="{Binding Expanded}"/>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0" IsVisible="{Binding Expandable}"></Border>
+                <CheckBox
+                    Margin="5,0,5,0"
+                    VerticalAlignment="Center"
+                    Content="Hide spaces"
+                    IsChecked="{Binding Expanded}"
+                    IsVisible="{Binding Expandable}" />
+                <Border
+                    Margin="0"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0"
+                    IsVisible="{Binding Expandable}" />
 
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Border Color:}"/>
-                <parent:PopupColorPicker Width="50" VerticalAlignment="Center" Margin="2, 0, 5, 0" Color="{Binding BorderColor, Mode=TwoWay}"/>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Border Size:}"/>
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Border Color:}" />
+                <parent:PopupColorPicker
+                    Width="50"
+                    Margin="2,0,5,0"
+                    VerticalAlignment="Center"
+                    Color="{Binding BorderColor, Mode=TwoWay}" />
+                <Border
+                    Margin="0"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0" />
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Border Size:}" />
 
-                <Slider Margin="5, 0, 0, 0" Width="50" Minimum="0" Maximum="5" Value="{Binding BorderSize}"></Slider>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="0"></Border>
+                <Slider
+                    Width="50"
+                    Margin="5,0,0,0"
+                    Maximum="5"
+                    Minimum="0"
+                    Value="{Binding BorderSize}" />
+                <Border
+                    Margin="0"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0" />
 
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Domino opacity:}"/>
-                <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding DominoOpacity}" Minimum="0" Maximum="1"></Slider>
-                
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Domino opacity:}" />
+                <Slider
+                    Width="50"
+                    Margin="5,0,0,0"
+                    Maximum="1"
+                    Minimum="0"
+                    Value="{Binding DominoOpacity}" />
 
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Image overlay transparency:}"/>
-                <Slider Margin="5, 0, 0, 0" Width="50" Value="{Binding ImageOpacity}" Minimum="0" Maximum="1"></Slider>
-                <RadioButton Classes="ToolButton" Margin="0, 0" GroupName="ImagePosition" ToolTip.Tip="{parent:Gettext Display image below dominoes}" IsChecked="{Binding Above, Converter={StaticResource BoolInverterConverter}}">
-                    <Image Source="{StaticResource stack_image_belowDrawingImage}" Classes="ToolImage"/>
+
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Image overlay transparency:}" />
+                <Slider
+                    Width="50"
+                    Margin="5,0,0,0"
+                    Maximum="1"
+                    Minimum="0"
+                    Value="{Binding ImageOpacity}" />
+                <RadioButton
+                    Margin="0,0"
+                    Classes="ToolButton"
+                    GroupName="ImagePosition"
+                    IsChecked="{Binding Above, Converter={StaticResource BoolInverterConverter}}"
+                    ToolTip.Tip="{parent:Gettext Display image below dominoes}">
+                    <Image Classes="ToolImage" Source="{StaticResource stack_image_belowDrawingImage}" />
                 </RadioButton>
-                <RadioButton Classes="ToolButton" Margin="1, 0" GroupName="ImagePosition" ToolTip.Tip="{parent:Gettext Display image above dominoes}" IsChecked="{Binding Above}">
-                    <Image Source="{StaticResource stack_image_aboveDrawingImage}" Classes="ToolImage"/>
+                <RadioButton
+                    Margin="1,0"
+                    Classes="ToolButton"
+                    GroupName="ImagePosition"
+                    IsChecked="{Binding Above}"
+                    ToolTip.Tip="{parent:Gettext Display image above dominoes}">
+                    <Image Classes="ToolImage" Source="{StaticResource stack_image_aboveDrawingImage}" />
                 </RadioButton>
-                <Border BorderBrush="Gray" BorderThickness="0, 0, 1, 0" Margin="5, 0, 0, 0"></Border>
-                <TextBlock VerticalAlignment="Center" Margin="5, 0, 2, 0" Text="{parent:Gettext Open Image:}"/>
-                <Button Margin="1, 0"  ToolTip.Tip="{parent:Gettext Open image}" Command="{Binding ShowImageClick}">
-                    <Image Source="{StaticResource openDrawingImage}" Classes="ToolImage"/>
+                <Border
+                    Margin="5,0,0,0"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0" />
+                <TextBlock
+                    Margin="5,0,2,0"
+                    VerticalAlignment="Center"
+                    Text="{parent:Gettext Open Image:}" />
+                <Button
+                    Margin="1,0"
+                    Command="{Binding ShowImageClick}"
+                    ToolTip.Tip="{parent:Gettext Open image}">
+                    <Image Classes="ToolImage" Source="{StaticResource openDrawingImage}" />
                 </Button>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:RulerToolVM}">
-            <DockPanel Margin="5, 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="18">
-                
-                <TextBlock Margin="0, 0" Text="{Binding Length, StringFormat={parent:Gettext 'Current Length: {0:F2} mm'}}" VerticalAlignment="Center"/>
-                <CheckBox Margin="10,0,0,-1"  IsChecked="{Binding Snapping}" VerticalAlignment="Center" Content="{parent:Gettext Snap to 5 degree increments (Toggle with Ctrl)}"/>
+            <DockPanel
+                Height="18"
+                Margin="5,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+
+                <TextBlock
+                    Margin="0,0"
+                    VerticalAlignment="Center"
+                    Text="{Binding Length, StringFormat={parent:Gettext 'Current Length: {0:F2} mm'}}" />
+                <CheckBox
+                    Margin="10,0,0,-1"
+                    VerticalAlignment="Center"
+                    Content="{parent:Gettext Snap to 5 degree increments (Toggle with Ctrl)}"
+                    IsChecked="{Binding Snapping}" />
                 <!--<TextBlock TextWrapping="Wrap" IsEnabled="False" VerticalAlignment="Center" Margin="20, 0, 0, 0">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{parent:Gettext 'Dimensions: {0} mm x {1} mm'}">
@@ -153,184 +294,357 @@
             </DockPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ZoomToolVM}">
-            <StackPanel Orientation="Horizontal" Margin="5, 0">
-                <Button Margin="1, 0" ToolTip.Tip="{parent:Gettext 1px on screen \= 1mm in real world}" Command="{Binding Zoom1To1}">
+            <StackPanel Margin="5,0" Orientation="Horizontal">
+                <Button
+                    Margin="1,0"
+                    Command="{Binding Zoom1To1}"
+                    ToolTip.Tip="{parent:Gettext '1px on screen = 1mm in real world'}">
                     1:1
                 </Button>
-                <Button Margin="1, 0" ToolTip.Tip="{parent:Gettext Show entire field}" Command="{Binding ZoomToFit}">
+                <Button
+                    Margin="1,0"
+                    Command="{Binding ZoomToFit}"
+                    ToolTip.Tip="{parent:Gettext Show entire field}">
                     Fit
                 </Button>
-                <Button Margin="1, 0"  ToolTip.Tip="{parent:Gettext Zoom out}" Command="{Binding ZoomOut}">
-                    <Image Source="{StaticResource zoom_outDrawingImage}" Classes="ToolImage"/>
-                </Button> 
-                <Slider HorizontalAlignment="Center" Minimum="{Binding MinZoomValue}" Maximum="{Binding MaxZoomValue}" x:CompileBindings="False" 
-                Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" Margin="5,0" VerticalAlignment="Center" Width="150"/>
-                <Button Margin="1, 0"  ToolTip.Tip="{parent:Gettext Zoom in}" Command="{Binding ZoomIn}">
-                    <Image Source="{StaticResource zoom_inDrawingImage}" Classes="ToolImage"/>
+                <Button
+                    Margin="1,0"
+                    Command="{Binding ZoomOut}"
+                    ToolTip.Tip="{parent:Gettext Zoom out}">
+                    <Image Classes="ToolImage" Source="{StaticResource zoom_outDrawingImage}" />
+                </Button>
+                <Slider
+                    Width="150"
+                    Margin="5,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    x:CompileBindings="False"
+                    Maximum="{Binding MaxZoomValue}"
+                    Minimum="{Binding MinZoomValue}"
+                    Value="{Binding DataContext.DisplaySettingsTool.ZoomValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" />
+                <Button
+                    Margin="1,0"
+                    Command="{Binding ZoomIn}"
+                    ToolTip.Tip="{parent:Gettext Zoom in}">
+                    <Image Classes="ToolImage" Source="{StaticResource zoom_inDrawingImage}" />
                 </Button>
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:RowColumnInsertionVM}">
-            <StackPanel Orientation="Horizontal" Margin="5, 0">
-                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding Direction}">
+            <StackPanel Margin="5,0" Orientation="Horizontal">
+                <RadioButton
+                    Classes="ToolButton"
+                    GroupName="RowColumn"
+                    IsChecked="{Binding Direction}">
                     <Image Source="{StaticResource add_delete_rowDrawingImage}">
                         <Image.RenderTransform>
-                            <RotateTransform Angle="90"></RotateTransform>
+                            <RotateTransform Angle="90" />
                         </Image.RenderTransform>
                     </Image>
                 </RadioButton>
-                <RadioButton Classes="ToolButton" GroupName="RowColumn" IsChecked="{Binding !Direction}"
-                             Content="Column">
-                    <Image Source="{StaticResource add_delete_rowDrawingImage}"/>
+                    <RadioButton
+                    Classes="ToolButton"
+                    GroupName="RowColumn"
+                    IsChecked="{Binding !Direction}">
+                    <Image Source="{StaticResource add_delete_rowDrawingImage}" />
                 </RadioButton>
-                <RadioButton Classes="ToolButton" GroupName="AddDelete" IsChecked="{Binding InsertionMode}" Content="+" Margin="10, 0, 0, 0"/>
-                <RadioButton Classes="ToolButton" GroupName="AddDelete" IsChecked="{Binding !InsertionMode}" Content="-"/>
+                <RadioButton
+                    Margin="10,0,0,0"
+                    Classes="ToolButton"
+                    Content="+"
+                    GroupName="AddDelete"
+                    IsChecked="{Binding InsertionMode}" />
+                <RadioButton
+                    Classes="ToolButton"
+                    Content="-"
+                    GroupName="AddDelete"
+                    IsChecked="{Binding !InsertionMode}" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:EditingToolVM}">
-            <TextBlock VerticalAlignment="Center" Text="{parent:Gettext Coming soon!}"/>
+            <TextBlock VerticalAlignment="Center" Text="{parent:Gettext Coming soon!}" />
         </DataTemplate>
     </UserControl.DataTemplates>
-    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1">
+    <Grid
+        Margin="1"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <Border BorderThickness="0, 0, 0, 1" BorderBrush="Gray">
+        <Border BorderBrush="Gray" BorderThickness="0,0,0,1">
 
-            <StackPanel Orientation="Horizontal" Margin="1, 1">
-                <Border BorderBrush="Black" BorderThickness="1" Width="30" Height="30">
-                    <Image Source="{Binding SelectedTool.Img}" Classes="ToolImage" ToolTip.Tip="{Binding SelectedTool.HelpToolTip, StringFormat={parent:Gettext 'Shortcuts:\\n{0}'}}"/>
+            <StackPanel Margin="1,1" Orientation="Horizontal">
+                <Border
+                    Width="30"
+                    Height="30"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                    <Image
+                        Classes="ToolImage"
+                        Source="{Binding SelectedTool.Img}"
+                        ToolTip.Tip="{Binding SelectedTool.HelpToolTip, StringFormat={parent:Gettext 'Shortcuts:\\n{0}'}}" />
                 </Border>
-                <ContentControl Margin="2, 0, 0, 0" Content="{Binding SelectedTool}">
-                    <!--ContentTemplate="{StaticResource DisplaySettingsTemplate}"-->
+                <ContentControl Margin="2,0,0,0" Content="{Binding SelectedTool}">
+                    <!--  ContentTemplate="{StaticResource DisplaySettingsTemplate}"  -->
 
                 </ContentControl>
 
             </StackPanel>
         </Border>
-        <Grid x:Name="CanGrid" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1" >
-            <!--SizeChanged="Grid_SizeChanged_1"-->
+        <Grid
+            x:Name="CanGrid"
+            Grid.Row="1"
+            Margin="1"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <!--  SizeChanged="Grid_SizeChanged_1"  -->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="320" />
             </Grid.ColumnDefinitions>
 
-            <DockPanel Margin="5, 0" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch">
-                <Button DockPanel.Dock="Top" Grid.Row="0" Margin="0, 2" Content="{parent:Gettext Clear Selection}" Command="{Binding ClearSelection}"/>
-                <Button DockPanel.Dock="Top" Grid.Row="1" Margin="0, 2" Content="{parent:Gettext Select stones in selected color}" Command="{Binding SelectColor}" ToolTip.Tip="{parent:Gettext Select all stones in the color selected in the list below. \\nIf some stones are selected this function only applies to the selected stones.}"/>
-                <parent:ColorControl Grid.Row="1" Grid.Column="2"
-                                                 ClickCommand="{Binding MouseClickCommand}"
-                                                 ColumnConfig="{Binding ColorColumnConfig}"
-                                                 Colors="{Binding DominoList}"
-                                                 SelectedColor="{Binding SelectedColor}">
-                </parent:ColorControl>
+            <DockPanel
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="5,0"
+                VerticalAlignment="Stretch">
+                <Button
+                    Grid.Row="0"
+                    Margin="0,2"
+                    Command="{Binding ClearSelection}"
+                    Content="{parent:Gettext Clear Selection}"
+                    DockPanel.Dock="Top" />
+                <Button
+                    Grid.Row="1"
+                    Margin="0,2"
+                    Command="{Binding SelectColor}"
+                    Content="{parent:Gettext Select stones in selected color}"
+                    DockPanel.Dock="Top"
+                    ToolTip.Tip="{parent:Gettext Select all stones in the color selected in the list below. \\nIf some stones are selected this function only applies to the selected stones.}" />
+                <parent:ColorControl
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    ClickCommand="{Binding MouseClickCommand}"
+                    Colors="{Binding DominoList}"
+                    ColumnConfig="{Binding ColorColumnConfig}"
+                    SelectedColor="{Binding SelectedColor}" />
             </DockPanel>
             <!--<ScrollViewer Grid.Column="1" x:Name="ScrollViewer" Margin="0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"> SizeChanged="Grid_SizeChanged" -->
-            <Grid Grid.Column="1" ColumnDefinitions="*, Auto" RowDefinitions="*, Auto">
-                <ScrollBar Grid.Row="1" Orientation="Horizontal" Visibility="Visible"
-                                                                 Minimum="0"
-                                                                 Maximum="100" Value="{Binding HorizontalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}"
-                                                                 ViewportSize="{Binding HorizontalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}">
-
-                </ScrollBar>
-                <ScrollBar Grid.Column="1" Orientation="Vertical" Width="20" Visibility="Visible"
-                                                                  Minimum="0"
-                                                                  Maximum="100" Value="{Binding VerticalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}"
-                                                                  ViewportSize="{Binding VerticalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}">
-                </ScrollBar>
+            <Grid
+                Grid.Column="1"
+                ColumnDefinitions="*, Auto"
+                RowDefinitions="*, Auto">
+                <ScrollBar
+                    Grid.Row="1"
+                    Maximum="100"
+                    Minimum="0"
+                    Orientation="Horizontal"
+                    ViewportSize="{Binding HorizontalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}"
+                    Visibility="Visible"
+                    Value="{Binding HorizontalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}" />
+                <ScrollBar
+                    Grid.Column="1"
+                    Width="20"
+                    Maximum="100"
+                    Minimum="0"
+                    Orientation="Vertical"
+                    ViewportSize="{Binding VerticalSliderSize, ElementName=ProjectCanvas, Mode=TwoWay}"
+                    Visibility="Visible"
+                    Value="{Binding VerticalSliderPos, ElementName=ProjectCanvas, Mode=TwoWay}" />
                 <Border BorderBrush="Beige" BorderThickness="1">
-                    <parent:ProjectCanvas Project="{Binding Dominoes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True" x:CompileBindings="True" x:DataType="vm:EditProjectVM"
-                                          ShiftX="{Binding DisplaySettingsTool.HorizontalOffset}"
-                                          ShiftY="{Binding DisplaySettingsTool.VerticalOffset}"
-                                          Zoom="{Binding DisplaySettingsTool.ZoomValue, Mode=TwoWay}"
-                                          SelectedBorderColor="{Binding DisplaySettingsTool.SelectedColor}"
-                                          UnselectedBorderColor="{Binding DisplaySettingsTool.BorderColor}"
-                                          SelectionDomain="{Binding SelectionTool.CurrentSelectionDomain.SelectionShape}"
-                                          SelectionDomainColor="{Binding SelectionTool.CurrentSelectionDomain.CurrentSelectionMode, Converter={StaticResource SelectionModeColorConverter}}"
-                                          SelectionDomainVisible="{Binding SelectionTool.CurrentSelectionDomain.SelectionPathVisible}"
-                                          SourceImage="{Binding DisplaySettingsTool.SlicedImage}"
-                                          SourceImageOpacity="{Binding DisplaySettingsTool.ImageOpacity}"
-                                          SourceImageAbove="{Binding DisplaySettingsTool.Above}"
-                                          BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"
-                                          DominoOpacity="{Binding DisplaySettingsTool.DominoOpacity}"
-                                          BorderSize="{Binding DisplaySettingsTool.BorderSize}"
-                                          ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
-                                          AdditionalDrawables="{Binding AdditionalDrawables}"
-                                          FitAllZoomValue="{Binding ZoomTool.FitAllZoomValue, Mode=OneWayToSource}"
-                                          x:Name="ProjectCanvas"/>
+                    <parent:ProjectCanvas
+                        x:Name="ProjectCanvas"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        x:CompileBindings="True"
+                        x:DataType="vm:EditProjectVM"
+                        AdditionalDrawables="{Binding AdditionalDrawables}"
+                        BackgroundColor="{Binding DisplaySettingsTool.BackgroundColor}"
+                        BorderSize="{Binding DisplaySettingsTool.BorderSize}"
+                        ClipToBounds="True"
+                        DominoOpacity="{Binding DisplaySettingsTool.DominoOpacity}"
+                        FitAllZoomValue="{Binding ZoomTool.FitAllZoomValue, Mode=OneWayToSource}"
+                        ForceRedraw="{Binding DisplaySettingsTool.ForceRedraw}"
+                        Project="{Binding Dominoes}"
+                        SelectedBorderColor="{Binding DisplaySettingsTool.SelectedColor}"
+                        SelectionDomain="{Binding SelectionTool.CurrentSelectionDomain.SelectionShape}"
+                        SelectionDomainColor="{Binding SelectionTool.CurrentSelectionDomain.CurrentSelectionMode, Converter={StaticResource SelectionModeColorConverter}}"
+                        SelectionDomainVisible="{Binding SelectionTool.CurrentSelectionDomain.SelectionPathVisible}"
+                        ShiftX="{Binding DisplaySettingsTool.HorizontalOffset}"
+                        ShiftY="{Binding DisplaySettingsTool.VerticalOffset}"
+                        SourceImage="{Binding DisplaySettingsTool.SlicedImage}"
+                        SourceImageAbove="{Binding DisplaySettingsTool.Above}"
+                        SourceImageOpacity="{Binding DisplaySettingsTool.ImageOpacity}"
+                        UnselectedBorderColor="{Binding DisplaySettingsTool.BorderColor}"
+                        Zoom="{Binding DisplaySettingsTool.ZoomValue, Mode=TwoWay}" />
                 </Border>
-                <Popup PlacementAnchor="Top" PlacementMode="Pointer" StaysOpen="False" IsOpen="{Binding SelectionTool.QuickReplacePopupOpen}">
+                <Popup
+                    IsLightDismissEnabled="True"
+                    IsOpen="{Binding SelectionTool.QuickReplacePopupOpen}"
+                    Placement="Pointer"
+                    PlacementAnchor="Top">
                     <StackPanel Orientation="Vertical">
-                        <ListBox Items="{Binding DominoList}" >
+                        <ListBox ItemsSource="{Binding DominoList}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type parent:ColorListEntry}">
-                                    <Rectangle Width="20" Height="20" Margin="1"
-                                    ToolTip.Tip="{Binding Name}" Stroke="Black" StrokeThickness="1">
+                                    <Rectangle
+                                        Width="20"
+                                        Height="20"
+                                        Margin="1"
+                                        Stroke="Black"
+                                        StrokeThickness="1"
+                                        ToolTip.Tip="{Binding Name}">
                                         <Rectangle.Fill>
-                                            <SolidColorBrush Color="{Binding Color}"/>
+                                            <SolidColorBrush Color="{Binding Color}" />
                                         </Rectangle.Fill>
-                                        <i:Interaction.Behaviors>
-                                            <ia:EventTriggerBehavior EventName="PointerReleased">
-                                                <ia:InvokeCommandAction Command="{Binding #ProjectCanvas.DataContext.ChangeColorCom}" CommandParameter="{Binding DominoColor}"/>
-                                            </ia:EventTriggerBehavior>
-                                            <ia:EventTriggerBehavior EventName="PointerReleased">
-                                                <ia:ChangePropertyAction TargetObject="{Binding #ProjectCanvas.DataContext.SelectionTool}" PropertyName="QuickReplacePopupOpen" Value="False"/>
-                                            </ia:EventTriggerBehavior>
-                                        </i:Interaction.Behaviors>
+                                        <Interaction.Behaviors>
+                                            <EventTriggerBehavior EventName="PointerReleased">
+                                                <InvokeCommandAction Command="{Binding #ProjectCanvas.DataContext.ChangeColorCom}" CommandParameter="{Binding DominoColor}" />
+                                            </EventTriggerBehavior>
+                                            <EventTriggerBehavior EventName="PointerReleased">
+                                                <ChangePropertyAction
+                                                    PropertyName="QuickReplacePopupOpen"
+                                                    TargetObject="{Binding #ProjectCanvas.DataContext.SelectionTool}"
+                                                    Value="False" />
+                                            </EventTriggerBehavior>
+                                        </Interaction.Behaviors>
                                     </Rectangle>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <WrapPanel Width="160"/>
+                                    <WrapPanel Width="160" />
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
-                        <TextBlock Margin="2" Text="{parent:Gettext Click color to replace}" Foreground="Gray" FontStyle="Italic"/>
+                        <TextBlock
+                            Margin="2"
+                            FontStyle="Italic"
+                            Foreground="Gray"
+                            Text="{parent:Gettext Click color to replace}" />
                     </StackPanel>
                 </Popup>
             </Grid>
-            <ListBox Background="Transparent"
-                     BorderBrush="Transparent"
-                     BorderThickness="0"
-                     VerticalAlignment="Stretch"
-                     Items="{Binding EditingTools}"
-                     SelectedItem="{Binding SelectedTool, Mode=TwoWay}" Classes="ToolButton">
+            <ListBox
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                Classes="ToolButton"
+                ItemsSource="{Binding EditingTools}"
+                SelectedItem="{Binding SelectedTool, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Image Classes="ToolImage" Source="{Binding Img}" ToolTip.Tip="{Binding Name}"/>
+                        <Image
+                            Classes="ToolImage"
+                            Source="{Binding Img}"
+                            ToolTip.Tip="{Binding Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
         <Grid Grid.Row="2">
-            <StackPanel Grid.Row="2"  Orientation="Horizontal">
-                <parent:ImageButton Image="/Icons/draw_freehand.ico"
-                                    Content="{parent:Gettext Basic Settings}" Command="{Binding RestoreBasicSettings}"/>
-                <parent:ImageButton Image="/Icons/file_export.ico" IsVisible="{Binding VisibleFieldplan}"
-                                    Content="{parent:Gettext Buildtools}" Command="{Binding BuildtoolsClick}"/>
-                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{parent:Gettext Name:}"/>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Name}" Margin="2, 0"/>
-                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{parent:Gettext Rows:}"/>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectHeight}" Margin="2, 0"/>
-                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{parent:Gettext Stones/Row:}"/>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectWidth}" Margin="2, 0"/>
-                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{parent:Gettext Amount:}"/>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ProjectAmount}" Margin="2, 0"/>
-                <Border VerticalAlignment="Stretch" Margin="5" BorderThickness="1, 0, 0, 0" BorderBrush="Black"></Border>
-                <TextBlock TextWrapping="Wrap" IsEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <parent:ImageButton
+                    Command="{Binding RestoreBasicSettings}"
+                    Content="{parent:Gettext Basic Settings}"
+                    Image="/Icons/draw_freehand.ico" />
+                <parent:ImageButton
+                    Command="{Binding BuildtoolsClick}"
+                    Content="{parent:Gettext Buildtools}"
+                    Image="/Icons/file_export.ico"
+                    IsVisible="{Binding VisibleFieldplan}" />
+                <Border
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    BorderBrush="Black"
+                    BorderThickness="1,0,0,0" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{parent:Gettext Name:}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    Margin="2,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{Binding Name}"
+                    TextWrapping="Wrap" />
+                <Border
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    BorderBrush="Black"
+                    BorderThickness="1,0,0,0" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{parent:Gettext Rows:}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    Margin="2,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{Binding ProjectHeight}"
+                    TextWrapping="Wrap" />
+                <Border
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    BorderBrush="Black"
+                    BorderThickness="1,0,0,0" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{parent:Gettext Stones/Row:}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    Margin="2,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{Binding ProjectWidth}"
+                    TextWrapping="Wrap" />
+                <Border
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    BorderBrush="Black"
+                    BorderThickness="1,0,0,0" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{parent:Gettext Amount:}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    Margin="2,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{Binding ProjectAmount}"
+                    TextWrapping="Wrap" />
+                <Border
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    BorderBrush="Black"
+                    BorderThickness="1,0,0,0" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    TextWrapping="Wrap">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{parent:Gettext 'Dimensions: {0} mm x {1} mm'}">
-                            <Binding Path="PhysicalLength"/>
-                            <Binding Path="PhysicalHeight"/>
+                            <Binding Path="PhysicalLength" />
+                            <Binding Path="PhysicalHeight" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

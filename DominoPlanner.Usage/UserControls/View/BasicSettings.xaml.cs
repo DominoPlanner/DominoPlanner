@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class BasicSettings : UserControl
+    public partial class BasicSettings : UserControl
     {
         public BasicSettings()
         {

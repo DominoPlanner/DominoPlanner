@@ -1,22 +1,49 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
-        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="110"
-        x:Class="DominoPlanner.Usage.UserControls.RenameObject"
-         Height="110" Width="300" CanResize="False">
+﻿<Window
+    x:Class="DominoPlanner.Usage.UserControls.RenameObject"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    Width="300"
+    Height="110"
+    d:DesignHeight="110"
+    d:DesignWidth="300"
+    x:DataType="local:RenameObjectVM"
+    CanResize="False"
+    mc:Ignorable="d">
     <Window.Title>
-        <Binding Path="OldName" StringFormat="{local:Gettext 'Rename file: {0}'}"></Binding>
+        <Binding Path="OldName" StringFormat="{local:Gettext 'Rename file: {0}'}" />
     </Window.Title>
     <Grid>
         <DockPanel Margin="10,10,10,0" VerticalAlignment="Top">
-            <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="{local:Gettext New name:}"/>
-            <TextBlock DockPanel.Dock="Right" Text="{Binding Extension}"></TextBlock>
-            <TextBox Margin="10,0,0, 0" Text="{Binding CurrentName}" local:SelectAllFocusBehavior.Enable="True"></TextBox>
+            <TextBlock
+                VerticalAlignment="Center"
+                DockPanel.Dock="Left"
+                Text="{local:Gettext New name:}" />
+            <TextBlock DockPanel.Dock="Right" Text="{Binding Extension}" />
+            <TextBox
+                Margin="10,0,0,0"
+                local:SelectAllFocusBehavior.Enable="True"
+                Text="{Binding CurrentName}" />
         </DockPanel>
-        <Button Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10" IsCancel="True" Command="{Binding Cancel}" Content="{local:Gettext Cancel}"/>
+        <Button
+            Width="100"
+            Margin="10"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Command="{Binding Cancel}"
+            Content="{local:Gettext Cancel}"
+            IsCancel="True" />
 
-        <Button Width="100" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" IsDefault="True" Command="{Binding OK}" Content="{local:Gettext OK}"/>
+        <Button
+            Width="100"
+            Margin="10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Command="{Binding OK}"
+            Content="{local:Gettext OK}"
+            IsDefault="True" />
     </Grid>
 </Window>

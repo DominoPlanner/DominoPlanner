@@ -35,7 +35,7 @@ namespace DominoPlanner.Usage
         }
 
         // Using a DependencyProperty as the backing store for ClickCommand.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty ClickCommandProperty =
+        public static readonly StyledProperty<ICommand> ClickCommandProperty =
             AvaloniaProperty.Register<ColorControl, ICommand>("ClickCommand");
 
 
@@ -104,8 +104,11 @@ namespace DominoPlanner.Usage
                 {
                     var cc = new ContentControl()
                     {
-                        [!ContentProperty] = new Binding(column.DataField, BindingMode.Default)
-                    };
+						[!ContentControl.ContentProperty] = new Binding(column.DataField)
+						{
+							Mode = BindingMode.Default
+						}
+					};
                     cc[!ForegroundProperty] = new Binding("Deleted") { Converter = new VisibilityToDeletedColorConverter() };
 
                     cc.Classes.Add(column.Class);
@@ -125,7 +128,7 @@ namespace DominoPlanner.Usage
         }
 
         // Using a DependencyProperty as the backing store for ColumnConfig.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty ColumnConfigProperty =
+        public static readonly StyledProperty<AvaloniaList<Column>> ColumnConfigProperty =
             AvaloniaProperty.Register<ColorControl, AvaloniaList<Column>>("ColumnConfig", new AvaloniaList<Column>());
 
 
@@ -137,7 +140,7 @@ namespace DominoPlanner.Usage
         }
 
         // Using a DependencyProperty as the backing store for SelectedColor.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty SelectedColorProperty =
+        public static readonly StyledProperty<ColorListEntry> SelectedColorProperty =
             AvaloniaProperty.Register<ColorControl, ColorListEntry>("SelectedColor", defaultBindingMode: BindingMode.TwoWay);
 
 
@@ -149,7 +152,7 @@ namespace DominoPlanner.Usage
         }
 
         // Using a DependencyProperty as the backing store for SelectedIndex.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty SelectedIndexProperty =
+        public static readonly StyledProperty<int> SelectedIndexProperty =
             AvaloniaProperty.Register<ColorControl, int>("SelectedIndex", 0);
 
 

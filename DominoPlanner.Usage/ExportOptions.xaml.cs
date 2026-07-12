@@ -5,7 +5,7 @@ using DominoPlanner.Core;
 
 namespace DominoPlanner.Usage
 {
-    public class ExportOptions : Window
+    public partial class ExportOptions : Window
     {
         public ExportOptions()
         {

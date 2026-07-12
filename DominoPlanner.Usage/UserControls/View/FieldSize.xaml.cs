@@ -7,7 +7,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class FieldSize : UserControl
+    public partial class FieldSize : UserControl
     {
         public FieldSize()
         {

@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using DominoPlanner.Core;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using System;
@@ -96,76 +97,60 @@ namespace DominoPlanner.Usage
 
         private async void SetStandardPathOpen()
         {
-            OpenFolderDialog ofd = new OpenFolderDialog { Directory = standardpath };
-            var result = await ofd.ShowAsyncWithParent<SetStandardV>();
-            if (result != null && !string.IsNullOrEmpty(result))
+            try
             {
-                standardpath = result;
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                    {
+                        Title = _("Select Standard Project Path"),
+                        AllowMultiple = false
+                    });
+
+                    if (folders.Count > 0)
+                    {
+                        standardpath = folders[0].Path.LocalPath;
+                    }
+                }
             }
+            catch (Exception) { }
         }
 
         private async void SetColorPath()
         {
-            var StandardColorPath = UserSettings.Instance.StandardColorArray;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
             try
             {
-                openFileDialog.Filters = new System.Collections.Generic.List<FileDialogFilter>
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension,  "clr", "farbe"}, Name = _("All color files")},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> { Declares.ColorExtension }, Name = _("DominoPlanner 3.x color files")},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"clr"}, Name = _("DominoPlanner 2.x color files")},
-                    new FileDialogFilter() { Extensions = new System.Collections.Generic.List<string> {"farbe"}, Name = _("Dominorechner color files")},
-                };
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
-                else
-                    // otherwise, the dialog is opened in the parent directory (see https://github.com/AvaloniaUI/Avalonia/issues/4141)
-                    // TODO: check macos
-                    openFileDialog.Directory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "lamping.DColor");
-            }
-            catch (Exception) { }
-            var result = await openFileDialog.ShowAsyncWithParent<SetStandardV>();
-            if (result != null && result.Length != 0)
-            {
-                var filename = result[0];
-                if (File.Exists(filename))
-                {
-                    ColorRepository colorList;
-                    int colorListVersion;
-                    try
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
                     {
-                        colorList = Workspace.Load<ColorRepository>(filename);
-                        colorListVersion = 3;
-                    }
-                    catch
-                    {
-                        // Colorlist version 1 or 2
-                        try
+                        Title = _("Select Color File"),
+                        AllowMultiple = false,
+                        FileTypeFilter = new[]
                         {
-                            colorList = new ColorRepository(filename);
-                            colorListVersion = 1;
+                            new FilePickerFileType(_("All color files")) { Patterns = new[] { $"*.{Declares.ColorExtension}", "*.clr", "*.farbe" } },
+                            new FilePickerFileType(_("DominoPlanner 3.x color files")) { Patterns = new[] { $"*.{Declares.ColorExtension}" } },
+                            new FilePickerFileType(_("DominoPlanner 2.x color files")) { Patterns = new[] { "*.clr" } },
+                            new FilePickerFileType(_("Dominorechner color files")) { Patterns = new[] { "*.farbe" } }
                         }
-                        catch
-                        {
-                            // file not readable
-                            await Errorhandler.RaiseMessage(GetParticularString("When importing color list fails", "Color repository file is invalid"), _("Error"), Errorhandler.MessageType.Error);
-                            return;
-                        }
-                    }
-                    File.Delete(StandardColorPath);
-                    if (colorListVersion == 3)
+                    });
+
+                    if (files.Count > 0)
                     {
-                        File.Copy(filename, StandardColorPath);
-                    }
-                    else if (colorListVersion != 0)
-                    {
-                        colorList.Save(StandardColorPath);
+                        UserSettings.Instance.StandardColorArray = files[0].Path.LocalPath;
+                        ColorVM = new ColorListControlVM(files[0].Path.LocalPath);
                     }
                 }
-                Workspace.CloseFile(StandardColorPath);
-                ColorVM.Reload(StandardColorPath);
             }
+            catch (Exception) { }
         }
 
         private void ClearListMet()

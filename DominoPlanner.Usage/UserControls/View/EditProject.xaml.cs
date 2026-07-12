@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class EditProject : UserControl
+    public partial class EditProject : UserControl
     {
         public EditProject()
         {

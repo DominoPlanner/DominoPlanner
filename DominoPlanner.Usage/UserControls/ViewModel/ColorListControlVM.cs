@@ -5,6 +5,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Platform.Storage;
 using DominoPlanner.Core;
 using Microsoft.Win32;
 using OfficeOpenXml;
@@ -221,7 +222,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public static readonly StyledProperty<AssemblyNode> ProjectProperty =
             AvaloniaProperty.Register<ColorControl, AssemblyNode>("Project");
 
-
     }
     public class ColorListControlVM : TabBaseVM
     {
@@ -338,31 +338,43 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             //ws.Cells.AutoFitColumns();
 
 
-            SaveFileDialog dlg = new SaveFileDialog
+            try
             {
-                InitialFileName = GetParticularString("Default filename for color list", "ColorList"),
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel files") },
-                    new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") }
-                },
-                Directory = DialogExtensions.GetCurrentProjectPath()
-            };
-            var result = await dlg.ShowAsyncWithParent<MainWindow>();
-            if (!string.IsNullOrEmpty(result))
-            {
-                try
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    p.SaveAs(new FileInfo(result));
-                    var process = new Process();
-                    process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
-                    process.Start();
-                }
-                catch (Exception ex)
-                {
-                    await Errorhandler.RaiseMessage(string.Format(_("Save failed: {0}"),  ex.Message), _("Error"), Errorhandler.MessageType.Error);
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                    {
+                        Title = _("Export Color List"),
+                        DefaultExtension = "xlsx",
+                        SuggestedFileName = GetParticularString("Default filename for color list", "ColorList"),
+                        FileTypeChoices = new[]
+                        {
+                            new FilePickerFileType(_("Excel files")) { Patterns = new[] { "*.xlsx" } },
+                            new FilePickerFileType(_("All files")) { Patterns = new[] { "*" } }
+                        }
+                    });
+
+                    if (files != null)
+                    {
+                        try
+                        {
+                            p.SaveAs(new FileInfo(files.Path.LocalPath));
+                            var process = new Process();
+                            process.StartInfo = new ProcessStartInfo(files.Path.LocalPath) { UseShellExecute = true };
+                            process.Start();
+                        }
+                        catch (Exception ex)
+                        {
+                            await Errorhandler.RaiseMessage(string.Format(_("Save failed: {0}"), ex.Message), _("Error"), Errorhandler.MessageType.Error);
+                        }
+                    }
                 }
             }
-
+            catch (Exception) { }
         }
         private ValueTuple<int, int> ExportAssemblyToExcel(ExcelWorksheet ws, AssemblyNode assy, int level, int start_column, int projectcount_startindex, int header_rows)
         {

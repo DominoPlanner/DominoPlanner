@@ -1,25 +1,61 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:DominoPlanner.Usage"
-             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="350"
-             x:Class="DominoPlanner.Usage.UserControls.View.RenderOptions">
-    <Grid Margin="5" x:Name="LayoutRoot">
+﻿<UserControl
+    x:Class="DominoPlanner.Usage.UserControls.View.RenderOptions"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ucView="using:DominoPlanner.Usage.UserControls.View"
+    d:DesignHeight="300"
+    d:DesignWidth="350"
+    x:DataType="ucView:RenderOptions"
+    mc:Ignorable="d">
+    <Grid x:Name="LayoutRoot" Margin="5">
         <StackPanel>
-            <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" IsVisible="{Binding ShowImageSize}" Grid.Row="0">
-                <TextBlock VerticalAlignment="Center"  Text="{local:Gettext Image size (larger side):}"/>
-                <NumericUpDown Width="100" HorizontalAlignment="Right" Minimum="200" Maximum="{Binding MaxSize}" Value="{Binding ImageSize}"/>
+            <DockPanel
+                Grid.Row="0"
+                Margin="0,5,0,0"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Top"
+                IsVisible="{Binding ShowImageSize}">
+                <TextBlock VerticalAlignment="Center" Text="{local:Gettext Image size (larger side):}" />
+                <NumericUpDown
+                    Width="100"
+                    HorizontalAlignment="Right"
+                    Maximum="{Binding MaxSize}"
+                    Minimum="200"
+                    Value="{Binding ImageSize}" />
             </DockPanel>
-            <DockPanel Margin="0, 5, 0, 0" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="1">
-                <TextBlock VerticalAlignment="Center" Text="{local:Gettext Background color:}"/>
-                <local:PopupColorPicker Color="{Binding BackgroundColor, Mode=TwoWay}"></local:PopupColorPicker>
+            <DockPanel
+                Grid.Row="1"
+                Margin="0,5,0,0"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Top">
+                <TextBlock VerticalAlignment="Center" Text="{local:Gettext Background color:}" />
+                <local:PopupColorPicker Color="{Binding BackgroundColor, Mode=TwoWay}" />
             </DockPanel>
-            <DockPanel Margin="0, 5, 0, 0" Height="26" DockPanel.Dock="Top" VerticalAlignment="Center" Grid.Row="2">
-                <CheckBox VerticalAlignment="Center" IsChecked="{Binding DrawBorders}" Grid.Row="2" Content="{local:Gettext Draw Domino Borders}"></CheckBox>
+            <DockPanel
+                Grid.Row="2"
+                Height="26"
+                Margin="0,5,0,0"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Top">
+                <CheckBox
+                    Grid.Row="2"
+                    VerticalAlignment="Center"
+                    Content="{local:Gettext Draw Domino Borders}"
+                    IsChecked="{Binding DrawBorders}" />
             </DockPanel>
 
-            <CheckBox  Height="26" VerticalContentAlignment="Center" Margin="0, 5, 0, 0" IsVisible="{Binding Collapsible}" VerticalAlignment="Center" IsChecked="{Binding Collapse}" Grid.Row="3" Content="{local:Gettext Remove spaces between dominoes}"/>
+            <CheckBox
+                Grid.Row="3"
+                Height="26"
+                Margin="0,5,0,0"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                Content="{local:Gettext Remove spaces between dominoes}"
+                IsChecked="{Binding Collapse}"
+                IsVisible="{Binding Collapsible}" />
         </StackPanel>
 
     </Grid>

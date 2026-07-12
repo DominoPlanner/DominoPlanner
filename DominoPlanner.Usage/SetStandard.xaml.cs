@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    public class SetStandardV : Window
+    public partial class SetStandardV : Window
     {
         public SetStandardV()
         {

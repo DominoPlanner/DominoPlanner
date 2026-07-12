@@ -7,12 +7,13 @@ using Avalonia;
 using System.Linq;
 using System.IO;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.Skia;
 using DominoPlanner.Usage.UserControls.View;
 using Avalonia.Collections;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using Avalonia.Input;
 using SkiaSharp;
-using Avalonia.Skia;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
@@ -23,6 +24,7 @@ using System.Globalization;
 using Avalonia.Controls.Shapes;
 using Avalonia.VisualTree;
 using System.Collections.Specialized;
+using Avalonia.Rendering;
 
 namespace DominoPlanner.Usage
 {
@@ -164,7 +166,7 @@ namespace DominoPlanner.Usage
             get { return GetValue(AdditionalDrawablesProperty); }
             set { SetValue(AdditionalDrawablesProperty, value); }
         }
-        public static readonly StyledProperty<AvaloniaList<CanvasDrawable>> AdditionalDrawablesProperty = AvaloniaProperty.Register<ProjectCanvas, AvaloniaList<CanvasDrawable>>(nameof(Project));
+        public static readonly StyledProperty<AvaloniaList<CanvasDrawable>> AdditionalDrawablesProperty = AvaloniaProperty.Register<ProjectCanvas, AvaloniaList<CanvasDrawable>>(nameof(AdditionalDrawables));
 
 
         public double VerticalSliderSize
@@ -225,7 +227,6 @@ namespace DominoPlanner.Usage
             //DataContextProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => SubscribeEvents(e));
             AffectsRender<ProjectCanvas>(ProjectProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainProperty);
-            AffectsRender<ProjectCanvas>(SelectionDomainProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainVisibleProperty);
             AffectsRender<ProjectCanvas>(SelectionDomainColorProperty);
             AffectsRender<ProjectCanvas>(SourceImageOpacityProperty);
@@ -251,6 +252,8 @@ namespace DominoPlanner.Usage
             AdditionalDrawablesProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => AdditionalDrawablesChanged(o, e));
             BoundsProperty.Changed.AddClassHandler<ProjectCanvas>((o, e) => UpdateMinZoomValue());
             
+            Project = new AvaloniaList<EditingDominoVM>();
+            AdditionalDrawables = new AvaloniaList<CanvasDrawable>();
         }
 
         private void AdditionalDrawablesChanged(ProjectCanvas o, AvaloniaPropertyChangedEventArgs e)
@@ -266,7 +269,9 @@ namespace DominoPlanner.Usage
         }
         private void ForceRedrawMethod(object sender, NotifyCollectionChangedEventArgs e)
         {
-            ForceRedraw = true;
+            // CollectionChanged can occur during a render pass. Defer setting the styled property
+            // so we don't invalidate the visual while rendering.
+            Dispatcher.UIThread.Post(() => ForceRedraw = true, DispatcherPriority.Background);
         }
 
         private void UpdateMinZoomValue()
@@ -418,7 +423,10 @@ namespace DominoPlanner.Usage
             UpdateHorizontalSlider(this, null);
             UpdateMinZoomValue();
             context.Custom(new DominoRenderer(this));
-            ForceRedraw = false;
+            // Do not set styled properties that affect render directly during the render pass.
+            // Posting to the UI dispatcher defers the assignment until after the render completes,
+            // avoiding "Visual was invalidated during the render pass" exceptions.
+            Dispatcher.UIThread.Post(() => ForceRedraw = false, DispatcherPriority.Background);
         }
     }
     public class CanvasDrawable
@@ -467,12 +475,16 @@ namespace DominoPlanner.Usage
 
         public DominoRenderer(ProjectCanvas pc)
         {
-            _noSkia = new FormattedText()
-            {
-                Text = "Current rendering API is not Skia"
-            };
+            _noSkia = new FormattedText(
+    "Current rendering API is not Skia",          // Der Text
+    CultureInfo.CurrentCulture,                   // Die Kultur/Sprache
+    FlowDirection.LeftToRight,                    // Textrichtung
+    new Typeface(Typeface.Default.FontFamily),    // Die Schriftart (Standard)
+    12,                                           // Schriftgröße (hier ggf. deine Wunschgröße eintragen)
+    Brushes.Black                                 // Textfarbe/Pinsel
+);
             Bounds = new Rect(0, 0, pc.Bounds.Width, pc.Bounds.Height);
-            TightBounds = pc.TransformedBounds;
+            //TightBounds = pc.TransformedBounds;
             shift_x = (float)pc.ShiftX;
             shift_y = (float)pc.ShiftY;
             zoom = (float)pc.Zoom;
@@ -481,7 +493,7 @@ namespace DominoPlanner.Usage
             pasteHightlightColor = Colors.Violet.ToSKColor();
             deletionHighlightColor = SKColors.Red;
             selectionColor = pc.SelectionDomainColor.ToSKColor();
-            selectionPath = pc.SelectionDomain.Clone();
+            selectionPath = pc.SelectionDomain != null ? pc.SelectionDomain.Clone() : null;
             this.project = pc.Project;
             // Transform the selection path into screen coordinates
             var transform = SKMatrix.CreateScaleTranslation(zoom, zoom, -shift_x * zoom, -shift_y * zoom);
@@ -507,54 +519,53 @@ namespace DominoPlanner.Usage
         public bool Equals([AllowNull] ICustomDrawOperation other) => false;
         public bool HitTest(Avalonia.Point p) => true;
 
-        public void Render(IDrawingContextImpl context)
+        public void Render(ImmediateDrawingContext context)
         {
-
             if (rendered > 20)
                 return;
 
-            var canvas = (context as ISkiaDrawingContextImpl)?.SkCanvas;
-            if (canvas == null)
-            {
-                context.DrawText(Brushes.Black, new Avalonia.Point(), _noSkia.PlatformImpl);
+            var leaseFeature = context.PlatformImpl.GetFeature<ISkiaSharpApiLeaseFeature>();
+            if (leaseFeature == null)
                 return;
-            }
 
             if (project == null)
                 return;
 
-            canvas.Save();
-
-            if (background.Alpha != 0)
+            using (var skiaLease = leaseFeature.Lease())
             {
-                canvas.DrawRect(new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), new SKPaint() { Color = background });
+                var canvas = skiaLease.SkCanvas;
+                if (canvas == null)
+                    return;
+
+                canvas.Save();
+
+                if (background.Alpha != 0)
+                {
+                    canvas.DrawRect(new SKRect(0, 0, (float)Bounds.Width, (float)Bounds.Height), new SKPaint() { Color = background });
+                }
+
+                if (!above) DrawImage(canvas);
+                for (int i = 0; i < project.Count; i++)
+                {
+                    DrawDomino(canvas, project[i]);
+                }
+                DrawAdditionals(canvas, true);
+                for (int i = 0; i < project.Count; i++)
+                {
+                    DrawDominoBorder(canvas, project[i]);
+                }
+                if (above) DrawImage(canvas);
+
+                if (selectionVisible && selectionPath != null)
+                {
+                    canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
+                    canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
+                }
+                DrawAdditionals(canvas, false);
+
+                canvas.Restore();
+                rendered += 1;
             }
-
-            if (!above) DrawImage(canvas);
-            for (int i = 0; i < project.Count; i++)
-            {
-                DrawDomino(canvas, project[i]);
-            }
-            DrawAdditionals(canvas, true);
-            for (int i = 0; i < project.Count; i++)
-            {
-                DrawDominoBorder(canvas, project[i]);
-            }
-            if (above) DrawImage(canvas);
-
-            if (selectionVisible && selectionPath != null)
-            {
-                canvas.DrawPath(selectionPath, new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsStroke = true, StrokeWidth = 4, IsAntialias = true });
-                canvas.DrawPath(selectionPath, new SKPaint() { Color = selectionColor, IsStroke = true, StrokeWidth = 2, IsAntialias = true });
-            }
-            DrawAdditionals(canvas, false);
-
-
-
-            canvas.Restore();
-            rendered += 1;
-
-
         }
         private void DrawAdditionals(SKCanvas canvas, bool beforeBorders)
         {

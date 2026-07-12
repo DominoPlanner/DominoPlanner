@@ -58,7 +58,7 @@ namespace DominoPlanner.Core
             if (scale_x != 1 || scale_y != 1)
             {
                 SKImageInfo info = new SKImageInfo((int)(image.Width * scale_x), (int)(image.Height * scale_y));
-                image = image.Resize(info, SKFilterQuality.High);
+                image = image.Resize(info, new SKSamplingOptions(SKCubicResampler.Mitchell));
             }
             //if (rotate_angle != 0)
             //    image = image.Rotate(rotate_angle, new Bgra(0, 0, 0, 0), false);
@@ -88,9 +88,9 @@ namespace DominoPlanner.Core
         [ProtoMember(3)]
         public int FontSize { get => _fontsize; set { if (SetField(ref _fontsize, value)) mat_valid = false; } }
 
-        private FontStyle _fontStyle;
-        [ProtoMember(4)]
-        public FontStyle FontStyle { get => _fontStyle; set { if (SetField(ref _fontStyle, value)) mat_valid = false; } }
+        //private FontStyle _fontStyle;
+        //[ProtoMember(4)]
+        //public FontStyle FontStyle { get => _fontStyle; set { if (SetField(ref _fontStyle, value)) mat_valid = false; } }
 
         [ProtoMember(5)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "Used by Protobuf to serialize _color")]

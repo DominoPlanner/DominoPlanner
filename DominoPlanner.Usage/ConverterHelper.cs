@@ -1,18 +1,19 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using DominoPlanner.Core;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Windows;
-using Avalonia.Controls;
 using System.Windows.Input;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Data;
-using Avalonia;
-using Avalonia.Platform;
-using Avalonia.Controls.Shapes;
 using ThemeEditor.Controls.ColorPicker;
 
 namespace DominoPlanner.Usage
@@ -25,19 +26,58 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] == null || values[2] == null || values[1] == null)
+            if (values == null || values.Count < 3)
                 return Brushes.Black;
-            if (int.TryParse(values[0].ToString(), out int anzahl) && int.TryParse(values[2].ToString(), out int gesamt))
+
+            // values[0] - content (number as object)
+            // values[1] - either ColorListEntry or bool (deleted)
+            // values[2] - either int (count) or IEnumerable<int> (project counts)
+
+            // parse first value as int
+            int anzahl = 0;
+            if (values[0] != null)
+                int.TryParse(values[0].ToString(), out anzahl);
+
+            // determine gesamt (total available)
+            int gesamt = 0;
+            if (values[2] is int gi)
             {
-                if (anzahl > gesamt)
+                gesamt = gi;
+            }
+            else if (values[2] is System.Collections.IEnumerable ie)
+            {
+                try
                 {
-                    return Brushes.Red;
+                    foreach (var o in ie)
+                    {
+                        if (o != null && int.TryParse(o.ToString(), out int v))
+                            gesamt += v;
+                    }
+                }
+                catch { }
+            }
+
+            if (gesamt > 0 && anzahl > gesamt)
+                return Brushes.Red;
+
+            // determine deleted flag
+            bool deleted = false;
+            if (values[1] is bool b2)
+                deleted = b2;
+            else if (values[1] != null && values[1].GetType().Name == "ColorListEntry")
+            {
+                // try to reflect Deleted property
+                var prop = values[1].GetType().GetProperty("Deleted");
+                if (prop != null)
+                {
+                    var v = prop.GetValue(values[1]);
+                    if (v is bool bb) deleted = bb;
                 }
             }
-            if (values[1] is bool b && b)
-            {
+
+            if (deleted)
                 return Brushes.Gray;
-            }
+
             return Brushes.Black;
         }
 
@@ -95,11 +135,12 @@ namespace DominoPlanner.Usage
     {
         public static Bitmap GetIcon(string iconpath)
         {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            var bitmap = new Bitmap(assets.Open(new Uri("avares://DominoPlanner.Usage" + iconpath)));
-            return bitmap;
+			using (var stream = AssetLoader.Open(new Uri("avares://DominoPlanner.Usage" + iconpath)))
+			{
+				return new Bitmap(stream);
+			}
 
-        }
+		}
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             try
@@ -133,56 +174,66 @@ namespace DominoPlanner.Usage
 
     public class FilterQualityToStringConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return ((SkiaSharp.SKFilterQuality)value).ToString();
-        }
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+				return string.Empty;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			return value.ToString();
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
-    public sealed class FilterQualityToIntConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-                return null;
+	public sealed class FilterQualityToIntConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value == null)
+				return null;
 
-            if (targetType.IsEnum)
-            {
-                var val = (int)(double)value;
-                return val switch
-                {
-                    0 => SkiaSharp.SKFilterQuality.Low,
-                    1 => SkiaSharp.SKFilterQuality.Medium,
-                    2 => SkiaSharp.SKFilterQuality.High,
-                    _ => SkiaSharp.SKFilterQuality.Low,
-                };
-            }
+			// 1. RICHTUNG: Von Zahl (Slider/Zahl aus UI) zu SKSamplingOptions
+			if (targetType == typeof(SKSamplingOptions))
+			{
+				// Sicher konvertieren (XAML übergibt Zahlen oft als double oder int)
+				int val = System.Convert.ToInt32(value);
 
-            if (value.GetType().IsEnum)
-            {
-                var val = (SkiaSharp.SKFilterQuality)value;
-                return val switch
-                {
-                    SkiaSharp.SKFilterQuality.Low => 0,
-                    SkiaSharp.SKFilterQuality.Medium => 1,
-                    SkiaSharp.SKFilterQuality.High => 2,
-                    _ => 0,
-                };
-            }
-            return null;
-        }
+				return val switch
+				{
+					0 => new SKSamplingOptions(SKFilterMode.Linear),
+					1 => new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear),
+					2 => new SKSamplingOptions(SKCubicResampler.Mitchell),
+					_ => new SKSamplingOptions(SKFilterMode.Linear),
+				};
+			}
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // perform the same conversion in both directions
-            return Convert(value, targetType, parameter, culture);
-        }
-    }
-    public struct DictHelper
+			// 2. RICHTUNG: Von SKSamplingOptions zurück zur Zahl (z.B. für TwoWay-Binding)
+			if (value is SKSamplingOptions options)
+			{
+				// Wir prüfen die Eigenschaften der Struktur mittels Property Pattern Matching
+				return options switch
+				{
+					{ MaxAniso: > 0 } => 1, // Falls Anistropisch genutzt wird (optional)
+					{ UseCubic: true } => 2, // Mitchell Resampler nutzt Cubic
+					{ Mipmap: SKMipmapMode.Linear } => 1,
+					{ Filter: SKFilterMode.Linear } => 0,
+					_ => 0
+				};
+			}
+
+			return null;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			// Da du in beide Richtungen die gleiche Logik verwendest,
+			// leitet ConvertBack die Daten einfach wieder durch.
+			return Convert(value, targetType, parameter, culture);
+		}
+	}
+	public struct DictHelper
     {
         public int index;
         public Type type;
@@ -348,15 +399,19 @@ namespace DominoPlanner.Usage
                 {
                     if (uri.StartsWith("/Icons/"))
                     {
-                        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-                        Uri test = new Uri($"avares://DominoPlanner.Usage/Icons/image.ico");
-                        return new Bitmap(assets.Open(test));
-                    }
+						Uri test = new Uri($"avares://DominoPlanner.Usage/Icons/image.ico");
+						using (var stream = AssetLoader.Open(test))
+						{
+							return new Bitmap(stream);
+						}
+					}
                     else
                     {
-                        FileStream fs = new FileStream(uri, FileMode.Open);
-                        return Bitmap.DecodeToWidth(fs, 40, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.HighQuality);
-                    }
+						using (FileStream fs = new FileStream(uri, FileMode.Open))
+						{
+							return Bitmap.DecodeToWidth(fs, 40, BitmapInterpolationMode.HighQuality);
+						}
+					}
                 }
                 catch { }
             }
@@ -410,9 +465,8 @@ namespace DominoPlanner.Usage
                         }
 
                     default:
-                        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-                        return new Bitmap(assets.Open(uri));
-                }
+						return new Bitmap(Avalonia.Platform.AssetLoader.Open(uri));
+				}
             }
             if (value == null)
                 return null;
@@ -472,7 +526,7 @@ namespace DominoPlanner.Usage
             throw new NotImplementedException();
         }
     }
-    public class PopupColorPicker : ColorPicker
+    public class PopupColorPicker : ThemeEditor.Controls.ColorPicker.ColorPicker
     {
         public PopupColorPicker() { }
     }

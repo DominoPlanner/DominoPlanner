@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace DominoPlanner.Usage
 {
-    internal class ExportOptionVM : ModelBase
+    public class ExportOptionVM : ModelBase
     {
         #region CTOR
         public ExportOptionVM()
@@ -17,6 +17,48 @@ namespace DominoPlanner.Usage
             Expandable = true;
         }
         #endregion
+
+        private string _filename;
+        public string Filename
+        {
+            get { return _filename; }
+            set
+            {
+                if (_filename != value)
+                {
+                    _filename = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _imageSize;
+        public int ImageSize
+        {
+            get { return _imageSize; }
+            set
+            {
+                if (_imageSize != value)
+                {
+                    _imageSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        private int _maxSize;
+        public int MaxSize
+        {
+            get { return _maxSize; }
+            set
+            {
+                if (_maxSize != value)
+                {
+                    _maxSize = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
 
         #region PROPERTIES
 
@@ -122,7 +164,7 @@ namespace DominoPlanner.Usage
         #endregion
     }
 
-    internal class ProjectExportOptionsVM : ExportOptionVM
+    public class ProjectExportOptionsVM : ExportOptionVM
     {
         private int width;
         private int height;

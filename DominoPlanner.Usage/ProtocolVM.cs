@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Converters;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
@@ -534,57 +535,82 @@ namespace DominoPlanner.Usage
         public async void SaveExcelFile()
         {
             _UpdateTemplatesInProtocolParams();
-            SaveFileDialog dlg = new SaveFileDialog
+            try
             {
-                DefaultExtension = ".xlsx",
-                InitialFileName = Titel,
-                Directory = DialogExtensions.GetCurrentProjectPath()
-            };
-            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "xlsx" }, Name = _("Excel Document") });
-
-            string result = await dlg.ShowAsyncWithParent<ProtocolV>();
-
-            if (result != null && result != "")
-            {
-                try
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    DominoProvider.SaveXLSFieldPlan(result, currentOPP);
-                    var process = new Process();
-                    process.StartInfo = new ProcessStartInfo(result) { UseShellExecute = true };
-                    process.Start();
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                    {
+                        Title = _("Export as Excel"),
+                        DefaultExtension = "xlsx",
+                        SuggestedFileName = Titel,
+                        FileTypeChoices = new[]
+                        {
+                             new FilePickerFileType(_("Excel Document")) { Patterns = new[] { "*.xlsx" } }
+                         }
+                    });
+
+                    if (files != null)
+                    {
+                         try
+                         {
+                             DominoProvider.SaveXLSFieldPlan(files.Path.LocalPath, currentOPP);
+                             var process = new Process();
+                             process.StartInfo = new ProcessStartInfo(files.Path.LocalPath) { UseShellExecute = true };
+                             process.Start();
+                         }
+                         catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
+                    }
                 }
-                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
             }
+            catch (Exception) { }
         }
         
         public async void SaveHTMLFile()
         {
             _UpdateTemplatesInProtocolParams();
-            SaveFileDialog dlg = new SaveFileDialog
+            try
             {
-                DefaultExtension = ".html",
-                InitialFileName = Titel,
-                Directory = DialogExtensions.GetCurrentProjectPath()
-            };
-            dlg.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "html" }, Name = _("Hypertext Markup Language") });
-            string filename = await dlg.ShowAsyncWithParent<ProtocolV>();
-            if (filename != null && filename != "")
-            {
+                 var app = Avalonia.Application.Current;
+                 if (app?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+                 {
+                     var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                     if (topLevel == null) return;
 
-                try
-                {
-                    string currentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
+                     var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                     {
+                         Title = _("Export as HTML"),
+                         DefaultExtension = "html",
+                         SuggestedFileName = Titel,
+                         FileTypeChoices = new[]
+                         {
+                             new FilePickerFileType(_("Hypertext Markup Language")) { Patterns = new[] { "*.html" } }
+                         }
+                     });
 
-                    FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write);
-                    StreamWriter sw = new StreamWriter(fs);
-                    sw.Write(currentProtocol);
-                    sw.Close();
-                    var process = new Process();
-                    process.StartInfo = new ProcessStartInfo(filename) { UseShellExecute = true };
-                    process.Start();
-                }
-                catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
+                     if (files != null)
+                     {
+                         try
+                         {
+                             string currentProtocol = DominoProvider.GetHTMLProcotol(currentOPP);
+
+                             FileStream fs = new FileStream(files.Path.LocalPath, FileMode.Create, FileAccess.Write);
+                             StreamWriter sw = new StreamWriter(fs);
+                             sw.Write(currentProtocol);
+                             sw.Close();
+                             var process = new Process();
+                             process.StartInfo = new ProcessStartInfo(files.Path.LocalPath) { UseShellExecute = true };
+                             process.Start();
+                         }
+                         catch (Exception ex) { await Errorhandler.RaiseMessage(_("Error: ") + ex.Message, _("Error"), Errorhandler.MessageType.Error); }
+                     }
+                 }
             }
+            catch (Exception) { }
         }
 
         private void _UpdateTemplatesInProtocolParams()

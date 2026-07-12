@@ -36,19 +36,19 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
             ClearSelection = new RelayCommand(o => { ClearFullSelection(true); });
-            CopyCom = new RelayCommand(o => { Copy(); });
+            Commands.CopyCom = new RelayCommand(o => { Copy(); });
 
-            AddRowAbove = new RelayCommand(o => { AddRow(false); });
-            AddRowBelow = new RelayCommand(o => { AddRow(true); });
-            AddColumnRight = new RelayCommand(o => { AddColumn(true); });
-            AddColumnLeft = new RelayCommand(o => { AddColumn(false); });
-            RemoveRows = new RelayCommand(o => { RemoveSelRows(); });
-            RemoveColumns = new RelayCommand(o => { RemoveSelColumns(); });
+            Commands.AddRowAbove = new RelayCommand(o => { AddRow(false); });
+            Commands.AddRowBelow = new RelayCommand(o => { AddRow(true); });
+            Commands.AddColumnRight = new RelayCommand(o => { AddColumn(true); });
+            Commands.AddColumnLeft = new RelayCommand(o => { AddColumn(false); });
+            Commands.RemoveRows = new RelayCommand(o => { RemoveSelRows(); });
+            Commands.RemoveColumns = new RelayCommand(o => { RemoveSelColumns(); });
             FlipHorizontallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
             FlipVerticallyCom = new RelayCommand(o => { System.Diagnostics.Debug.WriteLine("asdf"); ; });
             MouseInPicture = new RelayCommand(o => { UICursor = new Cursor(StandardCursorType.Hand); });
             MouseOutPicture = new RelayCommand(o => { UICursor = null; });
-            SelectAllCom = new RelayCommand(o => { SelectAll(); });
+            Commands.SelectAllCom = new RelayCommand(o => { SelectAll(); });
             ChangeColorCom = new RelayCommand(o => { if (o is IDominoColor dc) ChangeColor(dc); });
             UnsavedChanges = false;
             SelectionTool = new SelectionToolVM(this);

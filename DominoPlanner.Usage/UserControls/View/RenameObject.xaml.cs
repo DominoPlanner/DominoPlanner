@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls
 {
-    public class RenameObject : Window
+    public partial class RenameObject : Window
     {
         public RenameObject()
         {

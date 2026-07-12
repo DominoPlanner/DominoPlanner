@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class FieldReadoutV : UserControl
+    public partial class FieldReadoutV : UserControl
     {
         public FieldReadoutV()
         {

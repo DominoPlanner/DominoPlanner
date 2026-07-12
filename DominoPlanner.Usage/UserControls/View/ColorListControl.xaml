@@ -1,52 +1,64 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             
-             xmlns:local="clr-namespace:DominoPlanner.Usage"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl">
+﻿<UserControl
+    x:Class="DominoPlanner.Usage.UserControls.View.ColorListControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:core="using:DominoPlanner.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:ColorListControlVM"
+    mc:Ignorable="d">
     <UserControl.Resources>
-        <local:ColorToHTMLConverter x:Key="ColorToHTMLConverter"/>
+        <local:ColorToHTMLConverter x:Key="ColorToHTMLConverter" />
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <local:AmountToColorConverter x:Key="AmountToColorConverter" />
-        <local:IntToStringConverter x:Key="IntToStringConverter"/>
-        <local:IsNormalColorConverter x:Key="IsNormalColorConverter"/>
-        <local:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <local:IntToStringConverter x:Key="IntToStringConverter" />
+        <local:IsNormalColorConverter x:Key="IsNormalColorConverter" />
+        <local:BoolInverterConverter x:Key="BoolInverterConverter" />
     </UserControl.Resources>
     <Grid Margin="0,0,0,0" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="80" />
         </Grid.RowDefinitions>
-        <vm:ProjectColorList Colors="{Binding ColorList}" ColumnConfig="{Binding ColumnConfig}" Project="{Binding DominoAssembly}" SelectedColor="{Binding SelectedStone, Mode=TwoWay}" Margin="5,5,5,5">
+        <vm:ProjectColorList
+            Margin="5,5,5,5"
+            Colors="{Binding ColorList}"
+            ColumnConfig="{Binding ColumnConfig}"
+            Project="{Binding DominoAssembly}"
+            SelectedColor="{Binding SelectedStone, Mode=TwoWay}">
             <vm:ProjectColorList.Styles>
                 <Style Selector="ContentControl.Header.Sum, ContentControl.Header.Project">
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
-                                    <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Normal"  HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                                <Border BorderBrush="{StaticResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
+                                    <TextBlock
+                                        Margin="5,2"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        FontWeight="Normal"
+                                        Text="{TemplateBinding Content}" />
                                 </Border>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
                 </Style>
                 <Style Selector="GridSplitter">
-                    <Setter Property="Background" Value="{StaticResource ThemeBorderMidBrush}"/>
-                    <Setter Property="Width" Value="2"/>
+                    <Setter Property="Background" Value="{StaticResource ThemeBorderMidBrush}" />
+                    <Setter Property="Width" Value="2" />
                 </Style>
                 <Style Selector="ContentControl.Header.Sum /template/ TextBlock">
-                    <Setter Property="FontStyle" Value="Italic"/>
+                    <Setter Property="FontStyle" Value="Italic" />
                 </Style>
                 <Style Selector="ContentControl.RGB">
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <TextBlock Text="{TemplateBinding Content, Converter={StaticResource ColorToHTMLConverter}}"/>
+                                <TextBlock Text="{TemplateBinding Content, Converter={StaticResource ColorToHTMLConverter}}" />
 
                             </ControlTemplate>
                         </Setter.Value>
@@ -68,10 +80,20 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border BorderThickness="1 0 1 2" BorderBrush="{StaticResource ThemeBorderMidBrush}">
+                                <Border BorderBrush="{StaticResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image VerticalAlignment="Bottom" Margin="5" Width="15" Source="{StaticResource ExceptionDI}" ToolTip.Tip="{local:Gettext This subproject uses a different color list}"/>
-                                        <TextBlock Margin="5 2" VerticalAlignment="Bottom" FontWeight="Bold" HorizontalAlignment="Center" Text="{TemplateBinding Content}"/>
+                                        <Image
+                                            Width="15"
+                                            Margin="5"
+                                            VerticalAlignment="Bottom"
+                                            Source="{StaticResource ExceptionDI}"
+                                            ToolTip.Tip="{local:Gettext This subproject uses a different color list}" />
+                                        <TextBlock
+                                            Margin="5,2"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Bottom"
+                                            FontWeight="Bold"
+                                            Text="{TemplateBinding Content}" />
                                     </StackPanel>
                                 </Border>
                             </ControlTemplate>
@@ -84,7 +106,7 @@
               <Setter Property="Template">
                 <ControlTemplate>
                       <local:PopupColorPicker Color="{TemplateBinding Content, Mode=TwoWay}">
-                        
+
                       </local:PopupColorPicker>
                 </ControlTemplate>
               </Setter>
@@ -93,12 +115,17 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <TextBlock Margin="5 2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{TemplateBinding Content, Converter={StaticResource IntToStringConverter}}">
+                                <TextBlock
+                                    Margin="5,2"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Bottom"
+                                    Text="{TemplateBinding Content,
+                                                           Converter={StaticResource IntToStringConverter}}">
                                     <TextBlock.Foreground>
                                         <MultiBinding Converter="{StaticResource AmountToColorConverter}">
-                                            <TemplateBinding Property="Content"/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ListBoxItem}" Path="DataContext.Deleted"/>
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ListBoxItem}" Path="DataContext.Count"/>
+                                            <TemplateBinding Property="Content" />
+                                            <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ListBoxItem}" />
+                                            <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=ListBoxItem}" />
                                         </MultiBinding>
                                     </TextBlock.Foreground>
                                 </TextBlock>
@@ -108,39 +135,84 @@
                 </Style>
 
                 <Style Selector="ContentControl.Content.Sum /template/ TextBlock">
-                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontWeight" Value="Bold" />
                 </Style>
             </vm:ProjectColorList.Styles>
         </vm:ProjectColorList>
         <Grid Grid.Row="1">
             <Grid.Styles>
                 <Style Selector="DockPanel.OnlyNormalColors, StackPanel.OnlyNormalColors">
-                    <Setter Property="IsVisible" Value="{Binding SelectedStone, Converter={StaticResource IsNormalColorConverter}}"/>
+                    <Setter Property="IsVisible" Value="{Binding SelectedStone, Converter={StaticResource IsNormalColorConverter}}" />
                 </Style>
             </Grid.Styles>
-            <DockPanel  Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Classes="OnlyNormalColors" LastChildFill="False">
-                <local:PopupColorPicker VerticalAlignment="Center" Color="{Binding SelectedStone.Color, Mode=TwoWay}" DockPanel.Dock="Left"/>
+            <DockPanel
+                Margin="5"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                Classes="OnlyNormalColors"
+                LastChildFill="False">
+                <local:PopupColorPicker
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Color="{Binding SelectedStone.Color, Mode=TwoWay}" />
 
-                <TextBlock VerticalAlignment="Center" Margin="5" Text="{local:Gettext Color Name:}"/>
-                <TextBox Text="{Binding SelectedStone.Name, Mode=TwoWay}" Width="150" VerticalContentAlignment="Center"></TextBox>
-                <TextBlock VerticalAlignment="Center" Margin="5"  Text="{local:Gettext Color Amount:}"/>
-                <NumericUpDown Text="{Binding SelectedStone.Count}" Width="100"/>
+                <TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="{local:Gettext Color Name:}" />
+                <TextBox
+                    Width="150"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding SelectedStone.Name, Mode=TwoWay}" />
+                <TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="{local:Gettext Color Amount:}" />
+                <NumericUpDown Width="100" Text="{Binding SelectedStone.Count}" />
 
             </DockPanel>
-            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Bottom" LastChildFill="False">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Classes="OnlyNormalColors">
-                    <local:ImageButton Image="/Icons/up.ico" Command="{Binding BtnMoveUp}" ToolTip.Tip="{local:Gettext Move up}"/>
-                    <local:ImageButton Image="/Icons/down.ico" Command="{Binding BtnMoveDown}" ToolTip.Tip="{local:Gettext Move down}"/>
-                    <local:ImageButton Image="/Icons/add.ico" Command="{Binding BtnAddColor}" ToolTip.Tip="{local:Gettext Add Color}"/>
-                    <local:ImageButton Image="/Icons/remove.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
-                                        Content="{local:Gettext Remove Selected}" ToolTip.Tip="{local:Gettext 'The color will not be used in new projects (and won\'t be available during editing)\, but it will not be deleted from existing projects.'}"/>
-                    <local:ImageButton Image="/Icons/edit_redo.ico" Command="{Binding BtnRemove}" IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}"
-                                        Content="{local:Gettext Restore Selected}"/>
+            <DockPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                LastChildFill="False">
+                <StackPanel
+                    Classes="OnlyNormalColors"
+                    DockPanel.Dock="Left"
+                    Orientation="Horizontal">
+                    <local:ImageButton
+                        Command="{Binding BtnMoveUp}"
+                        Image="/Icons/up.ico"
+                        ToolTip.Tip="{local:Gettext Move up}" />
+                    <local:ImageButton
+                        Command="{Binding BtnMoveDown}"
+                        Image="/Icons/down.ico"
+                        ToolTip.Tip="{local:Gettext Move down}" />
+                    <local:ImageButton
+                        Command="{Binding BtnAddColor}"
+                        Image="/Icons/add.ico"
+                        ToolTip.Tip="{local:Gettext Add Color}" />
+                    <local:ImageButton
+                        Command="{Binding BtnRemove}"
+                        Content="{local:Gettext Remove Selected}"
+                        Image="/Icons/remove.ico"
+                        IsVisible="{Binding SelectedStone.Deleted, Converter={StaticResource BoolInverterConverter}}"
+                        ToolTip.Tip="{local:Gettext 'The color will not be used in new projects (and won\'t be available during editing)\, but it will not be deleted from existing projects.'}" />
+                    <local:ImageButton
+                        Command="{Binding BtnRemove}"
+                        Content="{local:Gettext Restore Selected}"
+                        Image="/Icons/edit_redo.ico"
+                        IsVisible="{Binding SelectedStone.Deleted, FallbackValue=False}" />
                 </StackPanel>
-                <local:ImageButton DockPanel.Dock="Right" Content="{local:Gettext Save Colors}"
-                                    Image="/Icons/document_save.ico" Command="{Binding BtnSaveColors}"/>
-                <local:ImageButton DockPanel.Dock="Right" Content="{local:Gettext Export to Excel}"
-                                    Image="/Icons/document_save.ico"  Command="{Binding BtnExportXLSX}"/>
+                <local:ImageButton
+                    Command="{Binding BtnSaveColors}"
+                    Content="{local:Gettext Save Colors}"
+                    DockPanel.Dock="Right"
+                    Image="/Icons/document_save.ico" />
+                <local:ImageButton
+                    Command="{Binding BtnExportXLSX}"
+                    Content="{local:Gettext Export to Excel}"
+                    DockPanel.Dock="Right"
+                    Image="/Icons/document_save.ico" />
             </DockPanel>
         </Grid>
     </Grid>

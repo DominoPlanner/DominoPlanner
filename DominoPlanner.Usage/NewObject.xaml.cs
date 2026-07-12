@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+// ZWINGEND ERFORDERLICH: Hier versteckt sich die .GetFiles()-Erweiterungsmethode!
+using Avalonia.Platform.Storage;
 
 namespace DominoPlanner.Usage
 {
@@ -60,27 +62,44 @@ public class FileDragDropHelper : AvaloniaObject
         }
     }
 
-    private static void OnDrop(object _sender, DragEventArgs _dragEventArgs)
-    {
-        if (!(_sender is AvaloniaObject d))
-        {
-            return;
-        }
-        var target = d.GetValue(FileDragDropTargetProperty);
-        if (target is IFileDragDropTarget fileTarget && fileTarget != null)
-        {
-            if (_dragEventArgs.Data.Contains(DataFormats.FileNames))
-            {
-                fileTarget.OnFileDrop(_dragEventArgs.Data.GetFileNames().ToArray());
-            }
-        }
-        else
-        {
-            throw new Exception("FileDragDropTarget object must be of type IFileDragDropTarget");
-        }
-    }
-}
-    public class NewObject : Window
+		private static void OnDrop(object _sender, DragEventArgs _dragEventArgs)
+		{
+			if (!(_sender is AvaloniaObject d))
+			{
+				return;
+			}
+
+			var target = d.GetValue(FileDragDropTargetProperty);
+			if (target is IFileDragDropTarget fileTarget && fileTarget != null)
+			{
+				// FIX für Avalonia 12: Verwende e.DataTransfer und das neue DataFormat.File
+				if (_dragEventArgs.DataTransfer != null && _dragEventArgs.DataTransfer.Formats.Contains(DataFormat.File))
+				{
+					// In Avalonia 12 holt man die Dateien synchron über TryGetFiles()
+					var storageFiles = _dragEventArgs.DataTransfer.TryGetFiles();
+
+					if (storageFiles != null)
+					{
+						// Extrahiere die lokalen Pfade (z.B. C:\Ordner\Datei.txt) aus den Storage-Objekten
+						string[] filePaths = storageFiles
+							.Select(file => file.Path.LocalPath)
+							.Where(path => !string.IsNullOrEmpty(path))
+							.ToArray();
+
+						if (filePaths.Length > 0)
+						{
+							fileTarget.OnFileDrop(filePaths);
+						}
+					}
+				}
+			}
+			else
+			{
+				throw new Exception("FileDragDropTarget object must be of type IFileDragDropTarget");
+			}
+		}
+	}
+    public partial class NewObject : Window
     {
         public NewObject()
         {

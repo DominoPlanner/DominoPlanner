@@ -1,6 +1,7 @@
-﻿using ProtoBuf;
+﻿using Avalonia.Media;
+using ProtoBuf;
+using SkiaSharp;
 using System;
-using Avalonia.Media;
 
 namespace DominoPlanner.Core
 {
@@ -156,7 +157,7 @@ namespace DominoPlanner.Core
         #endregion properties
         #region constructors
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int width, int height,
-            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
+			SKSamplingOptions scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation) : base(filepath)
         {
             ColorPath = colors;
             HorizontalDistance = horizontalDistance;
@@ -170,13 +171,13 @@ namespace DominoPlanner.Core
             HasProtocolDefinition = true;
         }
         public FieldParameters(string filepath, string imagePath, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+			SKSamplingOptions scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
             : this(filepath, imagePath, colors, horizontalDistance, horizontalSize, verticalSize, verticalDistance, 1, 1, scalingQuality, colorMode, ditherMode, iterationInformation)
         {
             TargetCount = targetSize;
         }
         public FieldParameters(int imageWidth, int imageHeight, Color background, string colors, int horizontalDistance, int horizontalSize, int verticalSize, int verticalDistance, int targetSize,
-            SkiaSharp.SKFilterQuality scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
+			SKSamplingOptions scalingQuality, IColorComparison colorMode, Dithering ditherMode, IterationInformation iterationInformation)
         {
 
             ColorPath = colors;

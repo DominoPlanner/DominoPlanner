@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class DominoDimensionsV : UserControl
+    public partial class DominoDimensionsV : UserControl
     {
         public DominoDimensionsV()
         {
@@ -20,7 +20,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for TangentialWidth.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty TangentialWidthProperty =
+        public static readonly StyledProperty<int> TangentialWidthProperty =
             AvaloniaProperty.Register<DominoDimensionsV, int>(nameof(TangentialWidth), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -32,7 +32,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for NormalWidth.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty NormalWidthProperty =
+        public static readonly StyledProperty<int> NormalWidthProperty =
             AvaloniaProperty.Register<DominoDimensionsV, int>(nameof(NormalWidth), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -44,7 +44,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for NormalDistance.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty NormalDistanceProperty =
+        public static readonly StyledProperty<int> NormalDistanceProperty =
             AvaloniaProperty.Register<DominoDimensionsV, int>(nameof(NormalDistance), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -56,7 +56,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for TangentialDistance.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty TangentialDistanceProperty =
+        public static readonly StyledProperty<int> TangentialDistanceProperty =
             AvaloniaProperty.Register<DominoDimensionsV, int>(nameof(TangentialDistance), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -68,7 +68,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for TangentialDistanceText.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty TangentialDistanceTextProperty =
+        public static readonly StyledProperty<string> TangentialDistanceTextProperty =
             AvaloniaProperty.Register<DominoDimensionsV, string>(nameof(TangentialDistanceText), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 
@@ -80,7 +80,7 @@ namespace DominoPlanner.Usage.UserControls.View
         }
 
         // Using a DependencyProperty as the backing store for NormalDistanceText.  This enables animation, styling, binding, etc...
-        public static readonly AvaloniaProperty NormalDistanceTextProperty =
+        public static readonly StyledProperty<string> NormalDistanceTextProperty =
             AvaloniaProperty.Register<DominoDimensionsV, string>(nameof(NormalDistanceText), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
 

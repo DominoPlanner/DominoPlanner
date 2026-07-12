@@ -128,7 +128,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private static void SelectAll(object sender, GotFocusEventArgs e)
+        private static void SelectAll(object sender, FocusChangedEventArgs e)
         {
             var frameworkElement = e.Source as Control;
             if (frameworkElement is TextBox box)

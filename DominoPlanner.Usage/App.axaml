@@ -6,10 +6,20 @@
              x:Class="DominoPlanner.Usage.App">
     <Application.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <!-- Minimal theme resources to allow XAML compilation without external theme packages -->
+        <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF0F0F0" />
+        <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#FFE0E0E0" />
+        <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#FFCCCCCC" />
+        <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#FF999999" />
+        <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#FF666666" />
+        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF000000" />
+        <x:Double x:Key="ThemeBorderThickness">1</x:Double>
+        <x:Double x:Key="ThemeDisabledOpacity">0.5</x:Double>
     </Application.Resources>
     <Application.Styles>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentTheme.xaml" />
+        <!-- Accent include removed; FluentTheme.xaml provides base resources. If needed, re-add a specific accent file. -->
         <StyleInclude Source="avares://ThemeEditor.Controls.ColorPicker/ColorPicker.axaml"/>
         <Style Selector="HeaderedContentControl">
             <Setter Property="Template">
@@ -87,7 +97,7 @@
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                       Content="{TemplateBinding Content}"
                                       Padding="{TemplateBinding Padding}"
-                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                       Foreground="{TemplateBinding Foreground}"
                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
                 </ControlTemplate>
@@ -130,7 +140,7 @@
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                       Content="{TemplateBinding Content}"
                                       Padding="{TemplateBinding Padding}"
-                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                       Foreground="{TemplateBinding Foreground}"
                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
                 </ControlTemplate>
@@ -183,7 +193,7 @@
                                 </Style>
                             </ToggleButton.Styles>
                         </ToggleButton>
-                        <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" StaysOpen="False">
+                        <Popup IsOpen="{Binding #PopupButton.IsChecked, Mode=TwoWay}" IsLightDismissEnabled="True">
                             <Border Background="{DynamicResource ThemeBackgroundBrush}" Padding="5" CornerRadius="3" BorderBrush="{DynamicResource ThemeBorderLowBrush}" BorderThickness="1">
                                 <cp:ColorPicker Name="ColorPicker" Width="300" Color="{TemplateBinding Color, Mode=TwoWay}"/>
                             </Border>

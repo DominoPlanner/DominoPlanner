@@ -58,39 +58,55 @@ namespace DominoPlanner.Usage
         {
             LoadLanguage(Language);
         }
-        public static List<CultureInfo> GetAllLocales()
-        {
-            List<CultureInfo> result = new List<CultureInfo>();
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            var langs = assets.GetAssets(new Uri("avares://DominoPlanner.Usage/locale/"), new Uri("avares://DominoPlanner.Usage/locale/"));
-            foreach (var l in langs)
-                if (Path.GetExtension(l.LocalPath) == ".mo")
-                {
-                    result.Add(new CultureInfo(Directory.GetParent(Directory.GetParent(l.LocalPath).FullName).Name));
-                }
-            result.Add(new CultureInfo("en-US"));
-            return result;
-        }
+		public static List<CultureInfo> GetAllLocales()
+		{
+			List<CultureInfo> result = new List<CultureInfo>();
 
-        public bool LoadLanguage(string language)
-        {
-            Language = language;
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            Uri uri = new Uri($"avares://DominoPlanner.Usage/locale/{language}/LC_MESSAGES/DominoPlanner.mo");
-            if (assets.Exists(uri))
-            {
-                using (var stream = assets.Open(uri))
-                {
-                    catalog = new GetText.Catalog(stream, new System.Globalization.CultureInfo(Language));
-                }
-                Invalidate();
+			// FIX: Wir übergeben null als zweiten Parameter (baseUri)
+			var langs = AssetLoader.GetAssets(new Uri("avares://DominoPlanner.Usage/locale/"), null);
 
-                return true;
-            }
-            return false;
-        } // LoadLanguage
+			if (langs != null)
+			{
+				foreach (var l in langs)
+				{
+					// l ist bereits ein Uri-Objekt, wir nutzen AbsolutePath oder LocalPath für die Dateiendung
+					if (Path.GetExtension(l.AbsolutePath) == ".mo")
+					{
+						// Extrahiert den Ordnernamen (die Sprache) aus dem Pfad
+						var directoryName = Directory.GetParent(Directory.GetParent(l.AbsolutePath).FullName)?.Name;
+						if (!string.IsNullOrEmpty(directoryName))
+						{
+							result.Add(new CultureInfo(directoryName));
+						}
+					}
+				}
+			}
 
-        private static string _Language;
+			result.Add(new CultureInfo("en-US"));
+			return result;
+		}
+
+		public bool LoadLanguage(string language)
+		{
+			Language = language;
+			Uri uri = new Uri($"avares://DominoPlanner.Usage/locale/{language}/LC_MESSAGES/DominoPlanner.mo");
+
+			// assets.Exists(uri) wird zu AssetLoader.Exists(uri)
+			if (AssetLoader.Exists(uri))
+			{
+				// assets.Open(uri) wird zu AssetLoader.Open(uri)
+				using (var stream = AssetLoader.Open(uri))
+				{
+					catalog = new GetText.Catalog(stream, new System.Globalization.CultureInfo(Language));
+				}
+				Invalidate();
+
+				return true;
+			}
+			return false;
+		} // LoadLanguage
+
+		private static string _Language;
         [SettingsAttribute("MainWindowViewModel", "en-US")]
         public static string Language
         {

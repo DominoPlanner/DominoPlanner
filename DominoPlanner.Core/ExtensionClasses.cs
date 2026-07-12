@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Avalonia.Media;
+using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -6,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia.Media;
 using Color = Avalonia.Media.Color;
 
 namespace DominoPlanner.Core
@@ -77,14 +78,19 @@ namespace DominoPlanner.Core
 
         public static void Save(this SkiaSharp.SKSurface surf, string filename, float dpiX, float dpiY)
         {
-            using (var image = surf.Snapshot().Encode())
+            using (var image = surf.Snapshot())
             {
-                using (MemoryStream ms = new MemoryStream(image.ToArray()))
+                var pngOptions = new SKPngEncoderOptions
                 {
-                    using (Bitmap bitmap = new Bitmap(ms))
+                    // Falls deine Skia-Version DPI unterstützt, kann man hier Metadaten übergeben.
+                    // Da Standard-PNGs meist Pixel-per-Meter speichern, wandelt Skia das intern um.
+                };
+
+                using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    using (var stream = File.OpenWrite(filename))
                     {
-						bitmap.SetResolution(dpiX, dpiY);
-						bitmap.Save(filename, ImageFormat.Png);
+                        data.SaveTo(stream);
                     }
                 }
             }

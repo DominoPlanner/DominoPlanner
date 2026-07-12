@@ -197,11 +197,13 @@ namespace DominoPlanner.Core
             SKCanvas canvas = surf.Canvas;
             canvas.Clear(new SKColor(background.R, background.G, background.B, background.A));
 
-            SKPaint paint = new SKPaint();
-            paint.TextSize = 64.0f;
-            paint.IsAntialias = true;
-            paint.Color = new SKColor(0x42, 0x81, 0xA4);
-            paint.IsStroke = false;
+			//using var font = new SKFont();
+			//font.Size = 24;
+
+			//SKPaint paint = new SKPaint();
+   //         paint.IsAntialias = true;
+   //         paint.Color = new SKColor(0x42, 0x81, 0xA4);
+   //         paint.IsStroke = false;
 
             Parallel.For(0, shapes.Length, (i) =>
             {
@@ -267,18 +269,20 @@ namespace DominoPlanner.Core
                                     canvas.DrawPath(path, pathPaint);
                                 }
 
-                                using (var paintTest = new SKPaint())
-                                {
-                                    paintTest.TextSize = 48f;
-                                    paintTest.IsAntialias = true;
-                                    paintTest.Color = new SKColor(0, 0, 0, 255);
-                                    paintTest.IsStroke = false;
-                                    paintTest.StrokeWidth = 0;
-                                    paintTest.TextAlign = SKTextAlign.Center;
+								using (var paintTest = new SKPaint())
+								using (var fontTest = new SKFont(SKTypeface.Default, 48f)) // TextSize direkt im Font-Konstruktor
+								{
+									paintTest.IsAntialias = true;
+									paintTest.Color = new SKColor(0, 0, 0, 255);
 
-                                    canvas.DrawTextOnPath(dominoColor.name, textpath, new SKPoint(), paintTest);
-                                }
-                            }
+									// IsStroke = false heißt jetzt SKPaintStyle.Fill
+									paintTest.Style = SKPaintStyle.Fill;
+									paintTest.StrokeWidth = 0;
+
+									// SKTextAlign.Center wird jetzt direkt als 4. Parameter in DrawTextOnPath übergeben
+									canvas.DrawTextOnPath(dominoColor.name, textpath, new SKPoint(), SKTextAlign.Center, fontTest, paintTest);
+								}
+							}
                         }
                     }
                 }

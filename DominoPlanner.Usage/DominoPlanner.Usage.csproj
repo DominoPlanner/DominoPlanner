@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ApplicationIcon>Icons/DominoCalculator.ico</ApplicationIcon>
     <Version>3.0.0.11</Version>
     <AssemblyVersion>3.0.0.11</AssemblyVersion>
@@ -127,19 +127,22 @@
     </AvaloniaXaml>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
-    <PackageReference Include="GetText.NET" Version="0.9.7" />
-    <PackageReference Include="MessageBox.Avalonia" Version="1.1.1" />
-    <PackageReference Include="SkiaSharp" Version="2.80.2" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
-    <PackageReference Include="ThemeEditor.Controls.ColorPicker" Version="0.10.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+    <PackageReference Include="Avalonia" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.5" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.18" />
+    <PackageReference Include="GetText.NET" Version="10.0.1" />
+    <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
+    <PackageReference Include="ReactiveUI.Avalonia" Version="12.0.3" />
+    <PackageReference Include="SkiaSharp" Version="4.148.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.9" />
+    <PackageReference Include="ThemeEditor.Controls.ColorPicker" Version="12.0.0" />
 
 
     <PackageReference Include="Dotnet.Bundle" Version="*" />
+
+
+    <PackageReference Include="Xaml.Behaviors.Avalonia" Version="12.0.0.1" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Icons\*"></AvaloniaResource>
@@ -265,12 +268,8 @@
   </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)/version.txt&quot;" />
-        <Exec 
-      Command="git describe --long --always --dirty --exclude=* --abbrev=8"
-      ConsoleToMSBuild="True"
-      IgnoreExitCode="False"
-      >
-      <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
+        <Exec Command="git describe --long --always --dirty --exclude=* --abbrev=8" ConsoleToMSBuild="True" IgnoreExitCode="False">
+      <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput" />
     </Exec>
     </Target>
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">

@@ -1,19 +1,21 @@
-﻿using DominoPlanner.Core;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+using Avalonia.Media;
+using Avalonia.Metadata;
+using Avalonia.Platform.Storage;
+using DominoPlanner.Core;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
 using Microsoft.Win32;
+using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using Avalonia;
-using Avalonia.Controls;
-using System.Windows.Input;
-using Avalonia.Media;
-using System.Collections.Generic;
-using Avalonia.Markup.Xaml.Templates;
-using Avalonia.Controls.Templates;
-using Avalonia.Metadata;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 
 namespace DominoPlanner.Usage
@@ -168,7 +170,7 @@ namespace DominoPlanner.Usage
                 ImageInformation = CurrentImageInformation,
                 Provider = new CreateFieldVM(
                     new FieldParameters(50, 50, Colors.Transparent, AbsoluteColorPath,
-                    8, 8, 24, 8, 5000, SkiaSharp.SKFilterQuality.High, new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
+                    8, 8, 24, 8, 5000, new SKSamplingOptions(SKCubicResampler.Mitchell), new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
             ViewModels.Add(new DominoProviderObjectEntry()
@@ -291,13 +293,32 @@ namespace DominoPlanner.Usage
         }
         private async void OpenNewImage()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "jpg", "jpeg", "jpe", "jfif", "png" }, Name = _("Image files") });
-            openFileDialog.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All Files") });
-            openFileDialog.AllowMultiple = false;
-            var result = await openFileDialog.ShowAsyncWithParent<NewObject>();
-            if (result != null && result.Length != 0)
-                SetNewImage(result[0]);
+            try
+            {
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                    {
+                        Title = _("Select Image File"),
+                        AllowMultiple = false,
+                        FileTypeFilter = new[]
+                        {
+                            new FilePickerFileType(_("Image files")) { Patterns = new[] { "*.jpg", "*.jpeg", "*.jpe", "*.jfif", "*.png" } },
+                            new FilePickerFileType(_("All Files")) { Patterns = new[] { "*" } }
+                        }
+                    });
+
+                    if (files.Count > 0)
+                    {
+                        SetNewImage(files[0].Path.LocalPath);
+                    }
+                }
+            }
+            catch (Exception) { }
         }
         public override void UpdateProvider(DominoProviderVM provider)
         {
@@ -342,7 +363,7 @@ namespace DominoPlanner.Usage
             string relPicturePath = $@"..\Source Image\{finalImagePath}";
             if (provider is FieldParameters f)
             {
-                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, SkiaSharp.SKFilterQuality.High);
+                provider.PrimaryImageTreatment = new FieldReadout(f, relPicturePath, new SKSamplingOptions(SKCubicResampler.Mitchell));
             }
             else
             {
@@ -498,48 +519,59 @@ namespace DominoPlanner.Usage
 
         }
     }
-    public class ImageTemplateSelector : IDataTemplate
-    {
-        public bool SupportsRecycling => false;
+	public class ImageTemplateSelector : IDataTemplate
+	{
+		public IDataTemplate EmptyImageTemplate { get; set; }
+		public IDataTemplate ImageTemplate { get; set; }
 
-        public DataTemplate EmptyImageTemplate { get; set; }
-        public DataTemplate ImageTemplate { get; set; }
+		public bool Match(object? data)
+		{
+			return data is string;
+		}
 
-        public bool Match(object data)
-        {
-            return data is string;
-        }
+		public Control Build(object? param)
+		{
+			if (string.IsNullOrEmpty(param?.ToString()))
+			{
+				return EmptyImageTemplate?.Build(param);
+			}
+			else
+			{
+				return ImageTemplate?.Build(param);
+			}
+		}
+	}
 
-        public IControl Build(object param)
-        {
-            if (string.IsNullOrEmpty(param.ToString()))
-                return EmptyImageTemplate.Build(param);
-            else
-                return ImageTemplate.Build(param);
+	// ==========================================
+	// 2. DAS EMPTY IMAGE TEMPLATE
+	// ==========================================
+	public class EmptyImageTemplate : DataTemplate, IDataTemplate
+	{
+		// Explizite Interface-Implementierung für Avalonia 11/12
+		bool IDataTemplate.Match(object? data)
+		{
+			if (string.IsNullOrEmpty(data?.ToString()))
+				return true;
 
-            //return Templates[string.IsNullOrEmpty((param as SingleImageInformation).InternPictureName) ? "EmptyImageTemplate" : "ImageTemplate"].Build(param);
-        }
+			return false;
+		}
+	}
 
-    }
-    public class EmptyImageTemplate : DataTemplate, IDataTemplate
-    {
-        bool IDataTemplate.Match(object data)
-        {
-            if (string.IsNullOrEmpty(data?.ToString()))
-                return true;
-            return false;
-        }
-    }
-    public class ImageTemplate : DataTemplate, IDataTemplate
-    {
-        bool IDataTemplate.Match(object data)
-        {
-            if (string.IsNullOrEmpty(data?.ToString()))
-                return false;
-            return true;
-        }
-    }
-    /*public class ImageSelector : DataTemplateSelector
+	// ==========================================
+	// 3. DAS IMAGE TEMPLATE
+	// ==========================================
+	public class ImageTemplate : DataTemplate, IDataTemplate
+	{
+		// Explizite Interface-Implementierung für Avalonia 11/12
+		bool IDataTemplate.Match(object? data)
+		{
+			if (string.IsNullOrEmpty(data?.ToString()))
+				return false;
+
+			return true;
+		}
+	}
+	/*public class ImageSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {

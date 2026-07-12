@@ -1,128 +1,156 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DominoPlanner.Usage"
-         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-       
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="DominoPlanner.Usage.ProtocolV"
-        Title="{local:Gettext Window title|Protocol}" MinHeight="700" MinWidth="800" Height="750" Width="800" Icon="/Icons/DominoCalculator.ico">
+﻿<Window
+    x:Class="DominoPlanner.Usage.ProtocolV"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="{local:Gettext Window title|Protocol}"
+    Width="800"
+    Height="750"
+    MinWidth="800"
+    MinHeight="700"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="local:ProtocolVM"
+    Icon="/Icons/DominoCalculator.ico"
+    mc:Ignorable="d">
     <Window.Resources>
-        <local:FieldPlanArrowsGridConverter x:Key="ArrowsGridConverter"/>
-        <local:ImgSizeConverter x:Key="ImgSizeConverter"/>
+        <local:FieldPlanArrowsGridConverter x:Key="ArrowsGridConverter" />
+        <local:ImgSizeConverter x:Key="ImgSizeConverter" />
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="205"/>
+            <ColumnDefinition />
+            <ColumnDefinition Width="205" />
         </Grid.ColumnDefinitions>
         <Grid x:Name="ParentGrid" Margin="5">
             <Grid>
                 <Grid.Styles>
                     <Style Selector="Ellipse">
-                        <Setter Property="ToolTip.Tip" Value="{local:Gettext 'Click to define as top left corner of the protocol'}"/> 
+                        <Setter Property="ToolTip.Tip" Value="{local:Gettext 'Click to define as top left corner of the protocol'}" />
                     </Style>
                 </Grid.Styles>
                 <Grid.Height>
                     <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Height">
-                        <Binding Path="CurrentPlan"/>
-                        <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
-                        <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
+                        <Binding Path="CurrentPlan" />
+                        <Binding ElementName="ParentGrid" Path="Bounds.Width" />
+                        <Binding ElementName="ParentGrid" Path="Bounds.Height" />
                     </MultiBinding>
                 </Grid.Height>
                 <Grid.Width>
                     <MultiBinding Converter="{StaticResource ImgSizeConverter}" ConverterParameter="Width">
-                        <Binding Path="CurrentPlan"/>
-                        <Binding Path="Bounds.Width" ElementName="ParentGrid"/>
-                        <Binding Path="Bounds.Height" ElementName="ParentGrid"/>
+                        <Binding Path="CurrentPlan" />
+                        <Binding ElementName="ParentGrid" Path="Bounds.Width" />
+                        <Binding ElementName="ParentGrid" Path="Bounds.Height" />
                     </MultiBinding>
                 </Grid.Width>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="10" />
                 </Grid.RowDefinitions>
-                <LayoutTransformControl Grid.Row="1" Grid.Column="1" Margin="1">
+                <LayoutTransformControl
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="1">
                     <LayoutTransformControl.LayoutTransform>
-                        <RotateTransform Angle="{Binding RotateAngle}"/>
+                        <RotateTransform Angle="{Binding RotateAngle}" />
                     </LayoutTransformControl.LayoutTransform>
-                    <Image  Source="{Binding Path=CurrentPlan}" Stretch="Uniform"/>
+                    <Image Source="{Binding Path=CurrentPlan}" Stretch="Uniform" />
                 </LayoutTransformControl>
-                <Ellipse Grid.Row="0" Grid.Column="0" Stroke="Red" StrokeThickness="1">
-                    <i:Interaction.Behaviors>
-                        <ia:EventTriggerBehavior EventName="PointerPressed">
-                            <ia:InvokeCommandAction Command="{Binding ClickTopLeft}"/>
-                        </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
+                <Ellipse
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Stroke="Red"
+                    StrokeThickness="1">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ClickTopLeft}" />
+                        </EventTriggerBehavior>
+                    </Interaction.Behaviors>
                     <Ellipse.Fill>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopLeft" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopLeft">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Ellipse.Fill>
                 </Ellipse>
-                <Ellipse Grid.Row="0" Grid.Column="2" Stroke="Red" StrokeThickness="1">
-                    <i:Interaction.Behaviors>
-                        <ia:EventTriggerBehavior EventName="PointerPressed">
-                            <ia:InvokeCommandAction Command="{Binding ClipTopRight}"/>
-                        </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
+                <Ellipse
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Stroke="Red"
+                    StrokeThickness="1">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ClipTopRight}" />
+                        </EventTriggerBehavior>
+                    </Interaction.Behaviors>
                     <Ellipse.Fill>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopRight" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopRight">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Ellipse.Fill>
                 </Ellipse>
-                <Ellipse Grid.Row="2" Grid.Column="0" Stroke="Red" StrokeThickness="1">
-                    <i:Interaction.Behaviors>
-                        <ia:EventTriggerBehavior EventName="PointerPressed">
-                            <ia:InvokeCommandAction Command="{Binding ClickBottomLeft}"/>
-                        </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
+                <Ellipse
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Stroke="Red"
+                    StrokeThickness="1">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ClickBottomLeft}" />
+                        </EventTriggerBehavior>
+                    </Interaction.Behaviors>
                     <Ellipse.Fill>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomLeft" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomLeft">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Ellipse.Fill>
                 </Ellipse>
-                <Ellipse Grid.Row="2" Grid.Column="2" Stroke="Red" StrokeThickness="1">
-                    <i:Interaction.Behaviors>
-                        <ia:EventTriggerBehavior EventName="PointerPressed">
-                            <ia:InvokeCommandAction Command="{Binding ClickBottomRight}"/>
-                        </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
+                <Ellipse
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Stroke="Red"
+                    StrokeThickness="1">
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerPressed">
+                            <InvokeCommandAction Command="{Binding ClickBottomRight}" />
+                        </EventTriggerBehavior>
+                    </Interaction.Behaviors>
                     <Ellipse.Fill>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomRight" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomRight">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Ellipse.Fill>
                 </Ellipse>
-                <Grid Grid.Column="1" Margin="1,0,1,0" ColumnDefinitions="7, *, 7">
+                <Grid
+                    Grid.Column="1"
+                    Margin="1,0,1,0"
+                    ColumnDefinitions="7, *, 7">
                     <Grid.Styles>
                         <Style Selector="Rectangle, Polygon">
                             <Setter Property="Fill">
                                 <SolidColorBrush>
                                     <SolidColorBrush.Color>
-                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalColor" >
-                                            <Binding Path="Orientation"/>
+                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalColor">
+                                            <Binding Path="Orientation" />
                                             <Binding Path="MirrorX" />
                                             <Binding Path="MirrorY" />
                                             <Binding Path="NaturalOrientation" />
@@ -131,8 +159,8 @@
                                 </SolidColorBrush>
                             </Setter>
                             <Setter Property="ToolTip.Tip">
-                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalToolTip" >
-                                    <Binding Path="Orientation"/>
+                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalToolTip">
+                                    <Binding Path="Orientation" />
                                     <Binding Path="MirrorX" />
                                     <Binding Path="MirrorY" />
                                     <Binding Path="NaturalOrientation" />
@@ -141,28 +169,34 @@
                         </Style>
                     </Grid.Styles>
                     <Grid.Row>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalRow" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="HorizontalRow">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Grid.Row>
-                    <Rectangle Grid.Column="1" Margin="-4,3,-4,3"/>
-                    <Polygon Grid.Column="0" Points="0,5 7,0 7,10" StrokeThickness="2">
+                    <Rectangle Grid.Column="1" Margin="-4,3,-4,3" />
+                    <Polygon
+                        Grid.Column="0"
+                        Points="0,5 7,0 7,10"
+                        StrokeThickness="2">
                         <Polygon.IsVisible>
-                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="LeftHorizontalVisibility" >
-                                <Binding Path="Orientation"/>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="LeftHorizontalVisibility">
+                                <Binding Path="Orientation" />
                                 <Binding Path="MirrorX" />
                                 <Binding Path="MirrorY" />
                                 <Binding Path="NaturalOrientation" />
                             </MultiBinding>
                         </Polygon.IsVisible>
                     </Polygon>
-                    <Polygon Grid.Column="2" Points="7,5 0,0 0,10" StrokeThickness="2">
+                    <Polygon
+                        Grid.Column="2"
+                        Points="7,5 0,0 0,10"
+                        StrokeThickness="2">
                         <Polygon.IsVisible>
-                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="RightHorizontalVisibility" >
-                                <Binding Path="Orientation"/>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="RightHorizontalVisibility">
+                                <Binding Path="Orientation" />
                                 <Binding Path="MirrorX" />
                                 <Binding Path="MirrorY" />
                                 <Binding Path="NaturalOrientation" />
@@ -171,14 +205,17 @@
                     </Polygon>
                 </Grid>
 
-                <Grid Grid.Row="1" Margin="0,1,0,1" RowDefinitions="7, *, 7">
+                <Grid
+                    Grid.Row="1"
+                    Margin="0,1,0,1"
+                    RowDefinitions="7, *, 7">
                     <Grid.Styles>
                         <Style Selector="Rectangle, Polygon">
                             <Setter Property="Fill">
                                 <SolidColorBrush>
                                     <SolidColorBrush.Color>
-                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColor" >
-                                            <Binding Path="Orientation"/>
+                                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColor">
+                                            <Binding Path="Orientation" />
                                             <Binding Path="MirrorX" />
                                             <Binding Path="MirrorY" />
                                             <Binding Path="NaturalOrientation" />
@@ -187,8 +224,8 @@
                                 </SolidColorBrush>
                             </Setter>
                             <Setter Property="ToolTip.Tip">
-                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalToolTip" >
-                                    <Binding Path="Orientation"/>
+                                <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalToolTip">
+                                    <Binding Path="Orientation" />
                                     <Binding Path="MirrorX" />
                                     <Binding Path="MirrorY" />
                                     <Binding Path="NaturalOrientation" />
@@ -197,18 +234,18 @@
                         </Style>
                     </Grid.Styles>
                     <Grid.Column>
-                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColumn" >
-                            <Binding Path="Orientation"/>
+                        <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="VerticalColumn">
+                            <Binding Path="Orientation" />
                             <Binding Path="MirrorX" />
                             <Binding Path="MirrorY" />
                             <Binding Path="NaturalOrientation" />
                         </MultiBinding>
                     </Grid.Column>
-                    <Rectangle Grid.Row="1" Margin="3,-4,3,-4"/>
+                    <Rectangle Grid.Row="1" Margin="3,-4,3,-4" />
                     <Polygon Grid.Row="0" Points="5,0 10,7 0,7">
                         <Polygon.IsVisible>
-                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopVerticalVisibility" >
-                                <Binding Path="Orientation"/>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="TopVerticalVisibility">
+                                <Binding Path="Orientation" />
                                 <Binding Path="MirrorX" />
                                 <Binding Path="MirrorY" />
                                 <Binding Path="NaturalOrientation" />
@@ -217,8 +254,8 @@
                     </Polygon>
                     <Polygon Grid.Row="2" Points="0,0 10,0 5,7">
                         <Polygon.IsVisible>
-                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomVerticalVisibility" >
-                                <Binding Path="Orientation"/>
+                            <MultiBinding Converter="{StaticResource ArrowsGridConverter}" ConverterParameter="BottomVerticalVisibility">
+                                <Binding Path="Orientation" />
                                 <Binding Path="MirrorX" />
                                 <Binding Path="MirrorY" />
                                 <Binding Path="NaturalOrientation" />
@@ -229,64 +266,182 @@
             </Grid>
         </Grid>
         <DockPanel Grid.Column="1" LastChildFill="False">
-            <HeaderedContentControl DockPanel.Dock="Top" Grid.Row="0" Header="{local:Gettext Main Settings}" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
+            <HeaderedContentControl
+                Grid.Row="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top"
+                Header="{local:Gettext Main Settings}">
                 <DockPanel>
-                    <DockPanel DockPanel.Dock="Top" Margin="2">
-                        <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Title:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <TextBox DockPanel.Dock="Right" Margin="5, 0, 0, 0" VerticalContentAlignment="Center" TextWrapping="Wrap" Text="{Binding Titel}" VerticalAlignment="Top"/>
+                    <DockPanel Margin="2" DockPanel.Dock="Top">
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Text="{local:Gettext Title:}" />
+                        <TextBox
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Top"
+                            VerticalContentAlignment="Center"
+                            DockPanel.Dock="Right"
+                            Text="{Binding Titel}"
+                            TextWrapping="Wrap" />
                     </DockPanel>
-                    <CheckBox Margin="2" DockPanel.Dock="Top" x:Name="chkUseTemplate" Content="{local:Gettext Display blocks (for template)}" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="{Binding UseBlocks}"
-                              ToolTip.Tip="{local:Gettext 'When activating this option\, DominoPlanner will show blocks in the specified length.\\nThis should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes (e.g. you left out one domino).'}"/>
-                    <CheckBox Margin="2" DockPanel.Dock="Top" IsChecked="{Binding HideText}" Content="{local:Gettext Hide color names}" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <DockPanel DockPanel.Dock="Top" Margin="2" IsVisible="{Binding !UseDynamicBlock}">
-                        <NumericUpDown DockPanel.Dock="Right" Focusable="False" IsEnabled="{Binding UseBlocks}" Value="{Binding StonesPerBlock}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="51" />
-                        <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Stones/Block}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <CheckBox
+                        x:Name="chkUseTemplate"
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Display blocks (for template)}"
+                        DockPanel.Dock="Top"
+                        IsChecked="{Binding UseBlocks}"
+                        ToolTip.Tip="{local:Gettext 'When activating this option\, DominoPlanner will show blocks in the specified length.\\nThis should be the length of your domino template because it allows to easily check for mistakes selecting the right dominoes (e.g. you left out one domino).'}" />
+                    <CheckBox
+                        Grid.Row="1"
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Hide color names}"
+                        DockPanel.Dock="Top"
+                        IsChecked="{Binding HideText}" />
+                    <DockPanel
+                        Margin="2"
+                        DockPanel.Dock="Top"
+                        IsVisible="{Binding !UseDynamicBlock}">
+                        <NumericUpDown
+                            Width="51"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Right"
+                            Focusable="False"
+                            IsEnabled="{Binding UseBlocks}"
+                            Value="{Binding StonesPerBlock}" />
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            DockPanel.Dock="Left"
+                            Text="{local:Gettext Stones/Block}" />
                     </DockPanel>
-					<CheckBox Margin="2" IsChecked="{Binding UseDynamicBlock}" DockPanel.Dock="Top">Create Dynamic Blocks</CheckBox>
-				    <ItemsControl Margin="10,0,0,0" IsVisible="{Binding UseDynamicBlock}" Items="{Binding CreatedBlocks}" DockPanel.Dock="Top">
-						<ItemsControl.ItemTemplate>
+                    <CheckBox
+                        Margin="2"
+                        DockPanel.Dock="Top"
+                        IsChecked="{Binding UseDynamicBlock}">
+                        Create Dynamic Blocks
+                    </CheckBox>
+                    <ItemsControl
+                        Margin="10,0,0,0"
+                        DockPanel.Dock="Top"
+                        IsVisible="{Binding UseDynamicBlock}"
+                        ItemsSource="{Binding CreatedBlocks}">
+                        <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border BorderThickness="0"
-										Padding="5">
-									<StackPanel Orientation="Horizontal">
-										<TextBlock Text="Show: " VerticalAlignment="Center"/>
-										<CheckBox IsChecked="{Binding UseBlock}" />	
-									    <TextBlock Margin="5,0,0,0" Text="Blocksize: " VerticalAlignment="Center"/>
-									    <NumericUpDown Height="34" Value="{Binding BlockSize}" Minimum="1" Maximum="500"/>
-									</StackPanel>
-								</Border>
-							</DataTemplate>
-						</ItemsControl.ItemTemplate>
-					</ItemsControl>
-					<local:ImageButton IsVisible="{Binding UseDynamicBlock}" DockPanel.Dock="Top" Image="/Icons/add.ico" Command="{Binding AddBlock}" Content="Add Block" />
-					<local:ImageButton IsVisible="{Binding UseDynamicBlock}" DockPanel.Dock="Top" Image="/Icons/remove.ico" Command="{Binding RemoveBlock}" Content="Remove Block" />
+                                <Border
+                                    Padding="5"
+                                    x:DataType="local:BlockData"
+                                    BorderThickness="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center" Text="Show: " />
+                                        <CheckBox IsChecked="{Binding UseBlock}" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Text="Blocksize: " />
+                                        <NumericUpDown
+                                            Height="34"
+                                            Maximum="500"
+                                            Minimum="1"
+                                            Value="{Binding BlockSize}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <local:ImageButton
+                        Command="{Binding AddBlock}"
+                        Content="Add Block"
+                        DockPanel.Dock="Top"
+                        Image="/Icons/add.ico"
+                        IsVisible="{Binding UseDynamicBlock}" />
+                    <local:ImageButton
+                        Command="{Binding RemoveBlock}"
+                        Content="Remove Block"
+                        DockPanel.Dock="Top"
+                        Image="/Icons/remove.ico"
+                        IsVisible="{Binding UseDynamicBlock}" />
                 </DockPanel>
             </HeaderedContentControl>
-            <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Summary Settings}" ToolTip.Tip="{local:Gettext Additional information shown at the end of the document}" VerticalAlignment="Top">
-                <StackPanel Margin="0, 2, 0, 0">
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasNoProperties}" Content="{local:Gettext No Properties}" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasShortProperties}" Content="{local:Gettext Short Properties}" ToolTip.Tip="{local:Gettext Shows Length\, Height\, and total amount of used dominoes}" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
-                    <RadioButton GroupName="Summary" IsChecked="{Binding HasExtendedProperties}" Content="{local:Gettext Detailed Properties}" ToolTip.Tip="{local:Gettext Shows a complete list of used colors}" HorizontalAlignment="Left" Margin="2" VerticalAlignment="Top"/>
+            <HeaderedContentControl
+                VerticalAlignment="Top"
+                DockPanel.Dock="Top"
+                Header="{local:Gettext Summary Settings}"
+                ToolTip.Tip="{local:Gettext Additional information shown at the end of the document}">
+                <StackPanel Margin="0,2,0,0">
+                    <RadioButton
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext No Properties}"
+                        GroupName="Summary"
+                        IsChecked="{Binding HasNoProperties}" />
+                    <RadioButton
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Short Properties}"
+                        GroupName="Summary"
+                        IsChecked="{Binding HasShortProperties}"
+                        ToolTip.Tip="{local:Gettext Shows Length\, Height\, and total amount of used dominoes}" />
+                    <RadioButton
+                        Margin="2"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Detailed Properties}"
+                        GroupName="Summary"
+                        IsChecked="{Binding HasExtendedProperties}"
+                        ToolTip.Tip="{local:Gettext Shows a complete list of used colors}" />
                 </StackPanel>
             </HeaderedContentControl>
             <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Transform field plan}">
-                <StackPanel Margin="0, 2, 0, 0">
-                    <CheckBox Margin="2" IsChecked="{Binding Orientation}"  Content="{local:Gettext Transpose field plan}"/>
-                    <CheckBox IsChecked="{Binding MirrorX}" Margin="2" VerticalAlignment="Top" Content="{local:Gettext Mirror horizontally}"/>
-                    <CheckBox IsChecked="{Binding MirrorY}" Margin="2" VerticalAlignment="Top" Content="{local:Gettext Mirror vertically}"/>
+                <StackPanel Margin="0,2,0,0">
+                    <CheckBox
+                        Margin="2"
+                        Content="{local:Gettext Transpose field plan}"
+                        IsChecked="{Binding Orientation}" />
+                    <CheckBox
+                        Margin="2"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Mirror horizontally}"
+                        IsChecked="{Binding MirrorX}" />
+                    <CheckBox
+                        Margin="2"
+                        VerticalAlignment="Top"
+                        Content="{local:Gettext Mirror vertically}"
+                        IsChecked="{Binding MirrorY}" />
                 </StackPanel>
 
             </HeaderedContentControl>
-            <Expander DockPanel.Dock="Top" IsVisible="true" Header="{local:Gettext Advanced Settings}" Margin="2,2,2,2" >
-                <!--Panel.ZIndex="3"-->
-                <StackPanel >
+            <Expander
+                Margin="2,2,2,2"
+                DockPanel.Dock="Top"
+                Header="{local:Gettext Advanced Settings}"
+                IsVisible="true">
+                <!--  Panel.ZIndex="3"  -->
+                <StackPanel>
                     <DockPanel Margin="2" VerticalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Cell content:}"/>
-                        <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextRegex}" ToolTip.Tip="{local:Gettext Represents the text in a cell.\\n%count% is replaced by the number of dominoes in the cell\, %color% by the color name.}"></TextBox>
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Cell content:}" />
+                        <TextBox
+                            Width="120"
+                            HorizontalAlignment="Right"
+                            Text="{Binding TextRegex}"
+                            ToolTip.Tip="{local:Gettext Represents the text in a cell.\\n%count% is replaced by the number of dominoes in the cell\, %color% by the color name.}" />
                     </DockPanel>
-                    <DockPanel  Margin="2" VerticalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Text Format:}"/>
-                        <TextBox HorizontalAlignment="Right" Width="120" Text="{Binding TextFormat}" ToolTip.Tip="{local:Gettext HTML Font Tag.\\nThe font tag is closed automatically. Not all HTML features are currently supported by Excel Export.}"></TextBox>
+                    <DockPanel Margin="2" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Text Format:}" />
+                        <TextBox
+                            Width="120"
+                            HorizontalAlignment="Right"
+                            Text="{Binding TextFormat}"
+                            ToolTip.Tip="{local:Gettext HTML Font Tag.\\nThe font tag is closed automatically. Not all HTML features are currently supported by Excel Export.}" />
                     </DockPanel>
                     <!--<GroupBox Header="{local:Gettext Border visibility}">
                         <StackPanel Margin="2">
@@ -295,26 +450,60 @@
                         </StackPanel>
 
                         </GroupBox>-->
-                    <HeaderedContentControl Header="{local:Gettext Cell background color}" >
-                        <StackPanel VerticalAlignment="Center" Margin="2">
-                            <RadioButton Content="{local:Gettext Cell or Text color|Domino color}" Margin="2"  ToolTip.Tip="{local:Gettext Uses the color of the domino as cell background}" IsChecked="{Binding DefaultBackColor}"/>
-                            <RadioButton Content="{local:Gettext Inverted}" Margin="2" ToolTip.Tip="{local:Gettext Uses the inverted color as cell background}" IsChecked="{Binding InvertedBackColor}"/>
+                    <HeaderedContentControl Header="{local:Gettext Cell background color}">
+                        <StackPanel Margin="2" VerticalAlignment="Center">
+                            <RadioButton
+                                Margin="2"
+                                Content="{local:Gettext Cell or Text color|Domino color}"
+                                IsChecked="{Binding DefaultBackColor}"
+                                ToolTip.Tip="{local:Gettext Uses the color of the domino as cell background}" />
+                            <RadioButton
+                                Margin="2"
+                                Content="{local:Gettext Inverted}"
+                                IsChecked="{Binding InvertedBackColor}"
+                                ToolTip.Tip="{local:Gettext Uses the inverted color as cell background}" />
                         </StackPanel>
                     </HeaderedContentControl>
                     <HeaderedContentControl Header="{local:Gettext Text color}">
                         <StackPanel Margin="2">
-                            <RadioButton Content="{local:Gettext Cell or Text color|Domino color}" Margin="2"  ToolTip.Tip="{local:Gettext Uses the color of the domino as text color}" IsChecked="{Binding DefaultTextColor}"/>
-                            <RadioButton Grid.Row="1" Content="{local:Gettext Inverted}" Margin="2" ToolTip.Tip="{local:Gettext Uses the inverted color as text color}" IsChecked="{Binding InvertedTextColor}"/>
-                            <RadioButton Grid.Row="2" Content="{local:Gettext Intelligent}" Margin="2" ToolTip.Tip="{local:Gettext Uses the inverted color as text color}" IsChecked="{Binding IntelligentTextColor}"/>
+                            <RadioButton
+                                Margin="2"
+                                Content="{local:Gettext Cell or Text color|Domino color}"
+                                IsChecked="{Binding DefaultTextColor}"
+                                ToolTip.Tip="{local:Gettext Uses the color of the domino as text color}" />
+                            <RadioButton
+                                Grid.Row="1"
+                                Margin="2"
+                                Content="{local:Gettext Inverted}"
+                                IsChecked="{Binding InvertedTextColor}"
+                                ToolTip.Tip="{local:Gettext Uses the inverted color as text color}" />
+                            <RadioButton
+                                Grid.Row="2"
+                                Margin="2"
+                                Content="{local:Gettext Intelligent}"
+                                IsChecked="{Binding IntelligentTextColor}"
+                                ToolTip.Tip="{local:Gettext Uses the inverted color as text color}" />
 
                         </StackPanel>
                     </HeaderedContentControl>
                 </StackPanel>
             </Expander>
 
-            <local:ImageButton Image="/Icons/insert_table.ico" DockPanel.Dock="Bottom"  Command="{Binding SaveExcel}" Content="{local:Gettext Save Excel File}" />
-            <local:ImageButton Image="/Icons/properties.ico" DockPanel.Dock="Bottom"  Command="{Binding ShowLiveBuildHelper}" Content="{local:Gettext Field Viewer}" />
-            <local:ImageButton Image="/Icons/document_save.ico" DockPanel.Dock="Bottom"  Command="{Binding SaveHTML}" Content="{local:Gettext Save as HTML}" />
+            <local:ImageButton
+                Command="{Binding SaveExcel}"
+                Content="{local:Gettext Save Excel File}"
+                DockPanel.Dock="Bottom"
+                Image="/Icons/insert_table.ico" />
+            <local:ImageButton
+                Command="{Binding ShowLiveBuildHelper}"
+                Content="{local:Gettext Field Viewer}"
+                DockPanel.Dock="Bottom"
+                Image="/Icons/properties.ico" />
+            <local:ImageButton
+                Command="{Binding SaveHTML}"
+                Content="{local:Gettext Save as HTML}"
+                DockPanel.Dock="Bottom"
+                Image="/Icons/document_save.ico" />
         </DockPanel>
     </Grid>
 </Window>

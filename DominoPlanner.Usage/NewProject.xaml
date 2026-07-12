@@ -1,46 +1,127 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="using:DominoPlanner.Usage"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="350"
-        Width="400" Height="350" CanResize="False"
-        x:Class="DominoPlanner.Usage.NewProject"
-        Title="{local:Gettext Window title|New Project}">
+﻿<Window
+    x:Class="DominoPlanner.Usage.NewProject"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="{local:Gettext Window title|New Project}"
+    Width="400"
+    Height="350"
+    d:DesignHeight="350"
+    d:DesignWidth="400"
+    x:DataType="local:NewProjectVM"
+    CanResize="False"
+    mc:Ignorable="d">
     <Grid>
-        <DockPanel Margin="5, 5, 5, 5" LastChildFill="False">
+        <DockPanel Margin="5,5,5,5" LastChildFill="False">
             <DockPanel Margin="0" DockPanel.Dock="Top">
-                <TextBlock  Text="{local:Gettext Project Name:}" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <TextBox Name="NameTextBox" Margin="5, 0, 0, 0" TextWrapping="Wrap" Text="{Binding ProjectName}" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Text="{local:Gettext Project Name:}" />
+                <TextBox
+                    Name="NameTextBox"
+                    Margin="5,0,0,0"
+                    VerticalAlignment="Top"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    Text="{Binding ProjectName}"
+                    TextWrapping="Wrap" />
             </DockPanel>
-            <DockPanel Margin="0, 5, 0, 0" LastChildFill="True" DockPanel.Dock="Top">
-                <TextBlock  Text="{local:Gettext Super Folder Path:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Button Command="{Binding SelectFolder}" DockPanel.Dock="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Width="26" Height="26" ToolTip.Tip="{local:Gettext 'Select the file path for your project. \\nTry using a Cloud Folder (e.g. dropbox) to share a project with a friend.'}">
-                    <Image Source="/Icons/open.ico"></Image>
+            <DockPanel
+                Margin="0,5,0,0"
+                DockPanel.Dock="Top"
+                LastChildFill="True">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Text="{local:Gettext Super Folder Path:}" />
+                <Button
+                    Width="26"
+                    Height="26"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Command="{Binding SelectFolder}"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="{local:Gettext 'Select the file path for your project. \\nTry using a Cloud Folder (e.g. dropbox) to share a project with a friend.'}">
+                    <Image Source="/Icons/open.ico" />
                 </Button>
-                <TextBox DockPanel.Dock="Left" x:Name="PathTextBox" Margin="5, 0, 5, 0" IsReadOnly="True" Width="NaN"
-                         TextWrapping="Wrap" Text="{Binding SelectedPath}" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+                <TextBox
+                    x:Name="PathTextBox"
+                    Width="NaN"
+                    Margin="5,0,5,0"
+                    VerticalAlignment="Top"
+                    DockPanel.Dock="Left"
+                    IsReadOnly="True"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    Text="{Binding SelectedPath}"
+                    TextWrapping="Wrap" />
             </DockPanel>
-            <DockPanel Margin="0, 5, 0, 0" LastChildFill="False" DockPanel.Dock="Top">
-                <TextBlock  Text="{local:Gettext Color Repository:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <RadioButton Margin="5, 0, 0, 0" IsChecked="{Binding rbStandard}" Content="{local:Gettext Color List on project creation|Use Standard}" HorizontalAlignment="Left" />
-                <RadioButton Margin="5, 0, 0, 0" IsChecked="{Binding rbCustom}" Content="{local:Gettext Color List on project creation|Select file}" HorizontalAlignment="Left" />
-                <Button Command="{Binding SelectColor}" IsVisible="{Binding ColorVisibility}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="26" Height="26" DockPanel.Dock="Right">
-                    <Image Source="/Icons/colorLine.ico"></Image>
+            <DockPanel
+                Margin="0,5,0,0"
+                DockPanel.Dock="Top"
+                LastChildFill="False">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Text="{local:Gettext Color Repository:}" />
+                <RadioButton
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    Content="{local:Gettext Color List on project creation|Use Standard}"
+                    IsChecked="{Binding rbStandard}" />
+                <RadioButton
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    Content="{local:Gettext Color List on project creation|Select file}"
+                    IsChecked="{Binding rbCustom}" />
+                <Button
+                    Width="26"
+                    Height="26"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Command="{Binding SelectColor}"
+                    DockPanel.Dock="Right"
+                    IsVisible="{Binding ColorVisibility}">
+                    <Image Source="/Icons/colorLine.ico" />
                 </Button>
             </DockPanel>
-            <TextBlock DockPanel.Dock="Top" FontStyle="Italic" Text="{Binding sPath, StringFormat=Path: {0}}" IsVisible="{Binding ColorVisibility}"
-                       HorizontalAlignment="Stretch" Margin="10, 0, 0, 0" TextTrimming="CharacterEllipsis" />
-            <TextBlock DockPanel.Dock="Top" Margin="0, 5, 0, 0" Text="{local:Gettext Tips:}"></TextBlock>
-            <Button Command="{Binding StartClick}" IsDefault="True" Content="{local:Gettext Let\'s start!}" HorizontalAlignment="Center" Height="26" DockPanel.Dock="Bottom" VerticalAlignment="Top" Width="107"/>
-            <DockPanel DockPanel.Dock="Top" Margin="5, 0, 0, 0" LastChildFill="False">
-                <TextBlock Text="{local:Gettext 'Linebreaks for Project creation help text|•\\n•\\n\\n•\\n\\n\\n•\\n\\n•'}" VerticalAlignment="Top" />
-                <TextBlock Margin="5, 0, 0, 0" DockPanel.Dock="Left"  Text="{local:Gettext 'DominoPlanner will create a folder containing all your project data.\\nIf you delete or move this folder, DominoPlanner won\'t open the \\nproject anymore. If it was moved, you can add it again.\\nDominoPlanner will also create a \'Master Document\' for your \\nproject, where your overall setup will be stored in. It contains e.g.\\nthe reference to all subprojects.\\nIf you select a cloud folder (e.g. Dropbox) as parent folder, you\\nan share the project with a fellow domino artist.\\nDominoPlanner will also copy the selected Domino Colors file to\\nthe project folder. You can edit it later on.'}"
-                     HorizontalAlignment="Left"  VerticalAlignment="Top" />
+            <TextBlock
+                Margin="10,0,0,0"
+                HorizontalAlignment="Stretch"
+                DockPanel.Dock="Top"
+                FontStyle="Italic"
+                IsVisible="{Binding ColorVisibility}"
+                Text="{Binding sPath, StringFormat=Path: {0}}"
+                TextTrimming="CharacterEllipsis" />
+            <TextBlock
+                Margin="0,5,0,0"
+                DockPanel.Dock="Top"
+                Text="{local:Gettext Tips:}" />
+            <Button
+                Width="107"
+                Height="26"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Command="{Binding StartClick}"
+                Content="{local:Gettext Let\'s start!}"
+                DockPanel.Dock="Bottom"
+                IsDefault="True" />
+            <DockPanel
+                Margin="5,0,0,0"
+                DockPanel.Dock="Top"
+                LastChildFill="False">
+                <TextBlock VerticalAlignment="Top" Text="{local:Gettext 'Linebreaks for Project creation help text|•\\n•\\n\\n•\\n\\n\\n•\\n\\n•'}" />
+                <TextBlock
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    DockPanel.Dock="Left"
+                    Text="{local:Gettext 'DominoPlanner will create a folder containing all your project data.\\nIf you delete or move this folder, DominoPlanner won\'t open the \\nproject anymore. If it was moved, you can add it again.\\nDominoPlanner will also create a \'Master Document\' for your \\nproject, where your overall setup will be stored in. It contains e.g.\\nthe reference to all subprojects.\\nIf you select a cloud folder (e.g. Dropbox) as parent folder, you\\nan share the project with a fellow domino artist.\\nDominoPlanner will also copy the selected Domino Colors file to\\nthe project folder. You can edit it later on.'}" />
 
             </DockPanel>
 
-            
+
         </DockPanel>
     </Grid>
 </Window>

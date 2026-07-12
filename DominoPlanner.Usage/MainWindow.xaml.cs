@@ -11,98 +11,100 @@ using System.Runtime.InteropServices;
 
 namespace DominoPlanner.Usage
 {
-    public class MainWindow : Window
-    {
-        NamedPipeManager PipeManager;
-        public MainWindow()
-        {
-            // Find out current locale if started for the first time. Needs to be done after app is started, but before first window is shown
-            var vm =  new MainWindowViewModel();
-            if (vm.FirstStartup)
-            {
-                var currentLocale = System.Globalization.CultureInfo.CurrentCulture;
-                var selectedLang = Localizer.GetAllLocales().Contains(currentLocale) ? currentLocale.Name : "en-US";
-                Localizer.Language = selectedLang;
-                Localizer.LocalizerInstance.LoadLanguage(selectedLang);
-            }
-            InitializeComponent();
+	public partial class MainWindow : Window
+	{
+		NamedPipeManager PipeManager;
+		public MainWindow()
+		{
+			// Find out current locale if started for the first time. Needs to be done after app is started, but before first window is shown
+			var vm = new MainWindowViewModel();
+			if (vm.FirstStartup)
+			{
+				var currentLocale = System.Globalization.CultureInfo.CurrentCulture;
+				var selectedLang = Localizer.GetAllLocales().Contains(currentLocale) ? currentLocale.Name : "en-US";
+				Localizer.Language = selectedLang;
+				Localizer.LocalizerInstance.LoadLanguage(selectedLang);
+			}
+			InitializeComponent();
 
-            DataContext = vm;
-            KeyDown += (o, e) => KeyPressedHandler(o, e);
-            Opened += (o, e) => MainWindow_Initialized();
-            PipeManager = new NamedPipeManager("DominoPlanner");
-            PipeManager.StartServer();
-            PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
-            var args = Environment.GetCommandLineArgs();
-            string filesToOpen = "";
-            if (args != null && args.Length > 1)
-            {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 1; i < args.Length; i++)
-                {
-                    sb.AppendLine(args[i]);
-                }
-                filesToOpen = sb.ToString();
-            }
-            PipeManager.Write(filesToOpen);
+			DataContext = vm;
+           // subscribe to Closing in code-behind to avoid XAML compile-time event signature checks
+			this.Closing += Window_Closing;
+			KeyDown += (o, e) => KeyPressedHandler(o, e);
+			Opened += (o, e) => MainWindow_Initialized();
+			PipeManager = new NamedPipeManager("DominoPlanner");
+			PipeManager.StartServer();
+			PipeManager.ReceiveString += HandleNamedPipe_OpenRequest;
+			var args = Environment.GetCommandLineArgs();
+			string filesToOpen = "";
+			if (args != null && args.Length > 1)
+			{
+				StringBuilder sb = new StringBuilder();
+				for (int i = 1; i < args.Length; i++)
+				{
+					sb.AppendLine(args[i]);
+				}
+				filesToOpen = sb.ToString();
+			}
+			PipeManager.Write(filesToOpen);
 #if DEBUG
-            this.AttachDevTools();
+			this.AttachDevTools();
 #endif
-        }
-        // ugly hacky workaround for the fact that events don't wait if they are canceled asynchronously
-        private bool should_really_close = false;
-        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (!should_really_close)
-            {
-                e.Cancel = true;
-            }
-            if (DataContext is MainWindowViewModel mwvm)
-            {
-                if (await mwvm.CloseAllTabs())
-                {
-                    mwvm.SaveSettings();
-                    if (!should_really_close)
-                    {
-                        should_really_close = true;
-                        this.Close();
-                    }
-                }
-            }
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                PipeManager.StopServer();
-        }
-        private void KeyPressedHandler(object sender, KeyEventArgs args)
-        {
-            if (DataContext is MainWindowViewModel mwvm)
-            {
-                mwvm.KeyPressed(sender, args);
-            }
-        }
-        public void HandleNamedPipe_OpenRequest(string filesToOpen)
-        {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                ((MainWindowViewModel)DataContext).OpenFile(filesToOpen);
+		}
+		// ugly hacky workaround for the fact that events don't wait if they are canceled asynchronously
+		private bool should_really_close = false;
+        private async void Window_Closing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
+		{
+			if (!should_really_close)
+			{
+				e.Cancel = true;
+			}
+			if (DataContext is MainWindowViewModel mwvm)
+			{
+				if (await mwvm.CloseAllTabs())
+				{
+					mwvm.SaveSettings();
+					if (!should_really_close)
+					{
+						should_really_close = true;
+						this.Close();
+					}
+				}
+			}
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				PipeManager.StopServer();
+		}
+		private void KeyPressedHandler(object sender, KeyEventArgs args)
+		{
+			if (DataContext is MainWindowViewModel mwvm)
+			{
+				mwvm.KeyPressed(sender, args);
+			}
+		}
+		public void HandleNamedPipe_OpenRequest(string filesToOpen)
+		{
+			Dispatcher.UIThread.InvokeAsync(() =>
+			{
+				((MainWindowViewModel)DataContext).OpenFile(filesToOpen);
 
-                if (WindowState == WindowState.Minimized)
-                    WindowState = WindowState.Normal;
+				if (WindowState == WindowState.Minimized)
+					WindowState = WindowState.Normal;
 
-                this.Topmost = true;
-                this.Activate();
-                Dispatcher.UIThread.InvokeAsync(new Action(() => { this.Topmost = false; }));
-            });
-        }
-        protected void MainWindow_Initialized()
-        {
-            if (DataContext is MainWindowViewModel mwvm)
-            {
-                mwvm.AfterStartupChecks();
-            }
-        }
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-    }
+				this.Topmost = true;
+				this.Activate();
+				Dispatcher.UIThread.InvokeAsync(new Action(() => { this.Topmost = false; }));
+			});
+		}
+		protected void MainWindow_Initialized()
+		{
+			if (DataContext is MainWindowViewModel mwvm)
+			{
+				mwvm.AfterStartupChecks();
+			}
+		}
+		private void InitializeComponent()
+		{
+			AvaloniaXamlLoader.Load(this);
+		}
+	}
 }

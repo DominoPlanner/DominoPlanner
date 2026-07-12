@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 using DominoPlanner.Core;
 using System;
 using System.Collections.Generic;
@@ -55,18 +56,33 @@ namespace DominoPlanner.Usage
         private async void ReplacePath()
         {
             if (IsResolved) return;
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Directory = Path.GetDirectoryName(Path.GetFullPath(Path.Combine(ParentPath, RelativePath)));
-            ofd.Title = string.Format(_("Locate file {0}"), Path.GetFileName(RelativePath));
-            string extension = Path.GetExtension(RelativePath);
-            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { extension.Replace(".", "") }, Name = string.Format(GetParticularString("Files of type {0}", "{0} files"), extension) });
-            ofd.Filters.Add(new FileDialogFilter() { Extensions = new List<string> { "*" }, Name = _("All files") });
-            ofd.AllowMultiple = false;
-            string[] result = await ofd.ShowAsyncWithParent<ReferenceManager>();
-            if (result != null && result.Length == 1 && File.Exists(result[0]))
+            try
             {
-                AbsolutePath = result[0];
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    string extension = Path.GetExtension(RelativePath);
+                    var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                    {
+                        Title = string.Format(_("Locate file {0}"), Path.GetFileName(RelativePath)),
+                        AllowMultiple = false,
+                        FileTypeFilter = new[]
+                        {
+                            new FilePickerFileType(string.Format(GetParticularString("Files of type {0}", "{0} files"), extension)) { Patterns = new[] { $"*{extension}" } },
+                            new FilePickerFileType(_("All files")) { Patterns = new[] { "*" } }
+                        }
+                    });
+
+                    if (files.Count > 0 && File.Exists(files[0].Path.LocalPath))
+                    {
+                        AbsolutePath = files[0].Path.LocalPath;
+                    }
+                }
             }
+            catch (Exception) { }
         }
 
         private RelayCommand replacePathCommand;
@@ -90,7 +106,7 @@ namespace DominoPlanner.Usage
             }
         }
     }
-    public class ReferenceManager : Window
+    public partial class ReferenceManager : Window
     {
         
         public ReferenceManager()

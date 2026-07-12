@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class CircleSize : UserControl
+    public partial class CircleSize : UserControl
     {
         public CircleSize()
         {

@@ -1,9 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using MessageBox.Avalonia.Enums;
 using System.Linq;
 using System.Threading.Tasks;
+
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace DominoPlanner.Usage
 {
@@ -17,8 +19,8 @@ namespace DominoPlanner.Usage
                 MessageType.Warning => Icon.Warning,
                 _ => Icon.Info,
             };
-            var box = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(header, message, ButtonEnum.Ok, image);
-            return await box.ShowDialog(owner);
+			var box = MessageBoxManager.GetMessageBoxStandard(header, message, ButtonEnum.Ok, image);
+			return await box.ShowAsPopupAsync(owner);
         }
         internal static async Task<ButtonResult> RaiseMessageWithParent<T>(string message, string header, MessageType messageType) where T : Window
         {

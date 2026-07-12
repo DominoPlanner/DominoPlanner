@@ -1,13 +1,14 @@
-﻿using OfficeOpenXml;
+﻿using Avalonia.Media;
+using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Avalonia.Media;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DominoPlanner.Core
 {
@@ -261,8 +262,8 @@ namespace DominoPlanner.Core
             ws.Cells[1, 1].Value = "a";
             ws.Cells[1, 2].Value = "b";
             // apply font scheme to all cells
-            System.Drawing.Font textFont = StringToFont(textFormat);
-            if(textFont != null) ws.Cells[1, 1, rowcounter, cols].Style.Font.SetFromFont(StringToFont(textFormat));
+            SKFont textFont = StringToFont(textFormat);
+            if(textFont != null) ws.Cells[1, 1, rowcounter, cols].Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
             // resize cell
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -280,7 +281,7 @@ namespace DominoPlanner.Core
                 ExcelRange cell1 = ws.Cells[rowcounter + 2, 1];
                 cell1.Value = "Rows: " + trans.rows + ", Columns: " + trans.columns;
                 ws.Cells[rowcounter + 3, 1].Value = "Total Number of dominoes: " + trans.counts.Sum();
-                if(textFont != null) ws.Cells[rowcounter + 2, 1, rowcounter + 3, 1].Style.Font.SetFromFont(textFont);
+                if(textFont != null) ws.Cells[rowcounter + 2, 1, rowcounter + 3, 1].Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
             }
             rowcounter += 4;
             // set footer
@@ -295,12 +296,12 @@ namespace DominoPlanner.Core
             ws.HeaderFooter.FirstHeader.RightAlignedText = "Go to View -> Page Break Preview for page overview";
             ws.HeaderFooter.OddHeader.CenteredText = "Project: " + project;
             ws.HeaderFooter.EvenHeader.CenteredText = "Project: " + project;
-            ws.PrinterSettings.TopMargin = (decimal)0.5;
-            ws.PrinterSettings.LeftMargin = (decimal)0.4;
-            ws.PrinterSettings.RightMargin = (decimal)0.4;
-            ws.PrinterSettings.BottomMargin = (decimal)0.5;
-            ws.PrinterSettings.HeaderMargin = (decimal)0.2;
-            ws.PrinterSettings.FooterMargin = (decimal)0.2;
+            ws.PrinterSettings.TopMargin = 0.5;
+            ws.PrinterSettings.LeftMargin = 0.4;
+            ws.PrinterSettings.RightMargin = 0.4;
+            ws.PrinterSettings.BottomMargin = 0.5;
+            ws.PrinterSettings.HeaderMargin = 0.2;
+            ws.PrinterSettings.FooterMargin = 0.2;
             if (summaryMode == SummaryMode.Large)
             {
                 var orderedList = OrderedColorBalance(trans);
@@ -322,7 +323,7 @@ namespace DominoPlanner.Core
                         non_empty_cols++;
                     }
                 }
-                if (textFont != null) summary.Cells[1, 1, trans.counts.Length, 4].Style.Font.SetFromFont(textFont);
+                if (textFont != null) summary.Cells[1, 1, trans.counts.Length, 4].Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                 if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     summary.Cells.AutoFitColumns(0);
 
@@ -343,13 +344,13 @@ namespace DominoPlanner.Core
                     }
                     indices[i] = endindex;
                 }
-                if(textFont != null) ws.Cells[rowcounter + 1, 1].Style.Font.SetFromFont(textFont);
+                if(textFont != null) ws.Cells[rowcounter + 1, 1].Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                 rowcounter += 2;
                 using (ExcelRange Color_Header = ws.Cells[rowcounter, 2, rowcounter, indices[0]])
                 {
                     Color_Header.Merge = true;
                     Color_Header.Value = "Color";
-                    if (textFont != null) Color_Header.Style.Font.SetFromFont(textFont);
+                    if (textFont != null) Color_Header.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                     SetAllBorders(Color_Header, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                     Color_Header.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
                 }
@@ -357,7 +358,7 @@ namespace DominoPlanner.Core
                 {
                     Count_Header.Merge = true;
                     Count_Header.Value = "Count";
-                    if (textFont != null) Count_Header.Style.Font.SetFromFont(textFont);
+                    if (textFont != null) Count_Header.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                     SetAllBorders(Count_Header, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                     Count_Header.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
                 }
@@ -365,7 +366,7 @@ namespace DominoPlanner.Core
                 {
                     Used_Header.Merge = true;
                     Used_Header.Value = "Used";
-                    if (textFont != null) Used_Header.Style.Font.SetFromFont(textFont);
+                    if (textFont != null) Used_Header.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                     SetAllBorders(Used_Header, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
                     Used_Header.Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
                 }
@@ -386,7 +387,7 @@ namespace DominoPlanner.Core
                             name_cell.Merge = true;
                             name_cell.Value = orderedList[i].color.name;
                             SetAllBorders(name_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
-                            if (textFont != null) name_cell.Style.Font.SetFromFont(textFont);
+                            if (textFont != null) name_cell.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                         }
                         using (ExcelRange count_cell = ws.Cells[rowcounter, indices[0] + 1, rowcounter, indices[1]])
                         {
@@ -396,18 +397,18 @@ namespace DominoPlanner.Core
                                 count_cell.Value = orderedList[i].color.count;
                             }
                             SetAllBorders(count_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
-                            if (textFont != null) count_cell.Style.Font.SetFromFont(textFont);
+                            if (textFont != null) count_cell.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                         }
                         using (ExcelRange used_cell = ws.Cells[rowcounter, indices[1] + 1, rowcounter, indices[2]])
                         {
                             used_cell.Merge = true;
                             used_cell.Value = orderedList[i].count;
                             SetAllBorders(used_cell, ExcelBorderStyle.Thin, System.Drawing.Color.Black);
-                            if (textFont != null) used_cell.Style.Font.SetFromFont(textFont);
+                            if (textFont != null) used_cell.Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
                         }
                     }
                 }
-                ws.Cells[rowcounter + 1, 1, rowcounter + non_empty_cols + 1, indices[2]].Style.Font.SetFromFont(StringToFont(textFormat));
+                ws.Cells[rowcounter + 1, 1, rowcounter + non_empty_cols + 1, indices[2]].Style.Font.SetFromFont(textFont.Typeface?.FamilyName, textFont.Size);
 
             }
 
@@ -424,9 +425,8 @@ namespace DominoPlanner.Core
             range.Style.Border.Top.Color.SetColor(color);
             range.Style.Border.Bottom.Color.SetColor(color);
         }
-        private System.Drawing.Font StringToFont(String format)
+        private SKFont StringToFont(String format)
         {
-            System.Drawing.Font f = null;
             try
             {
                 String family = "Calibri";
@@ -436,9 +436,11 @@ namespace DominoPlanner.Core
                     int b = format.IndexOf('\"', face + 6);
                     family = format.Substring(face + 6, b - face - 6);
                 }
-                f = new System.Drawing.Font(family, 12);
-            } catch(Exception) { }
-            return f;
+                var typeface = SKTypeface.FromFamilyName(family);
+                return new SKFont(typeface, 12);
+            }
+            catch (Exception) { }
+            return null;
         }
 
     }

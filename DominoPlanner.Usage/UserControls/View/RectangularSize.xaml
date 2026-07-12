@@ -1,90 +1,213 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="using:DominoPlanner.Usage"
-             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
-             x:Class="DominoPlanner.Usage.UserControls.View.RectangularSize">
+﻿<UserControl
+    x:Class="DominoPlanner.Usage.UserControls.View.RectangularSize"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+    xmlns:viewModels="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    d:DesignHeight="300"
+    d:DesignWidth="350"
+    x:DataType="viewModels:CreateRectangularStructureVM"
+    mc:Ignorable="d">
     <Grid>
         <HeaderedContentControl>
             <HeaderedContentControl.Header>
                 <TextBlock>
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{local:Gettext 'Structure Dimensions: {0}mm x {1}mm'}">
-                            <Binding Path="PhysicalLength"></Binding>
-                            <Binding Path="PhysicalHeight"></Binding>
+                            <Binding Path="PhysicalLength" />
+                            <Binding Path="PhysicalHeight" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>
             </HeaderedContentControl.Header>
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
-                    <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Structure Size:}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <NumericUpDown Value="{Binding DominoCount, Mode=OneWay}" Minimum="0" Width="120" HorizontalAlignment="Left" Name="SizeUpDown">
-                            <NumericUpDown.Styles>
-                                <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
-                                    <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}"/>
-                                    <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}"/>
-                                </Style>
-                            </NumericUpDown.Styles>
-                        </NumericUpDown>
-                    <TextBlock DockPanel.Dock="Left" Text="{local:Gettext Amount Structure|Dominoes}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="{local:Gettext Structure Size:}" />
+                    <NumericUpDown
+                        Name="SizeUpDown"
+                        Width="120"
+                        HorizontalAlignment="Left"
+                        Minimum="0"
+                        Value="{Binding DominoCount, Mode=OneWay}">
+                        <NumericUpDown.Styles>
+                            <Style Selector="NumericUpDown /template/ TextBox#PART_TextBox">
+                                <Setter Property="view:UpdateValueOnLeave.Command" Value="{Binding SetDominoCount}" />
+                                <Setter Property="view:UpdateValueOnLeave.CommandParameter" Value="{Binding ElementName=SizeUpDown, Path=Value}" />
+                            </Style>
+                        </NumericUpDown.Styles>
+                    </NumericUpDown>
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left"
+                        Text="{local:Gettext Amount Structure|Dominoes}" />
                 </DockPanel>
-                <ComboBox DockPanel.Dock="Top" Items="{Binding list}" SelectedIndex="{Binding structure_index}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0, 5, 0, 0"></ComboBox>
-                <Grid Margin="0, 5, 0, 0" Grid.IsSharedSizeScope="True">
+                <ComboBox
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    DockPanel.Dock="Top"
+                    ItemsSource="{Binding list}"
+                    SelectedIndex="{Binding structure_index}" />
+                <Grid Margin="0,5,0,0" Grid.IsSharedSizeScope="True">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="47" SharedSizeGroup="A"/>
-                        <ColumnDefinition SharedSizeGroup="A"/>
-                        <ColumnDefinition SharedSizeGroup="A"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="47" SharedSizeGroup="A" />
+                        <ColumnDefinition SharedSizeGroup="A" />
+                        <ColumnDefinition SharedSizeGroup="A" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition SharedSizeGroup="A"/>
-                        <RowDefinition SharedSizeGroup="A"/>
-                        <RowDefinition SharedSizeGroup="A"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition SharedSizeGroup="A" />
+                        <RowDefinition SharedSizeGroup="A" />
+                        <RowDefinition SharedSizeGroup="A" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="1">
-                        <Image VerticalAlignment="Bottom" HorizontalAlignment="Right" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[0]}"/>
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Source="{Binding Path=description_imgs[0]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="2">
-                        <Image  VerticalAlignment="Bottom" HorizontalAlignment="Center" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[1]}"/>
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Source="{Binding Path=description_imgs[1]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="0" Grid.Column="3">
-                        <Image VerticalAlignment="Bottom" HorizontalAlignment="Left" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[2]}"/>
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="3"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Source="{Binding Path=description_imgs[2]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="1">
-                        <Image  VerticalAlignment="Center" HorizontalAlignment="Right" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[3]}"/>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Source="{Binding Path=description_imgs[3]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="2">
-                        <Image   VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[4]}"/>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Source="{Binding Path=description_imgs[4]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="1" Grid.Column="3">
-                        <Image   VerticalAlignment="Center" HorizontalAlignment="Left" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[5]}"/>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="3"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Source="{Binding Path=description_imgs[5]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="1">
-                        <Image VerticalAlignment="Top" HorizontalAlignment="Right" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[6]}"/>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Source="{Binding Path=description_imgs[6]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="2">
-                        <Image  VerticalAlignment="Top" HorizontalAlignment="Center" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[7]}"/>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Source="{Binding Path=description_imgs[7]}"
+                            Stretch="None" />
                     </Border>
-                    <Border BorderBrush="Black" BorderThickness="1" Margin="1" Grid.Row="2" Grid.Column="3">
-                        <Image  VerticalAlignment="Top" HorizontalAlignment="Left" Stretch="None"
-                                   Margin="1" Source="{Binding Path=description_imgs[8]}"/>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="3"
+                        Margin="1"
+                        BorderBrush="Black"
+                        BorderThickness="1">
+                        <Image
+                            Margin="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Source="{Binding Path=description_imgs[8]}"
+                            Stretch="None" />
                     </Border>
 
-                    <NumericUpDown Grid.ColumnSpan="3" Minimum="0" Value="{Binding sLength}" IsVisible="{Binding ShowDetailSize}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" Margin="0, 5, 0, 0" Width="55"/>
-                    <NumericUpDown Minimum="0" Value="{Binding sHeight}" IsVisible="{Binding ShowDetailSize}" Grid.Row="1" Grid.Column="4"  VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5, 0, 0, 0" Width="55"/>
+                    <NumericUpDown
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="3"
+                        Width="55"
+                        Margin="0,5,0,0"
+                        VerticalAlignment="Top"
+                        IsVisible="True"
+                        Minimum="0"
+                        Value="{Binding sLength}" />
+                    <NumericUpDown
+                        Grid.Row="1"
+                        Grid.Column="4"
+                        Width="55"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        IsVisible="True"
+                        Minimum="0"
+                        Value="{Binding sHeight}" />
                 </Grid>
             </DockPanel>
         </HeaderedContentControl>

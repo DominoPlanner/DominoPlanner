@@ -311,17 +311,19 @@ namespace DominoPlanner.Core
             {
                 _resizeMode = value;
                 if (value == Inter.Nearest )
-                    ResizeQuality = SKFilterQuality.Low;
+                    ResizeQuality = new SKSamplingOptions(SKFilterMode.Linear);
                 else if (value == Inter.Linear || value == Inter.LinearExact || value == Inter.Cubic)
-                    ResizeQuality = SKFilterQuality.Medium;
+                    ResizeQuality = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
                 else
-                    ResizeQuality = SKFilterQuality.High;
+                    ResizeQuality = new SKSamplingOptions(SKCubicResampler.Mitchell);
                 _resizeMode = Inter.Unset;
             }
         }
-        private SKFilterQuality _resizeQuality;
-        [ProtoMember(2)]
-        public SKFilterQuality ResizeQuality
+        // runtime-only sampling options (SkiaSharp type) - do not let protobuf-net try to serialize this directly
+        [ProtoIgnore]
+        private SKSamplingOptions _resizeQuality;
+        [ProtoIgnore]
+        public SKSamplingOptions ResizeQuality
         {
             get => _resizeQuality;
             set
@@ -329,19 +331,55 @@ namespace DominoPlanner.Core
                 if (_resizeQuality != value)
                 {
                     _resizeQuality = value;
+                    // update serializable surrogates
+                    if (_resizeQuality.Cubic != null)
+                    {
+                        ResizeUseCubic = true;
+                        ResizeFilter = SKFilterMode.Linear;
+                        ResizeMipmap = SKMipmapMode.None;
+                    }
+                    else
+                    {
+                        ResizeUseCubic = false;
+                        ResizeFilter = _resizeQuality.Filter;
+                        ResizeMipmap = _resizeQuality.Mipmap;
+                    }
                     colorsValid = false;
                 }
             }
+        }
+
+        // Serializable surrogates for SKSamplingOptions
+        [ProtoMember(2)]
+        public SKFilterMode ResizeFilter { get; set; } = SKFilterMode.Linear;
+        [ProtoMember(3)]
+        public SKMipmapMode ResizeMipmap { get; set; } = SKMipmapMode.None;
+        [ProtoMember(4)]
+        public bool ResizeUseCubic { get; set; } = false;
+
+        [ProtoAfterDeserialization]
+        private void RebuildSamplingOptions()
+        {
+            // Reconstruct the runtime SKSamplingOptions from the serialized surrogate values
+            if (ResizeUseCubic)
+            {
+                _resizeQuality = new SKSamplingOptions(SKCubicResampler.Mitchell);
+            }
+            else
+            {
+                _resizeQuality = new SKSamplingOptions(ResizeFilter, ResizeMipmap);
+            }
+            colorsValid = false;
         }
         #endregion
         private SKBitmap resizedImage;
 
         #region constructors
-        public FieldReadout(FieldParameters parent, string relativeImagePath, SKFilterQuality resizeQuality) : base(relativeImagePath, parent)
+        public FieldReadout(FieldParameters parent, string relativeImagePath, SKSamplingOptions resizeQuality) : base(relativeImagePath, parent)
         {
             ResizeQuality = resizeQuality;
         }
-        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, SKFilterQuality resizeQuality) : base(imageWidth, imageHeight, parent)
+        public FieldReadout(FieldParameters parent, int imageWidth, int imageHeight, SKSamplingOptions resizeQuality) : base(imageWidth, imageHeight, parent)
         {
             ResizeQuality = resizeQuality;
         }

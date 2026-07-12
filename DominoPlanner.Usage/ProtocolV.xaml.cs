@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage
 {
-    public class ProtocolV : Window
+    public partial class ProtocolV : Window
     {
         public ProtocolV()
         {

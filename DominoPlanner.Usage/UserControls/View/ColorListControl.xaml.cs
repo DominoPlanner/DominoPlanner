@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace DominoPlanner.Usage.UserControls.View
 {
-    public class ColorListControl : UserControl
+    public partial class ColorListControl : UserControl
     {
         public ColorListControl()
         {

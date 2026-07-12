@@ -1,20 +1,21 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
+using Avalonia.Platform.Storage;
+using DominoPlanner.Core;
 using DominoPlanner.Usage.Serializer;
 using DominoPlanner.Usage.UserControls.ViewModel;
-using DominoPlanner.Core;
-using MessageBox.Avalonia;
-using MessageBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Input;
-using System.Runtime.InteropServices;
 using static DominoPlanner.Usage.Localizer;
 
 namespace DominoPlanner.Usage
@@ -463,8 +464,8 @@ namespace DominoPlanner.Usage
             bool remove = false;
             if (tabItem.Content.UnsavedChanges)
             {
-                var msgbox = MessageBoxManager.GetMessageBoxStandardWindow(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')),
-                    ButtonEnum.YesNoCancel, Icon.Warning);
+				var msgbox = MessageBoxManager.GetMessageBoxStandard(_("Warning"), string.Format(_("Save unsaved changes of {0}?"), tabItem.Header.TrimEnd('*')), ButtonEnum.YesNoCancel, Icon.Warning);
+
                 var result = await msgbox.ShowDialogWithParent<MainWindow>();
                 if (result == ButtonResult.Yes)
                 {
@@ -617,25 +618,40 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private async void AddProject_Exists()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = Declares.ProjectExtension } },
-                Directory = UserSettings.Instance.StandardProjectPath
-            };
-            //openFileDialog.RestoreDirectory = true;
-            var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
-            if (result != null && result.Length == 1 && File.Exists(result[0]))
-            {
-                {
-                    OpenProject openProject = OpenProjectSerializer.AddOpenProject(Path.GetFileNameWithoutExtension(result[0]), Path.GetDirectoryName(result[0]));
-                    LoadProject(openProject);
-                }
-            }
-        }
+		private async void AddProject_Exists()
+		{
+			// 1. Definition des Dateifilters im neuen Avalonia 11 Format
+			var projectFilter = new FilePickerFileType(Declares.ProjectExtension)
+			{
+				Patterns = new[] { $"*.{Declares.ProjectExtension}" }
+			};
 
-        private async void AddItem_Exists()
+			// 2. Aufruf unserer neuen Erweiterungsmethode aus dem vorherigen Schritt
+			var result = await DialogExtensions.ShowOpenFileDialogAsync<MainWindow>(
+				title: "Projekt öffnen",
+				initialDirectory: UserSettings.Instance.StandardProjectPath,
+				allowMultiple: false
+			);
+
+			// 3. Auswertung des Ergebnisses (IReadOnlyList<IStorageFile>)
+			if (result != null && result.Count == 1)
+			{
+				// Den echten lokalen Pfad-String aus dem Storage-Objekt herausholen
+				string selectedPath = result[0].Path.LocalPath;
+
+				if (File.Exists(selectedPath))
+				{
+					OpenProject openProject = OpenProjectSerializer.AddOpenProject(
+						Path.GetFileNameWithoutExtension(selectedPath),
+						Path.GetDirectoryName(selectedPath)
+					);
+
+					LoadProject(openProject);
+				}
+			}
+		}
+
+		private async void AddItem_Exists()
         {
             if (!await CheckIfParentProjectMissing())
                 SelectedAssembly.AddExistingItem();

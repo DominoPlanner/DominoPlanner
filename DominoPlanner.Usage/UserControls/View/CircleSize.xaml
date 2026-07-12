@@ -1,15 +1,19 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
-             xmlns:local="clr-namespace:DominoPlanner.Usage"
-             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="300"
-             x:Class="DominoPlanner.Usage.UserControls.View.CircleSize">
-    <UserControl.Styles>
-    </UserControl.Styles>
+﻿<UserControl
+    x:Class="DominoPlanner.Usage.UserControls.View.CircleSize"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DominoPlanner.Usage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:DominoPlanner.Usage.UserControls.View"
+    xmlns:vm="clr-namespace:DominoPlanner.Usage.UserControls.ViewModel"
+    d:DesignHeight="300"
+    d:DesignWidth="350"
+    x:DataType="vm:CreateCircleVM"
+    mc:Ignorable="d">
+    <UserControl.Styles />
     <UserControl.Resources>
-        <local:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <local:BoolInverterConverter x:Key="BoolInverterConverter" />
     </UserControl.Resources>
     <Grid>
         <StackPanel>
@@ -18,44 +22,76 @@
                     <TextBlock>
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{local:Gettext 'Circle Dimensions: {0}mm x {1}mm'}">
-                                <Binding Path="PhysicalLength"></Binding>
-                                <Binding Path="PhysicalHeight"></Binding>
+                                <Binding Path="PhysicalLength" />
+                                <Binding Path="PhysicalHeight" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
                 </HeaderedContentControl.Header>
                 <StackPanel>
-                    <DockPanel Margin="2" Grid.Row="0" VerticalAlignment="Top">
-                        <TextBlock  Text="{local:Gettext Structure Size (Dominoes):}" VerticalAlignment="Center"/>
-                        <NumericUpDown IsEnabled="False" Value="{Binding DominoCount}" Minimum="0" Width="80" HorizontalAlignment="Left"/>
+                    <DockPanel
+                        Grid.Row="0"
+                        Margin="2"
+                        VerticalAlignment="Top">
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Structure Size (Dominoes):}" />
+                        <NumericUpDown
+                            Width="80"
+                            HorizontalAlignment="Left"
+                            IsEnabled="False"
+                            Minimum="0"
+                            Value="{Binding DominoCount}" />
                     </DockPanel>
-                    <DockPanel LastChildFill="True" Margin="2" VerticalAlignment="Top">
-                        <TextBlock Text="{local:Gettext Rotations:}" VerticalAlignment="Center"/>
-                        <NumericUpDown  Value="{Binding Rotations}" Minimum="0"/>
+                    <DockPanel
+                        Margin="2"
+                        VerticalAlignment="Top"
+                        LastChildFill="True">
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Rotations:}" />
+                        <NumericUpDown Minimum="0" Value="{Binding Rotations}" />
                     </DockPanel>
-                    <DockPanel LastChildFill="True" Margin="2"  VerticalAlignment="Top">
-                        <TextBlock Text="{local:Gettext Divisor:}" VerticalAlignment="Center"/>
-                        <NumericUpDown  Value="{Binding ForceDivisibility}" Minimum="1"/>
+                    <DockPanel
+                        Margin="2"
+                        VerticalAlignment="Top"
+                        LastChildFill="True">
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Divisor:}" />
+                        <NumericUpDown Minimum="1" Value="{Binding ForceDivisibility}" />
                     </DockPanel>
-                    <DockPanel LastChildFill="True" Margin="2"  VerticalAlignment="Top">
-                        <TextBlock Text="{local:Gettext Inner Diameter:}" VerticalAlignment="Center"/>
-                        <NumericUpDown  Value="{Binding InnerDiameter}" Minimum="{Binding MinInnerDiameter}"/>
+                    <DockPanel
+                        Margin="2"
+                        VerticalAlignment="Top"
+                        LastChildFill="True">
+                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Inner Diameter:}" />
+                        <NumericUpDown Minimum="{Binding MinInnerDiameter}" Value="{Binding InnerDiameter}" />
                     </DockPanel>
-                    <CheckBox IsChecked="{Binding TryUsePerfectInnerCircle}" Content="Try create perfect inner circles"/>
+                    <CheckBox Content="Try create perfect inner circles" IsChecked="{Binding TryUsePerfectInnerCircle}" />
                     <DockPanel Margin="2">
-                        <RadioButton IsChecked="{Binding RandomShiftFactor}" VerticalAlignment="Center" Content="{local:Gettext circle start shift|Random Shift}"/>
-                        <RadioButton IsChecked="{Binding RandomShiftFactor, Converter={StaticResource BoolInverterConverter}}" Margin="5, 0, 0, 0" VerticalAlignment="Center" Content="{local:Gettext circle start shift|Fixed shift:}"/>
-                        <NumericUpDown IsEnabled="{Binding RandomShiftFactor, Converter={StaticResource BoolInverterConverter}}"  Value="{Binding AngleShiftFactor}" Minimum="-0.5" Maximum="0.5" Increment="0.01" MinWidth="80" FormatString="F2"/>
+                        <RadioButton
+                            VerticalAlignment="Center"
+                            Content="{local:Gettext circle start shift|Random Shift}"
+                            IsChecked="{Binding RandomShiftFactor}" />
+                        <RadioButton
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="{local:Gettext circle start shift|Fixed shift:}"
+                            IsChecked="{Binding RandomShiftFactor, Converter={StaticResource BoolInverterConverter}}" />
+                        <NumericUpDown
+                            MinWidth="80"
+                            FormatString="F2"
+                            Increment="0.01"
+                            IsEnabled="{Binding RandomShiftFactor, Converter={StaticResource BoolInverterConverter}}"
+                            Maximum="0.5"
+                            Minimum="-0.5"
+                            Value="{Binding AngleShiftFactor}" />
                     </DockPanel>
                 </StackPanel>
             </HeaderedContentControl>
             <HeaderedContentControl Header="{local:Gettext Domino dimensions}">
-                <view:DominoDimensionsV TangentialDistance="{Binding TangentialDistance}"
-                                     NormalDistance="{Binding NormalDistance}"
-                                     TangentialWidth="{Binding TangentialWidth}"
-                                     NormalWidth="{Binding NormalWidth}"
-                                     NormalDistanceText="{local:Gettext Between\\nCircles}"
-                                     TangentialDistanceText="{local:Gettext Between\\nDominoes}"/>
+                <view:DominoDimensionsV
+                    NormalDistance="{Binding NormalDistance}"
+                    NormalDistanceText="{local:Gettext Between\\nCircles}"
+                    NormalWidth="{Binding NormalWidth}"
+                    TangentialDistance="{Binding TangentialDistance}"
+                    TangentialDistanceText="{local:Gettext Between\\nDominoes}"
+                    TangentialWidth="{Binding TangentialWidth}" />
             </HeaderedContentControl>
         </StackPanel>
     </Grid>

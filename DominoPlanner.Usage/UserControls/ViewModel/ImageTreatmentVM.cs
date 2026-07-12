@@ -131,7 +131,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             get => CurrentModel as FieldReadout;
         }
-        public SkiaSharp.SKFilterQuality ResizeQuality
+        public SkiaSharp.SKSamplingOptions ResizeQuality
         {
             get => FRModel.ResizeQuality;
             set

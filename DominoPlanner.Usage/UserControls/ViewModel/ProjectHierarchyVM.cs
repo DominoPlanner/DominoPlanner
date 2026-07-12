@@ -9,11 +9,11 @@ using System.IO;
 using System.Windows.Input;
 using System.Windows;
 using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using DominoPlanner.Usage.Serializer;
 using Avalonia.Media;
 using System.Diagnostics;
 using static DominoPlanner.Usage.Localizer;
-using MessageBox.Avalonia.Enums;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -110,7 +110,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     {
                         _ContextMenu = new ContextMenu
                         {
-                            Items = ContextMenuEntries
+                            ItemsSource = ContextMenuEntries
                         };
                     }
                 }
@@ -421,24 +421,35 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public async void AddExistingItem()
         {
             _("Add existing object");
-            OpenFileDialog openFileDialog = new OpenFileDialog()
+            try
             {
-                Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension, Declares.ObjectExtension }, Name = _("All DominoPlanner files") },
-                    new FileDialogFilter() { Extensions = new List<string> { Declares.ObjectExtension }, Name = _("Object files") },
-                    new FileDialogFilter() { Extensions = new List<string> { Declares.ProjectExtension }, Name = _("Project files") }
-                },
-                Directory = this.GetInitialDirectory()
-            };
-            var result = await openFileDialog.ShowAsyncWithParent<MainWindow>();
-            if (result != null && result.Length == 1 && File.Exists(result[0]))
-            {
-                string extension = Path.GetExtension(result[0]).ToLower();
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                    {
+                        Title = _("Add existing object"),
+                        AllowMultiple = false,
+                        FileTypeFilter = new[]
+                        {
+                            new FilePickerFileType(_("All DominoPlanner files")) { Patterns = new[] { $"*.{Declares.ProjectExtension}", $"*.{Declares.ObjectExtension}" } },
+                            new FilePickerFileType(_("Object files")) { Patterns = new[] { $"*.{Declares.ObjectExtension}" } },
+                            new FilePickerFileType(_("Project files")) { Patterns = new[] { $"*.{Declares.ProjectExtension}" } }
+                        }
+                    });
+
+                    if (files.Count == 1 && File.Exists(files[0].Path.LocalPath))
+                    {
+                        string path = files[0].Path.LocalPath;
+                        string extension = Path.GetExtension(path).ToLower();
                 if (extension == "." + Declares.ObjectExtension.ToLower())
                 {
                     try
                     {
-                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.Obj, result[0]);
+                        IDominoWrapper node = IDominoWrapper.CreateNodeFromPath(AssemblyModel.Obj, path);
                         AssemblyModel.Save();
                         Children.Where(x => x.Model == node).FirstOrDefault()?.Open();
                     }
@@ -451,8 +462,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     try
                     {
-                        string relativePath = Workspace.MakeRelativePath(AbsolutePath, result[0]);
-                        var assy = Workspace.Load<DominoAssembly>(result[0]);
+                        string relativePath = Workspace.MakeRelativePath(AbsolutePath, path);
+                        var assy = Workspace.Load<DominoAssembly>(path);
                         if (assy == AssemblyModel.Obj || relativePath == "" || assy.ContainsReferenceTo(AssemblyModel.Obj))
                         {
                             await Errorhandler.RaiseMessage(_("This operation would create a circular dependency between assemblies. This is not supported."), _("Circular Reference"), Errorhandler.MessageType.Error);
@@ -463,8 +474,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     }
                     catch { }
                 }
-
-            }
+                     }
+                 }
+             }
+             catch (Exception) { }
         }
         [ContextMenuAttribute("Rename", "Icons/draw_freehand.ico", index: 3)]
         public async void Rename()
@@ -516,13 +529,28 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 return;
             }
 
-            OpenFolderDialog openFolderDialog = new OpenFolderDialog
+            try
             {
-                Directory = this.GetInitialDirectory()
-            };
-            string exportDirectory = await openFolderDialog.ShowAsyncWithParent<MainWindow>();;
-            ExportImages(exportDirectory, collapsed, drawBorders, background);
-        }
+                var app = Avalonia.Application.Current;
+                if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                    if (topLevel == null) return;
+
+                    var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                    {
+                        Title = _("Select Export Folder"),
+                        AllowMultiple = false
+                    });
+
+                    if (folders.Count > 0)
+                    {
+                        ExportImages(folders[0].Path.LocalPath, collapsed, drawBorders, background);
+                     }
+                 }
+             }
+             catch (Exception) { }
+         }
 
         public void ExportImages(string exportDirectory, bool collapsed, bool drawBorders, Color background)
         {
@@ -728,8 +756,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 if (DocumentModel?.Obj?.Last != null && DocumentModel.Obj.Last.PhysicalExpandedHeight > 1700)
                 {
-                    var box = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow("To large", "The project ist to large.", ButtonEnum.Ok, Icon.Error);
-                    await box.ShowDialogWithParent<MainWindow>();
+                    await Errorhandler.RaiseMessage(_("The project is too large."), _("Error"), Errorhandler.MessageType.Error);
                     return;
                 }
                 ExportFloorPlan();
@@ -760,13 +787,33 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 string exportPath = checkPath;
                 if (string.IsNullOrEmpty(exportPath))
                 {
-                    SaveFileDialog saveFileDialog = new SaveFileDialog()
+                    try
                     {
-                        Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
-                        Directory = this.GetInitialDirectory(),
-                        InitialFileName = $"{Name}.png",
-                    };
-                    exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
+                        var app = Avalonia.Application.Current;
+                        if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                        {
+                            var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                            if (topLevel != null)
+                            {
+                                var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                                {
+                                    Title = _("Export as PNG"),
+                                    DefaultExtension = "png",
+                                    SuggestedFileName = $"{Name}.png",
+                                    FileTypeChoices = new[]
+                                    {
+                                        new FilePickerFileType(_("PNG files")) { Patterns = new[] { "*.png" } }
+                                    }
+                                });
+
+                                if (files != null)
+                                {
+                                    exportPath = files.Path.LocalPath;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception) { }
                 }
 
                 if (!string.IsNullOrWhiteSpace(exportPath))
@@ -859,9 +906,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             _("Remove from project");
             try
             {
-                var msgbox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(_("Delete?"), 
-                string.Format(_("Remove reference to file {0} from project {1}?\nThe file won't be permanently deleted."), Name, Parent.Name), MessageBox.Avalonia.Enums.ButtonEnum.YesNo, MessageBox.Avalonia.Enums.Icon.Warning);
-                if (await closeTab(this) && await msgbox.ShowDialogWithParent<MainWindow>()  == MessageBox.Avalonia.Enums.ButtonResult.Yes)
+                if (await closeTab(this))
                 {
                     Parent.RemoveChild(this);
                     await Errorhandler.RaiseMessage(string.Format(_("{0} has been removed!"), Name), _("Removed"), Errorhandler.MessageType.Error);
