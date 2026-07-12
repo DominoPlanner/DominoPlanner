@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ApplicationIcon>Icons/DominoCalculator.ico</ApplicationIcon>
     <Version>3.0.0.11</Version>
     <AssemblyVersion>3.0.0.11</AssemblyVersion>
@@ -140,6 +140,7 @@
 
 
     <PackageReference Include="Dotnet.Bundle" Version="*" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Icons\*"></AvaloniaResource>
@@ -259,24 +260,20 @@
     <None Update="Resources\UserSettings.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\lamping %28de%29.DColor">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
-    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="git describe --long --tags &gt; &quot;$(ProjectDir)/version.txt&quot;" />
-        <Exec 
-      Command="git describe --long --always --dirty --exclude=* --abbrev=8"
-      ConsoleToMSBuild="True"
-      IgnoreExitCode="False"
-      >
-      <Output PropertyName="SourceRevisionId" TaskParameter="ConsoleOutput"/>
-    </Exec>
-    </Target>
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
         <DefineConstants>_WINDOWS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
       <DefineConstants>$(DefineConstants);_MasterplanExport</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
+      <DocumentationFile></DocumentationFile>
+      <DefineConstants>TRACE;RELEASE;NETCOREAPP;NETCOREAPP3_1;</DefineConstants>
+      <DocumentationFile></DocumentationFile>
     </PropertyGroup>
 </Project>
