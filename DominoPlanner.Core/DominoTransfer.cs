@@ -129,8 +129,12 @@ namespace DominoPlanner.Core
                         canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height,
                             new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true  });
                     }
-                    if (borders)
-                    {
+#if MasterplanExport
+                    if (borders && c.A > 0)
+#else
+					if (borders)
+#endif
+					{
                         canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height,
                             new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = false, IsStroke=true, StrokeWidth=1});
                     }
@@ -152,9 +156,13 @@ namespace DominoPlanner.Core
                             canvas.DrawPath(path,
                                 new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true, IsStroke = false });
                         }
-                        if (borders)
-                        {
-                            canvas.DrawPath(path,
+#if MasterplanExport
+                        if (borders && c.A > 0)
+#else
+						if (borders)
+#endif
+						{
+							canvas.DrawPath(path,
                                 new SKPaint() { Color = new SKColor(0, 0, 0, 255), IsAntialias = true, IsStroke = true, StrokeWidth = 1 });
                         }
                     }

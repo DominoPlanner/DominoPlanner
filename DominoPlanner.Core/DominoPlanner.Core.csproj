@@ -39,4 +39,7 @@
     <AssemblyOriginatorKeyFile>DominoPlanner.Core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);_MasterplanExport</DefineConstants>
+  </PropertyGroup>
 </Project>
