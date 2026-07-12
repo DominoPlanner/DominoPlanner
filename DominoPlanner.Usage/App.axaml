@@ -5,7 +5,13 @@
              xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
              x:Class="DominoPlanner.Usage.App">
     <Application.Resources>
-        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/Icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        </ResourceDictionary>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
@@ -209,11 +215,4 @@
 
         </Style>
     </Application.Styles>
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Resources/Icons.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Application.Resources>
 </Application>
