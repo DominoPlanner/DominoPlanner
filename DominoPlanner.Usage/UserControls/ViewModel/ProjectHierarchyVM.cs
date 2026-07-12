@@ -14,6 +14,8 @@ using Avalonia.Media;
 using System.Diagnostics;
 using static DominoPlanner.Usage.Localizer;
 using MessageBox.Avalonia.Enums;
+using SixLabors.ImageSharp.Formats.Png;
+using SkiaSharp;
 
 namespace DominoPlanner.Usage.UserControls.ViewModel
 {
@@ -742,9 +744,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             string finalExportPath = await ExportImage_PrepairPath(exportPath);
 
 #if MasterplanExport
-            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, true, true, 0, 0).Save(finalExportPath, 254f);
+            Export(DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, true, true, 0, 0), finalExportPath, 254);
 #else
-            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed, 0, 0).Save(finalExportPath, 24);
+            Export(DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, drawBorders, collapsed, 0, 0), finalExportPath, 24);
 #endif
         }
 
@@ -755,38 +757,55 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private async Task<string> ExportImage_PrepairPath(string checkPath)
         {
-            Task<string> createPath = Task.Run(async () =>
+            string exportPath = checkPath;
+            if (string.IsNullOrEmpty(exportPath))
             {
-                string exportPath = checkPath;
-                if (string.IsNullOrEmpty(exportPath))
+                SaveFileDialog saveFileDialog = new SaveFileDialog()
                 {
-                    SaveFileDialog saveFileDialog = new SaveFileDialog()
-                    {
-                        Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
-                        Directory = this.GetInitialDirectory(),
-                        InitialFileName = $"{Name}.png",
-                    };
-                    exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
-                }
+                    Filters = new List<FileDialogFilter>() { new FileDialogFilter() { Extensions = new List<string> { "png" }, Name = _("PNG files") } },
+                    Directory = this.GetInitialDirectory(),
+                    InitialFileName = $"{Name}.png",
+                };
+                exportPath = await saveFileDialog.ShowAsyncWithParent<MainWindow>();
+            }
 
-                if (!string.IsNullOrWhiteSpace(exportPath))
+            if (!string.IsNullOrWhiteSpace(exportPath))
+            {
+                if (File.Exists(exportPath))
                 {
-                    if (File.Exists(exportPath))
-                    {
-                        File.Delete(exportPath);
-                    }
+                    File.Delete(exportPath);
                 }
-                return exportPath;
-            });
-
-            await createPath;
-            return createPath.Result;
+            }
+            return exportPath;
         }
 
         public async void ExportFloorPlan()
         {
             string exportPath = await ExportImage_PrepairPath();
-            DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateFloorPlan().Save(exportPath, 300);
+
+            Export(DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateFloorPlan(), exportPath, 300);
+        }
+
+        public void Export(SKSurface surface, string exportPath, double dpi)
+        {
+            if (string.IsNullOrEmpty(exportPath)) return;
+
+            using (var image = surface.Snapshot().Encode(SkiaSharp.SKEncodedImageFormat.Png, 100))
+            {
+                using (MemoryStream ms = new MemoryStream(image.ToArray()))
+                {
+                    using (SixLabors.ImageSharp.Image exportImage = SixLabors.ImageSharp.Image.Load(ms))
+                    {
+                        exportImage.Metadata.HorizontalResolution = dpi;
+                        exportImage.Metadata.VerticalResolution = dpi;
+
+                        using (var outputStream = new FileStream(exportPath, FileMode.CreateNew))
+                        {
+                            exportImage.Save(outputStream, new PngEncoder());
+                        }
+                    }
+                }
+            }
         }
 
         public async void ExportImage(bool userDefinedExport)

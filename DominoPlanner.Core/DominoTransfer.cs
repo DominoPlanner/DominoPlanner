@@ -127,7 +127,7 @@ namespace DominoPlanner.Core
                     if (c.A != 0)
                     {
                         canvas.DrawRect((float)rect.x + xShift, (float)rect.y + yShift, (float)rect.width, (float)rect.height,
-                            new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = true  });
+                            new SKPaint() { Color = new SKColor(c.R, c.G, c.B, c.A), IsAntialias = false  });
                     }
 #if MasterplanExport
                     if (borders && c.A > 0)
