@@ -3,19 +3,40 @@
              xmlns:local="clr-namespace:DominoPlanner.Usage"
              xmlns:uc="clr-namespace:DominoPlanner.Usage.UserControls"
              xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
+
              x:Class="DominoPlanner.Usage.App">
     <Application.Resources>
-        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
-        <!-- Minimal theme resources to allow XAML compilation without external theme packages -->
-        <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFFFFFFF" />
-        <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF0F0F0" />
-        <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#FFE0E0E0" />
-        <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#FFCCCCCC" />
-        <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#FF999999" />
-        <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#FF666666" />
-        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF000000" />
-        <x:Double x:Key="ThemeBorderThickness">1</x:Double>
-        <x:Double x:Key="ThemeDisabledOpacity">0.5</x:Double>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+            <!-- Minimal theme resources to allow XAML compilation without external theme packages -->
+            <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF0F0F0" />
+            <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#FFE0E0E0" />
+            <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#FFCCCCCC" />
+            <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#FF999999" />
+            <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#FF666666" />
+            <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF000000" />
+            <Thickness x:Key="ThemeBorderThickness">1</Thickness>
+            <x:Double x:Key="ThemeDisabledOpacity">0.5</x:Double>
+            <!-- Compatibility fallbacks for older templates that expect System-like resource keys (simple string keys) -->
+            <SolidColorBrush x:Key="ControlLightLightBrush" Color="#FFF8F8F8" />
+            <SolidColorBrush x:Key="ControlLightBrush" Color="#FFEEEEEE" />
+            <SolidColorBrush x:Key="ControlDarkBrush" Color="#FF808080" />
+            <SolidColorBrush x:Key="ControlTextBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="WindowFrameBrush" Color="#FF888888" />
+            <!-- A simple keyed NumericUpDown style fallback for templates that reference it by key -->
+            <Style x:Key="NumericUpDown" Selector="NumericUpDown">
+                <Setter Property="Margin" Value="2,0" />
+                <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
+                <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}" />
+                <Setter Property="Padding" Value="2" />
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentTheme.xaml" />
@@ -73,7 +94,34 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <Style Selector="NumericUpDown">
-            <Setter Property="Margin" Value="5, 0">
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
+            <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBox Name="PART_TextBox"
+                                         VerticalContentAlignment="Center"
+                                         Margin="2,0,0,0"
+                                         FontSize="12"
+                                         Background="Transparent"
+                                         BorderThickness="0" />
+                                <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4,0,0,0">
+                                    <RepeatButton Name="PART_IncreaseButton" Width="18" Height="12" Content="▲" FontSize="10" Padding="0" Margin="0,0,0,1" />
+                                    <RepeatButton Name="PART_DecreaseButton" Width="18" Height="12" Content="▼" FontSize="10" Padding="0" Margin="0,1,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
             </Setter>
         </Style>
         <!-- styling tool buttons-->
@@ -219,11 +267,5 @@
 
         </Style>
     </Application.Styles>
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Resources/Icons.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Application.Resources>
+
 </Application>

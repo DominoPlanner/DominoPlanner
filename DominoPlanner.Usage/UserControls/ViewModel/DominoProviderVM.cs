@@ -33,7 +33,10 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             SetDominoCount = new RelayCommand(o =>
             {
                 if (CurrentProject is ICountTargetable)
-                    DominoCount = (int)Math.Floor((double)o);
+                {
+                    if (o != null)
+                        DominoCount = (int)Math.Floor(DominoPlanner.Usage.ConverterHelper.SafeToDouble(o));
+                }
             }
             );
 

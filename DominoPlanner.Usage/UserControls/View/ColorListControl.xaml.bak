@@ -35,7 +35,7 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
+                                <Border BorderBrush="{StaticResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
                                     <TextBlock
                                         Margin="5,2"
                                         HorizontalAlignment="Center"
@@ -48,7 +48,7 @@
                     </Setter>
                 </Style>
                 <Style Selector="GridSplitter">
-                    <Setter Property="Background" Value="{DynamicResource ThemeBorderMidBrush}" />
+                    <Setter Property="Background" Value="{StaticResource ThemeBorderMidBrush}" />
                     <Setter Property="Width" Value="2" />
                 </Style>
                 <Style Selector="ContentControl.Header.Sum /template/ TextBlock">
@@ -80,7 +80,7 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
+                                <Border BorderBrush="{StaticResource ThemeBorderMidBrush}" BorderThickness="1,0,1,2">
                                     <StackPanel Orientation="Horizontal">
                                         <Image
                                             Width="15"
@@ -217,4 +217,3 @@
         </Grid>
     </Grid>
 </UserControl>
-

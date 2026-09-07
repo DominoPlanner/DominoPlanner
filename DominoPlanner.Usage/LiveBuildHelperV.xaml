@@ -10,6 +10,7 @@
     Width="900"
     Height="600"
     x:DataType="local:LiveBuildHelperVM"
+    Focusable="True"
     Icon="/Icons/DominoCalculator.ico"
     WindowStartupLocation="CenterScreen"
     WindowState="Maximized"
@@ -46,7 +47,6 @@
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Focusable="False"
                     FontSize="25"
                     Maximum="{Binding CountRow}"
                     Minimum="1"
@@ -75,7 +75,6 @@
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
-                    Focusable="False"
                     FontSize="25"
                     Maximum="{Binding CountBlock}"
                     Minimum="1"
@@ -147,7 +146,7 @@
                         CommandParameter="{Binding PositionSnapshots, Converter={StaticResource FirstOrDefaultConverter}}"
                         Content="{local:Gettext Go To Last Pin}">
                         <ToolTip.Tip>
-                            <Binding Path="PositionSnapshots" Converter="{StaticResource FirstSnapshotToTipConverter}" />
+                            <Binding Converter="{StaticResource FirstSnapshotToTipConverter}" Path="PositionSnapshots" />
                         </ToolTip.Tip>
                     </Button>
                     <StackPanel Orientation="Vertical">
@@ -293,7 +292,7 @@
                 Grid.Row="0"
                 Margin="0"
                 Padding="0"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 BorderThickness="0"
                 GotFocus="ListBox_GotFocus"
                 IsVisible="{Binding ShowHistory}"
@@ -317,8 +316,9 @@
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
                                     <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
+                                    <!-- Use the configured block size (may be larger than the actual item count) so the last block keeps space for the full block -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
-                                    <Binding ElementName="LiveBuildHelper" Path="Bounds.Width" />
+                                    <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
@@ -331,7 +331,7 @@
                 Height="20"
                 Margin="0"
                 Padding="0"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 BorderThickness="0"
                 GotFocus="ListBox_GotFocus"
                 IsVisible="{Binding ShowSubBlocks}"
@@ -368,8 +368,9 @@
                             </Interaction.Behaviors>
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource BlockConverter}">
+                                    <!-- Use configured block size so subblocks reserve full block width -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
-                                    <Binding ElementName="LiveBuildHelper" Path="Bounds.Width" />
+                                    <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
                                     <Binding Path="BlockSize" />
                                     <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                 </MultiBinding>
@@ -383,7 +384,7 @@
                 Grid.Row="2"
                 Margin="0"
                 Padding="0"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 BorderThickness="0"
                 EffectiveViewportChanged="ListBox_EffectiveViewportChanged"
                 GotFocus="ListBox_GotFocus"
@@ -407,8 +408,9 @@
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
                                     <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
+                                    <!-- Use configured block size so each stone keeps width reserved for full block -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
-                                    <Binding ElementName="LiveBuildHelper" Path="Bounds.Width" />
+                                    <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
@@ -420,7 +422,7 @@
                 Grid.Row="3"
                 Margin="0,0,0,0"
                 Padding="0"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 BorderThickness="0"
                 GotFocus="ListBox_GotFocus"
                 ItemsSource="{Binding ColorNames}"
@@ -439,7 +441,7 @@
                                 <MultiBinding Converter="{StaticResource BorderWidthConverter}">
                                     <Binding Path="Amount" />
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
-                                    <Binding ElementName="LiveBuildHelper" Path="Bounds.Width" />
+                                    <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
                                     <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                 </MultiBinding>
                             </Border.Width>

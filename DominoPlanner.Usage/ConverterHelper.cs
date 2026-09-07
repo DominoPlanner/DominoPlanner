@@ -9,6 +9,7 @@ using Avalonia.Platform;
 using DominoPlanner.Core;
 using SkiaSharp;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -19,8 +20,38 @@ using ThemeEditor.Controls.ColorPicker;
 namespace DominoPlanner.Usage
 {
     using static Localizer;
-    class ConverterHelper
+    public static class ConverterHelper
     {
+        // Safe conversion helpers to avoid calling Convert.ToDouble on Avalonia.UnsetValueType
+        public static double SafeToDouble(object value, double defaultValue = 0)
+        {
+            try
+            {
+                if (value is double d) return d;
+                if (value is float f) return f;
+                if (value is int i) return i;
+                if (value is long l) return l;
+                if (value is decimal m) return (double)m;
+                if (value is IConvertible) return System.Convert.ToDouble(value);
+            }
+            catch { }
+            return defaultValue;
+        }
+
+        public static int SafeToInt(object value, int defaultValue = 0)
+        {
+            try
+            {
+                if (value is int i) return i;
+                if (value is long l) return (int)l;
+                if (value is double d) return (int)d;
+                if (value is float f) return (int)f;
+                if (value is decimal m) return (int)m;
+                if (value is IConvertible) return System.Convert.ToInt32(value);
+            }
+            catch { }
+            return defaultValue;
+        }
     }
     public class AmountToColorConverter : IMultiValueConverter
     {
@@ -197,8 +228,8 @@ namespace DominoPlanner.Usage
 			// 1. RICHTUNG: Von Zahl (Slider/Zahl aus UI) zu SKSamplingOptions
 			if (targetType == typeof(SKSamplingOptions))
 			{
-				// Sicher konvertieren (XAML übergibt Zahlen oft als double oder int)
-				int val = System.Convert.ToInt32(value);
+                // Sicher konvertieren (XAML übergibt Zahlen oft als double oder int)
+                int val = ConverterHelper.SafeToInt(value, 0);
 
 				return val switch
 				{
@@ -641,17 +672,45 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 4)
+            try
             {
-                if (values[0] is int colorAmount && values[1] is int amount && values[2] is double width && values[3] is double pixelDensity && pixelDensity > 0)
+                if (values.Count == 4)
                 {
-					double realWidth = Math.Ceiling(width * pixelDensity);
-					double realStoneWidth = Math.Floor(realWidth / amount);
-					double realBlockSize = realStoneWidth * colorAmount;
-					return realBlockSize / pixelDensity;
+
+                    // Defensive extraction and logging for diagnostics
+                    int colorAmount = ConverterHelper.SafeToInt(values[0], 1);
+                    int amount = ConverterHelper.SafeToInt(values[1], 1);
+                    double width = ConverterHelper.SafeToDouble(values[2], 0);
+                    double pixelDensity = ConverterHelper.SafeToDouble(values[3], 1.0);
+
+                    Debug.WriteLine($"BorderWidthConverter inputs: colorAmount={colorAmount}, amount={amount}, width={width}, pixelDensity={pixelDensity}");
+
+                    if (amount <= 0 || width <= 0)
+                    {
+                        double fallback = Math.Max(20, colorAmount * 10);
+                        Debug.WriteLine($"BorderWidthConverter fallback (bad input) -> {fallback}");
+                        return fallback;
+                    }
+
+                    // Calculate using the logical (floating) width to avoid cumulative rounding errors
+                    double realStoneWidth = width / amount;
+                    double realBlockSize = realStoneWidth * colorAmount;
+                    // small device-pixel margin (rounded to device pixels)
+                    double margin = Math.Round(4 * pixelDensity);
+                    double adjusted = Math.Round(realBlockSize - margin);
+                    if (adjusted < 1)
+                        adjusted = Math.Max(1, Math.Round(colorAmount * 4 * pixelDensity));
+
+                    Debug.WriteLine($"BorderWidthConverter result: {adjusted}");
+                    return adjusted;
                 }
             }
-            return 20;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BorderWidthConverter exception: {ex}");
+            }
+
+            return 40; // safer default to make blocks visible
         }
     }
 
@@ -659,17 +718,38 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 3)
+            try
             {
-                if (values[0] is double pixelDensity && pixelDensity > 0 && values[1] is int amount && values[2] is double width)
+                if (values.Count == 3)
                 {
-                    double realWidth = Math.Ceiling(width * pixelDensity);
-                    double realStoneWidth = Math.Floor(realWidth / amount);
+                    // Defensive checks: Avalonia binding can pass UnsetValue (non-convertible) objects
+                    double pixelDensity = ConverterHelper.SafeToDouble(values[0], 1.0);
+                    int amount = ConverterHelper.SafeToInt(values[1], 1);
+                    double width = ConverterHelper.SafeToDouble(values[2], 0);
+
+                    Debug.WriteLine($"StoneWidthConverter inputs: pixelDensity={pixelDensity}, amount={amount}, width={width}");
+
+                    if (amount <= 0 || width <= 0)
+                    {
+                        double fallback = 8;
+                        Debug.WriteLine($"StoneWidthConverter fallback -> {fallback}");
+                        return fallback;
+                    }
+
+                    double realStoneWidth = Math.Floor(width / amount);
                     realStoneWidth -= Math.Floor(4 * pixelDensity);
-                    return realStoneWidth / pixelDensity;
+                    if (realStoneWidth < 1) realStoneWidth = 1;
+
+                    Debug.WriteLine($"StoneWidthConverter result: {realStoneWidth}");
+                    return realStoneWidth;
                 }
             }
-            return 20;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"StoneWidthConverter exception: {ex}");
+            }
+
+            return 8;
         }
     }
 
@@ -677,21 +757,40 @@ namespace DominoPlanner.Usage
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count == 4)
+            try
             {
-                if (values[0] is int amount && values[1] is double width && values[2] is int blockSize && values[3] is double pixelDensity && pixelDensity > 0)
+                if (values.Count == 4)
                 {
-					double realWidth = Math.Ceiling(width * pixelDensity);
-					double realStoneWidth = Math.Floor(realWidth / amount);
+                    int amount = ConverterHelper.SafeToInt(values[0], 1);
+                    double width = ConverterHelper.SafeToDouble(values[1], 0);
+                    int blockSize = ConverterHelper.SafeToInt(values[2], 1);
+                    double pixelDensity = ConverterHelper.SafeToDouble(values[3], 1.0);
 
+                    Debug.WriteLine($"BlockConverter inputs: amount={amount}, width={width}, blockSize={blockSize}, pixelDensity={pixelDensity}");
+
+
+                    if (amount <= 0 || width <= 0)
+                    {
+                        double fallback = Math.Max(20, blockSize * 10);
+                        Debug.WriteLine($"BlockConverter fallback -> {fallback}");
+                        return fallback;
+                    }
+
+                    double realStoneWidth = Math.Floor(width / amount);
                     double realBlockSize = realStoneWidth * blockSize;
-
                     realBlockSize -= Math.Floor(4 * pixelDensity);
+                    if (realBlockSize < 1) realBlockSize = 1;
 
-                    return realBlockSize / pixelDensity;
+                    Debug.WriteLine($"BlockConverter result: {realBlockSize}");
+                    return realBlockSize;
                 }
             }
-			return 20;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BlockConverter exception: {ex}");
+            }
+
+            return 40;
         }
     }
 

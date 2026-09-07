@@ -15,7 +15,7 @@
         <local:DeletedColorVisibilityConverter x:Key="DeletedColorVisibilityConverter" />
         <vm:IntToStringConverter x:Key="IntToStringConverter" />
     </UserControl.Resources>
-    <Border BorderBrush="{StaticResource ThemeBorderHighBrush}" BorderThickness="1">
+    <Border BorderBrush="{DynamicResource ThemeBorderHighBrush}" BorderThickness="1">
         <ScrollViewer
             Name="OuterScrollViewer"
             HorizontalScrollBarVisibility="Visible"

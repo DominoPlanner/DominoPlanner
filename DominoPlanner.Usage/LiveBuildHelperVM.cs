@@ -396,7 +396,7 @@ namespace DominoPlanner.Usage
             }
         }
 
-        private int CurrentBlockSize
+        public int CurrentBlockSize
         {
             get
             {

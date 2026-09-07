@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Platform;
-using Avalonia.VisualTree;
 using System;
 
 namespace DominoPlanner.Usage
@@ -48,8 +46,8 @@ namespace DominoPlanner.Usage
         {
             try
             {
-                var mainGrid = this.Get<Grid>("MG");
-                mainGrid?.Focus();
+                // Keep focus on the window itself to avoid focus visuals on inner controls
+                this.Focus();
             }catch(Exception ex) { }
         }
 
@@ -88,8 +86,7 @@ namespace DominoPlanner.Usage
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space || e.Key == Key.P)
             {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
-                var mainGrid = this.Get<Grid>("MG");
-                mainGrid.Focus();
+                this.Focus();
                 e.Handled = true;
             }
         }
@@ -105,8 +102,7 @@ namespace DominoPlanner.Usage
             if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Space)
             {
                 ((LiveBuildHelperVM)DataContext).PressedKey(e.Key);
-                var mainGrid = this.Get<Grid>("MG");
-                mainGrid.Focus();
+                this.Focus();
                 e.Handled = true;
             }
         }

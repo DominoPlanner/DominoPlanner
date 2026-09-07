@@ -278,4 +278,8 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
       <DefineConstants>$(DefineConstants);_MasterplanExport</DefineConstants>
     </PropertyGroup>
+<!-- Exclude an accidentally-empty compatibility XAML from Avalonia build processing until file is fixed -->
+<ItemGroup>
+  <AvaloniaXaml Remove="Resources\Compatibility.axaml" />
+</ItemGroup>
 </Project>

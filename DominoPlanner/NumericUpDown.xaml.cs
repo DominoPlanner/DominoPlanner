@@ -245,7 +245,7 @@ namespace DominoPlanner
         /// <returns><list type="bullet"><item><term>true</term><description>The Value is inbetween <see cref="MinValue"/> and <see cref="MaxValue"/></description></item><item><term>false</term><description>The value is out of bounds</description></item></list></returns>
         static bool validateValue(object value)
         {
-            double val = Convert.ToDouble(value);
+            double val = DominoPlanner.Usage.ConverterHelper.SafeToDouble(value);
             return (val >= _minValue && val <= _maxValue);
         }
 
@@ -308,11 +308,11 @@ namespace DominoPlanner
         {
             if (e.Property == _minvalue)
             {
-                _minValue = Convert.ToDouble(e.NewValue);
+                _minValue = DominoPlanner.Usage.ConverterHelper.SafeToDouble(e.NewValue);
             }
             else if (e.Property == _maxvalue)
             {
-                _maxValue = Convert.ToDouble(e.NewValue);
+                _maxValue = DominoPlanner.Usage.ConverterHelper.SafeToDouble(e.NewValue);
             }
         }
 
@@ -498,7 +498,7 @@ namespace DominoPlanner
         {
             try
             {
-                return System.Convert.ToDouble(value);
+                return DominoPlanner.Usage.ConverterHelper.SafeToDouble(value);
             }
             catch (Exception)
             {
