@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
     <ApplicationIcon>Icons/DominoCalculator.ico</ApplicationIcon>
     <Version>3.0.0.11</Version>
     <AssemblyVersion>3.0.0.11</AssemblyVersion>
