@@ -1,10 +1,11 @@
-﻿<Application xmlns="https://github.com/avaloniaui"
+<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DominoPlanner.Usage"
-             xmlns:uc="clr-namespace:DominoPlanner.Usage.UserControls"
+              x:Class="DominoPlanner.Usage.App"
+              xmlns:uc="clr-namespace:DominoPlanner.Usage.UserControls"
              xmlns:cp="clr-namespace:ThemeEditor.Controls.ColorPicker;assembly=ThemeEditor.Controls.ColorPicker"
-
-             x:Class="DominoPlanner.Usage.App">
+             
+             RequestedThemeVariant="Default">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -94,34 +95,65 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <Style Selector="NumericUpDown">
-            <Setter Property="Margin" Value="2,0" />
-            <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderLowBrush}" />
-            <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}" />
-            <Setter Property="Padding" Value="2" />
+    <Setter Property="Increment" Value="1" />
+    <Setter Property="FormatString" Value="0" />
+    <Setter Property="ParsingNumberStyle" Value="Integer" />
+</Style>
+
+        <!-- Vertikale Pfeile für NumericUpDown -->
+        <Style Selector="NumericUpDown /template/ ButtonSpinner#PART_Spinner">
             <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="3"
-                                Padding="{TemplateBinding Padding}">
-                            <Grid ColumnDefinitions="*, Auto">
-                                <TextBox Name="PART_TextBox"
-                                         VerticalContentAlignment="Center"
-                                         Margin="2,0,0,0"
-                                         FontSize="12"
-                                         Background="Transparent"
-                                         BorderThickness="0" />
-                                <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4,0,0,0">
-                                    <RepeatButton Name="PART_IncreaseButton" Width="18" Height="12" Content="▲" FontSize="10" Padding="0" Margin="0,0,0,1" />
-                                    <RepeatButton Name="PART_DecreaseButton" Width="18" Height="12" Content="▼" FontSize="10" Padding="0" Margin="0,1,0,0" />
-                                </StackPanel>
+                <ControlTemplate>
+                    <DataValidationErrors>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <!-- Eingabefeld links -->
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Grid.Column="0"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                            <!-- Pfeil-Buttons rechts, vertikal gestapelt -->
+                            <Grid Grid.Column="1" 
+                                  RowDefinitions="*,*" 
+                                  Width="18">
+                                
+                                <!-- Pfeil nach oben -->
+                                <RepeatButton Name="PART_IncreaseButton"
+                                              Grid.Row="0"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Padding="0"
+                                              Focusable="False">
+                                    <Path Data="M 0 4 L 4 0 L 8 4 Z" 
+                                          Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" 
+                                          Stretch="None"/>
+                                </RepeatButton>
+
+                                <!-- Pfeil nach unten -->
+                                <RepeatButton Name="PART_DecreaseButton"
+                                              Grid.Row="1"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Padding="0"
+                                              Focusable="False">
+                                    <Path Data="M 0 0 L 4 4 L 8 0 Z" 
+                                          Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" 
+                                          Stretch="None"/>
+                                </RepeatButton>
                             </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
+                        </Grid>
+                    </DataValidationErrors>
+                </ControlTemplate>
             </Setter>
         </Style>
         <!-- styling tool buttons-->

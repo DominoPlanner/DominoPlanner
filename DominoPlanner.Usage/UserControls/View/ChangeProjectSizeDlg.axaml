@@ -1,0 +1,17 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls"
+        x:Class="DominoPlanner.Usage.UserControls.ChangeProjectSizeDlg"
+        Width="400" Height="220" Title="Change Project Size">
+
+  <StackPanel Margin="12">
+    <TextBlock Text="Rows / Columns to add:" />
+    <NumericUpDown x:Name="nudSizeChanger" Minimum="0" Value="1" Increment="1" Width="120" HorizontalAlignment="Left" />
+    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+      <Button Name="TopBtn" Content="Top" Margin="4" Click="OnTop" />
+      <Button Name="BottomBtn" Content="Bottom" Margin="4" Click="OnBottom" />
+      <Button Name="LeftBtn" Content="Left" Margin="4" Click="OnLeft" />
+      <Button Name="RightBtn" Content="Right" Margin="4" Click="OnRight" />
+    </StackPanel>
+  </StackPanel>
+</Window>

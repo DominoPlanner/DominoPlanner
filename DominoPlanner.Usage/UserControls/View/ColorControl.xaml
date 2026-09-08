@@ -73,7 +73,7 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate>
-                                    <Border BorderBrush="Orange" BorderThickness="1,0,1,2">
+                                    <Border BorderBrush="Transparent" BorderThickness="1,0,1,2">
                                         <TextBlock
                                             Margin="5,2"
                                             HorizontalAlignment="Center"

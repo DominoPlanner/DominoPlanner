@@ -74,8 +74,6 @@
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
-        </NativeMenu>
-
         <NativeMenuItem Header="{local:Gettext Settings}">
             <NativeMenuItem.Menu>
                 <NativeMenu>
@@ -140,6 +138,7 @@
                 </NativeMenu>
             </NativeMenuItem.Menu>
         </NativeMenuItem>
+        </NativeMenu>
     </NativeMenu.Menu>
     <Window.DataTemplates>
         <DataTemplate DataType="{x:Type vm:EditProjectVM}">
@@ -598,5 +597,8 @@
                 </TabControl>
             </Grid>
         </Border>
+        <!-- Add a Button for testing ChangeProjectSize dialog near top of Window content -->
+        <!-- Testing button uncommented to open ChangeProjectSize dialog -->
+        <Button Content="Test ChangeSize" Click="OnTestChangeSize" IsVisible="False"/>
     </Grid>
 </Window>

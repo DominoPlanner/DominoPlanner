@@ -165,7 +165,7 @@ namespace DominoPlanner
             MaxRows.Content = p.colors.GetLength(0);
         }
 
-        private void numRows_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void numRows_ValueChanged(object sender, RoutedEventArgs e)
         {
             if (numRows.Value <= 0)
                 numRows.Value = 1;
@@ -175,7 +175,7 @@ namespace DominoPlanner
             ReDraw();
         }
 
-        private void numBlocks_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void numBlocks_ValueChanged(object sender, RoutedEventArgs e)
         {
             if (numBlocks.Value <= 0)
                 numBlocks.Value = 1;

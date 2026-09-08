@@ -1,0 +1,1698 @@
+﻿<Window
+    x:Class="DominoPlanner.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:docclasses="clr-namespace:DominoPlanner.Document_Classes"
+    xmlns:local="clr-namespace:DominoPlanner"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    xmlns:util="clr-namespace:DominoPlanner.Util"
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    x:Name="DominoPlanner"
+    Title="Domino Planner"
+    Width="900"
+    Height="542"
+    Closing="DominoPlanner_Closing"
+    Icon="DominoCalculator.ico"
+    Initialized="MainWindow_Initialized"
+    Loaded="MainWindow_Loaded">
+    <Window.Resources>
+        <local:TypeToImageConverter x:Key="TypeToImageConverter" />
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+        <local:ColorToHTMLConverter x:Key="ColorToHTMLConverter" />
+        <local:RadioButtonCheckedConverter x:Key="RadioButtonCheckedConverter" />
+        <local:RegressionModeToStringConverter x:Key="RegressionToStringConverter" />
+        <local:ColorComparisonToStringConverter x:Key="ColorComparisonToStringConverter" />
+        <local:DiffusionToStringConverter x:Key="DiffusionToStringConverter" />
+        <local:PathToHeaderConverter x:Key="PathToHeaderConverter" />
+        <local:FilterToParametersConverter x:Key="FilterToParamertersConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <s:Boolean x:Key="True">True</s:Boolean>
+        <s:Boolean x:Key="False">False</s:Boolean>
+
+        <!--  Removed fake ScrollBar-based NumericUpDown style; using Avalonia NumericUpDown control instead  -->
+
+        <!--  Tab Control Header  -->
+        <DataTemplate x:Key="TabHeaderTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image
+                    Height="16"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Source="{Binding Path=path, Converter={StaticResource TypeToImageConverter}}" />
+                <Label>
+                    <Label.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Path=path, Converter={StaticResource PathToHeaderConverter}}" />
+                        </StackPanel>
+                    </Label.Content>
+                </Label>
+                <Button Click="CloseTab" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <Image
+                        Height="16"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="/Icons/closeWindow.ico" />
+                </Button>
+            </StackPanel>
+        </DataTemplate>
+
+        <!--  Bild Bearbeitung  -->
+        <DataTemplate x:Key="ImgTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="50" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="26" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label>Source Image:</Label>
+                    <Image Grid.Row="1" Source="{Binding source}" />
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="26" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label>Preview of Source image with selected filters applied:</Label>
+                    <Image Grid.Row="1" Source="{Binding preview}" />
+                </Grid>
+                <Grid
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label>Available Filters:</Label>
+                        <ListView Grid.Row="1" ItemsSource="{Binding available_filters}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="120" Header="Filter Name">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label Content="{Binding name}" ToolTip="{Binding tooltip}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="60" Header="Add">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Click="AvailFiltesList_AddFilter" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                    <Image
+                                                        Width="16"
+                                                        Height="16"
+                                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                                        Source="/Icons/forward.ico" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Column="1" Margin="5,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label>Applied Filters:</Label>
+                        <ListView
+                            Grid.Row="1"
+                            Drop="ApplFiltersList_Drop"
+                            ItemsSource="{Binding Path=applied_filters, Mode=TwoWay}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="80" Header="Filter Name">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label Content="{Binding name}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="190" Header="Parameters">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label Content="{Binding Path=., Converter={StaticResource FilterToParamertersConverter}}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="100" Header="Actions">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel MouseDown="ApplFiltersListItem_DoubleClick" Orientation="Horizontal">
+                                                    <Button Click="ApplFiltersListItem_Remove" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                            Source="/Icons/remove.ico" />
+                                                    </Button>
+                                                    <Button Click="ApplFiltersListItem_Edit" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                            Source="/Icons/properties.ico" />
+                                                    </Button>
+                                                    <Button Click="ApplFiltersListItem_MoveUp" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                            Source="/Icons/up.ico" />
+                                                    </Button>
+                                                    <Button Click="ApplFiltersListItem_MoveDown" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                                            Source="/Icons/down.ico" />
+                                                    </Button>
+
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Masterplan  -->
+        <DataTemplate x:Key="MstTemplate">
+            <!--<Button Click="Button_Click" Content="Hallo beim Masterplan" />-->
+        </DataTemplate>
+
+        <!--  Feldprotokoll  -->
+        <DataTemplate x:Key="FldPlanTemplate">
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                <Border BorderBrush="Black" BorderThickness="2">
+
+                    <WindowsFormsHost>
+                        <wf:WebBrowser Url="http://www.google.com" />
+                    </WindowsFormsHost>
+                    <!--<Canvas Margin="2" Width="5000" Height="5000">
+                        <ItemsControl ItemsSource="{Binding Path=cells}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <
+                    />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding left}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding top}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{Binding brushColor}" BorderThickness="{Binding border}" Width="{Binding width}" Background="{Binding backColor}">
+                                        <TextBlock FontFamily="{Binding Path=font}" FontSize="{Binding Path=size}" Text="{Binding Path=text}" Foreground="{Binding foreColor}"  />
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Canvas>-->
+                </Border>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <!--  Farbenliste  -->
+        <DataTemplate x:Key="ClrTemplate">
+            <Grid>
+                <ListView
+                    Margin="0,0,0,40"
+                    DataContextChanged="ListFiller"
+                    ItemsSource="{Binding cols, UpdateSourceTrigger=PropertyChanged}"
+                    KeyDown="ListView_KeyDown"
+                    Loaded="FillList">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="30">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Rectangle
+                                            Width="16"
+                                            Height="24"
+                                            Fill="{Binding rgb, Converter={StaticResource ColorToBrushConverter}}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn
+                                Width="120"
+                                DisplayMemberBinding="{Binding name}"
+                                Header="Name" />
+                            <GridViewColumn Width="90" Header="RGB">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding rgb, Converter={StaticResource ColorToHTMLConverter}}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="100" Header="Count">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Label Content="{Binding count}" ContentStringFormat="{0:##,#}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="100" Header="Actions">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Click="Color_Delete" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                    Source="/Icons/remove.ico" />
+                                            </Button>
+                                            <Button Click="Color_Edit" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                    Source="/Icons/colorPicker.ico" />
+                                            </Button>
+                                            <Button Click="Color_MoveUp" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                    Source="/Icons/up.ico" />
+                                            </Button>
+                                            <Button Click="Color_MoveDown" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                    Source="/Icons/down.ico" />
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <Button
+                    Width="120"
+                    Height="30"
+                    Margin="5,0,0,5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Click="AddColor">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Height="20"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="/Icons/add.ico" />
+                            <Label Content="Add Color" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button
+                    Width="120"
+                    Height="30"
+                    Margin="130,0,0,5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Click="SaveColorDocument">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Height="20"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="/Icons/document_save.ico" />
+                            <Label Content="Save Colors" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button
+                    Width="120"
+                    Height="30"
+                    Margin="255,0,0,5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Click="SaveColorDocumentGlobal">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Height="20"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="/Icons/document_save.ico" />
+                            <Label Content="Save as Standard" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Feld Haupteinstellungen  -->
+        <DataTemplate x:Key="FldTemplate">
+            <Grid ShowGridLines="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="240" />
+                    <RowDefinition Height="40" />
+                </Grid.RowDefinitions>
+
+                <Image
+                    Margin="5"
+                    RenderOptions.BitmapScalingMode="NearestNeighbor"
+                    Source="{Binding Path=img, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+                <!--  First Group => Size, Direction, ResizeMode  -->
+                <Grid Grid.Row="1" ShowGridLines="True">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="260" />
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid IsEnabled="{Binding SizeGridEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <!--  Count of Dominoes  -->
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <TextBlock Grid.Column="0" Text="{c:Binding length*height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='Size: {0:##,#} Dominoes'}" />
+                        </StackPanel>
+                        <Grid Margin="0,20,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="70" />
+                                <ColumnDefinition Width="60" />
+                                <ColumnDefinition Width="70" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Length and Height Setters  -->
+                            <Label HorizontalAlignment="Right" Content="Length:" />
+                            <local:NumericUpDown
+                                Name="x"
+                                Grid.Column="1"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                Content="Height:" />
+                            <local:NumericUpDown
+                                Name="y"
+                                Grid.Row="0"
+                                Grid.Column="3"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!--  Field Distances and Dimensions  -->
+                            <Label
+                                Grid.Row="4"
+                                HorizontalAlignment="Right"
+                                Content="a:" />
+                            <local:NumericUpDown
+                                Name="a_slide"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding a, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label
+                                Grid.Row="2"
+                                HorizontalAlignment="Right"
+                                Content="b:" />
+                            <local:NumericUpDown
+                                Name="b_slide"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding b, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                Content="c:" />
+                            <local:NumericUpDown
+                                Name="c_slide"
+                                Grid.Row="2"
+                                Grid.Column="3"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding c, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Label
+                                Grid.Row="4"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                Content="d:" />
+                            <local:NumericUpDown
+                                Name="d_slide"
+                                Grid.Row="4"
+                                Grid.Column="3"
+                                MaxValue="5000"
+                                Step="1"
+                                Value="{Binding d, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+
+                        <!--  Resize Mode  -->
+                        <StackPanel Margin="0,140,0,53" Orientation="Horizontal">
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="Resize mode: " />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="{Binding Path=ResizeMode, Converter={StaticResource RegressionToStringConverter}}" />
+                        </StackPanel>
+                        <Grid
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="0,160,0,0"
+                            VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="33" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="41" />
+                                <ColumnDefinition Width="12" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Pixel" />
+                            <Slider
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Width="160"
+                                Height="22"
+                                Margin="0,4,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Maximum="2"
+                                Minimum="0"
+                                Value="{Binding ResizeMode}" />
+                            <Label
+                                Grid.Column="2"
+                                Grid.ColumnSpan="2"
+                                Content="Smooth" />
+                        </Grid>
+
+                        <!--  FallDown Direction  -->
+                        <TextBlock Margin="0,195,0,0" Text="Falldown Direction:" />
+                        <Grid Margin="5,215,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <RadioButton
+                                Content="Horizontal"
+                                GroupName="HorizontalGroup"
+                                IsChecked="{Binding horizontal, Mode=TwoWay, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={StaticResource True}}" />
+                            <RadioButton
+                                Grid.Column="1"
+                                Content="Vertical"
+                                GroupName="VerticalGroup"
+                                IsChecked="{Binding horizontal, Mode=TwoWay, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={StaticResource False}}" />
+                        </Grid>
+                    </Grid>
+
+                    <Image
+                        Grid.Column="1"
+                        Margin="5,5,5,40"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="/Icons/Variablen.jpg" />
+                    <CheckBox
+                        Grid.Column="1"
+                        Margin="5,215,0,0"
+                        Content="Show Spaces"
+                        IsChecked="{Binding Mode=TwoWay, Path=ShowSpaces, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="45" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="45" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="80" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.ColumnSpan="3" Content="{Binding ColorRegressionMode, Mode=TwoWay, Converter={StaticResource ColorComparisonToStringConverter}}" />
+
+                        <!--  Color Comparison Slider  -->
+                        <TextBlock
+                            Grid.Row="1"
+                            Margin="5,0,0,0"
+                            Text="Fast" />
+                        <Slider
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Maximum="3"
+                            Minimum="0"
+                            SmallChange="1"
+                            ToolTip="Try out what setting produces the best result. &#10;This mainly depends on your image."
+                            Value="{Binding ColorRegressionMode, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Margin="5,0,0,0"
+                            Text="Slow" />
+                        <Label
+                            Grid.Row="2"
+                            Grid.ColumnSpan="3"
+                            Content="{Binding DiffusionMode, Mode=TwoWay, Converter={StaticResource DiffusionToStringConverter}}" />
+
+                        <!--  Dithering Slider  -->
+                        <TextBlock
+                            Grid.Row="3"
+                            Margin="5,0,0,0"
+                            Text="None" />
+                        <Slider
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Maximum="3"
+                            Minimum="0"
+                            SmallChange="1"
+                            ToolTip="Try out what setting produces the best result. &#10;This mainly depends on your image.&#10;Dithering only looks good for large (&gt;10000 Dominoes) fields."
+                            Value="{Binding DiffusionMode, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="2"
+                            Margin="5,0,0,0"
+                            Text="Slow" />
+                    </Grid>
+                </Grid>
+                <!--  Bottom Buttons  -->
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="5,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="Field_Save">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/document_save.ico" />
+                        <Label Content="Save Field" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="130,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="ManualEdit">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Edit" />
+                    </StackPanel>
+                </Button>
+                <!--Button Click="UnlockUI" Grid.Row="2" Height="30" Margin="255, 5, 0, 5" Width="160" HorizontalAlignment="Left">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/decrypted.ico" Height="32" />
+                            <Label Content="Unlock basic controls." />
+                        </StackPanel>
+                    </Button.Content>
+                </-->
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="130,5,0,5"
+                    HorizontalAlignment="Right"
+                    Click="ShowFieldplan">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Show Fieldplan" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="250,5,125,5"
+                    HorizontalAlignment="Right"
+                    Click="ShowBlockViewer">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Field Viewer" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Strukturansicht  -->
+        <DataTemplate x:Key="SctTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="27" />
+                    <RowDefinition Height="250" />
+                    <RowDefinition Height="40" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <!--  Top Left box: Source Image  -->
+                <Border
+                    Grid.ColumnSpan="1"
+                    Margin="1"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                    <Grid>
+                        <Image
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="{Binding SourcePreview}" />
+                    </Grid>
+                </Border>
+                <Label
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    VerticalAlignment="Bottom"
+                    Content="{Binding imageInfo}" />
+                <!--  Top right box: Result Image  -->
+                <Border
+                    Grid.Column="1"
+                    Margin="1"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                    <Image
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="2"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="{Binding TargetPreview}" />
+                </Border>
+                <!--  Bottom Left box: Common Stucture Parameters  -->
+                <Border
+                    Grid.Row="2"
+                    Margin="1"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                    <Grid>
+                        <Grid.Resources>
+
+                            <DataTemplate x:Key="RectangleStructureTemplate">
+                                <Grid>
+                                    <ComboBox
+                                        Height="25"
+                                        Margin="5"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Top"
+                                        ItemsSource="{Binding Path=list}"
+                                        SelectedIndex="{Binding Path=structure_index}" />
+                                    <Grid
+                                        Width="230"
+                                        Height="200"
+                                        Margin="5,32,5,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="52" />
+                                            <ColumnDefinition Width="70" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="52" />
+                                            <RowDefinition Height="52" />
+                                            <RowDefinition Height="52" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
+                                        <Border
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                Source="{Binding Path=description_imgs[0]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Bottom"
+                                                Source="{Binding Path=description_imgs[1]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="0"
+                                            Grid.Column="2"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                Source="{Binding Path=description_imgs[2]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Source="{Binding Path=description_imgs[3]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Source="{Binding Path=description_imgs[4]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="1"
+                                            Grid.Column="2"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Source="{Binding Path=description_imgs[5]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="2"
+                                            Grid.Column="0"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Top"
+                                                Source="{Binding Path=description_imgs[6]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Top"
+                                                Source="{Binding Path=description_imgs[7]}"
+                                                Stretch="None" />
+                                        </Border>
+                                        <Border
+                                            Grid.Row="2"
+                                            Grid.Column="2"
+                                            Margin="1"
+                                            BorderBrush="Black"
+                                            BorderThickness="1">
+                                            <Image
+                                                Width="51"
+                                                Height="51"
+                                                Margin="1"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Source="{Binding Path=description_imgs[8]}"
+                                                Stretch="None" />
+                                        </Border>
+
+                                        <local:NumericUpDown
+                                            Name="x"
+                                            Grid.Row="4"
+                                            Grid.Column="1"
+                                            Width="50"
+                                            Height="20"
+                                            VerticalAlignment="Top"
+                                            MaxValue="5000"
+                                            MinValue="1"
+                                            Step="1"
+                                            Value="{Binding length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <local:NumericUpDown
+                                            Name="y"
+                                            Grid.Row="1"
+                                            Grid.Column="4"
+                                            Height="20"
+                                            MaxValue="5000"
+                                            MinValue="1"
+                                            Step="1"
+                                            Value="{Binding height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="SpiralTemplate">
+                                <GroupBox Header="Dimensions of spiral">
+                                    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+
+                                        <StackPanel
+                                            Height="50"
+                                            Margin="5,5,0,0"
+                                            VerticalAlignment="Top"
+                                            Orientation="Horizontal">
+                                            <Label>Quarter rotations:</Label>
+                                            <xctk:IntegerUpDown
+                                                Width="70"
+                                                Height="25"
+                                                Margin="50,0,0,0"
+                                                Maximum="5000"
+                                                Minimum="1"
+                                                Value="{c:Binding quarter_rotations}" />
+                                        </StackPanel>
+                                        <Grid Margin="5,40,5,5" VerticalAlignment="Top">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="25" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="25" />
+                                                <RowDefinition Height="40" />
+                                            </Grid.RowDefinitions>
+                                            <Label Grid.Row="0" Grid.ColumnSpan="2">Domino Dimensions</Label>
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                Width
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding domino_width}" />
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                Height
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="1"
+                                                Grid.Column="3"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding domino_height}" />
+                                            <Label Grid.Row="2" Grid.ColumnSpan="2">Distances</Label>
+                                            <Label
+                                                Grid.Row="3"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                <TextBlock>
+                                                    Between<LineBreak />
+                                                    Lines:</TextBlock>
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="3"
+                                                Grid.Column="1"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding normal_distance}" />
+                                            <Label
+                                                Grid.Row="3"
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                <TextBlock>
+                                                    Between<LineBreak />
+                                                    Dominoes:</TextBlock>
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="3"
+                                                Grid.Column="3"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding tangential_distance}" />
+                                        </Grid>
+
+                                    </Grid>
+                                </GroupBox>
+                            </DataTemplate>
+                            <DataTemplate x:Key="CircleTemplate">
+                                <GroupBox Header="Dimensions of circle">
+                                    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+
+                                        <StackPanel
+                                            Height="50"
+                                            Margin="5,5,0,0"
+                                            VerticalAlignment="Top"
+                                            Orientation="Horizontal">
+                                            <Label>Circles:</Label>
+                                            <xctk:IntegerUpDown
+                                                Width="70"
+                                                Height="25"
+                                                Margin="50,0,0,0"
+                                                Maximum="5000"
+                                                Minimum="1"
+                                                Value="{c:Binding rotations}" />
+                                        </StackPanel>
+                                        <Grid Margin="5,40,5,5" VerticalAlignment="Top">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="25" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="25" />
+                                                <RowDefinition Height="40" />
+                                            </Grid.RowDefinitions>
+                                            <Label Grid.Row="0" Grid.ColumnSpan="2">Domino Dimensions</Label>
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                Width
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding domino_width}" />
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                Height
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="1"
+                                                Grid.Column="3"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding domino_height}" />
+                                            <Label Grid.Row="2" Grid.ColumnSpan="2">Distances</Label>
+                                            <Label
+                                                Grid.Row="3"
+                                                Grid.Column="0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                <TextBlock>
+                                                    Between<LineBreak />
+                                                    Lines:</TextBlock>
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="3"
+                                                Grid.Column="1"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding normal_distance}" />
+                                            <Label
+                                                Grid.Row="3"
+                                                Grid.Column="2"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center">
+                                                <TextBlock>
+                                                    Between<LineBreak />
+                                                    Dominoes:</TextBlock>
+                                            </Label>
+                                            <xctk:IntegerUpDown
+                                                Grid.Row="3"
+                                                Grid.Column="3"
+                                                Width="70"
+                                                Height="25"
+                                                Value="{Binding tangential_distance}" />
+                                        </Grid>
+
+                                    </Grid>
+                                </GroupBox>
+                            </DataTemplate>
+                            <local:StructureTemplateSelector
+                                x:Key="StructureTemplateSelector"
+                                CircleStructureTemplate="{StaticResource CircleTemplate}"
+                                RectangleStructureTemplate="{StaticResource RectangleStructureTemplate}"
+                                SpiralStructureTemplate="{StaticResource SpiralTemplate}" />
+                        </Grid.Resources>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <local:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
+                            </StackPanel.Resources>
+                            <RadioButton Margin="5,0,0,0" IsChecked="{Binding Path=typ, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static docclasses:structure_type.Rectangular}}">Rectangular</RadioButton>
+                            <RadioButton Margin="40,0,0,0" IsChecked="{Binding Path=typ, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static docclasses:structure_type.Spiral}}">Spiral</RadioButton>
+                            <RadioButton Margin="75,0,0,0" IsChecked="{Binding Path=typ, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static docclasses:structure_type.Circle}}">Circle</RadioButton>
+                        </StackPanel>
+                        <ContentPresenter
+                            Margin="0,25,0,0"
+                            Content="{Binding provider}"
+                            ContentTemplateSelector="{StaticResource StructureTemplateSelector}" />
+
+                    </Grid>
+                </Border>
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="1"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="45" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="200" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  Color Comparison Slider  -->
+                        <Label Grid.ColumnSpan="3" Content="{Binding regression_mode, Mode=TwoWay, Converter={StaticResource ColorComparisonToStringConverter}}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Margin="5,0,0,0"
+                            Text="Fast" />
+                        <Slider
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Maximum="3"
+                            Minimum="0"
+                            SmallChange="1"
+                            ToolTip="Try out what setting produces the best result. &#10;This mainly depends on your image."
+                            Value="{Binding regression_mode, Mode=TwoWay}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Margin="5,0,0,0"
+                            Text="Slow" />
+
+                        <Label
+                            Grid.Row="2"
+                            Grid.ColumnSpan="3"
+                            Content="Pixel Selection Mode:" />
+                        <StackPanel
+                            Grid.Row="3"
+                            Grid.ColumnSpan="3"
+                            Orientation="Horizontal">
+                            <RadioButton
+                                Margin="5,0,0,0"
+                                VerticalContentAlignment="Center"
+                                Content="Single Pixel&#10;(top left corner)"
+                                IsChecked="{Binding Path=calculation_mode, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={StaticResource False}}" />
+                            <RadioButton
+                                Margin="50,0,0,0"
+                                VerticalContentAlignment="Center"
+                                Content="Average of&#10;Source Area"
+                                IsChecked="{Binding Path=calculation_mode, Converter={StaticResource RadioButtonCheckedConverter}, ConverterParameter={StaticResource True}}" />
+                        </StackPanel>
+                        <CheckBox
+                            Grid.Row="4"
+                            Grid.ColumnSpan="3"
+                            Margin="5,10,0,0"
+                            Content="Draw Domino Borders in Preview Image"
+                            IsChecked="{Binding Mode=TwoWay, Path=draw_borders, UpdateSourceTrigger=PropertyChanged}" />
+                        <CheckBox
+                            Grid.Row="5"
+                            Grid.ColumnSpan="3"
+                            Margin="5,10,0,0"
+                            Content="Fit Image to Structure Size"
+                            IsChecked="{Binding Mode=TwoWay, Path=allow_stretch, UpdateSourceTrigger=PropertyChanged}" />
+                        <StackPanel
+                            Grid.Row="6"
+                            Grid.ColumnSpan="3"
+                            Orientation="Horizontal">
+                            <Label>Number of Dominoes:</Label>
+                            <Label Content="{Binding dominoes.Count}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Button
+                    Grid.Row="3"
+                    Width="120"
+                    Height="30"
+                    Margin="5,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="Field_Save">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/document_save.ico" />
+                        <Label Content="Save Structure" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="3"
+                    Width="120"
+                    Height="30"
+                    Margin="130,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="ManualEdit">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Edit" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Width="120"
+                    Height="30"
+                    Margin="10,5,5,5"
+                    HorizontalAlignment="Right"
+                    Click="ShowFieldplan"
+                    Visibility="{Binding HasProtocolDefinition, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Show Fieldplan" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <!--  Projekt nachbearbeiten  -->
+        <DataTemplate x:Key="EditTemplate">
+            <Grid ShowGridLines="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="40" />
+                </Grid.RowDefinitions>
+
+                <!--  First Group => Size, Direction, ResizeMode  -->
+                <Grid Grid.Row="0" ShowGridLines="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="277" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="120" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0">
+                            <Label Content="Stones" />
+                            <Label Content="{Binding height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ContentStringFormat="Height: {0:##,#} Stones" />
+                            <Label Content="{Binding length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ContentStringFormat="Length: {0:##,#} Stones" />
+                            <Label Content="{Binding remaining, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ContentStringFormat="Together: {0:##,#} Stones" />
+                        </StackPanel>
+
+                        <ListView
+                            Grid.Row="1"
+                            ItemsSource="{Binding Colors}"
+                            MouseDoubleClick="ListView_MouseDown">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="30">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Rectangle
+                                                    Width="16"
+                                                    Height="24"
+                                                    Fill="{Binding rgb, Converter={StaticResource ColorToBrushConverter}}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn
+                                        Width="120"
+                                        DisplayMemberBinding="{Binding name}"
+                                        Header="Name" />
+                                    <!--GridViewColumn Header="Remaining Stones" Width="100">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Label Content="{Binding count}" ContentStringFormat=" {0:##,#}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </-->
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Column="1" ShowGridLines="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="100" />
+                        </Grid.RowDefinitions>
+                        <ScrollViewer
+                            Grid.Row="0"
+                            CanContentScroll="True"
+                            Content="{Binding EditCanvas}"
+                            HorizontalScrollBarVisibility="Auto"
+                            KeyDown="DominoCanvas_KeyDown"
+                            Loaded="ScrollViewer_Loaded"
+                            MouseEnter="ScrollViewer_MouseEnter"
+                            MouseLeave="ScrollViewer_MouseLeave"
+                            MouseUp="ScrollViewer_MouseUp"
+                            SizeChanged="ScrollViewer_SizeChanged"
+                            ToolTip="{Binding path}"
+                            VerticalScrollBarVisibility="Auto">
+                            <!--local:DominoCanvas ToolTip="{Binding path}" Height="500" Width="345" Loaded="Canvas_Loaded" SizeChanged="Canvas_SizeChanged" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="Canvas_MouseMove" MouseUp="Canvas_MouseUp" MouseDown="Canvas_MouseDown" MouseLeave="DominoCanvas_MouseLeave">
+                                <Canvas.RenderTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                </Canvas.RenderTransform>
+                            </-->
+                        </ScrollViewer>
+                        <Grid Grid.Row="1" ShowGridLines="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" ShowGridLines="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0">Zoom</TextBlock>
+                                <Slider
+                                    Grid.Row="1"
+                                    AutoToolTipPrecision="0"
+                                    Interval="1"
+                                    Minimum="1"
+                                    SmallChange="1"
+                                    TickPlacement="TopLeft"
+                                    ValueChanged="Slider_ValueChanged"
+                                    Value="1" />
+                                <TextBlock Grid.Row="2" HorizontalAlignment="Left">Min</TextBlock>
+                                <TextBlock Grid.Row="2" HorizontalAlignment="Right">Max</TextBlock>
+                            </Grid>
+                            <Grid Grid.Column="1" ShowGridLines="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <ComboBox
+                                    Grid.Row="0"
+                                    ItemsSource="{Binding UsedColors, Mode=TwoWay}"
+                                    PreviewMouseDown="ComboBox_PreviewMouseDown"
+                                    SelectionChanged="ComboBox_SelectionChanged">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle
+                                                    Width="16"
+                                                    Height="16"
+                                                    Margin="0,2,5,2"
+                                                    Fill="{Binding rgb, Converter={StaticResource ColorToBrushConverter}}" />
+                                                <TextBlock Text="{Binding name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <ComboBox
+                                    Grid.Row="2"
+                                    ItemsSource="{Binding Colors}"
+                                    SelectionChanged="ComboBox_Preview_SelectionChanged">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle
+                                                    Width="16"
+                                                    Height="16"
+                                                    Margin="0,2,5,2"
+                                                    Fill="{Binding rgb, Converter={StaticResource ColorToBrushConverter}}" />
+                                                <TextBlock Text="{Binding name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Button Grid.Row="1" Click="Button_Click">Change Color</Button>
+                            </Grid>
+                            <Grid Grid.Column="2" ShowGridLines="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Click="Edit_Click">Add Lines/Collumns</Button>
+                                    <Button Grid.Column="1" Click="Remove_Click">Remove Lines/Collumns</Button>
+                                </Grid>
+                                <Button Grid.Row="1" Click="Copy_Click">Copy</Button>
+                                <Button Grid.Row="2" Click="Paste_Click">Paste</Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!--  Bottom Buttons  -->
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="5,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="FieldSave">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/document_save.ico" />
+                        <Label Content="Save Field" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="370,5,5,5"
+                    HorizontalAlignment="Right"
+                    Click="ShowFieldplan">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Show Fieldplan" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="160"
+                    Height="30"
+                    Margin="130,5,0,5"
+                    HorizontalAlignment="Left"
+                    Click="UnlockUI">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Height="32"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="/Icons/decrypted.ico" />
+                            <Label Content="Unlock basic controls." />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Width="120"
+                    Height="30"
+                    Margin="240,5,125,5"
+                    HorizontalAlignment="Right"
+                    Click="ShowBlockViewer">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <Image
+                            Height="20"
+                            Margin="2"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="/Icons/draw_freehand.ico" />
+                        <Label Content="Field Viewer" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <local:TabTemplateSelector
+            x:Key="TabTemplateSelector"
+            ColorArrayTemplate="{StaticResource ClrTemplate}"
+            FieldPlanTemplate="{StaticResource FldTemplate}"
+            FieldProtocolTemplate="{StaticResource FldPlanTemplate}"
+            ImageEditorTemplate="{StaticResource ImgTemplate}"
+            MasterplanTemplate="{StaticResource MstTemplate}"
+            ProjectEditorTemplate="{StaticResource EditTemplate}"
+            StructureTemplate="{StaticResource SctTemplate}" />
+
+    </Window.Resources>
+
+    <DockPanel>
+        <Grid>
+            <TreeView
+                Name="ProjectsTV"
+                Width="200"
+                Margin="0,0,0,30"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Stretch">
+                <TreeView.Resources>
+                    <ContextMenu x:Key="HomeContextMenu" StaysOpen="true">
+                        <MenuItem Click="CreateProject" Header="Create New...">
+                            <MenuItem.Icon>
+                                <Image
+                                    Height="32"
+                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                    Source="/Icons/new.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="AddProject" Header="Add existing...">
+                            <MenuItem.Icon>
+                                <Image
+                                    Height="32"
+                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                    Source="/Icons/add.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <ContextMenu x:Key="MasterplanContextMenu" StaysOpen="True">
+                        <MenuItem Click="ExportPNG" Header="Export as Image...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/file_export.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="OpenFolder" Header="Open Project Folder...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/folder.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="DeleteObject" Header="Remove Project from List">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/remove.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="ShowProperties" Header="Project Properties...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/properties.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <ContextMenu x:Key="FieldFolderContextMenu" StaysOpen="True">
+                        <MenuItem Click="AddNewField" Header="Add new field...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/new.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="GenerateFieldPlan" Header="Generate all Field Plans...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/insert_table.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <ContextMenu x:Key="FieldContextMenu" StaysOpen="True">
+                        <MenuItem Click="ExportPNG" Header="Export as Image...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/file_export.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="GenerateFieldPlan" Header="Generate Field Plan...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/insert_table.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="OpenFolder" Header="Show in File Explorer...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/folder.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="DeleteObject" Header="Delete Field">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/remove.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="ShowProperties" Header="Field Properties...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/properties.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <ContextMenu x:Key="StructureFolderContextMenu" StaysOpen="True">
+                        <MenuItem Click="AddNewField" Header="Add new structure...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/new.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                    <ContextMenu x:Key="StructureContextMenu" StaysOpen="True">
+                        <MenuItem Click="ExportPNG" Header="Export as Image...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/file_export.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="GenerateFieldPlan" Header="Generate Structure Protocol...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/insert_table.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="OpenFolder" Header="Show in File Explorer...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/folder.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="DeleteObject" Header="Delete Field">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/remove.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Click="ShowProperties" Header="Field Properties...">
+                            <MenuItem.Icon>
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Icons/properties.ico" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TreeView.Resources>
+                <TreeViewItem
+                    Name="HomeTVI"
+                    ContextMenu="{StaticResource HomeContextMenu}"
+                    IsExpanded="True">
+                    <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image
+                                Height="16"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="/Icons/home.ico" />
+                            <Label Content="My Projects" />
+                        </StackPanel>
+                    </TreeViewItem.Header>
+                </TreeViewItem>
+            </TreeView>
+            <Button
+                Height="30"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Click="AboutBox">
+                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                    <Image
+                        Height="20"
+                        Margin="2"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="/Icons/properties.ico" />
+                    <Label Content="About..." />
+                </StackPanel>
+            </Button>
+        </Grid>
+        <TabControl
+            Name="TabControlMain"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            ContentTemplateSelector="{StaticResource TabTemplateSelector}"
+            ItemTemplate="{StaticResource TabHeaderTemplate}"
+            ItemsSource="{Binding OpenedDocuments}"
+            SelectionChanged="UpdateTab" />
+        <!--<TabControl
+            Name="TabControlMain"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            >
+
+        <TabItem >
+                <ContentPresenter ContentTemplate="{StaticResource ImgTemplate}"/>
+            </TabItem>
+
+        </TabControl>-->
+    </DockPanel>
+</Window>

@@ -125,6 +125,7 @@
     <AvaloniaXaml Include="UserControls\View\StructureReadoutV.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
+
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="12.0.5" />

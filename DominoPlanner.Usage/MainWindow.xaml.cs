@@ -6,6 +6,7 @@ using System;
 using System.Configuration;
 using System.Text;
 using Avalonia;
+using Avalonia.Interactivity;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -106,5 +107,11 @@ namespace DominoPlanner.Usage
 		{
 			AvaloniaXamlLoader.Load(this);
 		}
+	private async void OnTestChangeSize(object sender, Avalonia.Interactivity.RoutedEventArgs e)
+	{
+		var dlg = new DominoPlanner.Usage.UserControls.ChangeProjectSizeDlg();
+		await dlg.ShowDialog(this);
+		// read dlg.Count and dlg.ResizePlace for debugging
+	}
 	}
 }
