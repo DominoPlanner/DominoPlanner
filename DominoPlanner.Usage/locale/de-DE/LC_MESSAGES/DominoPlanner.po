@@ -1884,6 +1884,9 @@ msgstr "Anzeigeeinstellungen"
 msgid "Warning"
 msgstr "Warnung"
 
+msgid "You are about to switch back to basic settings. This will undo all changes. Do you want to continue?"
+msgstr "Sie wechseln jetzt zu den Grundeinstellungen zurück. Dadurch werden alle Änderungen rückgängig gemacht. Möchten Sie fortfahren?"
+
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\UserControls\ViewModel\DominoProviderVM.cs:47
 msgctxt "Emphasis during calculation"
 msgid "Weight"

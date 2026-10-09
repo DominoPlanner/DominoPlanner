@@ -1,4 +1,7 @@
 ﻿using DominoPlanner.Core;
+using DominoPlanner.Usage;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,7 +34,20 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             RefreshList();
             selectedColors = new int[CurrentProject.colors.Length];
             SaveField = new RelayCommand(o => { Save(); });
-            RestoreBasicSettings = new RelayCommand(o => { redoStack = new Stack<PostFilter>(); Editing = false; });
+            RestoreBasicSettings = new RelayCommand(async o =>
+            {
+                var confirmation = MessageBoxManager.GetMessageBoxStandard(
+                    _("Warning"),
+                    _("You are about to switch back to basic settings. This will undo all changes. Do you want to continue?"),
+                    ButtonEnum.YesNo,
+                    Icon.Warning);
+                var result = await confirmation.ShowDialogWithParent<MainWindow>();
+                if (result == ButtonResult.Yes)
+                {
+                    redoStack = new Stack<PostFilter>();
+                    Editing = false;
+                }
+            });
             
             SelectColor = new RelayCommand(o => { SelectAllStonesWithColor(); });
             MouseClickCommand = new RelayCommand(o => { ChangeColor(); });
