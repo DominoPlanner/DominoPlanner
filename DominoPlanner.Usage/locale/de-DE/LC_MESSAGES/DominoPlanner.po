@@ -1096,6 +1096,11 @@ msgctxt "Dominoes of the given color within the next 'N'"
 msgid "Next 'N'"
 msgstr "In nächsten 'N'"
 
+#: DominoPlanner.Usage/LiveBuildHelperVM.cs
+msgctxt "Dominoes of the given color within the next 'N' in selection"
+msgid "Next 'N' in Selection"
+msgstr "In den nächsten 'N' der Auswahl"
+
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ConverterHelper.cs:198
 msgid "No Dithering"
 msgstr "Kein Dithering"
@@ -1772,6 +1777,11 @@ msgstr "Schildkrötenfeld"
 msgctxt "Number of stones available"
 msgid "Total"
 msgstr "Gesamt"
+
+#: DominoPlanner.Usage/LiveBuildHelperVM.cs
+msgctxt "Remaining number of stones in selection"
+msgid "Remaining in Selection"
+msgstr "Verbleibend in der Auswahl"
 
 #: C:\Users\jonat\source\repos\DominoPlanner\DominoPlanner.Usage\ProtocolV.xaml:272
 msgid "Transform field plan"

@@ -65,6 +65,11 @@ namespace DominoPlanner.Usage
                 new Column() { DataField = "ProjectCount[1]", Header = GetParticularString("Remaining number of stones", "Remaining"), Class="Count" },
                 new Column() { DataField = "ProjectCount[2]", Header = GetParticularString("Dominoes of the given color within the next 'N'", "Next 'N'") }
             };
+            if (BlockSizes.Any(x => !x.UseBlock))
+            {
+                ColumnConfig.Insert(4, new Column() { DataField = "ProjectCount[3]", Header = GetParticularString("Remaining number of stones in selection", "Remaining in Selection"), Class = "Count" });
+                ColumnConfig.Add(new Column() { DataField = "ProjectCount[4]", Header = GetParticularString("Dominoes of the given color within the next 'N' in selection", "Next 'N' in Selection") });
+            }
 
             OpenPopup = new RelayCommand(x => { FillColorList(); PopupOpen = true; });
 
@@ -442,7 +447,22 @@ namespace DominoPlanner.Usage
             int firstRow = SelectedRow - 1;
             int[] RemainingCount = new int[fullColors.Count];
             int[] NextNCount = new int[fullColors.Count];
+            int[] RemainingInBlocksCount = new int[fullColors.Count];
+            int[] NextNInBlocksCount = new int[fullColors.Count];
+            bool[] activeBlockColumns = new bool[stonesPerLine];
+            int blockStart = 0;
+            foreach (BlockData block in BlockSizes)
+            {
+                int blockEnd = Math.Min(blockStart + block.BlockSize, stonesPerLine);
+                for (int j = blockStart; j < blockEnd; j++)
+                {
+                    activeBlockColumns[j] = block.UseBlock;
+                }
+                blockStart = blockEnd;
+                if (blockStart == stonesPerLine) break;
+            }
             int counter = 0;
+            int activeBlockCounter = 0;
             for (int i = firstRow; i < intField.GetLength(1); i++)
             {
                 int startj = (i == firstRow) ? firstBlockStone : 0; 
@@ -453,7 +473,13 @@ namespace DominoPlanner.Usage
                         NextNCount[intField[j, i]]++;
                         counter++;
                     }
+                    if (activeBlockColumns[j] && activeBlockCounter < NextN && intField[j, i] > 0)
+                    {
+                        NextNInBlocksCount[intField[j, i]]++;
+                        activeBlockCounter++;
+                    }
                     if(intField[j, i] >= 0 && intField[j, i] < RemainingCount.Count()) RemainingCount[intField[j, i]]++;
+                    if (activeBlockColumns[j] && intField[j, i] >= 0 && intField[j, i] < RemainingInBlocksCount.Length) RemainingInBlocksCount[intField[j, i]]++;
 
                 }
             }
@@ -466,13 +492,22 @@ namespace DominoPlanner.Usage
                     {
                         fParameters.Counts[i],
                         RemainingCount[i],
-                        NextNCount[i]
+                        NextNCount[i],
+                        RemainingInBlocksCount[i],
+                        NextNInBlocksCount[i]
                     };
 
                 }
                 else
                 {
-                    fullColors[i].ProjectCount.Add(fParameters.Counts[0]);
+                    fullColors[i].ProjectCount = new ObservableCollection<int>
+                    {
+                        fParameters.Counts[0],
+                        RemainingCount[i],
+                        NextNCount[i],
+                        RemainingInBlocksCount[i],
+                        NextNInBlocksCount[i]
+                    };
                 }
             }
         }

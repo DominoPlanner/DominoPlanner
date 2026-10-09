@@ -237,7 +237,7 @@
                     <StackPanel>
                         <TextBlock Text="{local:Gettext Show remaining colors}" />
                         <Popup
-                            Width="400"
+                            MaxWidth="800"
                             IsLightDismissEnabled="True"
                             IsOpen="{Binding PopupOpen}">
                             <Border
