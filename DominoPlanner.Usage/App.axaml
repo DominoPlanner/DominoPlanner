@@ -40,7 +40,8 @@
         </ResourceDictionary>
     </Application.Resources>
     <Application.Styles>
-        <StyleInclude Source="avares://Avalonia.Themes.Fluent/FluentTheme.xaml" />
+        <SimpleTheme />
+
         <!-- Accent include removed; FluentTheme.xaml provides base resources. If needed, re-add a specific accent file. -->
         <StyleInclude Source="avares://ThemeEditor.Controls.ColorPicker/ColorPicker.axaml"/>
         <Style Selector="HeaderedContentControl">
@@ -99,63 +100,6 @@
     <Setter Property="FormatString" Value="0" />
     <Setter Property="ParsingNumberStyle" Value="Integer" />
 </Style>
-
-        <!-- Vertikale Pfeile für NumericUpDown -->
-        <Style Selector="NumericUpDown /template/ ButtonSpinner#PART_Spinner">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <DataValidationErrors>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <!-- Eingabefeld links -->
-                            <ContentPresenter Name="PART_ContentPresenter"
-                                              Grid.Column="0"
-                                              Content="{TemplateBinding Content}"
-                                              ContentTemplate="{TemplateBinding ContentTemplate}"
-                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-
-                            <!-- Pfeil-Buttons rechts, vertikal gestapelt -->
-                            <Grid Grid.Column="1" 
-                                  RowDefinitions="*,*" 
-                                  Width="18">
-                                
-                                <!-- Pfeil nach oben -->
-                                <RepeatButton Name="PART_IncreaseButton"
-                                              Grid.Row="0"
-                                              HorizontalAlignment="Stretch"
-                                              VerticalAlignment="Stretch"
-                                              HorizontalContentAlignment="Center"
-                                              VerticalContentAlignment="Center"
-                                              Background="Transparent"
-                                              BorderThickness="0"
-                                              Padding="0"
-                                              Focusable="False">
-                                    <Path Data="M 0 4 L 4 0 L 8 4 Z" 
-                                          Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" 
-                                          Stretch="None"/>
-                                </RepeatButton>
-
-                                <!-- Pfeil nach unten -->
-                                <RepeatButton Name="PART_DecreaseButton"
-                                              Grid.Row="1"
-                                              HorizontalAlignment="Stretch"
-                                              VerticalAlignment="Stretch"
-                                              HorizontalContentAlignment="Center"
-                                              VerticalContentAlignment="Center"
-                                              Background="Transparent"
-                                              BorderThickness="0"
-                                              Padding="0"
-                                              Focusable="False">
-                                    <Path Data="M 0 0 L 4 4 L 8 0 Z" 
-                                          Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" 
-                                          Stretch="None"/>
-                                </RepeatButton>
-                            </Grid>
-                        </Grid>
-                    </DataValidationErrors>
-                </ControlTemplate>
-            </Setter>
-        </Style>
         <!-- styling tool buttons-->
         <Style Selector="ListBox.ToolButton > ListBoxItem">
             <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>

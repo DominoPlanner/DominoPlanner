@@ -138,6 +138,7 @@
     <PackageReference Include="SkiaSharp" Version="4.148.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.9" />
     <PackageReference Include="ThemeEditor.Controls.ColorPicker" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.5" />
 
 
     <PackageReference Include="Dotnet.Bundle" Version="*" />
