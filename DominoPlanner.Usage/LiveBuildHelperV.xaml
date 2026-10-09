@@ -241,7 +241,7 @@
                             IsLightDismissEnabled="True"
                             IsOpen="{Binding PopupOpen}">
                             <Border
-                                Background="Transparent"
+                                Background="{DynamicResource ThemeBackgroundBrush}"
                                 BorderBrush="Gray"
                                 BorderThickness="1"
                                 CornerRadius="2">
