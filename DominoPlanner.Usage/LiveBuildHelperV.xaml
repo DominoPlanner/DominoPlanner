@@ -315,10 +315,10 @@
                             BorderThickness="1">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                     <!-- Use the configured block size (may be larger than the actual item count) so the last block keeps space for the full block -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
                                     <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
+                                    <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                 </MultiBinding>
                             </Border.Width>
                         </Border>
@@ -370,7 +370,7 @@
                                 <MultiBinding Converter="{StaticResource BlockConverter}">
                                     <!-- Use configured block size so subblocks reserve full block width -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
-                                    <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
+                                    <Binding ElementName="StoneBox" Path="Bounds.Width" />
                                     <Binding Path="BlockSize" />
                                     <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                 </MultiBinding>
@@ -407,10 +407,10 @@
                             BorderThickness="1">
                             <Border.Width>
                                 <MultiBinding Converter="{StaticResource StoneWidthConverter}">
-                                    <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                     <!-- Use configured block size so each stone keeps width reserved for full block -->
                                     <Binding ElementName="LiveBuildHelper" Path="DataContext.CurrentBlockSize" />
                                     <Binding Path="Bounds.Width" RelativeSource="{RelativeSource AncestorType=ListBox}" />
+                                    <Binding ElementName="LiveBuildHelper" Path="ActivePixelDensity" />
                                 </MultiBinding>
                             </Border.Width>
                         </Border>

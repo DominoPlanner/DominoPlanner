@@ -9,7 +9,6 @@ using Avalonia.Platform;
 using DominoPlanner.Core;
 using SkiaSharp;
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -22,6 +21,15 @@ namespace DominoPlanner.Usage
     using static Localizer;
     public static class ConverterHelper
     {
+        public static double GetPixelAlignedCellWidth(double width, int amount, double renderScaling)
+        {
+            if (width <= 0 || amount <= 0)
+                return 0;
+
+            double scale = renderScaling > 0 ? renderScaling : 1;
+            return Math.Floor(width / amount * scale) / scale;
+        }
+
         // Safe conversion helpers to avoid calling Convert.ToDouble on Avalonia.UnsetValueType
         public static double SafeToDouble(object value, double defaultValue = 0)
         {
@@ -681,33 +689,24 @@ namespace DominoPlanner.Usage
                     int colorAmount = ConverterHelper.SafeToInt(values[0], 1);
                     int amount = ConverterHelper.SafeToInt(values[1], 1);
                     double width = ConverterHelper.SafeToDouble(values[2], 0);
-                    double pixelDensity = ConverterHelper.SafeToDouble(values[3], 1.0);
-
-                    Debug.WriteLine($"BorderWidthConverter inputs: colorAmount={colorAmount}, amount={amount}, width={width}, pixelDensity={pixelDensity}");
-
+                    double renderScaling = ConverterHelper.SafeToDouble(values[3], 1);
                     if (amount <= 0 || width <= 0)
                     {
                         double fallback = Math.Max(20, colorAmount * 10);
-                        Debug.WriteLine($"BorderWidthConverter fallback (bad input) -> {fallback}");
                         return fallback;
                     }
 
-                    // Calculate using the logical (floating) width to avoid cumulative rounding errors
-                    double realStoneWidth = width / amount;
+                    double realStoneWidth = ConverterHelper.GetPixelAlignedCellWidth(width, amount, renderScaling);
                     double realBlockSize = realStoneWidth * colorAmount;
-                    // small device-pixel margin (rounded to device pixels)
-                    double margin = Math.Round(4 * pixelDensity);
-                    double adjusted = Math.Round(realBlockSize - margin);
+                    double adjusted = realBlockSize - 4;
                     if (adjusted < 1)
-                        adjusted = Math.Max(1, Math.Round(colorAmount * 4 * pixelDensity));
+                        adjusted = 1;
 
-                    Debug.WriteLine($"BorderWidthConverter result: {adjusted}");
                     return adjusted;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"BorderWidthConverter exception: {ex}");
             }
 
             return 40; // safer default to make blocks visible
@@ -723,30 +722,25 @@ namespace DominoPlanner.Usage
                 if (values.Count == 3)
                 {
                     // Defensive checks: Avalonia binding can pass UnsetValue (non-convertible) objects
-                    double pixelDensity = ConverterHelper.SafeToDouble(values[0], 1.0);
-                    int amount = ConverterHelper.SafeToInt(values[1], 1);
-                    double width = ConverterHelper.SafeToDouble(values[2], 0);
-
-                    Debug.WriteLine($"StoneWidthConverter inputs: pixelDensity={pixelDensity}, amount={amount}, width={width}");
+                    int amount = ConverterHelper.SafeToInt(values[0], 1);
+                    double width = ConverterHelper.SafeToDouble(values[1], 0);
+                    double renderScaling = ConverterHelper.SafeToDouble(values[2], 1);
 
                     if (amount <= 0 || width <= 0)
                     {
                         double fallback = 8;
-                        Debug.WriteLine($"StoneWidthConverter fallback -> {fallback}");
                         return fallback;
                     }
 
-                    double realStoneWidth = Math.Floor(width / amount);
-                    realStoneWidth -= Math.Floor(4 * pixelDensity);
+                    double realStoneWidth = ConverterHelper.GetPixelAlignedCellWidth(width, amount, renderScaling);
+                    realStoneWidth -= 4;
                     if (realStoneWidth < 1) realStoneWidth = 1;
 
-                    Debug.WriteLine($"StoneWidthConverter result: {realStoneWidth}");
                     return realStoneWidth;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"StoneWidthConverter exception: {ex}");
             }
 
             return 8;
@@ -764,30 +758,23 @@ namespace DominoPlanner.Usage
                     int amount = ConverterHelper.SafeToInt(values[0], 1);
                     double width = ConverterHelper.SafeToDouble(values[1], 0);
                     int blockSize = ConverterHelper.SafeToInt(values[2], 1);
-                    double pixelDensity = ConverterHelper.SafeToDouble(values[3], 1.0);
-
-                    Debug.WriteLine($"BlockConverter inputs: amount={amount}, width={width}, blockSize={blockSize}, pixelDensity={pixelDensity}");
-
-
+                    double renderScaling = ConverterHelper.SafeToDouble(values[3], 1);
                     if (amount <= 0 || width <= 0)
                     {
                         double fallback = Math.Max(20, blockSize * 10);
-                        Debug.WriteLine($"BlockConverter fallback -> {fallback}");
                         return fallback;
                     }
 
-                    double realStoneWidth = Math.Floor(width / amount);
+                    double realStoneWidth = ConverterHelper.GetPixelAlignedCellWidth(width, amount, renderScaling);
                     double realBlockSize = realStoneWidth * blockSize;
-                    realBlockSize -= Math.Floor(4 * pixelDensity);
+                    realBlockSize -= 4;
                     if (realBlockSize < 1) realBlockSize = 1;
 
-                    Debug.WriteLine($"BlockConverter result: {realBlockSize}");
                     return realBlockSize;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"BlockConverter exception: {ex}");
             }
 
             return 40;
