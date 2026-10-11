@@ -107,7 +107,7 @@ namespace DominoPlanner.Usage
 		/// <summary>
 		/// Öffnet einen modernen Datei-Speichern-Dialog.
 		/// </summary>
-		public async static Task<IStorageFile> ShowSaveFileDialogAsync<T>(string title, string suggestedName = null, string initialDirectory = null) where T : Window
+		public async static Task<IStorageFile> ShowSaveFileDialogAsync<T>(string title, string suggestedName = null, string initialDirectory = null, IReadOnlyList<FilePickerFileType> fileTypeChoices = null) where T : Window
 		{
 			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
 			{
@@ -117,7 +117,8 @@ namespace DominoPlanner.Usage
 					var options = new FilePickerSaveOptions
 					{
 						Title = title,
-						SuggestedFileName = suggestedName
+						SuggestedFileName = suggestedName,
+						FileTypeChoices = fileTypeChoices
 					};
 
 					if (!string.IsNullOrEmpty(initialDirectory) && Directory.Exists(initialDirectory))

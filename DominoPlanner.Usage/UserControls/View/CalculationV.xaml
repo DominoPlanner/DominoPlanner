@@ -149,14 +149,14 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Current Selected Color</TextBlock>
-                        <CheckBox IsChecked="{Binding IsColorUsed}"/>
+                    <CheckBox IsChecked="{Binding IsColorUsed}"/>
                         <TextBlock>Forcen:</TextBlock>
                         <CheckBox IsChecked="{Binding ShouldUseForceMode}"/>
                         <CheckBox IsChecked="{Binding ForcedValue}"/>
                     </StackPanel>
                     <local:ColorControl Grid.Row="2" SelectedColor="{Binding SelectedColor}"
                                         ColumnConfig="{Binding ColorColumnConfig}" 
-                                        Colors="{Binding DataContext.SortedColors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}}" >
+                                        Colors="{Binding Path=((vm:DominoProviderVM)DataContext).SortedColors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type view:BasicSettings}}}" >
                     </local:ColorControl>
                 </StackPanel>
             </HeaderedContentControl>
@@ -185,7 +185,7 @@
                             Background="Transparent"
                             BorderBrush="Transparent"
                             Command="{Binding OpenPopup}"
-                            DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=view:BasicSettings}, Path=DataContext}"
+                            DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type view:BasicSettings}}, Path=DataContext}"
                             ToolTip.Tip="{local:Gettext Show usage of colors}">
                             <StackPanel>
                                 <Image Source="{Binding Converter={StaticResource BoolToImageConverter}, Path=ColorRestrictionFulfilled}" />

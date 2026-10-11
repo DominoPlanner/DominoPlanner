@@ -14,7 +14,6 @@ using DominoPlanner.Usage.Serializer;
 using Avalonia.Media;
 using System.Diagnostics;
 using static DominoPlanner.Usage.Localizer;
-using MessageBox.Avalonia.Enums;
 using SixLabors.ImageSharp.Formats.Png;
 using SkiaSharp;
 
@@ -783,53 +782,40 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             return await ExportImage_PrepairPath(string.Empty);
         }
 
-        private async Task<string> ExportImage_PrepairPath(string checkPath)
-        {
-            Task<string> createPath = Task.Run(async () =>
-            {
-                string exportPath = checkPath;
-                if (string.IsNullOrEmpty(exportPath))
-                {
+		private async Task<string> ExportImage_PrepairPath(string checkPath)
+		{
+			Task<string> createPath = Task.Run(async () =>
+			{
+				string exportPath = checkPath;
+				if (string.IsNullOrEmpty(exportPath))
+				{
                     try
                     {
-                        var app = Avalonia.Application.Current;
-                        if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-                        {
-                            var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
-                            if (topLevel != null)
-                            {
-                                var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-                                {
-                                    Title = _("Export as PNG"),
-                                    DefaultExtension = "png",
-                                    SuggestedFileName = $"{Name}.png",
-                                    FileTypeChoices = new[]
-                                    {
-                                        new FilePickerFileType(_("PNG files")) { Patterns = new[] { "*.png" } }
-                                    }
-                                });
-
-                                if (files != null)
-                                {
-                                    exportPath = files.Path.LocalPath;
-                                }
-                            }
-                        }
+                        var saveFile = await DialogExtensions.ShowSaveFileDialogAsync<MainWindow>(
+                            _("PNG files"),
+                            $"{Name}.png",
+                            this.GetInitialDirectory(),
+                            new[] { new FilePickerFileType(_("PNG files")) { Patterns = new[] { "*.png" } } });
+                        exportPath = saveFile?.Path.LocalPath;
                     }
                     catch (Exception) { }
-                }
+				}
 
-            if (!string.IsNullOrWhiteSpace(exportPath))
-            {
-                if (File.Exists(exportPath))
-                {
-                    File.Delete(exportPath);
-                }
-            }
-            return exportPath;
-        }
+				if (!string.IsNullOrWhiteSpace(exportPath))
+				{
+					if (File.Exists(exportPath))
+					{
+						File.Delete(exportPath);
+					}
+				}
+				return exportPath;
+			});
 
-        public async void ExportFloorPlan()
+			await createPath;
+			return createPath.Result;
+		}
+
+		public async void ExportFloorPlan()
         {
             string exportPath = await ExportImage_PrepairPath();
 
