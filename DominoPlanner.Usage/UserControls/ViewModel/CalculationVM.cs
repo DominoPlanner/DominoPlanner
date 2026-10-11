@@ -94,7 +94,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                 {
                     _SelectedColor = value;
                     RaisePropertyChanged();
-                    RaisePropertyChanged("IsColorUsed");
 
                     if(SelectedColor != null)
                     {
@@ -106,20 +105,21 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
                         if(ColorFilters == null)
                         {
-                            IsColorUsed = true;
+                            _IsColorUsed = true;
                         }
                         else
                         {
                             if (ColorFilters.OfType<ChangeCountColorFilter>().Any(x => x.Index == CalcIndex(SelectedColor.DominoColor as DominoColor)))
                             {
-                                IsColorUsed = false;
+                                _IsColorUsed = false;
                             }
                             else
                             {
-                                IsColorUsed = true;
+                                _IsColorUsed = true;
                             }
                         }
                     }
+                    RaisePropertyChanged(nameof(IsColorUsed));
                 }
             }
         }

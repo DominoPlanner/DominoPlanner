@@ -246,13 +246,8 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             }
         }
         public ObservableCollection<ColorListEntry> UsedColors { get; set; }
-        public ObservableCollection<ColorListEntry> SortedColors
-        {
-            get
-            {
-                return new ObservableCollection<ColorListEntry>(UsedColors.OrderBy(x => x.SortIndex));
-            }
-        }
+        private readonly ObservableCollection<ColorListEntry> _sortedColors = new();
+        public ObservableCollection<ColorListEntry> SortedColors => _sortedColors;
 
         private bool _ColorRestrictionFulfilled;
 
@@ -382,6 +377,9 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
             {
                 UsedColors.Add(new ColorListEntry() { DominoColor = CurrentProject.colors.RepresentionForCalculation.OfType<EmptyDomino>().First(), SortIndex = -1 });
             }
+
+            foreach (ColorListEntry color in UsedColors.OrderBy(x => x.SortIndex))
+                _sortedColors.Add(color);
         }
         protected void RefreshColorAmount()
         {
@@ -404,7 +402,6 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
                     UsedColors[i].ProjectCount.Add(CurrentProject.Counts[0]);
                 }
             }
-            TabPropertyChanged(nameof(SortedColors), false);
             ColorRestrictionFulfilled = fulfilled;
         }
         protected void OpenBuildTools()
