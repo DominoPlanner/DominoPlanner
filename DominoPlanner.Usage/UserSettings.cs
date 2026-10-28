@@ -136,6 +136,21 @@ namespace DominoPlanner.Usage
                 }
             }
         }
+
+        private bool _UseImperialUnits;
+        [SettingsAttribute("UserSettings", false)]
+        public bool UseImperialUnits
+        {
+            get { return _UseImperialUnits; }
+            set
+            {
+                if (_UseImperialUnits != value)
+                {
+                    _UseImperialUnits = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
         #endregion
     }
 }

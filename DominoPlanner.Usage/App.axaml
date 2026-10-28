@@ -13,6 +13,11 @@
             </ResourceDictionary.MergedDictionaries>
 
             <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+            <local:LengthUnitConverter x:Key="LengthUnitConverter" />
+            <local:LengthTextConverter x:Key="LengthTextConverter" />
+            <local:LengthStepConverter x:Key="LengthStepConverter" />
+            <local:LengthLimitConverter x:Key="LengthLimitConverter" />
+            <local:LengthUnitLabelConverter x:Key="LengthUnitLabelConverter" />
             <!-- Minimal theme resources to allow XAML compilation without external theme packages -->
             <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF0F0F0" />
@@ -100,6 +105,9 @@
     <Setter Property="FormatString" Value="0" />
     <Setter Property="ParsingNumberStyle" Value="Integer" />
 </Style>
+        <Style Selector="NumericUpDown.LengthInput /template/ TextBox#PART_TextBox">
+            <Setter Property="local:RefreshLengthInputOnLeave.Enabled" Value="True" />
+        </Style>
         <!-- styling tool buttons-->
         <Style Selector="ListBox.ToolButton > ListBoxItem">
             <Setter Property="Background" Value="{DynamicResource ThemeControlMidBrush}"/>

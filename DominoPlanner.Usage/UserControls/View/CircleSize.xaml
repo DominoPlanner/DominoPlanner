@@ -21,9 +21,10 @@
                 <HeaderedContentControl.Header>
                     <TextBlock>
                         <TextBlock.Text>
-                            <MultiBinding StringFormat="{local:Gettext 'Circle Dimensions: {0}mm x {1}mm'}">
+                            <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Circle Dimensions: {0}mm x {1}mm">
                                 <Binding Path="PhysicalLength" />
                                 <Binding Path="PhysicalHeight" />
+                                <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -59,8 +60,20 @@
                         Margin="2"
                         VerticalAlignment="Top"
                         LastChildFill="True">
-                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Inner Diameter:}" />
-                        <NumericUpDown Minimum="{Binding MinInnerDiameter}" Value="{Binding InnerDiameter}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Inner Diameter:'}" />
+                        <local:LengthNumericUpDown
+                            FormatString="0.##"
+                            ParsingNumberStyle="Float"
+                            Classes="LengthInput"
+                            Millimeters="{Binding InnerDiameter, Mode=TwoWay}"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                            <NumericUpDown.Minimum>
+                                <MultiBinding Converter="{StaticResource LengthUnitConverter}" Mode="OneWay">
+                                    <Binding Path="MinInnerDiameter" />
+                                    <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
+                                </MultiBinding>
+                            </NumericUpDown.Minimum>
+                        </local:LengthNumericUpDown>
                     </DockPanel>
                     <CheckBox Content="Try create perfect inner circles" IsChecked="{Binding TryUsePerfectInnerCircle}" />
                     <DockPanel Margin="2">
@@ -84,7 +97,10 @@
                     </DockPanel>
                 </StackPanel>
             </HeaderedContentControl>
-            <HeaderedContentControl Header="{local:Gettext Domino dimensions}">
+            <HeaderedContentControl>
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Domino dimensions'}" />
+                </HeaderedContentControl.Header>
                 <view:DominoDimensionsV
                     NormalDistance="{Binding NormalDistance}"
                     NormalDistanceText="{local:Gettext Between\\nCircles}"

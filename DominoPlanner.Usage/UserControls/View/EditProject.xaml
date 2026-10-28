@@ -276,8 +276,14 @@
 
                 <TextBlock
                     Margin="0,0"
-                    VerticalAlignment="Center"
-                    Text="{Binding Length, StringFormat={parent:Gettext 'Current Length: {0:F2} mm'}}" />
+                    VerticalAlignment="Center">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Current Length: {0:F2} mm">
+                            <Binding Path="Length" />
+                            <Binding Source="{x:Static parent:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
                 <CheckBox
                     Margin="10,0,0,-1"
                     VerticalAlignment="Center"
@@ -298,7 +304,7 @@
                 <Button
                     Margin="1,0"
                     Command="{Binding Zoom1To1}"
-                    ToolTip.Tip="{parent:Gettext '1px on screen = 1mm in real world'}">
+                    ToolTip.Tip="{Binding Source={x:Static parent:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthTextConverter}, ConverterParameter='1px on screen = 1mm in real world'}">
                     1:1
                 </Button>
                 <Button
@@ -642,9 +648,10 @@
                     IsEnabled="False"
                     TextWrapping="Wrap">
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{parent:Gettext 'Dimensions: {0} mm x {1} mm'}">
+                        <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Dimensions: {0} mm x {1} mm">
                             <Binding Path="PhysicalLength" />
                             <Binding Path="PhysicalHeight" />
+                            <Binding Source="{x:Static parent:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

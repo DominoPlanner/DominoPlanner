@@ -16,9 +16,10 @@
             <HeaderedContentControl.Header>
                 <TextBlock>
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{local:Gettext 'Structure Dimensions: {0}mm x {1}mm'}">
+                        <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Structure Dimensions: {0}mm x {1}mm">
                             <Binding Path="PhysicalLength" />
                             <Binding Path="PhysicalHeight" />
+                            <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

@@ -20,9 +20,10 @@
                 <HeaderedContentControl.Header>
                     <TextBlock>
                         <TextBlock.Text>
-                            <MultiBinding StringFormat="{local:Gettext 'Spiral Dimensions: {0}mm x {1}mm'}">
+                            <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Spiral Dimensions: {0}mm x {1}mm">
                                 <Binding Path="PhysicalLength" />
                                 <Binding Path="PhysicalHeight" />
+                                <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -72,8 +73,15 @@
                             Minimum="-50"
                             Value="{Binding Shift}" />
 
-                        <TextBlock VerticalAlignment="Center" Text="{local:Gettext Distance btw. arms:}" />
-                        <NumericUpDown Minimum="0" Value="{Binding DistanceBetweenArms}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Distance btw. arms:'}" />
+                        <local:LengthNumericUpDown
+                            FormatString="0.##"
+                            Minimum="0"
+                            ParsingNumberStyle="Float"
+                            Classes="LengthInput"
+                            Millimeters="{Binding DistanceBetweenArms, Mode=TwoWay}"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                        </local:LengthNumericUpDown>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock Margin="0,0,5,0" Text="{local:Gettext Spiral arm end type|End mode:}" />
@@ -89,7 +97,10 @@
                     </DockPanel>
                 </StackPanel>
             </HeaderedContentControl>
-            <HeaderedContentControl Header="{local:Gettext Domino dimensions}">
+            <HeaderedContentControl>
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Domino dimensions'}" />
+                </HeaderedContentControl.Header>
                 <view:DominoDimensionsV
                     NormalDistance="{Binding NormalDistance}"
                     NormalDistanceText="{local:Gettext Btw. Lines\\ninside arm}"

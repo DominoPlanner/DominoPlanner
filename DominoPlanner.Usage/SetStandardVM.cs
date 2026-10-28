@@ -63,6 +63,19 @@ namespace DominoPlanner.Usage
 
         public List<CultureInfo> Languages { get; set; }
 
+        public bool UseImperialUnits
+        {
+            get { return UserSettings.Instance.UseImperialUnits; }
+            set
+            {
+                if (UserSettings.Instance.UseImperialUnits != value)
+                {
+                    UserSettings.Instance.UseImperialUnits = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
         private CultureInfo culture;
 
         public CultureInfo CurrentLanguage

@@ -32,6 +32,11 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
         </HeaderedContentControl>
+        <HeaderedContentControl DockPanel.Dock="Top" Header="{local:Gettext Units|Units}">
+            <CheckBox
+                Content="{local:Gettext Display measurements in inches|Display measurements in inches}"
+                IsChecked="{Binding UseImperialUnits}" />
+        </HeaderedContentControl>
         <HeaderedContentControl DockPanel.Dock="Top">
             <StackPanel>
                 <Label Content="{local:Gettext Select a standard folder to store your projects in:}" DockPanel.Dock="Top" />

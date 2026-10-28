@@ -29,54 +29,86 @@
                 Grid.Column="0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Text="{local:Gettext Width:}" />
-            <NumericUpDown
+                Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Width:'}" />
+            <local:LengthNumericUpDown
                 Grid.Row="0"
                 Grid.Column="1"
                 Width="70"
                 Minimum="0"
-                Value="{Binding TangentialWidth}" />
+                FormatString="0.##"
+                ParsingNumberStyle="Float"
+                Classes="LengthInput"
+                Millimeters="{Binding TangentialWidth, Mode=TwoWay}"
+                Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+            </local:LengthNumericUpDown>
             <TextBlock
                 Grid.Row="0"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Text="{local:Gettext Length:}" />
-            <NumericUpDown
+                Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Length:'}" />
+            <local:LengthNumericUpDown
                 Grid.Row="0"
                 Grid.Column="3"
                 Width="70"
                 Minimum="0"
-                Value="{Binding NormalWidth}" />
+                FormatString="0.##"
+                ParsingNumberStyle="Float"
+                Classes="LengthInput"
+                Millimeters="{Binding NormalWidth, Mode=TwoWay}"
+                Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+            </local:LengthNumericUpDown>
             <TextBlock
                 Grid.Row="1"
                 VerticalAlignment="Center"
-                Text="{local:Gettext Distances:}" />
+                Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Distances:'}" />
             <TextBlock
                 Grid.Row="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Text="{Binding TangentialDistanceText}"
-                TextAlignment="Center" />
-            <NumericUpDown
+                TextAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource LengthUnitLabelConverter}" Mode="OneWay">
+                        <Binding Path="TangentialDistanceText" />
+                        <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <local:LengthNumericUpDown
                 Grid.Row="2"
                 Grid.Column="1"
                 Width="70"
                 Minimum="0"
-                Value="{Binding TangentialDistance}" />
+                FormatString="0.##"
+                ParsingNumberStyle="Float"
+                Classes="LengthInput"
+                Millimeters="{Binding TangentialDistance, Mode=TwoWay}"
+                Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+            </local:LengthNumericUpDown>
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Text="{Binding NormalDistanceText}"
-                TextAlignment="Center" />
-            <NumericUpDown
+                TextAlignment="Center">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource LengthUnitLabelConverter}" Mode="OneWay">
+                        <Binding Path="NormalDistanceText" />
+                        <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <local:LengthNumericUpDown
                 Grid.Row="2"
                 Grid.Column="3"
                 Width="70"
                 Minimum="0"
-                Value="{Binding NormalDistance}" />
+                FormatString="0.##"
+                ParsingNumberStyle="Float"
+                Classes="LengthInput"
+                Millimeters="{Binding NormalDistance, Mode=TwoWay}"
+                Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+            </local:LengthNumericUpDown>
         </Grid>
     </Grid>
 </UserControl>

@@ -21,9 +21,10 @@
                 <HeaderedContentControl.Header>
                     <TextBlock>
                         <TextBlock.Text>
-                            <MultiBinding StringFormat="{local:Gettext 'Field Dimensions: {0}mm x {1}mm'}">
+                            <MultiBinding Converter="{StaticResource LengthTextConverter}" ConverterParameter="Field Dimensions: {0}mm x {1}mm">
                                 <Binding Path="PhysicalLength" />
                                 <Binding Path="PhysicalHeight" />
+                                <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -119,8 +120,10 @@
             <HeaderedContentControl
                 Grid.Row="1"
                 Margin="0,5,0,0"
-                DockPanel.Dock="Bottom"
-                Header="{local:Gettext Domino dimensions}">
+                DockPanel.Dock="Bottom">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthUnitLabelConverter}, ConverterParameter='Domino dimensions'}" />
+                </HeaderedContentControl.Header>
                 <DockPanel DockPanel.Dock="Top">
                     <DockPanel
                         Margin="0,5,0,0"
@@ -133,7 +136,20 @@
                         <ComboBox
                             Margin="5,0,5,0"
                             ItemsSource="{Binding Field_templates}"
-                            SelectedItem="{Binding SelectedItem}" />
+                            SelectedItem="{Binding SelectedItem}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:CompileBindings="False">
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource LengthTextConverter}" Mode="OneWay">
+                                                <Binding Path="Name" />
+                                                <Binding Source="{x:Static local:UserSettings.Instance}" Path="UseImperialUnits" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </DockPanel>
 
                     <Grid
@@ -148,27 +164,35 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Text="{local:Gettext Distance\\ninside line:}" />
-                        <NumericUpDown
+                        <local:LengthNumericUpDown
                             Grid.Row="2"
                             Grid.Column="1"
                             Margin="5,0,0,0"
-                            Increment="1"
+                            FormatString="0.##"
                             IsEnabled="{Binding CanChange}"
                             Minimum="0"
-                            Value="{Binding HorizontalDistance}" />
+                            Classes="LengthInput"
+                            Millimeters="{Binding HorizontalDistance, Mode=TwoWay}"
+                            ParsingNumberStyle="Float"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                        </local:LengthNumericUpDown>
                         <TextBlock
                             Grid.Row="0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Text="{local:Gettext Domino\\nwidth:}" />
-                        <NumericUpDown
+                        <local:LengthNumericUpDown
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="5,0,0,0"
-                            Increment="1"
+                            FormatString="0.##"
                             IsEnabled="{Binding CanChange}"
-                            Minimum="1"
-                            Value="{Binding HorizontalSize}" />
+                            Minimum="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthLimitConverter}, ConverterParameter=1}"
+                            Classes="LengthInput"
+                            Millimeters="{Binding HorizontalSize, Mode=TwoWay}"
+                            ParsingNumberStyle="Float"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                        </local:LengthNumericUpDown>
                         <TextBlock
                             Grid.Row="0"
                             Grid.Column="2"
@@ -176,14 +200,18 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Text="{local:Gettext Domino\\ndepth:}" />
-                        <NumericUpDown
+                        <local:LengthNumericUpDown
                             Grid.Row="0"
                             Grid.Column="3"
                             Margin="5,0,0,0"
-                            Increment="1"
                             IsEnabled="{Binding CanChange}"
-                            Minimum="1"
-                            Value="{Binding VerticalSize}" />
+                            FormatString="0.##"
+                            Minimum="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthLimitConverter}, ConverterParameter=1}"
+                            ParsingNumberStyle="Float"
+                            Classes="LengthInput"
+                            Millimeters="{Binding VerticalSize, Mode=TwoWay}"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                        </local:LengthNumericUpDown>
                         <TextBlock
                             Grid.Row="2"
                             Grid.Column="2"
@@ -191,14 +219,18 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Text="{local:Gettext 'Distance\\nbtw. lines:'}" />
-                        <NumericUpDown
+                        <local:LengthNumericUpDown
                             Grid.Row="2"
                             Grid.Column="3"
                             Margin="5,0,0,0"
-                            Increment="1"
+                            FormatString="0.##"
                             IsEnabled="{Binding CanChange}"
                             Minimum="0"
-                            Value="{Binding VerticalDistance}" />
+                            Classes="LengthInput"
+                            Millimeters="{Binding VerticalDistance, Mode=TwoWay}"
+                            ParsingNumberStyle="Float"
+                            Increment="{Binding Source={x:Static local:UserSettings.Instance}, Path=UseImperialUnits, Converter={StaticResource LengthStepConverter}}">
+                        </local:LengthNumericUpDown>
                     </Grid>
                 </DockPanel>
             </HeaderedContentControl>

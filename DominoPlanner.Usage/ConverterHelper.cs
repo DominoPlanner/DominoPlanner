@@ -3,15 +3,19 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using DominoPlanner.Core;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using ThemeEditor.Controls.ColorPicker;
@@ -61,6 +65,280 @@ namespace DominoPlanner.Usage
             return defaultValue;
         }
     }
+
+    public class LengthUnitConverter : IMultiValueConverter
+    {
+        private const double MillimetersPerInch = 25.4;
+
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Count < 2 || values[1] is not bool useImperialUnits || values[0] == null)
+                return BindingOperations.DoNothing;
+
+            double millimeters = ConverterHelper.SafeToDouble(values[0], double.NaN);
+            if (double.IsNaN(millimeters) || double.IsInfinity(millimeters))
+                return BindingOperations.DoNothing;
+
+            double displayValue = useImperialUnits ? millimeters / MillimetersPerInch : millimeters;
+            return (decimal)displayValue;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            if (targetTypes == null || targetTypes.Length < 2 || value == null)
+                return new object[] { BindingOperations.DoNothing, BindingOperations.DoNothing };
+
+            bool useImperialUnits = UserSettings.Instance.UseImperialUnits;
+            double displayValue = ConverterHelper.SafeToDouble(value, double.NaN);
+            if (double.IsNaN(displayValue) || double.IsInfinity(displayValue))
+                return new object[] { BindingOperations.DoNothing, BindingOperations.DoNothing };
+
+            double millimeters = useImperialUnits ? displayValue * MillimetersPerInch : displayValue;
+            Type sourceType = Nullable.GetUnderlyingType(targetTypes[0]) ?? targetTypes[0];
+            object sourceValue;
+
+            try
+            {
+                if (sourceType == typeof(int))
+                    sourceValue = (int)Math.Round(millimeters, MidpointRounding.AwayFromZero);
+                else if (sourceType == typeof(long))
+                    sourceValue = (long)Math.Round(millimeters, MidpointRounding.AwayFromZero);
+                else if (sourceType == typeof(float))
+                    sourceValue = (float)millimeters;
+                else if (sourceType == typeof(double))
+                    sourceValue = millimeters;
+                else if (sourceType == typeof(decimal))
+                    sourceValue = (decimal)millimeters;
+                else
+                    sourceValue = System.Convert.ChangeType(millimeters, sourceType, culture);
+            }
+            catch
+            {
+                return new object[] { BindingOperations.DoNothing, BindingOperations.DoNothing };
+            }
+
+            return new object[] { sourceValue, BindingOperations.DoNothing };
+        }
+    }
+
+    public class RefreshLengthInputOnLeave : AvaloniaObject
+    {
+        static RefreshLengthInputOnLeave()
+        {
+            EnabledProperty.Changed.AddClassHandler<TextBox>(OnEnabledChanged);
+        }
+
+        public static readonly StyledProperty<bool> EnabledProperty =
+            AvaloniaProperty.RegisterAttached<TextBox, RefreshLengthInputOnLeave, bool>("Enabled", false);
+
+        public static bool GetEnabled(AvaloniaObject obj)
+        {
+            return (bool)obj.GetValue(EnabledProperty);
+        }
+
+        public static void SetEnabled(AvaloniaObject obj, bool value)
+        {
+            obj.SetValue(EnabledProperty, value);
+        }
+
+        private static void OnEnabledChanged(TextBox control, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (Equals(e.NewValue, e.OldValue) || e.NewValue is not bool enabled)
+                return;
+
+            if (enabled)
+            {
+                control.AddHandler(Control.LostFocusEvent, OnLostFocus);
+                control.AddHandler(Control.KeyUpEvent, OnKeyUp);
+            }
+            else
+            {
+                control.RemoveHandler(Control.LostFocusEvent, OnLostFocus);
+                control.RemoveHandler(Control.KeyUpEvent, OnKeyUp);
+            }
+        }
+
+        private static void OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox control)
+                CommitAndRefresh(control);
+        }
+
+        private static void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && sender is TextBox control)
+                CommitAndRefresh(control);
+        }
+
+        private static void CommitAndRefresh(TextBox editor)
+        {
+            if (editor.TemplatedParent is not NumericUpDown control)
+                return;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (control is LengthNumericUpDown lengthInput)
+                {
+                    lengthInput.RefreshDisplayedValue();
+                    return;
+                }
+
+                var binding = BindingOperations.GetBindingExpressionBase(control, NumericUpDown.ValueProperty);
+                if (binding == null)
+                    return;
+
+                binding.UpdateSource();
+                binding.UpdateTarget();
+            }, DispatcherPriority.Background);
+        }
+    }
+
+    public class LengthTextConverter : IMultiValueConverter, IValueConverter
+    {
+        private const double MillimetersPerInch = 25.4;
+
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Count == 0)
+                return string.Empty;
+
+            if (values.Count == 2 && values[0] is string name && values[1] is bool useImperialUnits)
+            {
+                if (!useImperialUnits)
+                    return name;
+
+                string trimmedName = name.Trim();
+                if (trimmedName.EndsWith("mm", StringComparison.OrdinalIgnoreCase) &&
+                    double.TryParse(trimmedName[..^2].Trim(), NumberStyles.Number, culture, out double millimeters))
+                {
+                    return $"{millimeters / MillimetersPerInch:0.##} in";
+                }
+
+                return name;
+            }
+
+            if (values.Count == 1 && values[0] is bool imperialSetting && parameter is string description)
+                return FormatScaleDescription(imperialSetting, description);
+
+            if (parameter is not string format || values[values.Count - 1] is not bool useImperial)
+                return string.Empty;
+
+            string localizedFormat = _(format);
+            if (useImperial)
+                localizedFormat = localizedFormat.Replace("mm", "in", StringComparison.OrdinalIgnoreCase);
+
+            object[] formattedValues = new object[values.Count - 1];
+            for (int i = 0; i < formattedValues.Length; i++)
+            {
+                double millimeters = ConverterHelper.SafeToDouble(values[i], double.NaN);
+                if (double.IsNaN(millimeters) || double.IsInfinity(millimeters))
+                    return string.Empty;
+
+                formattedValues[i] = useImperial
+                    ? Math.Round(millimeters / MillimetersPerInch, 2)
+                    : values[i];
+            }
+
+            try
+            {
+                return string.Format(culture ?? CultureInfo.CurrentCulture, localizedFormat, formattedValues);
+            }
+            catch (FormatException)
+            {
+                return string.Empty;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return targetTypes == null
+                ? Array.Empty<object>()
+                : targetTypes.Select(_ => BindingOperations.DoNothing).ToArray();
+        }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is bool imperialSetting && parameter is string description
+                ? FormatScaleDescription(imperialSetting, description)
+                : string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return BindingOperations.DoNothing;
+        }
+
+        private static string FormatScaleDescription(bool useImperialUnits, string description)
+        {
+            string localizedDescription = _(description);
+            return useImperialUnits
+                ? localizedDescription.Replace("1mm", "0.04in", StringComparison.OrdinalIgnoreCase)
+                : localizedDescription;
+        }
+    }
+
+    public class LengthStepConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is bool useImperialUnits && useImperialUnits ? 0.04m : 1m;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return BindingOperations.DoNothing;
+        }
+    }
+
+    public class LengthLimitConverter : IValueConverter
+    {
+        private const double MillimetersPerInch = 25.4;
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double millimeters = ConverterHelper.SafeToDouble(parameter, 0);
+            return (decimal)(value is bool useImperialUnits && useImperialUnits
+                ? millimeters / MillimetersPerInch
+                : millimeters);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return BindingOperations.DoNothing;
+        }
+    }
+
+    public class LengthUnitLabelConverter : IValueConverter, IMultiValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (parameter is not string label)
+                return string.Empty;
+
+            return $"{_(label)} ({(value is bool useImperialUnits && useImperialUnits ? "in" : "mm")})";
+        }
+
+        public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values == null || values.Count < 2 || values[0] is not string label || values[1] is not bool useImperialUnits)
+                return string.Empty;
+
+            return $"{label} ({(useImperialUnits ? "in" : "mm")})";
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return targetTypes == null
+                ? Array.Empty<object>()
+                : targetTypes.Select(_ => BindingOperations.DoNothing).ToArray();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return BindingOperations.DoNothing;
+        }
+    }
+
     public class AmountToColorConverter : IMultiValueConverter
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
