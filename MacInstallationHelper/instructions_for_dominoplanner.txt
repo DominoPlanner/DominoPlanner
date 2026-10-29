@@ -1,0 +1,46 @@
+================================================================================
+RUNNING DOMINOPLANNER ON MACOS (NON-DEVELOPER GUIDE)
+================================================================================
+
+Because DominoPlanner is a self-contained, independent application built without 
+a paid Apple Developer certificate, modern versions of macOS will block it by 
+default when you try to open it for the first time.
+
+This security feature is standard Apple behavior to prevent running unverified 
+code from the internet, but you can easily bypass it manually.
+
+
+--------------------------------------------------------------------------------
+1. WHY DOESN'T IT OPEN RIGHT AWAY?
+--------------------------------------------------------------------------------
+When you double-click an app that isn't signed by an officially registered 
+Apple Developer, macOS quarantines the app and prevents it from executing to 
+protect your system. You might see a warning saying that "the app cannot be 
+opened because the developer cannot be verified" or that "it is damaged."
+
+
+--------------------------------------------------------------------------------
+2. HOW TO RUN IT ANYWAY (STEP-BY-STEP)
+--------------------------------------------------------------------------------
+You only need to do this once on your Mac:
+
+  • Right-click (or hold the Control key and click) on "DominoPlanner.app".
+  • Select "Open" from the top of the context menu.
+  • A warning dialog will pop up stating that macOS cannot verify the 
+    developer. Click the "Open" button anyway.
+
+
+--------------------------------------------------------------------------------
+3. ALTERNATIVE METHOD (VIA SYSTEM SETTINGS)
+--------------------------------------------------------------------------------
+If the right-click method doesn't give you the option to open it:
+
+  1. Try to open the app normally once (it will be blocked).
+  2. Open "System Settings" -> "Privacy & Security".
+  3. Scroll down to the security section — you will see a message saying 
+     "DominoPlanner.app was blocked from use because it is not from an 
+     identified developer."
+  4. Click "Open Anyway" and confirm your Mac password.
+
+After doing this once, the app is fully trusted on your system and will open 
+normally with a standard double-click from then on!
