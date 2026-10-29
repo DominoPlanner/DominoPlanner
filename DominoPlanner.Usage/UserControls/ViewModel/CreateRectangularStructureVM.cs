@@ -152,26 +152,52 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         {
             var structures = new List<XElement>();
             var names = new List<string>();
-            try
-            {
-                string structurepath = Path.Combine(MainWindowViewModel.ShareDirectory, UserSettings.Instance.StructureTemplates);
-                if (!File.Exists(structurepath))
-                {
-                    Debug.WriteLine("Structure file not found");
-                }
-                StreamReader fr = new StreamReader(structurepath);
-                XElement xElement = XElement.Parse(fr.ReadToEnd());
-                structures = xElement.Elements().ToList();
+            string configuredPath = UserSettings.Instance.StructureTemplates;
+            string applicationDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var candidatePaths = new List<string>();
 
-                foreach (var structure in structures)
+            if (!string.IsNullOrWhiteSpace(configuredPath))
+            {
+                if (Path.IsPathRooted(configuredPath))
                 {
-                    names.Add(structure.FirstAttribute.Value);
+                    candidatePaths.Add(configuredPath);
+                }
+                else
+                {
+                    candidatePaths.Add(Path.Combine(MainWindowViewModel.ShareDirectory, configuredPath));
+                    candidatePaths.Add(Path.Combine(applicationDirectory, configuredPath.TrimStart('.', '/', '\\')));
                 }
             }
-            catch (Exception es)
+            candidatePaths.Add(Path.Combine(applicationDirectory, "Resources", "Structures.xml"));
+
+            foreach (string structurePath in candidatePaths.Distinct())
             {
-                System.Diagnostics.Debug.WriteLine(es);
+                if (!File.Exists(structurePath))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    XElement root = XElement.Load(structurePath);
+                    structures = root.Elements().ToList();
+                    names = structures.Select(structure => structure.FirstAttribute?.Value ?? string.Empty).ToList();
+                    if (structures.Count > 0)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception);
+                }
             }
+
+            if (structures.Count == 0)
+            {
+                Debug.WriteLine("No structure templates were found.");
+            }
+
             return new Tuple<List<XElement>, List<string>>(structures, names);
         }
         

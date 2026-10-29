@@ -173,16 +173,20 @@ namespace DominoPlanner.Usage
                     8, 8, 24, 8, 5000, new SKSamplingOptions(SKCubicResampler.Mitchell), new CieDe2000Comparison(), new Dithering(), new NoColorRestriction()), null)
                 { BindSize = true }
             });
-            ViewModels.Add(new DominoProviderObjectEntry()
+            var structureTypes = CreateRectangularStructureVM.StuctureTypes();
+            if (structureTypes.Item1.Count > 0)
             {
-                Name = GetParticularString("The domino structure type", "Structure"),
-                Description = _("Add a structure (e.g. Wall) based on an image"),
-                Icon = "/icons/insert_table.ico",
-                ImageInformation = CurrentImageInformation,
-                Provider = new CreateRectangularStructureVM(
-                    new StructureParameters(5, 5, Colors.Transparent, CreateRectangularStructureVM.StuctureTypes().Item1[0],
-                    2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
-            });
+                ViewModels.Add(new DominoProviderObjectEntry()
+                {
+                    Name = GetParticularString("The domino structure type", "Structure"),
+                    Description = _("Add a structure (e.g. Wall) based on an image"),
+                    Icon = "/icons/insert_table.ico",
+                    ImageInformation = CurrentImageInformation,
+                    Provider = new CreateRectangularStructureVM(
+                        new StructureParameters(5, 5, Colors.Transparent, structureTypes.Item1[0],
+                        2000, AbsoluteColorPath, new CieDe2000Comparison(), new Dithering(), AverageMode.Corner, new NoColorRestriction()), null)
+                });
+            }
             ViewModels.Add(new DominoProviderObjectEntry()
             {
                 Name = GetParticularString("The domino structure type", "Circle"),
