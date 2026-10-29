@@ -205,15 +205,16 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public void RefreshDescriptionImages()
         {
             SKSurface[,] previews = StructureParameters.getPreviews(47, SelectedStructureElement);
-            description_imgs = new AvaloniaList<IImage>();
+            var images = new AvaloniaList<IImage>();
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
                     var bit = previews[j, i].Snapshot();
-                    description_imgs.Add(Bitmap.DecodeToWidth(bit.Encode(SKEncodedImageFormat.Png, 100).AsStream(), bit.Width));
+                    images.Add(Bitmap.DecodeToWidth(bit.Encode(SKEncodedImageFormat.Png, 100).AsStream(), bit.Width));
                 }
             }
+            description_imgs = images;
         }
         #endregion
     }
