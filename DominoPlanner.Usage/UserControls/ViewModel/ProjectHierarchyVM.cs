@@ -767,6 +767,7 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
         public async void ExportImage(string exportPath, bool collapsed, bool drawBorders, Color background, int width = 0)
         {
             string finalExportPath = await ExportImage_PrepairPath(exportPath);
+            if (string.IsNullOrWhiteSpace(finalExportPath)) return;
 
 #if MasterplanExport
             DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateImage(background, width, true, true, 0, 0).Save(finalExportPath, 254f);
@@ -782,57 +783,49 @@ namespace DominoPlanner.Usage.UserControls.ViewModel
 
         private async Task<string> ExportImage_PrepairPath(string checkPath)
         {
-            Task<string> createPath = Task.Run(async () =>
+            string exportPath = checkPath;
+            if (string.IsNullOrEmpty(exportPath))
             {
-                string exportPath = checkPath;
-                if (string.IsNullOrEmpty(exportPath))
+                try
                 {
-                    try
+                    var app = Avalonia.Application.Current;
+                    if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
                     {
-                        var app = Avalonia.Application.Current;
-                        if (app?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                        var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
+                        if (topLevel != null)
                         {
-                            var topLevel = TopLevel.GetTopLevel(desktop.MainWindow);
-                            if (topLevel != null)
+                            var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                             {
-                                var files = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                                Title = _("Export as PNG"),
+                                DefaultExtension = "png",
+                                SuggestedFileName = $"{Name}.png",
+                                FileTypeChoices = new[]
                                 {
-                                    Title = _("Export as PNG"),
-                                    DefaultExtension = "png",
-                                    SuggestedFileName = $"{Name}.png",
-                                    FileTypeChoices = new[]
-                                    {
-                                        new FilePickerFileType(_("PNG files")) { Patterns = new[] { "*.png" } }
-                                    }
-                                });
-
-                                if (files != null)
-                                {
-                                    exportPath = files.Path.LocalPath;
+                                    new FilePickerFileType(_("PNG files")) { Patterns = new[] { "*.png" } }
                                 }
+                            });
+
+                            if (files != null)
+                            {
+                                exportPath = files.Path.LocalPath;
                             }
                         }
                     }
-                    catch (Exception) { }
                 }
+                catch (Exception) { }
+            }
 
-                if (!string.IsNullOrWhiteSpace(exportPath))
-                {
-                    if (File.Exists(exportPath))
-                    {
-                        File.Delete(exportPath);
-                    }
-                }
-                return exportPath;
-            });
-
-            await createPath;
-            return createPath.Result;
+            if (!string.IsNullOrWhiteSpace(exportPath) && File.Exists(exportPath))
+            {
+                File.Delete(exportPath);
+            }
+            return exportPath;
         }
 
         public async void ExportFloorPlan()
         {
             string exportPath = await ExportImage_PrepairPath();
+            if (string.IsNullOrWhiteSpace(exportPath)) return;
             DocumentModel.Obj.Generate(new System.Threading.CancellationToken()).GenerateFloorPlan().Save(exportPath, 300);
         }
 
