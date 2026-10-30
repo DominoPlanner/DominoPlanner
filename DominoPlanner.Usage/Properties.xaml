@@ -65,9 +65,9 @@
             </Border>
             <ScrollViewer Grid.Row="1">
                 <TreeView>
-                    <TreeView.Items>
+                    <TreeView.ItemsSource>
                         <Binding x:DataType="local:PropertiesVM" Path="Children" />
-                    </TreeView.Items>
+                    </TreeView.ItemsSource>
                     <TreeView.Styles>
                         <Style Selector="TreeViewItem" />
                         <Style Selector="TreeViewItem">
@@ -194,7 +194,7 @@
                                                                 </StackPanel>
                                                             </StackPanel>
                                                         </DataTemplate>
-                                                        <DataTemplate>
+                                                        <DataTemplate DataType="{x:Type System:Object}">
                                                             <TextBlock Margin="2" Text="{Binding ., Converter={StaticResource ObjectToStringConverter}}" />
                                                         </DataTemplate>
                                                     </ContentControl.DataTemplates>
@@ -205,6 +205,11 @@
                                             Name="PART_ItemsPresenter"
                                             IsVisible="{TemplateBinding IsExpanded}"
                                             ItemsSource="{Binding Children}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="local:PropertyEntryVM">
+                                                    <TreeViewItem />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel />
